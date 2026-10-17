@@ -1,0 +1,23 @@
+{
+  "events": [
+    {
+      "id": "event_caught_messenger",
+      "title": "Przechwycony Posłaniec",
+      "speaker_id": "char_bishop_anselm",
+      "text": "W ręce twojej straży wpadł kurier zmierzający do Rzymu z listem obciążającym biskupa stołecznego.",
+      "conditions": {"turn_min": 1, "suspicion_max": 85},
+      "choices": [
+        {
+          "id": "choice_extort_bishop",
+          "text": "Zaszantażuj biskupa i zażądaj dziesięciny",
+          "outcomes": {"gold": 75, "suspicion": 15, "church": -20}
+        },
+        {
+          "id": "choice_hand_over_to_king",
+          "text": "Oddaj dowody bezpośrednio monarsze",
+          "outcomes": {"gold": 0, "suspicion": -5, "church": -30, "king_favor": 25}
+        }
+      ]
+    }
+  ]
+}

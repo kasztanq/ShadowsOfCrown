@@ -1,0 +1,28 @@
+{
+  "characters": [
+    {
+      "id": "char_bishop_anselm",
+      "name": "Biskup Anselm",
+      "title": "Biskup Stołeczny",
+      "faction": "church",
+      "portrait_asset": "res://assets/portraits/bishop_anselm.png",
+      "disposition": 40,
+      "stats": {"influence": 75, "cunning": 60, "loyalty": 30},
+      "traits": ["chciwy", "pobożny", "hipokryta"],
+      "vulnerabilities": {"bribe_affinity": 0.8, "fear_affinity": 0.3, "blackmail_affinity": 0.9},
+      "known_secrets": ["secret_anselm_bastard"]
+    },
+    {
+      "id": "char_marshal_vane",
+      "name": "Lord Gerard Vane",
+      "title": "Wielki Marszałek",
+      "faction": "nobility",
+      "portrait_asset": "res://assets/portraits/marshal_vane.png",
+      "disposition": 25,
+      "stats": {"influence": 85, "cunning": 35, "loyalty": 80},
+      "traits": ["honorowy", "hazardzista", "porywczy"],
+      "vulnerabilities": {"bribe_affinity": 0.2, "fear_affinity": 0.1, "blackmail_affinity": 0.7},
+      "known_secrets": ["secret_marshal_debts"]
+    }
+  ]
+}
