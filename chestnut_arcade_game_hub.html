@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Chestnut Arcade Hub - Snake & Space Impact</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts for Retro Arcade & Clean UI -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --chestnut-dark: #1c1008;
+      --chestnut-shell: #6e3512;
+      --chestnut-glow: #d97706;
+      --burr-green: #65a30d;
+      --retro-cream: #fef3c7;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #120a06;
+      background-image: 
+        radial-gradient(circle at 20% 20%, rgba(217, 119, 6, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(101, 163, 13, 0.1) 0%, transparent 50%);
+      color: #fef3c7;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .font-arcade {
+      font-family: 'Press Start 2P', monospace;
+    }
+
+    /* Retro CRT Scanline Effect Overlay */
+    .crt-overlay {
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.22) 50%
+      );
+      background-size: 100% 4px;
+      pointer-events: none;
+    }
+
+    /* Arcade Button Styling */
+    .arcade-btn {
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 0 #451a03, 0 6px 15px rgba(0,0,0,0.5);
+    }
+    .arcade-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #451a03, 0 10px 20px rgba(217, 119, 6, 0.3);
+    }
+    .arcade-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #451a03, 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    .arcade-btn-green {
+      box-shadow: 0 4px 0 #365314, 0 6px 15px rgba(0,0,0,0.5);
+    }
+    .arcade-btn-green:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #365314, 0 10px 20px rgba(101, 163, 13, 0.35);
+    }
+    .arcade-btn-green:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #365314;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 10;
+      max-height: 70vh;
+      image-rendering: pixelated;
+    }
+
+    /* Custom Scrollbar for Code Guide */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1c1008;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #78350f;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #d97706;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+  <!-- TOP NAVIGATION / ARCADE HEADER -->
+  <header class="w-full bg-amber-950/80 border-b-2 border-amber-700/60 backdrop-blur-md sticky top-0 z-30 px-4 py-3">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand Title -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="returnToMenu()">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-amber-900 border-2 border-amber-400 flex items-center justify-center shadow-lg">
+          <span class="text-xl">🌰</span>
+        </div>
+        <div>
+          <h1 class="font-arcade text-sm sm:text-base md:text-lg text-amber-300 tracking-wider drop-shadow">
+            CHESTNUT ARCADE
+          </h1>
+          <p class="text-xs text-amber-200/70 hidden sm:block">Retro Autumn Dual-Game Cabinet</p>
+        </div>
+      </div>
+
+      <!-- Top Action Controls -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Back to Menu button (shown when inside a game) -->
+        <button id="headerMenuBtn" onclick="returnToMenu()" class="hidden arcade-btn bg-amber-700 hover:bg-amber-600 text-amber-100 text-xs sm:text-sm font-bold px-3 py-2 rounded-lg border border-amber-400/50 flex items-center gap-2">
+          <i class="fa-solid fa-house"></i>
+          <span>MAIN MENU</span>
+        </button>
+
+        <!-- Step-by-Step Code & Architecture Toggle -->
+        <button id="codeToggleBtn" onclick="toggleCodeGuide()" class="arcade-btn bg-stone-800 hover:bg-stone-700 text-amber-300 text-xs sm:text-sm font-bold px-3 py-2 rounded-lg border border-amber-600/50 flex items-center gap-2">
+          <i class="fa-solid fa-code"></i>
+          <span id="codeToggleText">STEP-BY-STEP GUIDE</span>
+        </button>
+
+        <!-- Sound Mute / Unmute Toggle -->
+        <button id="soundToggleBtn" onclick="toggleMute()" class="arcade-btn bg-amber-900/90 hover:bg-amber-800 text-amber-200 w-10 h-10 rounded-lg border border-amber-600/50 flex items-center justify-center" title="Toggle Retro Synth Audio">
+          <i id="soundIcon" class="fa-solid fa-volume-high"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="flex-grow flex flex-col items-center justify-center p-3 sm:p-6 relative max-w-6xl w-full mx-auto">
+
+    <!-- ==========================================
+         VIEW 1: INTERACTIVE MAIN MENU
+         ========================================== -->
+    <section id="mainMenuView" class="w-full max-w-4xl transition-all duration-300">
+      <!-- Hero Banner -->
+      <div class="text-center mb-6 sm:mb-8">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-900/60 border border-amber-500/40 text-amber-300 text-xs font-semibold mb-3">
+          <i class="fa-solid fa-gamepad"></i> INSERT COIN // SELECT YOUR GAME
+        </div>
+        <h2 class="font-arcade text-xl sm:text-3xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-lime-400 drop-shadow-sm mb-2">
+          CHOOSE YOUR CARTRIDGE
+        </h2>
+        <p class="text-amber-100/80 text-sm sm:text-base max-w-xl mx-auto">
+          Two full HTML5 Canvas games powered by custom chestnut vector graphics, particle physics, and Web Audio synthesizer effects.
+        </p>
+      </div>
+
+      <!-- 2-Game Cartridge Selection Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        
+        <!-- CARD 1: CHESTNUT SNAKE -->
+        <div class="group relative bg-gradient-to-b from-amber-950/90 to-stone-950 border-2 border-lime-600/60 hover:border-lime-400 rounded-2xl p-5 sm:p-6 flex flex-col justify-between shadow-2xl transition-all duration-200 hover:-translate-y-1">
+          <div>
+            <!-- Cartridge Header & High Score Badge -->
+            <div class="flex justify-between items-start gap-2 mb-4">
+              <span class="px-3 py-1 rounded-md bg-lime-950 border border-lime-600 text-lime-300 font-arcade text-[10px]">
+                CARTRIDGE #01
+              </span>
+              <div class="text-right">
+                <span class="text-[11px] uppercase tracking-wider text-amber-300/70 block">High Score</span>
+                <span id="menuSnakeHigh" class="font-arcade text-sm text-lime-400">0000</span>
+              </div>
+            </div>
+
+            <!-- Custom Preview Graphic -->
+            <div class="w-full h-36 rounded-xl bg-stone-900/90 border border-lime-800/60 mb-4 flex items-center justify-center relative overflow-hidden">
+              <!-- Decorative Grid -->
+              <div class="absolute inset-0 opacity-20" style="background-image: linear-gradient(#65a30d 1px, transparent 1px), linear-gradient(90deg, #65a30d 1px, transparent 1px); background-size: 20px 20px;"></div>
+              <!-- Snake & Chestnut SVG Illustration -->
+              <svg class="w-48 h-28 relative z-10" viewBox="0 0 200 100">
+                <!-- Snake Body Segments -->
+                <rect x="20" y="45" width="18" height="18" rx="5" fill="#4d7c0f" />
+                <rect x="40" y="45" width="18" height="18" rx="5" fill="#65a30d" />
+                <rect x="60" y="45" width="18" height="18" rx="5" fill="#84cc16" />
+                <rect x="60" y="25" width="18" height="18" rx="5" fill="#84cc16" />
+                <!-- Snake Head -->
+                <rect x="80" y="25" width="20" height="20" rx="6" fill="#a3e635" />
+                <circle cx="94" cy="30" r="2.5" fill="#1c1917" />
+                <circle cx="94" cy="40" r="2.5" fill="#1c1917" />
+                <path d="M100 35 L108 32 M100 35 L108 38" stroke="#ef4444" stroke-width="2" />
+                <!-- Glossy Chestnut Target -->
+                <g transform="translate(145, 35)">
+                  <!-- Spiky Burr Halo -->
+                  <circle cx="0" cy="0" r="18" fill="none" stroke="#84cc16" stroke-width="2" stroke-dasharray="3 3" />
+                  <!-- Nut Shell -->
+                  <path d="M-12,4 C-14,-8 0,-15 0,-15 C0,-15 14,-8 12,4 C10,12 -10,12 -12,4 Z" fill="#78350f" stroke="#451a03" stroke-width="1.5"/>
+                  <!-- Tan Base -->
+                  <path d="M-9,5 C-5,11 5,11 9,5 C6,3 -6,3 -9,5 Z" fill="#fde68a" />
+                  <!-- Gloss Highlight -->
+                  <ellipse cx="-4" cy="-4" rx="2.5" ry="5" transform="rotate(-25 -4 -4)" fill="#ffffff" opacity="0.45" />
+                </g>
+              </svg>
+            </div>
+
+            <h3 class="font-arcade text-lg sm:text-xl text-lime-400 mb-2">CHESTNUT SNAKE</h3>
+            <p class="text-amber-100/80 text-xs sm:text-sm mb-4 leading-relaxed">
+              Slither across the autumn forest floor! Collect glossy chestnuts bursting from spiky green burrs to grow longer and faster. Eat golden chestnuts for bonus points!
+            </p>
+
+            <!-- Controls Pills -->
+            <div class="bg-black/40 rounded-xl p-3 border border-amber-900/50 mb-5 text-xs space-y-1.5">
+              <div class="flex items-center justify-between text-amber-200">
+                <span class="text-amber-400 font-semibold"><i class="fa-solid fa-arrows-up-down-left-right mr-1.5"></i>Move:</span>
+                <span class="font-mono bg-amber-950 px-2 py-0.5 rounded border border-amber-700">WASD / Arrow Keys</span>
+              </div>
+              <div class="flex items-center justify-between text-amber-200">
+                <span class="text-amber-400 font-semibold"><i class="fa-solid fa-bolt mr-1.5"></i>Special:</span>
+                <span>Speed scales with every chestnut!</span>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="launchGame('snake')" class="arcade-btn arcade-btn-green w-full bg-gradient-to-r from-lime-600 to-green-600 hover:from-lime-500 hover:to-green-500 text-stone-950 font-arcade text-xs sm:text-sm py-3.5 rounded-xl flex items-center justify-center gap-2">
+            <i class="fa-solid fa-play"></i> PLAY CHESTNUT SNAKE
+          </button>
+        </div>
+
+        <!-- CARD 2: SPACE CHESTNUT (SPACE IMPACT) -->
+        <div class="group relative bg-gradient-to-b from-amber-950/90 to-stone-950 border-2 border-amber-500/60 hover:border-amber-400 rounded-2xl p-5 sm:p-6 flex flex-col justify-between shadow-2xl transition-all duration-200 hover:-translate-y-1">
+          <div>
+            <!-- Cartridge Header & High Score Badge -->
+            <div class="flex justify-between items-start gap-2 mb-4">
+              <span class="px-3 py-1 rounded-md bg-amber-950 border border-amber-500 text-amber-300 font-arcade text-[10px]">
+                CARTRIDGE #02
+              </span>
+              <div class="text-right">
+                <span class="text-[11px] uppercase tracking-wider text-amber-300/70 block">High Score</span>
+                <span id="menuSpaceHigh" class="font-arcade text-sm text-amber-400">0000</span>
+              </div>
+            </div>
+
+            <!-- Custom Preview Graphic -->
+            <div class="w-full h-36 rounded-xl bg-stone-950 border border-amber-700/60 mb-4 flex items-center justify-center relative overflow-hidden">
+              <!-- Starfield dots -->
+              <div class="absolute inset-0 opacity-60" style="background-image: radial-gradient(#fde68a 1px, transparent 1px), radial-gradient(#f59e0b 1.5px, transparent 1.5px); background-size: 30px 30px; background-position: 0 0, 15px 15px;"></div>
+              <!-- Space Impact SVG Illustration -->
+              <svg class="w-56 h-28 relative z-10" viewBox="0 0 220 100">
+                <!-- Player Chestnut Starfighter -->
+                <g transform="translate(35, 50)">
+                  <!-- Thruster flame -->
+                  <polygon points="-22,0 -12,-5 -12,5" fill="#f97316" />
+                  <!-- Wings -->
+                  <polygon points="-8,-18 8,0 -8,18" fill="#d97706" />
+                  <!-- Chestnut Hull -->
+                  <ellipse cx="0" cy="0" rx="14" ry="10" fill="#78350f" stroke="#fde68a" stroke-width="1.5" />
+                  <!-- Cockpit -->
+                  <ellipse cx="4" cy="-2" rx="5" ry="3" fill="#38bdf8" />
+                </g>
+                <!-- Spinning Little Chestnut Bullets -->
+                <g transform="translate(85, 50)">
+                  <circle cx="0" cy="0" r="5" fill="#92400e" stroke="#fde68a" stroke-width="1.5" />
+                  <circle cx="28" cy="0" r="5" fill="#92400e" stroke="#fde68a" stroke-width="1.5" />
+                  <circle cx="56" cy="0" r="5" fill="#92400e" stroke="#fde68a" stroke-width="1.5" />
+                </g>
+                <!-- Enemy Cosmic Burr Boss / Asteroid -->
+                <g transform="translate(180, 50)">
+                  <polygon points="0,-24 6,-12 19,-17 13,-4 24,0 13,4 19,17 6,12 0,24 -6,12 -19,17 -13,4 -24,0 -13,-4 -19,-17 -6,-12" fill="#4d7c0f" stroke="#a3e635" stroke-width="1.5" />
+                  <circle cx="0" cy="0" r="11" fill="#78350f" />
+                  <circle cx="-4" cy="-3" r="3" fill="#ef4444" />
+                  <circle cx="-4" cy="4" r="3" fill="#ef4444" />
+                </g>
+              </svg>
+            </div>
+
+            <h3 class="font-arcade text-lg sm:text-xl text-amber-400 mb-2">SPACE CHESTNUT</h3>
+            <p class="text-amber-100/80 text-xs sm:text-sm mb-4 leading-relaxed">
+              Inspired by classic Nokia <em>Space Impact</em>! Pilot the Chestnut Starfighter, fire spinning mini-chestnut projectiles, and blast alien bugs, space squirrels &amp; cosmic burrs!
+            </p>
+
+            <!-- Controls Pills -->
+            <div class="bg-black/40 rounded-xl p-3 border border-amber-900/50 mb-5 text-xs space-y-1.5">
+              <div class="flex items-center justify-between text-amber-200">
+                <span class="text-amber-400 font-semibold"><i class="fa-solid fa-jet-fighter mr-1.5"></i>Pilot Ship:</span>
+                <span class="font-mono bg-amber-950 px-2 py-0.5 rounded border border-amber-700">WASD / Arrow Keys</span>
+              </div>
+              <div class="flex items-center justify-between text-amber-200">
+                <span class="text-amber-400 font-semibold"><i class="fa-solid fa-crosshairs mr-1.5"></i>Nut Cannon:</span>
+                <span class="font-mono bg-amber-950 px-2 py-0.5 rounded border border-amber-700">SPACEBAR or Auto-Fire</span>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="launchGame('space')" class="arcade-btn w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-stone-950 font-arcade text-xs sm:text-sm py-3.5 rounded-xl flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rocket"></i> PLAY SPACE CHESTNUT
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Bottom Quick Info Bar -->
+      <div class="bg-amber-950/50 border border-amber-800/60 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-amber-200/80">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-400 text-lg"></i>
+          <span>Want to learn how this hub &amp; both games are programmed from scratch?</span>
+        </div>
+        <button onclick="toggleCodeGuide()" class="px-4 py-2 rounded-lg bg-amber-800/80 hover:bg-amber-700 text-amber-100 font-semibold whitespace-nowrap transition">
+          Open Step-by-Step Code Tutorial &rarr;
+        </button>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 2: ACTIVE GAME CABINET (CANVAS)
+         ========================================== -->
+    <section id="gameCabinetView" class="hidden w-full max-w-4xl flex flex-col items-center">
+      
+      <!-- Top HUD Bar Outside Canvas -->
+      <div class="w-full bg-stone-900/95 border-2 border-amber-700/80 rounded-t-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 shadow-lg">
+        <!-- Game Title & Wave/Speed Info -->
+        <div class="flex items-center gap-3">
+          <span id="hudGameIcon" class="text-xl">🌰</span>
+          <div>
+            <h2 id="hudGameTitle" class="font-arcade text-xs sm:text-sm text-amber-300">CHESTNUT SNAKE</h2>
+            <p id="hudSubStatus" class="text-[11px] text-lime-400 font-mono">SPEED: 1.0x</p>
+          </div>
+        </div>
+
+        <!-- Score & High Score Readout -->
+        <div class="flex items-center gap-4 sm:gap-6">
+          <!-- Lives / Hull bar (Used in Space Chestnut) -->
+          <div id="hudLivesContainer" class="hidden items-center gap-1 text-red-400 text-sm">
+            <span class="text-xs text-amber-200/70 mr-1 font-mono">HULL:</span>
+            <div id="hudHearts" class="flex gap-1"></div>
+          </div>
+
+          <div class="text-right">
+            <span class="text-[10px] text-amber-300/70 uppercase block">Score</span>
+            <span id="hudScore" class="font-arcade text-xs sm:text-sm text-white">0000</span>
+          </div>
+
+          <div class="text-right">
+            <span class="text-[10px] text-amber-300/70 uppercase block">Best</span>
+            <span id="hudHighScore" class="font-arcade text-xs sm:text-sm text-amber-400">0000</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Canvas Frame with CRT Scanline & Overlay Screens -->
+      <div class="relative w-full bg-stone-950 border-x-2 border-b-2 border-amber-700/80 rounded-b-2xl overflow-hidden shadow-2xl">
+        <!-- Main HTML5 Canvas (800 x 500 internal resolution) -->
+        <canvas id="arcadeCanvas" width="800" height="500"></canvas>
+
+        <!-- Subtle Retro Scanline Overlay -->
+        <div class="crt-overlay absolute inset-0"></div>
+
+        <!-- PAUSE / GAME OVER MODAL OVERLAY -->
+        <div id="canvasOverlay" class="hidden absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-20">
+          <div class="bg-stone-900 border-2 border-amber-500 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <div id="overlayEmoji" class="text-4xl mb-2">💥</div>
+            <h3 id="overlayTitle" class="font-arcade text-lg sm:text-2xl text-amber-400 mb-2">GAME OVER</h3>
+            <p id="overlayMessage" class="text-amber-100/80 text-xs sm:text-sm mb-4">
+              Your Chestnut Starfighter was overwhelmed!
+            </p>
+            <div class="bg-black/50 rounded-xl p-3 mb-5 border border-amber-800/60 flex justify-around">
+              <div>
+                <span class="text-[10px] uppercase text-amber-400/70 block">Final Score</span>
+                <span id="overlayFinalScore" class="font-arcade text-base text-white">0</span>
+              </div>
+              <div class="border-r border-amber-800/60"></div>
+              <div>
+                <span class="text-[10px] uppercase text-amber-400/70 block">High Score</span>
+                <span id="overlayBestScore" class="font-arcade text-base text-lime-400">0</span>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button onclick="restartCurrentGame()" class="arcade-btn arcade-btn-green flex-1 bg-lime-600 hover:bg-lime-500 text-stone-950 font-arcade text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2">
+                <i class="fa-solid fa-rotate-right"></i> PLAY AGAIN
+              </button>
+              <button onclick="returnToMenu()" class="arcade-btn flex-1 bg-amber-700 hover:bg-amber-600 text-white font-arcade text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2">
+                <i class="fa-solid fa-bars"></i> MAIN MENU
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Arcade Control Deck (Outside Canvas) -->
+      <div class="w-full mt-4 flex flex-wrap items-center justify-between gap-3 bg-amber-950/60 border border-amber-800/60 rounded-xl p-3">
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="togglePauseGame()" id="pauseBtn" class="arcade-btn bg-stone-800 hover:bg-stone-700 text-amber-200 text-xs font-bold px-3.5 py-2 rounded-lg border border-amber-700/60 flex items-center gap-1.5">
+            <i class="fa-solid fa-pause"></i> <span id="pauseBtnText">PAUSE (P)</span>
+          </button>
+
+          <button onclick="restartCurrentGame()" class="arcade-btn bg-stone-800 hover:bg-stone-700 text-amber-200 text-xs font-bold px-3.5 py-2 rounded-lg border border-amber-700/60 flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate-right"></i> RESTART
+          </button>
+
+          <!-- Auto-Fire Toggle (Only shown in Space Chestnut) -->
+          <button id="autoFireBtn" onclick="toggleAutoFire()" class="hidden arcade-btn bg-amber-900/90 hover:bg-amber-800 text-amber-300 text-xs font-bold px-3.5 py-2 rounded-lg border border-amber-500/60 flex items-center gap-1.5">
+            <i class="fa-solid fa-fire"></i> <span id="autoFireText">AUTO-FIRE: OFF</span>
+          </button>
+        </div>
+
+        <!-- Keyboard Hint -->
+        <div id="controlsHintBar" class="text-xs text-amber-200/80 font-mono">
+          Use <span class="text-amber-400 font-bold">WASD / Arrows</span> to move
+        </div>
+      </div>
+
+      <!-- On-Screen Touch D-Pad & Fire Button for Mobile / Tablet -->
+      <div class="w-full mt-4 flex items-center justify-between gap-4 sm:hidden bg-stone-900/80 p-4 rounded-2xl border border-amber-800/50">
+        <!-- Directional Pad -->
+        <div class="grid grid-cols-3 gap-1.5 w-36 h-36">
+          <div></div>
+          <button ontouchstart="handleTouchDir('UP', event)" onmousedown="handleTouchDir('UP', event)" ontouchend="handleTouchRelease('UP', event)" class="bg-stone-800 active:bg-amber-600 rounded-lg border border-amber-600/50 flex items-center justify-center text-amber-300 text-lg">
+            <i class="fa-solid fa-caret-up"></i>
+          </button>
+          <div></div>
+          <button ontouchstart="handleTouchDir('LEFT', event)" onmousedown="handleTouchDir('LEFT', event)" ontouchend="handleTouchRelease('LEFT', event)" class="bg-stone-800 active:bg-amber-600 rounded-lg border border-amber-600/50 flex items-center justify-center text-amber-300 text-lg">
+            <i class="fa-solid fa-caret-left"></i>
+          </button>
+          <div class="bg-stone-950 rounded-lg flex items-center justify-center text-xs">🌰</div>
+          <button ontouchstart="handleTouchDir('RIGHT', event)" onmousedown="handleTouchDir('RIGHT', event)" ontouchend="handleTouchRelease('RIGHT', event)" class="bg-stone-800 active:bg-amber-600 rounded-lg border border-amber-600/50 flex items-center justify-center text-amber-300 text-lg">
+            <i class="fa-solid fa-caret-right"></i>
+          </button>
+          <div></div>
+          <button ontouchstart="handleTouchDir('DOWN', event)" onmousedown="handleTouchDir('DOWN', event)" ontouchend="handleTouchRelease('DOWN', event)" class="bg-stone-800 active:bg-amber-600 rounded-lg border border-amber-600/50 flex items-center justify-center text-amber-300 text-lg">
+            <i class="fa-solid fa-caret-down"></i>
+          </button>
+          <div></div>
+        </div>
+
+        <!-- Mobile Chestnut Cannon Button (For Space Chestnut) -->
+        <div id="mobileFireContainer" class="hidden flex-col items-center">
+          <button ontouchstart="triggerSpaceFire(true, event)" ontouchend="triggerSpaceFire(false, event)" onmousedown="triggerSpaceFire(true, event)" onmouseup="triggerSpaceFire(false, event)" class="w-24 h-24 rounded-full bg-gradient-to-br from-amber-500 to-red-700 active:scale-95 border-4 border-amber-300 shadow-xl flex flex-col items-center justify-center text-stone-950 font-arcade text-xs">
+            <span class="text-2xl mb-1">🌰</span>
+            <span>FIRE!</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         VIEW 3: STEP-BY-STEP ARCHITECTURE & CODE BREAKDOWN
+         ========================================== -->
+    <section id="codeGuideView" class="hidden w-full max-w-5xl bg-stone-900/95 border-2 border-amber-600/70 rounded-2xl p-5 sm:p-8 shadow-2xl my-4">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-amber-800 pb-4 mb-6">
+        <div>
+          <span class="text-xs font-arcade text-amber-400 block mb-1">DEVELOPER BLUEPRINT</span>
+          <h2 class="text-xl sm:text-2xl font-bold text-white">How to Build a Dual-Game HTML5 Arcade Hub Step-by-Step</h2>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="copyFullSourceCode()" class="arcade-btn bg-lime-600 hover:bg-lime-500 text-stone-950 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl flex items-center gap-2">
+            <i class="fa-solid fa-copy"></i> <span id="copyBtnLabel">COPY COMPLETE HTML CODE</span>
+          </button>
+          <button onclick="toggleCodeGuide()" class="bg-stone-800 hover:bg-stone-700 text-amber-200 px-3 py-2.5 rounded-xl text-xs font-bold border border-amber-700">
+            <i class="fa-solid fa-xmark mr-1"></i> Close
+          </button>
+        </div>
+      </div>
+
+      <!-- Step-by-Step Cards -->
+      <div class="space-y-6 text-sm text-amber-100/90 leading-relaxed">
+        
+        <!-- STEP 1 -->
+        <div class="bg-stone-950/90 border border-amber-800/60 rounded-xl p-4 sm:p-5">
+          <h3 class="text-base sm:text-lg font-bold text-amber-400 mb-2 flex items-center gap-2">
+            <span class="bg-amber-500 text-stone-950 font-arcade text-xs px-2.5 py-1 rounded">STEP 1</span>
+            State Machine &amp; Shared Game Loop Architecture
+          </h3>
+          <p class="mb-3">
+            When combining multiple games into one HTML5 Canvas, the cleanest approach is a <strong>central state machine</strong> (`currentMode = 'MENU' | 'SNAKE' | 'SPACE'`). A single `requestAnimationFrame(masterLoop)` runs continuously and delegates rendering and physics updates to whichever cartridge is active, preventing duplicate loops or memory leaks when switching back and forth.
+          </p>
+          <pre class="bg-black/80 text-lime-300 p-3 rounded-lg overflow-x-auto text-xs font-mono border border-stone-800"><code>let currentMode = 'MENU'; // 'MENU', 'SNAKE', or 'SPACE'
+
+function masterLoop(timestamp) {
+  const dt = timestamp - lastTime;
+  lastTime = timestamp;
+
+  if (!isPaused && !isGameOver) {
+    if (currentMode === 'SNAKE') updateSnakeGame(timestamp);
+    else if (currentMode === 'SPACE') updateSpaceGame(dt);
+  }
+
+  if (currentMode === 'SNAKE') drawSnakeGame();
+  else if (currentMode === 'SPACE') drawSpaceGame();
+
+  requestAnimationFrame(masterLoop);
+}</code></pre>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="bg-stone-950/90 border border-amber-800/60 rounded-xl p-4 sm:p-5">
+          <h3 class="text-base sm:text-lg font-bold text-lime-400 mb-2 flex items-center gap-2">
+            <span class="bg-lime-500 text-stone-950 font-arcade text-xs px-2.5 py-1 rounded">STEP 2</span>
+            Drawing Custom Vector Chestnuts on Canvas
+          </h3>
+          <p class="mb-3">
+            Instead of relying on external image files that can fail to load offline, we use a reusable `drawChestnut(ctx, x, y, radius, angle, hasBurr)` function. It renders a spiky green husk (if enabled), a rich brown rounded-triangle shell, a creamy tan base (`#fde68a`), and a glossy white highlight arc. This same function draws the Snake food AND the spinning mini-chestnut bullets in Space Chestnut!
+          </p>
+          <pre class="bg-black/80 text-amber-300 p-3 rounded-lg overflow-x-auto text-xs font-mono border border-stone-800"><code>function drawChestnut(ctx, x, y, radius, rotation = 0, showBurr = false) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rotation);
+  // 1. Optional Spiky Green Burr Halo
+  // 2. Dark Brown Glossy Chestnut Dome (bezierCurveTo)
+  // 3. Light Tan Hilum Base + Specular White Shine
+  ctx.restore();
+}</code></pre>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="bg-stone-950/90 border border-amber-800/60 rounded-xl p-4 sm:p-5">
+          <h3 class="text-base sm:text-lg font-bold text-amber-400 mb-2 flex items-center gap-2">
+            <span class="bg-amber-500 text-stone-950 font-arcade text-xs px-2.5 py-1 rounded">STEP 3</span>
+            Game 1 Logic: Grid-Based "Chestnut Snake"
+          </h3>
+          <p class="mb-3">
+            In <strong>Chestnut Snake</strong>, the 800&times;500 canvas is divided into a 25&times;25px grid (32 columns &times; 20 rows). We use an input queue (`snake.dirQueue`) so rapid key presses (e.g., Up then Left within a single tick) never cause accidental self-collision. Eating a chestnut spawns green burr spikes as particles and decreases `moveInterval` to speed up the game.
+          </p>
+          <pre class="bg-black/80 text-lime-300 p-3 rounded-lg overflow-x-auto text-xs font-mono border border-stone-800"><code>// Move snake head on each tick interval
+const head = { x: snake.body[0].x + snake.dir.x, y: snake.body[0].y + snake.dir.y };
+snake.body.unshift(head); // Add new head
+
+if (head.x === food.x && head.y === food.y) {
+  score += food.isGolden ? 30 : 10;
+  spawnBurrParticles(head.x * GRID_SIZE, head.y * GRID_SIZE);
+  spawnSnakeFood(); // Don't pop tail -> Snake grows!
+} else {
+  snake.body.pop(); // Remove tail segment to keep length constant
+}</code></pre>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="bg-stone-950/90 border border-amber-800/60 rounded-xl p-4 sm:p-5">
+          <h3 class="text-base sm:text-lg font-bold text-orange-400 mb-2 flex items-center gap-2">
+            <span class="bg-orange-500 text-stone-950 font-arcade text-xs px-2.5 py-1 rounded">STEP 4</span>
+            Game 2 Logic: "Space Chestnut" (Nokia Space Impact Style)
+          </h3>
+          <p class="mb-3">
+            In <strong>Space Chestnut</strong>, the player's Starfighter moves smoothly in 4 directions (`WASD` or `Arrows`) while pressing `SPACE` fires miniature spinning chestnuts (`bullet.angle += 0.25` per frame). Enemies spawn in waves with distinct behaviors:
+          </p>
+          <ul class="list-disc list-inside space-y-1 text-xs sm:text-sm text-amber-200 mb-3">
+            <li><strong>Alien Acorn Bugs (1 HP):</strong> Fly in a smooth sine-wave (`Math.sin(frame * 0.06)`) pattern across space.</li>
+            <li><strong>Space Squirrels (2 HP):</strong> Actively track the player's vertical `Y` position (`homing` behavior).</li>
+            <li><strong>Spiky Burr Asteroids (3 HP):</strong> Heavy rotating hazards that split into green spine shrapnel when destroyed.</li>
+            <li><strong>Giant Mecha-Squirrel Dreadnought (Boss Wave):</strong> Appears every 150 points with a multi-hit health bar and radial plasma projectiles!</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="w-full py-3 px-4 text-center text-xs text-amber-200/50 border-t border-amber-900/40">
+    Chestnut Arcade Hub &bull; Built with HTML5 Canvas &amp; Web Audio API &bull; Use WASD / Arrows &amp; Spacebar
+  </footer>
+
+  <!-- =================================================================
+       COMPLETE JAVASCRIPT ENGINE (AUDIO, GRAPHICS, SNAKE & SPACE IMPACT)
+       ================================================================= -->
+  <script>
+    /**************************************************************
+     * 1. WEB AUDIO SYNTHESIZER (Retro Arcade Sound Effects)
+     **************************************************************/
+    let audioCtx = null;
+    let isMuted = false;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      if (isMuted) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'crunch') {
+        // Chestnut pickup sound (pleasant arpeggio)
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(587.33, now + 0.06);
+        osc.frequency.setValueAtTime(880, now + 0.12);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'pew') {
+        // Little chestnut bullet shot
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(620, now);
+        osc.frequency.exponentialRampToValueAtTime(160, now + 0.11);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+        osc.start(now);
+        osc.stop(now + 0.11);
+      } else if (type === 'hit') {
+        // Enemy hit thud
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(190, now);
+        osc.frequency.exponentialRampToValueAtTime(55, now + 0.14);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        osc.start(now);
+        osc.stop(now + 0.14);
+      } else if (type === 'boom') {
+        // Enemy destroyed / Boss explosion
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(130, now);
+        osc.frequency.exponentialRampToValueAtTime(28, now + 0.35);
+        gain.gain.setValueAtTime(0.22, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'gameover') {
+        // Retro descending melody
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(392, now);
+        osc.frequency.setValueAtTime(349.23, now + 0.15);
+        osc.frequency.setValueAtTime(329.63, now + 0.3);
+        osc.frequency.setValueAtTime(261.63, now + 0.45);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+        osc.start(now);
+        osc.stop(now + 0.7);
+      }
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      const icon = document.getElementById('soundIcon');
+      icon.className = isMuted ? 'fa-solid fa-volume-xmark text-red-400' : 'fa-solid fa-volume-high';
+      if (!isMuted) playSound('crunch');
+    }
+
+    /**************************************************************
+     * 2. GLOBAL HUB STATE & HIGH SCORES
+     **************************************************************/
+    const canvas = document.getElementById('arcadeCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let currentMode = 'MENU'; // 'MENU' | 'SNAKE' | 'SPACE'
+    let isPaused = false;
+    let isGameOver = false;
+    let score = 0;
+
+    // Persistent Local High Scores
+    let highScores = {
+      snake: parseInt(localStorage.getItem('chestnut_snake_hi') || '0', 10),
+      space: parseInt(localStorage.getItem('chestnut_space_hi') || '0', 10)
+    };
+
+    function updateMenuHighScores() {
+      document.getElementById('menuSnakeHigh').textContent = String(highScores.snake).padStart(4, '0');
+      document.getElementById('menuSpaceHigh').textContent = String(highScores.space).padStart(4, '0');
+    }
+    updateMenuHighScores();
+
+    /**************************************************************
+     * 3. SHARED CHESTNUT VECTOR ART RENDERER
+     **************************************************************/
+    /**
+     * Draws a detailed glossy chestnut at (x, y)
+     * Used for Snake collectibles AND Space Chestnut spinning bullets!
+     */
+    function drawChestnut(ctx, x, y, radius, rotation = 0, showBurr = false, isGolden = false) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rotation);
+
+      // 1. Optional Spiky Green Husk/Burr Halo
+      if (showBurr) {
+        ctx.save();
+        ctx.strokeStyle = isGolden ? '#facc15' : '#84cc16';
+        ctx.fillStyle = isGolden ? '#854d0e' : '#3f6212';
+        ctx.lineWidth = 1.5;
+        const spikes = 12;
+        ctx.beginPath();
+        for (let i = 0; i < spikes * 2; i++) {
+          const r = i % 2 === 0 ? radius * 1.42 : radius * 0.95;
+          const angle = (i * Math.PI) / spikes;
+          const sx = Math.cos(angle) * r;
+          const sy = Math.sin(angle) * r;
+          if (i === 0) ctx.moveTo(sx, sy);
+          else ctx.lineTo(sx, sy);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 2. Main Chestnut Shell (Rich Brown or Golden)
+      ctx.fillStyle = isGolden ? '#eab308' : '#7c2d12';
+      ctx.strokeStyle = isGolden ? '#fef08a' : '#451a03';
+      ctx.lineWidth = Math.max(1, radius * 0.12);
+
+      ctx.beginPath();
+      ctx.moveTo(0, -radius * 0.95); // Pointed tip at top
+      ctx.bezierCurveTo(
+        radius * 1.15, -radius * 0.45,
+        radius * 1.05, radius * 0.75,
+        0, radius * 0.85
+      );
+      ctx.bezierCurveTo(
+        -radius * 1.05, radius * 0.75,
+        -radius * 1.15, -radius * 0.45,
+        0, -radius * 0.95
+      );
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // 3. Light Tan Hilum Base (Bottom of the chestnut)
+      ctx.fillStyle = isGolden ? '#fef9c3' : '#fde68a';
+      ctx.beginPath();
+      ctx.arc(0, radius * 0.32, radius * 0.56, 0.15 * Math.PI, 0.85 * Math.PI, false);
+      ctx.quadraticCurveTo(0, radius * 0.35, -radius * 0.5, radius * 0.56);
+      ctx.closePath();
+      ctx.fill();
+
+      // 4. Glossy White Highlight
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.beginPath();
+      ctx.ellipse(-radius * 0.32, -radius * 0.2, radius * 0.16, radius * 0.32, -0.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    /**************************************************************
+     * 4. GAME 1: "CHESTNUT SNAKE" ENGINE
+     **************************************************************/
+    const SNAKE_GRID = 25; // 800x500 -> 32 cols x 20 rows
+    const SNAKE_COLS = canvas.width / SNAKE_GRID; // 32
+    const SNAKE_ROWS = canvas.height / SNAKE_GRID; // 20
+
+    let snake = {
+      body: [],
+      dir: { x: 1, y: 0 },
+      dirQueue: [],
+      moveInterval: 125, // ms per grid step
+      lastMoveTime: 0,
+      chestnutsEaten: 0
+    };
+
+    let snakeFood = { x: 15, y: 10, isGolden: false, pulse: 0 };
+    let snakeParticles = [];
+    let autumnLeaves = [];
+
+    function initSnakeGame() {
+      score = 0;
+      snake.body = [
+        { x: 8, y: 10 },
+        { x: 7, y: 10 },
+        { x: 6, y: 10 },
+        { x: 5, y: 10 }
+      ];
+      snake.dir = { x: 1, y: 0 };
+      snake.dirQueue = [];
+      snake.moveInterval = 125;
+      snake.lastMoveTime = performance.now();
+      snake.chestnutsEaten = 0;
+      snakeParticles = [];
+
+      // Decorative background leaves
+      autumnLeaves = [];
+      for (let i = 0; i < 14; i++) {
+        autumnLeaves.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: 4 + Math.random() * 5,
+          angle: Math.random() * Math.PI * 2,
+          color: Math.random() > 0.5 ? 'rgba(217, 119, 6, 0.18)' : 'rgba(101, 163, 13, 0.15)'
+        });
+      }
+
+      spawnSnakeFood();
+      updateHUD();
+    }
+
+    function spawnSnakeFood() {
+      let valid = false;
+      let fx = 0, fy = 0;
+      while (!valid) {
+        fx = Math.floor(Math.random() * (SNAKE_COLS - 2)) + 1;
+        fy = Math.floor(Math.random() * (SNAKE_ROWS - 2)) + 1;
+        valid = !snake.body.some(seg => seg.x === fx && seg.y === fy);
+      }
+      // Every 5th chestnut is a Golden Bonus Chestnut!
+      const isGolden = (snake.chestnutsEaten > 0 && (snake.chestnutsEaten + 1) % 5 === 0);
+      snakeFood = { x: fx, y: fy, isGolden, pulse: 0 };
+    }
+
+    function spawnSnakeBurrBurst(px, py, isGolden) {
+      for (let i = 0; i < 18; i++) {
+        const angle = (Math.PI * 2 * i) / 18 + Math.random() * 0.3;
+        const speed = 1.5 + Math.random() * 3.5;
+        snakeParticles.push({
+          x: px,
+          y: py,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 1.0,
+          color: isGolden ? '#facc15' : (i % 2 === 0 ? '#84cc16' : '#d97706'),
+          size: 3 + Math.random() * 3
+        });
+      }
+    }
+
+    function updateSnakeGame(timestamp) {
+      snakeFood.pulse += 0.08;
+
+      // Update burr particles
+      for (let i = snakeParticles.length - 1; i >= 0; i--) {
+        const p = snakeParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.035;
+        if (p.life <= 0) snakeParticles.splice(i, 1);
+      }
+
+      if (timestamp - snake.lastMoveTime < snake.moveInterval) return;
+      snake.lastMoveTime = timestamp;
+
+      // Process queued direction change
+      if (snake.dirQueue.length > 0) {
+        const nextDir = snake.dirQueue.shift();
+        if (nextDir.x !== -snake.dir.x || nextDir.y !== -snake.dir.y) {
+          snake.dir = nextDir;
+        }
+      }
+
+      const head = {
+        x: snake.body[0].x + snake.dir.x,
+        y: snake.body[0].y + snake.dir.y
+      };
+
+      // Check Wall Collision
+      if (head.x < 0 || head.x >= SNAKE_COLS || head.y < 0 || head.y >= SNAKE_ROWS) {
+        triggerGameOver('Your snake crashed into the forest border!');
+        return;
+      }
+
+      // Check Self Collision
+      if (snake.body.some(seg => seg.x === head.x && seg.y === head.y)) {
+        triggerGameOver('Your snake tangled into its own tail!');
+        return;
+      }
+
+      snake.body.unshift(head);
+
+      // Check Chestnut Collection
+      if (head.x === snakeFood.x && head.y === snakeFood.y) {
+        playSound('crunch');
+        snake.chestnutsEaten++;
+        const pts = snakeFood.isGolden ? 30 : 10;
+        score += pts;
+        if (score > highScores.snake) {
+          highScores.snake = score;
+          localStorage.setItem('chestnut_snake_hi', highScores.snake);
+          updateMenuHighScores();
+        }
+
+        // Speed scaling (caps at 55ms per step)
+        snake.moveInterval = Math.max(55, 125 - snake.chestnutsEaten * 2.5);
+
+        const centerX = head.x * SNAKE_GRID + SNAKE_GRID / 2;
+        const centerY = head.y * SNAKE_GRID + SNAKE_GRID / 2;
+        spawnSnakeBurrBurst(centerX, centerY, snakeFood.isGolden);
+        spawnSnakeFood();
+        updateHUD();
+      } else {
+        snake.body.pop();
+      }
+    }
+
+    function drawSnakeGame() {
+      // 1. Forest Floor Checkerboard Grid
+      for (let r = 0; r < SNAKE_ROWS; r++) {
+        for (let c = 0; c < SNAKE_COLS; c++) {
+          ctx.fillStyle = (r + c) % 2 === 0 ? '#1c120c' : '#23170f';
+          ctx.fillRect(c * SNAKE_GRID, r * SNAKE_GRID, SNAKE_GRID, SNAKE_GRID);
+        }
+      }
+
+      // Subtle decorative autumn leaves on the floor
+      autumnLeaves.forEach(leaf => {
+        ctx.save();
+        ctx.translate(leaf.x, leaf.y);
+        ctx.rotate(leaf.angle);
+        ctx.fillStyle = leaf.color;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, leaf.size * 1.5, leaf.size, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // 2. Draw Collectible Chestnut with pulsing spiky burr
+      const fx = snakeFood.x * SNAKE_GRID + SNAKE_GRID / 2;
+      const fy = snakeFood.y * SNAKE_GRID + SNAKE_GRID / 2;
+      const pulseRadius = (SNAKE_GRID * 0.45) + Math.sin(snakeFood.pulse) * 1.5;
+      drawChestnut(ctx, fx, fy, pulseRadius, Math.sin(snakeFood.pulse * 0.5) * 0.15, true, snakeFood.isGolden);
+
+      // 3. Draw Snake Body Segments
+      for (let i = snake.body.length - 1; i >= 0; i--) {
+        const seg = snake.body[i];
+        const sx = seg.x * SNAKE_GRID;
+        const sy = seg.y * SNAKE_GRID;
+
+        if (i === 0) {
+          // Snake Head
+          ctx.fillStyle = '#a3e635';
+          ctx.strokeStyle = '#365314';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.roundRect(sx + 1, sy + 1, SNAKE_GRID - 2, SNAKE_GRID - 2, 7);
+          ctx.fill();
+          ctx.stroke();
+
+          // Cute Snake Eyes oriented to movement direction
+          ctx.fillStyle = '#1c1917';
+          const eyeOffsetX = snake.dir.x * 4;
+          const eyeOffsetY = snake.dir.y * 4;
+          ctx.beginPath();
+          ctx.arc(sx + SNAKE_GRID / 2 + eyeOffsetX - snake.dir.y * 5, sy + SNAKE_GRID / 2 + eyeOffsetY - snake.dir.x * 5, 2.5, 0, Math.PI * 2);
+          ctx.arc(sx + SNAKE_GRID / 2 + eyeOffsetX + snake.dir.y * 5, sy + SNAKE_GRID / 2 + eyeOffsetY + snake.dir.x * 5, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // Alternating Autumn Green/Amber scales on body
+          const ratio = 1 - (i / (snake.body.length + 4)) * 0.5;
+          ctx.fillStyle = i % 2 === 0 ? `rgba(132, 204, 22, ${ratio})` : `rgba(101, 163, 13, ${ratio})`;
+          ctx.beginPath();
+          ctx.roundRect(sx + 2, sy + 2, SNAKE_GRID - 4, SNAKE_GRID - 4, 5);
+          ctx.fill();
+
+          // Chestnut stripe dot on segments
+          ctx.fillStyle = 'rgba(120, 53, 15, 0.55)';
+          ctx.beginPath();
+          ctx.arc(sx + SNAKE_GRID / 2, sy + SNAKE_GRID / 2, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // 4. Draw Burr Particles
+      snakeParticles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    /**************************************************************
+     * 5. GAME 2: "SPACE CHESTNUT" (NOKIA SPACE IMPACT STYLE)
+     **************************************************************/
+    let spacePlayer = {
+      x: 70,
+      y: 250,
+      width: 44,
+      height: 30,
+      speed: 5.2,
+      lives: 4,
+      maxLives: 4,
+      invulnerableTimer: 0,
+      fireCooldown: 0,
+      autoFire: false
+    };
+
+    let spaceBullets = [];      // Player's spinning little chestnuts
+    let enemyProjectiles = [];  // Boss/enemy plasma seeds
+    let spaceEnemies = [];      // Bugs, Space Squirrels, Burr-Asteroids, Boss
+    let spaceParticles = [];    // Explosion sparks
+    let spaceStars = [];        // Parallax starfield
+    let spaceWave = 1;
+    let spaceSpawnTimer = 0;
+    let spaceFrameCount = 0;
+    let activeBoss = null;
+
+    // Keyboard state for smooth 4-way movement + shooting
+    const keysPressed = {
+      up: false,
+      down: false,
+      left: false,
+      right: false,
+      shoot: false
+    };
+
+    function initSpaceGame() {
+      score = 0;
+      spaceWave = 1;
+      spaceFrameCount = 0;
+      spaceSpawnTimer = 40;
+      activeBoss = null;
+
+      spacePlayer.x = 70;
+      spacePlayer.y = canvas.height / 2;
+      spacePlayer.lives = 4;
+      spacePlayer.invulnerableTimer = 0;
+      spacePlayer.fireCooldown = 0;
+
+      spaceBullets = [];
+      enemyProjectiles = [];
+      spaceEnemies = [];
+      spaceParticles = [];
+
+      // Initialize 3-layer parallax starfield
+      spaceStars = [];
+      for (let i = 0; i < 75; i++) {
+        spaceStars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 2.2 + 0.6,
+          speed: Math.random() * 2.5 + 0.5,
+          color: Math.random() > 0.3 ? '#fef3c7' : '#f59e0b'
+        });
+      }
+
+      updateHUD();
+    }
+
+    function toggleAutoFire() {
+      spacePlayer.autoFire = !spacePlayer.autoFire;
+      const btnText = document.getElementById('autoFireText');
+      const btn = document.getElementById('autoFireBtn');
+      btnText.textContent = `AUTO-FIRE: ${spacePlayer.autoFire ? 'ON' : 'OFF'}`;
+      if (spacePlayer.autoFire) {
+        btn.classList.replace('bg-amber-900/90', 'bg-lime-700');
+      } else {
+        btn.classList.replace('bg-lime-700', 'bg-amber-900/90');
+      }
+    }
+
+    function fireLittleChestnut() {
+      playSound('pew');
+      spaceBullets.push({
+        x: spacePlayer.x + 28,
+        y: spacePlayer.y,
+        vx: 9.5,
+        vy: 0,
+        radius: 8,
+        angle: 0,
+        spinSpeed: 0.28
+      });
+
+      // At Wave 3+, unlock twin chestnut blasters!
+      if (spaceWave >= 3) {
+        spaceBullets.push({
+          x: spacePlayer.x + 22,
+          y: spacePlayer.y - 14,
+          vx: 9.2,
+          vy: -0.6,
+          radius: 6.5,
+          angle: 1,
+          spinSpeed: 0.32
+        });
+        spaceBullets.push({
+          x: spacePlayer.x + 22,
+          y: spacePlayer.y + 14,
+          vx: 9.2,
+          vy: 0.6,
+          radius: 6.5,
+          angle: 2,
+          spinSpeed: 0.32
+        });
+      }
+    }
+
+    function spawnSpaceEnemy() {
+      // Spawn a Dreadnought Boss every 150 points if none is active
+      if (score > 0 && score >= spaceWave * 150 && !activeBoss) {
+        activeBoss = {
+          type: 'boss',
+          x: canvas.width + 60,
+          y: canvas.height / 2,
+          radius: 44,
+          hp: 18 + spaceWave * 6,
+          maxHp: 18 + spaceWave * 6,
+          vx: -1.5,
+          vy: 2.2,
+          angle: 0,
+          shootTimer: 70
+        };
+        spaceEnemies.push(activeBoss);
+        return;
+      }
+
+      const rand = Math.random();
+      const yPos = 45 + Math.random() * (canvas.height - 90);
+
+      if (rand < 0.45) {
+        // 1. Alien Acorn Bug (Fast Sine-Wave Swarmer)
+        spaceEnemies.push({
+          type: 'bug',
+          x: canvas.width + 30,
+          y: yPos,
+          baseY: yPos,
+          radius: 16,
+          hp: 1,
+          maxHp: 1,
+          vx: -(3.2 + spaceWave * 0.35),
+          phase: Math.random() * Math.PI * 2,
+          angle: 0
+        });
+      } else if (rand < 0.78) {
+        // 2. Cosmic Burr-Asteroid (Spiky Rotating Hazard)
+        spaceEnemies.push({
+          type: 'burr',
+          x: canvas.width + 30,
+          y: yPos,
+          radius: 22,
+          hp: 3,
+          maxHp: 3,
+          vx: -(2.1 + spaceWave * 0.25),
+          vy: (Math.random() - 0.5) * 1.2,
+          angle: 0
+        });
+      } else {
+        // 3. Space Squirrel Interceptor (Tracks Player Y & Fires Seeds)
+        spaceEnemies.push({
+          type: 'squirrel',
+          x: canvas.width + 30,
+          y: yPos,
+          radius: 19,
+          hp: 2,
+          maxHp: 2,
+          vx: -(2.6 + spaceWave * 0.3),
+          angle: 0,
+          shootTimer: 90 + Math.floor(Math.random() * 50)
+        });
+      }
+    }
+
+    function createSpaceExplosion(x, y, color, count = 16) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1 + Math.random() * 4.5;
+        spaceParticles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 1.0,
+          color: i % 2 === 0 ? color : '#fde68a',
+          size: 2.5 + Math.random() * 3.5
+        });
+      }
+    }
+
+    function updateSpaceGame() {
+      spaceFrameCount++;
+
+      // 1. Update Parallax Starfield
+      spaceStars.forEach(star => {
+        star.x -= star.speed;
+        if (star.x < 0) {
+          star.x = canvas.width;
+          star.y = Math.random() * canvas.height;
+        }
+      });
+
+      // 2. Move Player Chestnut Starfighter
+      if (keysPressed.up) spacePlayer.y -= spacePlayer.speed;
+      if (keysPressed.down) spacePlayer.y += spacePlayer.speed;
+      if (keysPressed.left) spacePlayer.x -= spacePlayer.speed;
+      if (keysPressed.right) spacePlayer.x += spacePlayer.speed;
+
+      // Clamp Player inside Screen Bounds
+      spacePlayer.x = Math.max(30, Math.min(canvas.width - 40, spacePlayer.x));
+      spacePlayer.y = Math.max(28, Math.min(canvas.height - 28, spacePlayer.y));
+
+      if (spacePlayer.invulnerableTimer > 0) spacePlayer.invulnerableTimer--;
+
+      // 3. Handle Little Chestnut Cannon Firing
+      if (spacePlayer.fireCooldown > 0) spacePlayer.fireCooldown--;
+      if ((keysPressed.shoot || spacePlayer.autoFire) && spacePlayer.fireCooldown <= 0) {
+        fireLittleChestnut();
+        spacePlayer.fireCooldown = 13;
+      }
+
+      // 4. Update Spinning Chestnut Bullets
+      for (let i = spaceBullets.length - 1; i >= 0; i--) {
+        const b = spaceBullets[i];
+        b.x += b.vx;
+        b.y += b.vy;
+        b.angle += b.spinSpeed;
+        if (b.x - b.radius > canvas.width) {
+          spaceBullets.splice(i, 1);
+        }
+      }
+
+      // 5. Update Enemy Projectiles
+      for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
+        const ep = enemyProjectiles[i];
+        ep.x += ep.vx;
+        ep.y += ep.vy;
+
+        // Check collision with Player
+        const dist = Math.hypot(ep.x - spacePlayer.x, ep.y - spacePlayer.y);
+        if (dist < ep.radius + 16 && spacePlayer.invulnerableTimer <= 0) {
+          enemyProjectiles.splice(i, 1);
+          damageSpacePlayer();
+          continue;
+        }
+
+        if (ep.x < -20 || ep.x > canvas.width + 20 || ep.y < -20 || ep.y > canvas.height + 20) {
+          enemyProjectiles.splice(i, 1);
+        }
+      }
+
+      // 6. Spawn Enemies
+      spaceSpawnTimer--;
+      if (spaceSpawnTimer <= 0) {
+        spawnSpaceEnemy();
+        spaceSpawnTimer = Math.max(26, 68 - spaceWave * 5);
+      }
+
+      // 7. Update Enemies & Check Collisions
+      for (let i = spaceEnemies.length - 1; i >= 0; i--) {
+        const en = spaceEnemies[i];
+
+        if (en.type === 'bug') {
+          en.x += en.vx;
+          en.y = en.baseY + Math.sin(spaceFrameCount * 0.06 + en.phase) * 38;
+        } else if (en.type === 'burr') {
+          en.x += en.vx;
+          en.y += en.vy;
+          en.angle -= 0.05;
+          if (en.y < 30 || en.y > canvas.height - 30) en.vy *= -1;
+        } else if (en.type === 'squirrel') {
+          en.x += en.vx;
+          // Gently home toward player's Y coordinate
+          if (en.y < spacePlayer.y - 4) en.y += 1.3;
+          else if (en.y > spacePlayer.y + 4) en.y -= 1.3;
+
+          en.shootTimer--;
+          if (en.shootTimer <= 0 && en.x > spacePlayer.x) {
+            en.shootTimer = 100;
+            enemyProjectiles.push({
+              x: en.x - 16,
+              y: en.y,
+              vx: -5.5,
+              vy: (spacePlayer.y - en.y) * 0.015,
+              radius: 5
+            });
+          }
+        } else if (en.type === 'boss') {
+          // Boss hovers on the right side of the screen
+          if (en.x > canvas.width - 110) en.x += en.vx;
+          en.y += en.vy;
+          if (en.y < 65 || en.y > canvas.height - 65) en.vy *= -1;
+          en.angle += 0.03;
+
+          en.shootTimer--;
+          if (en.shootTimer <= 0) {
+            en.shootTimer = 55;
+            // Radial 3-way plasma burst
+            [-1.4, 0, 1.4].forEach(vySpread => {
+              enemyProjectiles.push({
+                x: en.x - 35,
+                y: en.y,
+                vx: -5.2,
+                vy: vySpread,
+                radius: 6
+              });
+            });
+          }
+        }
+
+        // Check Bullet -> Enemy Collisions
+        let enemyDestroyed = false;
+        for (let j = spaceBullets.length - 1; j >= 0; j--) {
+          const b = spaceBullets[j];
+          const dist = Math.hypot(b.x - en.x, b.y - en.y);
+          if (dist < b.radius + en.radius) {
+            spaceBullets.splice(j, 1);
+            en.hp--;
+            createSpaceExplosion(b.x, b.y, '#d97706', 6);
+
+            if (en.hp <= 0) {
+              playSound('boom');
+              const pts = en.type === 'boss' ? 100 : (en.type === 'burr' ? 25 : (en.type === 'squirrel' ? 20 : 10));
+              score += pts;
+              if (score > highScores.space) {
+                highScores.space = score;
+                localStorage.setItem('chestnut_space_hi', highScores.space);
+                updateMenuHighScores();
+              }
+
+              createSpaceExplosion(en.x, en.y, '#84cc16', en.type === 'boss' ? 40 : 18);
+
+              if (en.type === 'boss') {
+                activeBoss = null;
+                spaceWave++;
+              }
+
+              spaceEnemies.splice(i, 1);
+              enemyDestroyed = true;
+              updateHUD();
+              break;
+            } else {
+              playSound('hit');
+            }
+          }
+        }
+        if (enemyDestroyed) continue;
+
+        // Check Player -> Enemy Body Collision
+        const playerDist = Math.hypot(en.x - spacePlayer.x, en.y - spacePlayer.y);
+        if (playerDist < en.radius + 18 && spacePlayer.invulnerableTimer <= 0) {
+          createSpaceExplosion(en.x, en.y, '#ef4444', 20);
+          if (en.type !== 'boss') {
+            spaceEnemies.splice(i, 1);
+          }
+          damageSpacePlayer();
+          continue;
+        }
+
+        // Remove off-screen enemies
+        if (en.x + en.radius < -40) {
+          if (en.type === 'boss') activeBoss = null;
+          spaceEnemies.splice(i, 1);
+        }
+      }
+
+      // 8. Update Explosion Particles
+      for (let i = spaceParticles.length - 1; i >= 0; i--) {
+        const p = spaceParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.03;
+        if (p.life <= 0) spaceParticles.splice(i, 1);
+      }
+    }
+
+    function damageSpacePlayer() {
+      playSound('boom');
+      spacePlayer.lives--;
+      spacePlayer.invulnerableTimer = 75; // ~1.25 sec invulnerability blink
+      updateHUD();
+
+      if (spacePlayer.lives <= 0) {
+        triggerGameOver('Your Chestnut Starfighter was destroyed in deep space!');
+      }
+    }
+
+    function drawSpaceGame() {
+      // 1. Deep Space Background
+      ctx.fillStyle = '#090504';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 2. Parallax Starfield
+      spaceStars.forEach(star => {
+        ctx.fillStyle = star.color;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 3. Draw Player Chestnut Starfighter (Blinks when invulnerable)
+      if (spacePlayer.invulnerableTimer % 6 < 4) {
+        ctx.save();
+        ctx.translate(spacePlayer.x, spacePlayer.y);
+
+        // Jet Thruster Flame
+        const flameLen = 14 + Math.random() * 10;
+        ctx.fillStyle = '#f97316';
+        ctx.beginPath();
+        ctx.moveTo(-18, -6);
+        ctx.lineTo(-18 - flameLen, 0);
+        ctx.lineTo(-18, 6);
+        ctx.closePath();
+        ctx.fill();
+
+        // Leaf-shaped Swept Wings
+        ctx.fillStyle = '#65a30d';
+        ctx.strokeStyle = '#ecfccb';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(-10, -22);
+        ctx.lineTo(12, 0);
+        ctx.lineTo(-10, 22);
+        ctx.lineTo(-16, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Chestnut Fuselage Body
+        drawChestnut(ctx, 2, 0, 15, Math.PI / 2, false, false);
+
+        // Glowing Cyan Canopy
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath();
+        ctx.ellipse(6, 0, 6, 3.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      // 4. Draw Spinning "Little Chestnut" Bullets!
+      spaceBullets.forEach(b => {
+        drawChestnut(ctx, b.x, b.y, b.radius, b.angle, false, false);
+      });
+
+      // 5. Draw Enemy Projectiles
+      enemyProjectiles.forEach(ep => {
+        ctx.save();
+        ctx.fillStyle = '#ef4444';
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(ep.x, ep.y, ep.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // 6. Draw Enemies (Alien Bugs, Burr-Asteroids, Space Squirrels, Boss)
+      spaceEnemies.forEach(en => {
+        ctx.save();
+        ctx.translate(en.x, en.y);
+
+        if (en.type === 'bug') {
+          // Alien Acorn Bug
+          ctx.fillStyle = '#a855f7';
+          ctx.strokeStyle = '#f3e8ff';
+          ctx.lineWidth = 1.5;
+          // Wings
+          const wingFlap = Math.sin(spaceFrameCount * 0.3) * 6;
+          ctx.fillStyle = 'rgba(192, 132, 252, 0.5)';
+          ctx.beginPath();
+          ctx.ellipse(0, -12 + wingFlap * 0.3, 10, 6, 0.3, 0, Math.PI * 2);
+          ctx.ellipse(0, 12 - wingFlap * 0.3, 10, 6, -0.3, 0, Math.PI * 2);
+          ctx.fill();
+          // Thorax
+          ctx.fillStyle = '#7e22ce';
+          ctx.beginPath();
+          ctx.arc(0, 0, en.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          // Glowing alien eye
+          ctx.fillStyle = '#facc15';
+          ctx.beginPath();
+          ctx.arc(-6, -3, 3.5, 0, Math.PI * 2);
+          ctx.arc(-6, 4, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (en.type === 'burr') {
+          // Spiky Burr-Asteroid
+          drawChestnut(ctx, 0, 0, en.radius * 0.78, en.angle, true, false);
+        } else if (en.type === 'squirrel') {
+          // Space Squirrel Saucer
+          ctx.fillStyle = '#ea580c';
+          ctx.strokeStyle = '#fed7aa';
+          ctx.lineWidth = 1.5;
+          // Bushy Tail Fin
+          ctx.beginPath();
+          ctx.arc(14, -6, 12, 0, Math.PI * 2);
+          ctx.fill();
+          // Ship Pod
+          ctx.fillStyle = '#9a3412';
+          ctx.beginPath();
+          ctx.ellipse(0, 2, 20, 12, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          // Squirrel Helmet Dome
+          ctx.fillStyle = '#fde68a';
+          ctx.beginPath();
+          ctx.arc(-4, -3, 8, 0, Math.PI * 2);
+          ctx.fill();
+          // Visor
+          ctx.fillStyle = '#ef4444';
+          ctx.fillRect(-10, -5, 7, 4);
+        } else if (en.type === 'boss') {
+          // Dreadnought Cosmic Burr Boss
+          drawChestnut(ctx, 0, 0, en.radius * 0.85, en.angle, true, true);
+          // Angry Boss Eyes
+          ctx.fillStyle = '#dc2626';
+          ctx.beginPath();
+          ctx.arc(-12, -10, 6, 0, Math.PI * 2);
+          ctx.arc(-12, 10, 6, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Boss Overhead Health Bar
+          const barW = 70;
+          const hpRatio = Math.max(0, en.hp / en.maxHp);
+          ctx.fillStyle = 'rgba(0,0,0,0.7)';
+          ctx.fillRect(-barW / 2, -en.radius - 18, barW, 8);
+          ctx.fillStyle = '#ef4444';
+          ctx.fillRect(-barW / 2, -en.radius - 18, barW * hpRatio, 8);
+          ctx.strokeStyle = '#fde68a';
+          ctx.strokeRect(-barW / 2, -en.radius - 18, barW, 8);
+        }
+
+        ctx.restore();
+      });
+
+      // 7. Draw Particles
+      spaceParticles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    /**************************************************************
+     * 6. MENU NAVIGATION, HUD & INPUT CONTROLLERS
+     **************************************************************/
+    function launchGame(gameType) {
+      initAudio();
+      playSound('crunch');
+
+      document.getElementById('mainMenuView').classList.add('hidden');
+      document.getElementById('codeGuideView').classList.add('hidden');
+      document.getElementById('gameCabinetView').classList.remove('hidden');
+      document.getElementById('headerMenuBtn').classList.remove('hidden');
+      document.getElementById('canvasOverlay').classList.add('hidden');
+
+      isPaused = false;
+      isGameOver = false;
+      document.getElementById('pauseBtnText').textContent = 'PAUSE (P)';
+
+      if (gameType === 'snake') {
+        currentMode = 'SNAKE';
+        document.getElementById('hudGameIcon').textContent = '🐍';
+        document.getElementById('hudGameTitle').textContent = 'CHESTNUT SNAKE';
+        document.getElementById('hudLivesContainer').classList.add('hidden');
+        document.getElementById('autoFireBtn').classList.add('hidden');
+        document.getElementById('mobileFireContainer').classList.add('hidden');
+        document.getElementById('controlsHintBar').innerHTML =
+          'Move: <span class="text-lime-400 font-bold">WASD / Arrows</span> &bull; Collect chestnuts to grow!';
+        initSnakeGame();
+      } else {
+        currentMode = 'SPACE';
+        document.getElementById('hudGameIcon').textContent = '🚀';
+        document.getElementById('hudGameTitle').textContent = 'SPACE CHESTNUT';
+        document.getElementById('hudLivesContainer').classList.remove('hidden');
+        document.getElementById('hudLivesContainer').classList.add('flex');
+        document.getElementById('autoFireBtn').classList.remove('hidden');
+        document.getElementById('mobileFireContainer').classList.remove('hidden');
+        document.getElementById('mobileFireContainer').classList.add('flex');
+        document.getElementById('controlsHintBar').innerHTML =
+          'Move: <span class="text-amber-400 font-bold">WASD / Arrows</span> &bull; Shoot Little Chestnuts: <span class="text-amber-400 font-bold">SPACEBAR</span>';
+        initSpaceGame();
+      }
+    }
+
+    function returnToMenu() {
+      currentMode = 'MENU';
+      isPaused = false;
+      isGameOver = false;
+      document.getElementById('gameCabinetView').classList.add('hidden');
+      document.getElementById('codeGuideView').classList.add('hidden');
+      document.getElementById('mainMenuView').classList.remove('hidden');
+      document.getElementById('headerMenuBtn').classList.add('hidden');
+      document.getElementById('codeToggleText').textContent = 'STEP-BY-STEP GUIDE';
+      updateMenuHighScores();
+    }
+
+    function restartCurrentGame() {
+      if (currentMode === 'SNAKE') launchGame('snake');
+      else if (currentMode === 'SPACE') launchGame('space');
+    }
+
+    function togglePauseGame() {
+      if (currentMode === 'MENU' || isGameOver) return;
+      isPaused = !isPaused;
+      document.getElementById('pauseBtnText').textContent = isPaused ? 'RESUME (P)' : 'PAUSE (P)';
+    }
+
+    function triggerGameOver(reasonText) {
+      isGameOver = true;
+      playSound('gameover');
+
+      const best = currentMode === 'SNAKE' ? highScores.snake : highScores.space;
+      document.getElementById('overlayTitle').textContent = 'GAME OVER';
+      document.getElementById('overlayMessage').textContent = reasonText;
+      document.getElementById('overlayFinalScore').textContent = score;
+      document.getElementById('overlayBestScore').textContent = best;
+      document.getElementById('canvasOverlay').classList.remove('hidden');
+    }
+
+    function updateHUD() {
+      document.getElementById('hudScore').textContent = String(score).padStart(4, '0');
+
+      if (currentMode === 'SNAKE') {
+        document.getElementById('hudHighScore').textContent = String(highScores.snake).padStart(4, '0');
+        const speedMult = (125 / snake.moveInterval).toFixed(1);
+        document.getElementById('hudSubStatus').textContent = `LENGTH: ${snake.body.length} // SPEED: ${speedMult}x`;
+      } else if (currentMode === 'SPACE') {
+        document.getElementById('hudHighScore').textContent = String(highScores.space).padStart(4, '0');
+        document.getElementById('hudSubStatus').textContent = activeBoss
+          ? `⚠️ BOSS APPROACHING!`
+          : `WAVE ${spaceWave} // NUT CANNON READY`;
+
+        // Render Hull Hearts
+        const heartsContainer = document.getElementById('hudHearts');
+        heartsContainer.innerHTML = '';
+        for (let i = 0; i < spacePlayer.maxLives; i++) {
+          const heart = document.createElement('i');
+          heart.className = i < spacePlayer.lives
+            ? 'fa-solid fa-heart text-red-500'
+            : 'fa-regular fa-heart text-stone-600';
+          heartsContainer.appendChild(heart);
+        }
+      }
+    }
+
+    /**************************************************************
+     * 7. KEYBOARD & TOUCH INPUT LISTENERS
+     **************************************************************/
+    window.addEventListener('keydown', (e) => {
+      if (currentMode === 'MENU') return;
+
+      // Prevent page scrolling when using Arrows or Space inside the game
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+        e.preventDefault();
+      }
+
+      if (e.code === 'KeyP') {
+        togglePauseGame();
+        return;
+      }
+
+      if (isGameOver && e.code === 'Enter') {
+        restartCurrentGame();
+        return;
+      }
+
+      // SNAKE DIRECTION QUEUE
+      if (currentMode === 'SNAKE') {
+        const lastDir = snake.dirQueue.length > 0 ? snake.dirQueue[snake.dirQueue.length - 1] : snake.dir;
+        if ((e.code === 'ArrowUp' || e.code === 'KeyW') && lastDir.y === 0) {
+          snake.dirQueue.push({ x: 0, y: -1 });
+        } else if ((e.code === 'ArrowDown' || e.code === 'KeyS') && lastDir.y === 0) {
+          snake.dirQueue.push({ x: 0, y: 1 });
+        } else if ((e.code === 'ArrowLeft' || e.code === 'KeyA') && lastDir.x === 0) {
+          snake.dirQueue.push({ x: -1, y: 0 });
+        } else if ((e.code === 'ArrowRight' || e.code === 'KeyD') && lastDir.x === 0) {
+          snake.dirQueue.push({ x: 1, y: 0 });
+        }
+      }
+
+      // SPACE CHESTNUT CONTINUOUS MOVEMENT & SHOOTING
+      if (currentMode === 'SPACE') {
+        if (e.code === 'ArrowUp' || e.code === 'KeyW') keysPressed.up = true;
+        if (e.code === 'ArrowDown' || e.code === 'KeyS') keysPressed.down = true;
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') keysPressed.left = true;
+        if (e.code === 'ArrowRight' || e.code === 'KeyD') keysPressed.right = true;
+        if (e.code === 'Space') keysPressed.shoot = true;
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.code === 'ArrowUp' || e.code === 'KeyW') keysPressed.up = false;
+      if (e.code === 'ArrowDown' || e.code === 'KeyS') keysPressed.down = false;
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') keysPressed.left = false;
+      if (e.code === 'ArrowRight' || e.code === 'KeyD') keysPressed.right = false;
+      if (e.code === 'Space') keysPressed.shoot = false;
+    });
+
+    // Touch D-Pad Helpers for Mobile Devices
+    function handleTouchDir(dir, e) {
+      if (e) e.preventDefault();
+      if (currentMode === 'SNAKE') {
+        const lastDir = snake.dirQueue.length > 0 ? snake.dirQueue[snake.dirQueue.length - 1] : snake.dir;
+        if (dir === 'UP' && lastDir.y === 0) snake.dirQueue.push({ x: 0, y: -1 });
+        if (dir === 'DOWN' && lastDir.y === 0) snake.dirQueue.push({ x: 0, y: 1 });
+        if (dir === 'LEFT' && lastDir.x === 0) snake.dirQueue.push({ x: -1, y: 0 });
+        if (dir === 'RIGHT' && lastDir.x === 0) snake.dirQueue.push({ x: 1, y: 0 });
+      } else if (currentMode === 'SPACE') {
+        if (dir === 'UP') keysPressed.up = true;
+        if (dir === 'DOWN') keysPressed.down = true;
+        if (dir === 'LEFT') keysPressed.left = true;
+        if (dir === 'RIGHT') keysPressed.right = true;
+      }
+    }
+
+    function handleTouchRelease(dir, e) {
+      if (e) e.preventDefault();
+      if (dir === 'UP') keysPressed.up = false;
+      if (dir === 'DOWN') keysPressed.down = false;
+      if (dir === 'LEFT') keysPressed.left = false;
+      if (dir === 'RIGHT') keysPressed.right = false;
+    }
+
+    function triggerSpaceFire(active, e) {
+      if (e) e.preventDefault();
+      keysPressed.shoot = active;
+    }
+
+    /**************************************************************
+     * 8. STEP-BY-STEP CODE GUIDE & CLIPBOARD HELPER
+     **************************************************************/
+    function toggleCodeGuide() {
+      const guideView = document.getElementById('codeGuideView');
+      const menuView = document.getElementById('mainMenuView');
+      const cabinetView = document.getElementById('gameCabinetView');
+      const btnText = document.getElementById('codeToggleText');
+
+      const isOpening = guideView.classList.contains('hidden');
+      if (isOpening) {
+        if (currentMode !== 'MENU') isPaused = true;
+        guideView.classList.remove('hidden');
+        menuView.classList.add('hidden');
+        cabinetView.classList.add('hidden');
+        btnText.textContent = currentMode === 'MENU' ? 'BACK TO MENU' : 'BACK TO GAME';
+      } else {
+        guideView.classList.add('hidden');
+        if (currentMode === 'MENU') {
+          menuView.classList.remove('hidden');
+        } else {
+          cabinetView.classList.remove('hidden');
+          isPaused = false;
+        }
+        btnText.textContent = 'STEP-BY-STEP GUIDE';
+      }
+    }
+
+    function copyFullSourceCode() {
+      const fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const textarea = document.createElement('textarea');
+      textarea.value = fullHtml;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        const label = document.getElementById('copyBtnLabel');
+        label.textContent = 'COPIED TO CLIPBOARD!';
+        setTimeout(() => {
+          label.textContent = 'COPY COMPLETE HTML CODE';
+        }, 2500);
+      } catch (err) {
+        console.error('Copy failed', err);
+      }
+      document.body.removeChild(textarea);
+    }
+
+    /**************************************************************
+     * 9. MASTER ANIMATION LOOP
+     **************************************************************/
+    let lastFrameTime = performance.now();
+
+    function masterGameLoop(timestamp) {
+      const dt = timestamp - lastFrameTime;
+      lastFrameTime = timestamp;
+
+      if (currentMode !== 'MENU') {
+        if (!isPaused && !isGameOver) {
+          if (currentMode === 'SNAKE') {
+            updateSnakeGame(timestamp);
+          } else if (currentMode === 'SPACE') {
+            updateSpaceGame(dt);
+          }
+        }
+
+        if (currentMode === 'SNAKE') {
+          drawSnakeGame();
+        } else if (currentMode === 'SPACE') {
+          drawSpaceGame();
+        }
+
+        // Draw Paused Banner if game is paused
+        if (isPaused && !isGameOver) {
+          ctx.save();
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = '#fde68a';
+          ctx.font = '24px "Press Start 2P", monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText('GAME PAUSED', canvas.width / 2, canvas.height / 2);
+          ctx.font = '12px "Press Start 2P", monospace';
+          ctx.fillStyle = '#a3e635';
+          ctx.fillText('Press P or Resume Button to Continue', canvas.width / 2, canvas.height / 2 + 35);
+          ctx.restore();
+        }
+      }
+
+      requestAnimationFrame(masterGameLoop);
+    }
+
+    window.onload = function () {
+      requestAnimationFrame(masterGameLoop);
+    };
+  </script>
+</body>
+</html>
