@@ -1,5 +1,4 @@
-# Repozytorium zawiera hobbistyczny zestaw gier: Chestnut Arcade Game Hub (Snake i space impact) oraz Cienie Korony (Shadows of the Crown) w wersji mobilnej i desktopowej
-
+# Repozytorium zawiera hobbistyczny zestaw gier: Chestnut Arcade Game Hub (Snake i space impact) oraz Cienie Korony (Shadows of the Crown) w wersji mobilnej (Godot engine)
 
 
 # Chestnut Arcade Game Hub 🌰🚀
