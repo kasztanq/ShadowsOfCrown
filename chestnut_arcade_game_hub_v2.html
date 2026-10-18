@@ -653,16 +653,14 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         <div class="bg-stone-950/90 border border-amber-800/60 rounded-xl p-4 sm:p-5">
           <h3 class="text-base sm:text-lg font-bold text-red-400 mb-2 flex items-center gap-2">
             <span class="bg-red-500 text-white font-arcade text-xs px-2.5 py-1 rounded">STEP 3</span>
-            Cartridge #03: Chestnut Tanks (Battle City Arena, Levels &amp; Mega-Tank Boss)
+            Cartridge #03: Chestnut Tanks (6 Biomes, Safe Base Perimeter &amp; Mega-Tank Boss)
           </h3>
           <p class="mb-3">
-            <strong>Chestnut Tanks</strong> divides the 800&times;500 arena into a 32&times;20 tactical grid (`25px` tiles) with destructible wooden brick walls (`tile === 1`), indestructible stone blocks (`tile === 2`), and the <strong>Golden Chestnut Base</strong> (`tile === 9`) at the bottom center.
+            <strong>Chestnut Tanks</strong> uses a 21&times;13 tactical arena (`38px` tiles) with a forgiving `26x26` tank hitbox and automatic corner-sliding. The <strong>Golden Chestnut Base</strong> sits at `(baseCol = 10, baseRow = 12)` protected by 5 U-shaped shield bricks, while a guaranteed clear safety perimeter (`rows 10..12`, `cols 6..14`) ensures the tank is never boxed in on the left or right side of the base.
           </p>
           <ul class="list-disc list-inside space-y-1 text-xs sm:text-sm text-amber-200 mb-3">
-            <li><strong>Level 1:</strong> Scout &amp; Light Acorn Tanks patrol the lanes and fire at brick walls and your base.</li>
-            <li><strong>Level 2:</strong> Fast Raider Tanks &amp; Heavy 2-Hit Armored Tanks aggressively flank the Golden Chestnut Base.</li>
-            <li><strong>Level 3+ (Boss Stages &amp; Endless Scaling):</strong> The massive <strong>Iron Husk Mega-Tank Boss</strong> rolls onto the battlefield with a Boss HP bar, 3-way chestnut spread cannons, and minion tank support!</li>
-            <li><strong>Power-Ups:</strong> Collect Burr Shields (invulnerability), Rapid Nut Cannons (fast fire), and Base Repair kits (+1 hull &amp; rebuilds base walls).</li>
+            <li><strong>6 Unique Level Biomes &amp; Blueprints:</strong> Lv.1 <em>Autumn Woodland Glade</em> (Twin-Corridor Fortress), Lv.2 <em>Crimson Canyon Quarry</em> (Chevron Stone Bunkers), Lv.3 <em>Iron Husk Citadel</em> (Boss Arena), Lv.4 <em>Frost-Pine Tundra</em> (Cross-Bastion Maze), Lv.5 <em>Golden Amber Stronghold</em> (Hourglass Citadel), and Lv.6+ <em>Volcanic Ember Forge</em>.</li>
+            <li><strong>Power-Ups &amp; Safe Ejection:</strong> Collect Burr Shields (`SHD`), Rapid Nut Cannons (`SPD`), and Base Fortify kits (`FIX` — rebuilds the 5 U-shaped base bricks and automatically nudges any overlapping tank into the clear corridor).</li>
           </ul>
         </div>
 
@@ -670,15 +668,14 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         <div class="bg-stone-950/90 border border-amber-800/60 rounded-xl p-4 sm:p-5">
           <h3 class="text-base sm:text-lg font-bold text-purple-400 mb-2 flex items-center gap-2">
             <span class="bg-purple-500 text-white font-arcade text-xs px-2.5 py-1 rounded">STEP 4</span>
-            Cartridge #04: Bomber-Nut (Chestnut Bomberman, Raycast Blasts &amp; King Burr-Golem)
+            Cartridge #04: Bomber-Nut (6 Stage Biomes, Custom Pillar Layouts &amp; King Burr-Golem)
           </h3>
           <p class="mb-3">
-            <strong>Bomber-Nut</strong> uses a 17&times;11 maze grid (`44px` tiles) with indestructible stone pillars at even intersections and destructible autumn leaf/wood crates. Pressing `SPACEBAR` plants a ticking <strong>Spiky Chestnut Bomb</strong> that raycasts in 4 directions (`UP, DOWN, LEFT, RIGHT`) up to `player.blastRange` tiles, triggering chain reactions with other bombs!
+            <strong>Bomber-Nut</strong> uses a 17&times;11 arena (`44px` tiles) that changes both its indestructible pillar architecture and background biome on every stage while keeping the player spawn corner `(1,1)`, `(1,2)`, and `(2,1)` 100% clear.
           </p>
           <ul class="list-disc list-inside space-y-1 text-xs sm:text-sm text-amber-200">
-            <li><strong>Power-Ups in Crates:</strong> Extra Chestnut Bomb (`+1 Bomb`), Burr Flame Range (`+1 Range`), and Speed Boots (`+Speed`).</li>
-            <li><strong>Level 1 &amp; 2:</strong> Clear patrolling Forest Bugs (Level 1) and smart Chaser Beetles (Level 2) to unlock the glowing <strong>Autumn Exit Portal</strong>.</li>
-            <li><strong>Level 3+ (Boss Arena):</strong> Face the <strong>King Burr-Golem Boss</strong>—a giant multi-tile boss that hurls spiky mini-burrs across the maze and must be tactically trapped with Chestnut Bombs!</li>
+            <li><strong>6 Stage Biomes &amp; Layouts:</strong> Stg.1 <em>Mossy Forest Clearing</em> (Classic Checkerboard), Stg.2 <em>Twilight Mushroom Cavern</em> (Cross Avenue &amp; Corner Monoliths), Stg.3 <em>King Burr-Golem's Amber Throne</em> (Boss Arena Ring), Stg.4 <em>Frosted Birch Ruins</em> (Staggered Bastion Gates), Stg.5 <em>Sunken Root Labyrinth</em> (Concentric Chambers), and Stg.6+ <em>Volcanic Cinder Pit</em>.</li>
+            <li><strong>Power-Ups &amp; Bosses:</strong> Blast crates for `+1 Bomb`, `+1 Range`, and `Speed Boots`, unlock the glowing Exit Portal, and trap <strong>King Burr-Golem</strong> on every 3rd stage!</li>
           </ul>
         </div>
 
@@ -2835,18 +2832,123 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
 
     /**************************************************************
      * 6. GAME 3: "CHESTNUT TANKS" (BATTLE CITY TRIBUTE)
+     *    21x13 Grid (38px tiles), 26x26 Forgiving Hitbox, Smooth
+     *    Corner-Sliding, Guaranteed Clear Base Perimeter & 6 Biomes
      **************************************************************/
-    const TANK_TILE = 25; // 32 cols x 20 rows (800 x 500)
-    const TANK_COLS = 32;
-    const TANK_ROWS = 20;
+    const TANK_TILE = 38; // 21 cols x 13 rows = 798 x 494 centered on 800x500 canvas
+    const TANK_COLS = 21;
+    const TANK_ROWS = 13;
+    const TANK_OFFSET_X = Math.floor((canvas.width - TANK_COLS * TANK_TILE) / 2);  // 1px
+    const TANK_OFFSET_Y = Math.floor((canvas.height - TANK_ROWS * TANK_TILE) / 2); // 3px
+    const TANK_BASE_COL = Math.floor(TANK_COLS / 2); // Col 10 (Exact Center)
+    const TANK_BASE_ROW = TANK_ROWS - 1;             // Row 12 (Bottom Center)
 
-    // Map Tile Legend: 0 = Empty, 1 = Destructible Brick/Wood, 2 = Indestructible Stone, 3 = Forest Bush Cover, 9 = Golden Chestnut Base
+    function tankTileCenterX(c) {
+      return TANK_OFFSET_X + c * TANK_TILE + TANK_TILE / 2;
+    }
+    function tankTileCenterY(r) {
+      return TANK_OFFSET_Y + r * TANK_TILE + TANK_TILE / 2;
+    }
+
+    // 6 Distinct Level Biomes & Wall Styling Themes for Chestnut Tanks
+    const TANK_BIOMES = [
+      {
+        name: 'AUTUMN WOODLAND GLADE',
+        floorBg: '#182614',
+        floorAlt: '#1e2f19',
+        accentCol: 'rgba(132, 204, 22, 0.14)',
+        brickFill: '#9a3412',
+        brickTop: '#c2410c',
+        brickStroke: '#431407',
+        stoneFill: '#57534e',
+        stoneInner: '#78716c',
+        stoneStroke: '#d6d3d1',
+        bushCol: 'rgba(77, 124, 15, 0.88)',
+        pattern: 'leaves'
+      },
+      {
+        name: 'CRIMSON CANYON QUARRY',
+        floorBg: '#2b1612',
+        floorAlt: '#361c17',
+        accentCol: 'rgba(249, 115, 22, 0.14)',
+        brickFill: '#b45309',
+        brickTop: '#d97706',
+        brickStroke: '#451a03',
+        stoneFill: '#64413a',
+        stoneInner: '#85584f',
+        stoneStroke: '#fda4af',
+        bushCol: 'rgba(180, 83, 9, 0.82)',
+        pattern: 'strata'
+      },
+      {
+        name: 'IRON HUSK CITADEL',
+        floorBg: '#161b24',
+        floorAlt: '#1e2530',
+        accentCol: 'rgba(148, 163, 184, 0.14)',
+        brickFill: '#7f1d1d',
+        brickTop: '#b91c1c',
+        brickStroke: '#450a0a',
+        stoneFill: '#334155',
+        stoneInner: '#475569',
+        stoneStroke: '#94a3b8',
+        bushCol: 'rgba(71, 85, 105, 0.85)',
+        pattern: 'rivets'
+      },
+      {
+        name: 'FROST-PINE TUNDRA',
+        floorBg: '#122430',
+        floorAlt: '#172e3d',
+        accentCol: 'rgba(56, 189, 248, 0.14)',
+        brickFill: '#7c2d12',
+        brickTop: '#9a3412',
+        brickStroke: '#3b1106',
+        stoneFill: '#3b6275',
+        stoneInner: '#56859c',
+        stoneStroke: '#bae6fd',
+        bushCol: 'rgba(20, 184, 166, 0.82)',
+        pattern: 'frost'
+      },
+      {
+        name: 'GOLDEN AMBER STRONGHOLD',
+        floorBg: '#2a200e',
+        floorAlt: '#362912',
+        accentCol: 'rgba(250, 204, 21, 0.14)',
+        brickFill: '#92400e',
+        brickTop: '#b45309',
+        brickStroke: '#451a03',
+        stoneFill: '#6b5b3e',
+        stoneInner: '#8c7853',
+        stoneStroke: '#fde047',
+        bushCol: 'rgba(161, 98, 7, 0.85)',
+        pattern: 'ornate'
+      },
+      {
+        name: 'VOLCANIC EMBER FORGE',
+        floorBg: '#261116',
+        floorAlt: '#33161d',
+        accentCol: 'rgba(239, 68, 68, 0.18)',
+        brickFill: '#881337',
+        brickTop: '#be123c',
+        brickStroke: '#4c0519',
+        stoneFill: '#3f2e3e',
+        stoneInner: '#5c435a',
+        stoneStroke: '#fb7185',
+        bushCol: 'rgba(190, 18, 60, 0.80)',
+        pattern: 'lava'
+      }
+    ];
+
+    function getTankBiome(lvl) {
+      return TANK_BIOMES[(lvl - 1) % TANK_BIOMES.length];
+    }
+
+    // Map Tile Legend: 0 = Empty, 1 = Destructible Brick, 2 = Indestructible Stone, 3 = Stealth Bush, 9 = Golden Chestnut Base
     let tankMap = [];
     let tankLevel = 1;
     let tankPlayer = {
-      x: 275,
-      y: 450,
-      radius: 15,
+      x: 0,
+      y: 0,
+      radius: 13, // 26x26 forgiving hitbox inside 38x38 grid cell
       dir: { x: 0, y: -1 },
       speed: 2.7,
       lives: 3,
@@ -2859,11 +2961,9 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
     let tankBullets = [];
     let enemyTanks = [];
     let tankPowerUps = [];
-    let tankParticles = [];
     let tanksRemainingToSpawn = 0;
     let tankSpawnCooldown = 0;
     let activeTankBoss = null;
-    let baseAlive = true;
 
     function initTanksGame() {
       score = 0;
@@ -2874,15 +2974,164 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       setupTankLevel(1);
     }
 
+    // Ejects any tank (player or enemy) that overlaps the 5 U-shaped base shield bricks or base tile
+    function ejectTankFromBaseShield(unit) {
+      const minX = TANK_OFFSET_X + (TANK_BASE_COL - 1) * TANK_TILE - unit.radius;
+      const maxX = TANK_OFFSET_X + (TANK_BASE_COL + 2) * TANK_TILE + unit.radius;
+      const minY = TANK_OFFSET_Y + (TANK_BASE_ROW - 1) * TANK_TILE - unit.radius;
+
+      if (unit.x > minX && unit.x < maxX && unit.y > minY) {
+        if (unit.x <= tankTileCenterX(TANK_BASE_COL)) {
+          unit.x = tankTileCenterX(TANK_BASE_COL - 2);
+        } else {
+          unit.x = tankTileCenterX(TANK_BASE_COL + 2);
+        }
+        unit.y = Math.min(unit.y, tankTileCenterY(TANK_BASE_ROW));
+      }
+    }
+
+    // Enforces the Guaranteed Clear Perimeter around the Golden Chestnut Base & Player Spawn
+    // and builds the 5 U-shaped shield bricks around (TANK_BASE_COL, TANK_BASE_ROW)
     function buildBaseWalls(tileType = 1) {
-      // Base occupies cols 15..16, rows 18..19
-      // Surround cols 14..17, rows 17..19 with protective walls
-      for (let r = 17; r <= 19; r++) {
-        for (let c = 14; c <= 17; c++) {
-          if (r >= 18 && (c === 15 || c === 16)) {
-            tankMap[r][c] = 9; // Golden Chestnut Base core
-          } else {
-            tankMap[r][c] = tileType;
+      // 1. Clear generous safety zone: rows ROWS-3..ROWS-1 (10..12), cols baseCol-5..baseCol+5 (5..15)
+      for (let r = TANK_ROWS - 3; r <= TANK_ROWS - 1; r++) {
+        for (let c = TANK_BASE_COL - 5; c <= TANK_BASE_COL + 5; c++) {
+          if (r >= 0 && r < TANK_ROWS && c >= 0 && c < TANK_COLS) {
+            tankMap[r][c] = 0;
+          }
+        }
+      }
+
+      // 2. Place Golden Chestnut Base at (baseCol, ROWS - 1)
+      tankMap[TANK_BASE_ROW][TANK_BASE_COL] = 9;
+
+      // 3. Place the 5 U-Shaped Shield Bricks around the Base
+      const shieldCoords = [
+        { c: TANK_BASE_COL - 1, r: TANK_BASE_ROW },
+        { c: TANK_BASE_COL - 1, r: TANK_BASE_ROW - 1 },
+        { c: TANK_BASE_COL,     r: TANK_BASE_ROW - 1 },
+        { c: TANK_BASE_COL + 1, r: TANK_BASE_ROW - 1 },
+        { c: TANK_BASE_COL + 1, r: TANK_BASE_ROW }
+      ];
+      shieldCoords.forEach(pt => {
+        tankMap[pt.r][pt.c] = tileType;
+      });
+
+      // 4. Ensure neither the player tank nor any enemy tank is pinched or trapped in the rebuilt walls
+      ejectTankFromBaseShield(tankPlayer);
+      enemyTanks.forEach(et => ejectTankFromBaseShield(et));
+    }
+
+    function applyTankLevelBlueprint(lvl) {
+      const blueprintIdx = ((lvl - 1) % 6) + 1;
+
+      if (blueprintIdx === 1) {
+        // LEVEL 1: Autumn Woodland Glade — Classic Twin-Corridor Brick Fortress + Stealth Bush Belt
+        for (let r = 2; r <= 9; r++) {
+          [2, 3, 6, 7, 13, 14, 17, 18].forEach(c => {
+            if (r !== 5 && r !== 6) tankMap[r][c] = 1;
+          });
+        }
+        // Central Stealth Bush Belt & Center Brick Shield
+        for (let c = 1; c < TANK_COLS - 1; c++) {
+          if (c === 9 || c === 10 || c === 11) {
+            tankMap[4][c] = 1;
+            tankMap[7][c] = 1;
+          } else if (c % 2 === 1) {
+            tankMap[5][c] = 3;
+            tankMap[6][c] = 3;
+          }
+        }
+        tankMap[5][10] = 2; // Center stone anchor
+      } else if (blueprintIdx === 2) {
+        // LEVEL 2: Crimson Canyon Quarry — Chevron Stone Bunkers & Flanking Brick Pillboxes
+        // Upper Chevron Stone Bunkers
+        [[3, 4], [4, 5], [3, 6], [3, 14], [4, 15], [3, 16]].forEach(([r, c]) => {
+          tankMap[r][c] = 2;
+        });
+        // Center Canyon Ridge
+        for (let c = 8; c <= 12; c++) {
+          tankMap[5][c] = (c === 10) ? 2 : 1;
+          tankMap[6][c] = 3;
+        }
+        // Flanking Brick Pillboxes
+        for (let r = 6; r <= 8; r++) {
+          [2, 3, 5, 15, 17, 18].forEach(c => {
+            tankMap[r][c] = 1;
+          });
+        }
+        // Canyon Brush Pockets
+        [[2, 8], [2, 12], [8, 4], [8, 16]].forEach(([r, c]) => {
+          tankMap[r][c] = 3;
+        });
+      } else if (blueprintIdx === 3) {
+        // LEVEL 3 (BOSS STAGE): Iron Husk Citadel — Open Boss Arena with 4 Stone Blast-Pillars
+        const pillars = [
+          { r: 4, c: 5 }, { r: 4, c: 15 },
+          { r: 7, c: 5 }, { r: 7, c: 15 }
+        ];
+        pillars.forEach(p => {
+          tankMap[p.r][p.c] = 2;
+          tankMap[p.r][p.c + (p.c < 10 ? 1 : -1)] = 1;
+        });
+        // Destructible Midfield Cover Line for Boss Duel
+        for (let c = 8; c <= 12; c++) {
+          if (c !== 10) tankMap[6][c] = 1;
+          else tankMap[6][c] = 3;
+        }
+        // Side Stealth Bushes
+        for (let r = 4; r <= 7; r++) {
+          tankMap[r][2] = 3;
+          tankMap[r][TANK_COLS - 3] = 3;
+        }
+      } else if (blueprintIdx === 4) {
+        // LEVEL 4: Frost-Pine Tundra — Cross-Bastion Maze with Steel Dividers & Bush Alleys
+        for (let c = 3; c <= 17; c++) {
+          if (c !== 6 && c !== 10 && c !== 14) {
+            tankMap[3][c] = (c === 4 || c === 16) ? 2 : 1;
+          }
+          if (c !== 5 && c !== 10 && c !== 15) {
+            tankMap[7][c] = (c === 9 || c === 11) ? 2 : 1;
+          }
+        }
+        for (let r = 2; r <= 8; r++) {
+          if (r !== 5) {
+            tankMap[r][2] = 3;
+            tankMap[r][10] = (r === 4 || r === 6) ? 2 : 3;
+            tankMap[r][18] = 3;
+          }
+        }
+      } else if (blueprintIdx === 5) {
+        // LEVEL 5: Golden Amber Stronghold — Hourglass Citadel with Choke Points
+        for (let d = 0; d < 4; d++) {
+          tankMap[2 + d][3 + d] = (d === 2) ? 2 : 1;
+          tankMap[2 + d][17 - d] = (d === 2) ? 2 : 1;
+          tankMap[8 - d][3 + d] = 1;
+          tankMap[8 - d][17 - d] = 1;
+        }
+        // Central Sanctuary Bastion
+        for (let c = 8; c <= 12; c++) {
+          tankMap[4][c] = 1;
+          tankMap[5][c] = (c === 10) ? 2 : 3;
+          tankMap[6][c] = 1;
+        }
+        for (let r = 3; r <= 7; r++) {
+          tankMap[r][1] = 1;
+          tankMap[r][19] = 1;
+        }
+      } else {
+        // LEVEL 6 (BOSS & ENDLESS CYCLE): Volcanic Ember Forge — Fortified Obsidian Pillars & Lava Lanes
+        const stoneClusters = [
+          [4, 4], [4, 5], [4, 15], [4, 16],
+          [7, 7], [7, 13]
+        ];
+        stoneClusters.forEach(([r, c]) => { tankMap[r][c] = 2; });
+        for (let c = 3; c <= 17; c++) {
+          if (c % 2 === 0 && c !== 10) {
+            tankMap[5][c] = 1;
+            tankMap[8][c] = 1;
+          } else if (c % 3 === 0) {
+            tankMap[6][c] = 3;
           }
         }
       }
@@ -2890,66 +3139,46 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
 
     function setupTankLevel(lvl) {
       tankLevel = lvl;
-      baseAlive = true;
       tankBullets = [];
       enemyTanks = [];
       tankPowerUps = [];
-      tankParticles = [];
       activeTankBoss = null;
 
-      // Reset Player Position beside the Golden Chestnut Base
-      tankPlayer.x = 11 * TANK_TILE + TANK_TILE;
-      tankPlayer.y = 18 * TANK_TILE + TANK_TILE / 2;
-      tankPlayer.dir = { x: 0, y: -1 };
-      tankPlayer.shieldTimer = 110; // Brief spawn protection
-
-      // Initialize Empty Map
+      // Initialize Empty Map (13 rows x 21 cols)
       tankMap = Array.from({ length: TANK_ROWS }, () => Array(TANK_COLS).fill(0));
 
       const isBossStage = (lvl % 3 === 0);
+      const biome = getTankBiome(lvl);
 
-      // Build Arena Walls based on Level
-      for (let r = 3; r < 16; r++) {
-        for (let c = 2; c < TANK_COLS - 2; c++) {
-          if (isBossStage) {
-            // Boss stage: wider tactical firing lanes with stone bunkers
-            if ((r === 8 || r === 9) && (c === 7 || c === 8 || c === 23 || c === 24)) {
-              tankMap[r][c] = 2;
-            } else if ((r === 12 || r === 13) && (c >= 11 && c <= 20) && c % 3 !== 0) {
-              tankMap[r][c] = 1;
-            }
-          } else {
-            // Standard Battle City columns & cross walls
-            if (c % 4 === 0 && c !== 16 && r !== 9 && r !== 10) {
-              tankMap[r][c] = 1;
-              if (c + 1 < TANK_COLS - 2) tankMap[r][c + 1] = 1;
-            }
-            // Indestructible stone accents
-            if ((r === 6 || r === 13) && (c === 6 || c === 15 || c === 16 || c === 25)) {
-              tankMap[r][c] = (lvl >= 2 && (c === 15 || c === 16)) ? 2 : 1;
-            }
-            // Forest bushes
-            if ((r === 9 || r === 10) && (c === 4 || c === 5 || c === 26 || c === 27)) {
-              tankMap[r][c] = 3;
-            }
-          }
+      // Apply Level-Specific Wall Setup Blueprint
+      applyTankLevelBlueprint(lvl);
+
+      // Keep Top Enemy Spawn Lanes (Row 0..1) & Boss Patrol Lane (Row 1..2 on Boss Stages) Clear
+      for (let c = 0; c < TANK_COLS; c++) {
+        tankMap[0][c] = 0;
+        if (isBossStage || c <= 2 || (c >= 9 && c <= 11) || c >= TANK_COLS - 3) {
+          tankMap[1][c] = 0;
+          if (isBossStage) tankMap[2][c] = 0;
         }
       }
 
-      // Build Golden Chestnut Base & Protective Brick Wall
+      // Spawn Player Tank Safely at (baseCol - 2, ROWS - 1) Centered in Tile
+      tankPlayer.x = tankTileCenterX(TANK_BASE_COL - 2);
+      tankPlayer.y = tankTileCenterY(TANK_BASE_ROW);
+      tankPlayer.dir = { x: 0, y: -1 };
+      tankPlayer.shieldTimer = 110; // Brief spawn protection
+
+      // Enforce Clear Perimeter (rows ROWS-3..ROWS-1, cols baseCol-4..baseCol+4) & Build 5 Base Shield Bricks
       buildBaseWalls(1);
 
       if (isBossStage) {
-        tanksRemainingToSpawn = 2 + Math.floor(lvl / 3); // Minion escorts
+        tanksRemainingToSpawn = 2 + Math.floor(lvl / 3);
         spawnIronHuskBoss(lvl);
-        showLevelBanner(`LEVEL ${lvl}: BOSS STAGE!`, 'Defeat the Iron Husk Mega-Tank!');
+        showLevelBanner(`LV.${lvl} ${biome.name}`, '⚠️ BOSS STAGE: Defeat Iron Husk Mega-Tank!');
       } else {
         tanksRemainingToSpawn = 6 + lvl * 2;
         tankSpawnCooldown = 30;
-        const subtitle = lvl === 1
-          ? 'Scout & Light Acorn Tanks Incoming!'
-          : 'Fast Raiders & Heavy Armored Tanks!';
-        showLevelBanner(`CHESTNUT TANKS - LEVEL ${lvl}`, subtitle);
+        showLevelBanner(`LV.${lvl}: ${biome.name}`, 'Defend the Golden Chestnut Base!');
       }
 
       updateHUD();
@@ -2963,40 +3192,39 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         type: 'boss',
         name: `IRON HUSK MEGA-TANK MK-${bossTier}`,
         x: canvas.width / 2,
-        y: 55,
-        radius: 28,
+        y: tankTileCenterY(1) + 10,
+        radius: 26,
         dir: { x: 0, y: 1 },
-        vx: 1.4 + bossTier * 0.25,
+        vx: 1.5 + bossTier * 0.25,
         hp: maxHp,
         maxHp: maxHp,
-        shootTimer: 65,
-        moveTimer: 90
+        shootTimer: 65
       };
       enemyTanks.push(activeTankBoss);
     }
 
     function spawnEnemyTank() {
       const spawnPoints = [
-        { x: 2 * TANK_TILE, y: 1.5 * TANK_TILE },
-        { x: 16 * TANK_TILE, y: 1.5 * TANK_TILE },
-        { x: 29 * TANK_TILE, y: 1.5 * TANK_TILE }
+        { x: tankTileCenterX(1),             y: tankTileCenterY(0) },
+        { x: tankTileCenterX(TANK_BASE_COL), y: tankTileCenterY(0) },
+        { x: tankTileCenterX(TANK_COLS - 2), y: tankTileCenterY(0) }
       ];
       const sp = spawnPoints[Math.floor(Math.random() * spawnPoints.length)];
 
       // Choose Tank Type based on Level
       let type = 'scout';
       let hp = 1;
-      let speed = 1.4 + tankLevel * 0.1;
+      let speed = 1.45 + tankLevel * 0.09;
 
       const roll = Math.random();
       if (tankLevel >= 2 && roll < 0.4) {
         type = 'heavy'; // 2-3 Hit Heavy Armored Chestnut Tank
         hp = 2 + (tankLevel >= 4 ? 1 : 0);
-        speed = 1.15 + tankLevel * 0.08;
+        speed = 1.15 + tankLevel * 0.07;
       } else if (tankLevel >= 2 && roll < 0.75) {
         type = 'raider'; // Fast Flanking Tank
         hp = 1;
-        speed = 2.2 + tankLevel * 0.12;
+        speed = 2.15 + tankLevel * 0.1;
       }
 
       const dropsPowerUp = Math.random() < 0.35;
@@ -3006,26 +3234,31 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         type,
         x: sp.x,
         y: sp.y,
-        radius: 15,
+        radius: 13,
         dir: { x: 0, y: 1 },
         speed,
         hp,
         maxHp: hp,
         dropsPowerUp,
         shootTimer: 45 + Math.floor(Math.random() * 50),
-        aiTimer: 40 + Math.floor(Math.random() * 40)
+        aiTimer: 45 + Math.floor(Math.random() * 45)
       });
     }
 
     function rectCollidesTankMap(cx, cy, r) {
-      // Check canvas boundaries
-      if (cx - r < 0 || cx + r > canvas.width || cy - r < 0 || cy + r > canvas.height) {
+      const minX = TANK_OFFSET_X;
+      const maxX = TANK_OFFSET_X + TANK_COLS * TANK_TILE;
+      const minY = TANK_OFFSET_Y;
+      const maxY = TANK_OFFSET_Y + TANK_ROWS * TANK_TILE;
+
+      if (cx - r < minX || cx + r > maxX || cy - r < minY || cy + r > maxY) {
         return true;
       }
-      const leftCol = Math.floor((cx - r + 2) / TANK_TILE);
-      const rightCol = Math.floor((cx + r - 2) / TANK_TILE);
-      const topRow = Math.floor((cy - r + 2) / TANK_TILE);
-      const botRow = Math.floor((cy + r - 2) / TANK_TILE);
+
+      const leftCol = Math.floor((cx - r - TANK_OFFSET_X + 1) / TANK_TILE);
+      const rightCol = Math.floor((cx + r - TANK_OFFSET_X - 1) / TANK_TILE);
+      const topRow = Math.floor((cy - r - TANK_OFFSET_Y + 1) / TANK_TILE);
+      const botRow = Math.floor((cy + r - TANK_OFFSET_Y - 1) / TANK_TILE);
 
       for (let row = topRow; row <= botRow; row++) {
         for (let col = leftCol; col <= rightCol; col++) {
@@ -3040,19 +3273,69 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       return false;
     }
 
+    // Moves a tank with automatic smooth corner-sliding around walls & base corners
+    function moveTankWithCornerSlide(unit, dx, dy) {
+      if (dx !== 0) {
+        if (!rectCollidesTankMap(unit.x + dx, unit.y, unit.radius)) {
+          unit.x += dx;
+          return true;
+        } else {
+          // Smooth vertical corner-slide toward the nearest aligned row lane
+          const curRow = Math.floor((unit.y - TANK_OFFSET_Y) / TANK_TILE);
+          for (let dr = -1; dr <= 1; dr++) {
+            const targetRow = curRow + dr;
+            if (targetRow < 0 || targetRow >= TANK_ROWS) continue;
+            const laneY = tankTileCenterY(targetRow);
+            if (Math.abs(unit.y - laneY) <= TANK_TILE * 0.62) {
+              if (!rectCollidesTankMap(unit.x + dx, laneY, unit.radius)) {
+                const stepY = Math.sign(laneY - unit.y) * Math.min(Math.abs(laneY - unit.y), unit.speed);
+                if (!rectCollidesTankMap(unit.x, unit.y + stepY, unit.radius)) {
+                  unit.y += stepY;
+                  return true;
+                }
+              }
+            }
+          }
+        }
+      } else if (dy !== 0) {
+        if (!rectCollidesTankMap(unit.x, unit.y + dy, unit.radius)) {
+          unit.y += dy;
+          return true;
+        } else {
+          // Smooth horizontal corner-slide toward the nearest aligned column lane
+          const curCol = Math.floor((unit.x - TANK_OFFSET_X) / TANK_TILE);
+          for (let dc = -1; dc <= 1; dc++) {
+            const targetCol = curCol + dc;
+            if (targetCol < 0 || targetCol >= TANK_COLS) continue;
+            const laneX = tankTileCenterX(targetCol);
+            if (Math.abs(unit.x - laneX) <= TANK_TILE * 0.62) {
+              if (!rectCollidesTankMap(laneX, unit.y + dy, unit.radius)) {
+                const stepX = Math.sign(laneX - unit.x) * Math.min(Math.abs(laneX - unit.x), unit.speed);
+                if (!rectCollidesTankMap(unit.x + stepX, unit.y, unit.radius)) {
+                  unit.x += stepX;
+                  return true;
+                }
+              }
+            }
+          }
+        }
+      }
+      return false;
+    }
+
     function spawnTankPowerUp(x, y) {
       const types = ['SHIELD', 'RAPID', 'REPAIR'];
       const kind = types[Math.floor(Math.random() * types.length)];
       tankPowerUps.push({
-        x: Math.max(40, Math.min(canvas.width - 40, x)),
-        y: Math.max(40, Math.min(canvas.height - 60, y)),
+        x: Math.max(48, Math.min(canvas.width - 48, x)),
+        y: Math.max(48, Math.min(canvas.height - 68, y)),
         kind,
-        timer: 500
+        timer: 520
       });
     }
 
     function updateTanksGame() {
-      // 1. Player Movement (4-Way Cardinal Tank Driving)
+      // 1. Player Movement (4-Way Cardinal Tank Driving + Smooth Corner-Sliding)
       let moveDx = 0, moveDy = 0;
       if (keysPressed.up) { moveDy = -tankPlayer.speed; tankPlayer.dir = { x: 0, y: -1 }; }
       else if (keysPressed.down) { moveDy = tankPlayer.speed; tankPlayer.dir = { x: 0, y: 1 }; }
@@ -3060,12 +3343,7 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       else if (keysPressed.right) { moveDx = tankPlayer.speed; tankPlayer.dir = { x: 1, y: 0 }; }
 
       if (moveDx !== 0 || moveDy !== 0) {
-        const nextX = tankPlayer.x + moveDx;
-        const nextY = tankPlayer.y + moveDy;
-        if (!rectCollidesTankMap(nextX, nextY, tankPlayer.radius)) {
-          tankPlayer.x = nextX;
-          tankPlayer.y = nextY;
-        }
+        moveTankWithCornerSlide(tankPlayer, moveDx, moveDy);
       }
 
       if (tankPlayer.shieldTimer > 0) tankPlayer.shieldTimer--;
@@ -3078,8 +3356,8 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         const shellSpeed = tankPlayer.rapidFireTimer > 0 ? 8.5 : 6.5;
         tankBullets.push({
           fromPlayer: true,
-          x: tankPlayer.x + tankPlayer.dir.x * 18,
-          y: tankPlayer.y + tankPlayer.dir.y * 18,
+          x: tankPlayer.x + tankPlayer.dir.x * 16,
+          y: tankPlayer.y + tankPlayer.dir.y * 16,
           vx: tankPlayer.dir.x * shellSpeed,
           vy: tankPlayer.dir.y * shellSpeed,
           radius: 5.5,
@@ -3104,9 +3382,9 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         const et = enemyTanks[i];
 
         if (et.isBoss) {
-          // Boss patrols horizontally at top of arena & crushes bricks in its path
+          // Boss patrols horizontally at top of arena
           et.x += et.vx;
-          if (et.x - et.radius < 35 || et.x + et.radius > canvas.width - 35) {
+          if (et.x - et.radius < 42 || et.x + et.radius > canvas.width - 42) {
             et.vx *= -1;
           }
           et.shootTimer--;
@@ -3127,12 +3405,11 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
             });
           }
         } else {
-          // Standard Enemy Tank AI
-          const nextX = et.x + et.dir.x * et.speed;
-          const nextY = et.y + et.dir.y * et.speed;
+          // Standard Enemy Tank AI with Corner-Slide Assist
+          const moved = moveTankWithCornerSlide(et, et.dir.x * et.speed, et.dir.y * et.speed);
           et.aiTimer--;
 
-          if (rectCollidesTankMap(nextX, nextY, et.radius) || et.aiTimer <= 0) {
+          if (!moved || et.aiTimer <= 0) {
             et.aiTimer = 45 + Math.floor(Math.random() * 50);
             // Bias movement toward bottom Golden Chestnut Base or Player
             const dirs = [
@@ -3143,9 +3420,6 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
               { x: 0, y: -1 }
             ];
             et.dir = dirs[Math.floor(Math.random() * dirs.length)];
-          } else {
-            et.x = nextX;
-            et.y = nextY;
           }
 
           et.shootTimer--;
@@ -3153,8 +3427,8 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
             et.shootTimer = Math.max(40, 85 - tankLevel * 6);
             tankBullets.push({
               fromPlayer: false,
-              x: et.x + et.dir.x * 16,
-              y: et.y + et.dir.y * 16,
+              x: et.x + et.dir.x * 15,
+              y: et.y + et.dir.y * 15,
               vx: et.dir.x * 5.2,
               vy: et.dir.y * 5.2,
               radius: 5,
@@ -3165,8 +3439,19 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
 
         // Check Enemy Tank collision with Player Tank
         const distToPlayer = Math.hypot(et.x - tankPlayer.x, et.y - tankPlayer.y);
-        if (distToPlayer < et.radius + tankPlayer.radius && tankPlayer.shieldTimer <= 0) {
-          damageTankPlayer();
+        if (distToPlayer < et.radius + tankPlayer.radius) {
+          if (tankPlayer.shieldTimer <= 0) {
+            damageTankPlayer();
+          } else if (!et.isBoss) {
+            // Push enemy tank away during spawn/shield protection so it can never pin the player by the base
+            const pushAngle = Math.atan2(et.y - tankPlayer.y, et.x - tankPlayer.x);
+            const pushedX = et.x + Math.cos(pushAngle) * 6;
+            const pushedY = et.y + Math.sin(pushAngle) * 6;
+            if (!rectCollidesTankMap(pushedX, pushedY, et.radius)) {
+              et.x = pushedX;
+              et.y = pushedY;
+            }
+          }
         }
       }
 
@@ -3183,8 +3468,8 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         }
 
         // Check Tile Hit
-        const col = Math.floor(b.x / TANK_TILE);
-        const row = Math.floor(b.y / TANK_TILE);
+        const col = Math.floor((b.x - TANK_OFFSET_X) / TANK_TILE);
+        const row = Math.floor((b.y - TANK_OFFSET_Y) / TANK_TILE);
         if (row >= 0 && row < TANK_ROWS && col >= 0 && col < TANK_COLS) {
           const tile = tankMap[row][col];
           if (tile === 1) {
@@ -3201,10 +3486,10 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
             tankBullets.splice(i, 1);
             continue;
           } else if (tile === 9) {
+          } else if ( tile === 9) {
             // Golden Chestnut Base Hit!
-            baseAlive = false;
             tankBullets.splice(i, 1);
-            createSpaceExplosion(16 * TANK_TILE, 19 * TANK_TILE, '#facc15', 35);
+            createSpaceExplosion(tankTileCenterX(TANK_BASE_COL), tankTileCenterY(TANK_BASE_ROW), '#facc15', 35);
             triggerGameOver('The Golden Chestnut Base was destroyed!');
             return;
           }
@@ -3263,7 +3548,7 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       for (let i = tankPowerUps.length - 1; i >= 0; i--) {
         const pu = tankPowerUps[i];
         pu.timer--;
-        if (Math.hypot(pu.x - tankPlayer.x, pu.y - tankPlayer.y) < 24) {
+        if (Math.hypot(pu.x - tankPlayer.x, pu.y - tankPlayer.y) < 25) {
           playSound('powerup');
           score += 25;
           checkAndSaveHighScore('tanks');
@@ -3307,9 +3592,11 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       playSound('boom');
       createSpaceExplosion(tankPlayer.x, tankPlayer.y, '#ef4444', 22);
       tankPlayer.lives--;
-      tankPlayer.shieldTimer = 100;
-      tankPlayer.x = 11 * TANK_TILE + TANK_TILE;
-      tankPlayer.y = 18 * TANK_TILE + TANK_TILE / 2;
+      tankPlayer.shieldTimer = 110;
+      // Respawn safely at (baseCol - 2, ROWS - 1) centered in the clear corridor
+      tankPlayer.x = tankTileCenterX(TANK_BASE_COL - 2);
+      tankPlayer.y = tankTileCenterY(TANK_BASE_ROW);
+      tankPlayer.dir = { x: 0, y: -1 };
       updateHUD();
 
       if (tankPlayer.lives <= 0) {
@@ -3365,61 +3652,97 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
     }
 
     function drawTanksGame() {
-      // 1. Tactical Battlefield Floor
-      ctx.fillStyle = '#140d08';
+      const biome = getTankBiome(tankLevel);
+
+      // 1. Biome Battlefield Floor & Pattern Accents
+      ctx.fillStyle = biome.floorBg;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Subtle Grid Lines
-      ctx.strokeStyle = 'rgba(120, 53, 15, 0.14)';
-      ctx.lineWidth = 1;
-      for (let c = 0; c <= TANK_COLS; c++) {
-        ctx.beginPath();
-        ctx.moveTo(c * TANK_TILE, 0);
-        ctx.lineTo(c * TANK_TILE, canvas.height);
-        ctx.stroke();
-      }
-      for (let r = 0; r <= TANK_ROWS; r++) {
-        ctx.beginPath();
-        ctx.moveTo(0, r * TANK_TILE);
-        ctx.lineTo(canvas.width, r * TANK_TILE);
-        ctx.stroke();
+      for (let r = 0; r < TANK_ROWS; r++) {
+        for (let c = 0; c < TANK_COLS; c++) {
+          const tx = TANK_OFFSET_X + c * TANK_TILE;
+          const ty = TANK_OFFSET_Y + r * TANK_TILE;
+
+          if ((r + c) % 2 === 1) {
+            ctx.fillStyle = biome.floorAlt;
+            ctx.fillRect(tx, ty, TANK_TILE, TANK_TILE);
+          }
+
+          // Biome-Specific Ground Details
+          if (biome.pattern === 'leaves' && (r * 7 + c * 3) % 5 === 0) {
+            ctx.fillStyle = biome.accentCol;
+            ctx.beginPath();
+            ctx.arc(tx + 12, ty + 14, 3, 0, Math.PI * 2);
+            ctx.fill();
+          } else if (biome.pattern === 'strata' && r % 2 === 0) {
+            ctx.strokeStyle = biome.accentCol;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(tx + 4, ty + TANK_TILE / 2);
+            ctx.lineTo(tx + TANK_TILE - 4, ty + TANK_TILE / 2);
+            ctx.stroke();
+          } else if (biome.pattern === 'rivets') {
+            ctx.fillStyle = biome.accentCol;
+            ctx.fillRect(tx + 3, ty + 3, 2, 2);
+            ctx.fillRect(tx + TANK_TILE - 5, ty + TANK_TILE - 5, 2, 2);
+          } else if (biome.pattern === 'frost' && (r + c) % 3 === 0) {
+            ctx.strokeStyle = biome.accentCol;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(tx + 10, ty + 10, TANK_TILE - 20, TANK_TILE - 20);
+          } else if (biome.pattern === 'ornate') {
+            ctx.strokeStyle = biome.accentCol;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(tx + 3, ty + 3, TANK_TILE - 6, TANK_TILE - 6);
+          } else if (biome.pattern === 'lava' && (r * 5 + c * 11) % 6 === 0) {
+            ctx.strokeStyle = biome.accentCol;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(tx + 6, ty + 8);
+            ctx.lineTo(tx + 19, ty + 22);
+            ctx.lineTo(tx + 30, ty + 16);
+            ctx.stroke();
+          }
+        }
       }
 
-      // 2. Draw Map Tiles (Bricks, Stone, Golden Base)
-      let baseDrawn = false;
+      // 2. Draw Map Tiles (Biome Bricks, Stone Bunkers, Golden Chestnut Base)
       for (let r = 0; r < TANK_ROWS; r++) {
         for (let c = 0; c < TANK_COLS; c++) {
           const tile = tankMap[r][c];
-          const tx = c * TANK_TILE;
-          const ty = r * TANK_TILE;
+          const tx = TANK_OFFSET_X + c * TANK_TILE;
+          const ty = TANK_OFFSET_Y + r * TANK_TILE;
 
           if (tile === 1) {
-            // Destructible Chestnut-Wood / Brick Wall
-            ctx.fillStyle = '#9a3412';
+            // Destructible Biome Brick Wall
+            ctx.fillStyle = biome.brickFill;
             ctx.fillRect(tx + 1, ty + 1, TANK_TILE - 2, TANK_TILE - 2);
-            ctx.strokeStyle = '#431407';
+            ctx.strokeStyle = biome.brickStroke;
             ctx.lineWidth = 1.5;
             ctx.strokeRect(tx + 1, ty + 1, TANK_TILE - 2, TANK_TILE - 2);
-            ctx.fillStyle = '#c2410c';
-            ctx.fillRect(tx + 3, ty + 3, TANK_TILE - 6, 8);
+            ctx.fillStyle = biome.brickTop;
+            ctx.fillRect(tx + 3, ty + 3, TANK_TILE - 6, 10);
+            ctx.fillRect(tx + 3, ty + 18, (TANK_TILE - 8) / 2, 12);
+            ctx.fillRect(tx + 3 + (TANK_TILE - 4) / 2, ty + 18, (TANK_TILE - 8) / 2, 12);
           } else if (tile === 2) {
-            // Indestructible Stone Block
-            ctx.fillStyle = '#57534e';
+            // Indestructible Biome Stone / Steel Block
+            ctx.fillStyle = biome.stoneFill;
             ctx.fillRect(tx + 1, ty + 1, TANK_TILE - 2, TANK_TILE - 2);
-            ctx.strokeStyle = '#d6d3d1';
+            ctx.strokeStyle = biome.stoneStroke;
             ctx.lineWidth = 1.5;
             ctx.strokeRect(tx + 2, ty + 2, TANK_TILE - 4, TANK_TILE - 4);
-            ctx.fillStyle = '#78716c';
-            ctx.fillRect(tx + 5, ty + 5, TANK_TILE - 10, TANK_TILE - 10);
-          } else if (tile === 9 && !baseDrawn) {
-            baseDrawn = true;
-            // Golden Chestnut Base (2x2 tiles at cols 15..16, rows 18..19)
-            const bx = 16 * TANK_TILE;
-            const by = 19 * TANK_TILE;
+            ctx.fillStyle = biome.stoneInner;
+            ctx.fillRect(tx + 7, ty + 7, TANK_TILE - 14, TANK_TILE - 14);
+          } else if (tile === 9) {
+            // Golden Chestnut Base (Centered at TANK_BASE_COL, TANK_BASE_ROW)
+            const bx = tankTileCenterX(c);
+            const by = tankTileCenterY(r);
             ctx.save();
-            ctx.fillStyle = 'rgba(234, 179, 8, 0.2)';
-            ctx.fillRect(15 * TANK_TILE, 18 * TANK_TILE, TANK_TILE * 2, TANK_TILE * 2);
-            drawChestnut(ctx, bx, by, 20, 0, true, true);
+            ctx.fillStyle = 'rgba(234, 179, 8, 0.24)';
+            ctx.strokeStyle = '#facc15';
+            ctx.lineWidth = 1.5;
+            ctx.fillRect(tx + 2, ty + 2, TANK_TILE - 4, TANK_TILE - 4);
+            ctx.strokeRect(tx + 2, ty + 2, TANK_TILE - 4, TANK_TILE - 4);
+            drawChestnut(ctx, bx, by, 14, 0, true, true);
             ctx.restore();
           }
         }
@@ -3491,17 +3814,17 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         drawChestnut(ctx, b.x, b.y, b.radius, b.angle, false, b.fromPlayer);
       });
 
-      // 7. Draw Forest Bush Cover (Rendered above tanks for stealth!)
+      // 7. Draw Stealth Bush Cover (Rendered above tanks for stealth!)
       for (let r = 0; r < TANK_ROWS; r++) {
         for (let c = 0; c < TANK_COLS; c++) {
           if (tankMap[r][c] === 3) {
-            const tx = c * TANK_TILE;
-            const ty = r * TANK_TILE;
-            ctx.fillStyle = 'rgba(77, 124, 15, 0.85)';
+            const tx = TANK_OFFSET_X + c * TANK_TILE;
+            const ty = TANK_OFFSET_Y + r * TANK_TILE;
+            ctx.fillStyle = biome.bushCol;
             ctx.beginPath();
-            ctx.arc(tx + 8, ty + 8, 8, 0, Math.PI * 2);
-            ctx.arc(tx + 17, ty + 9, 8, 0, Math.PI * 2);
-            ctx.arc(tx + 12, ty + 17, 8, 0, Math.PI * 2);
+            ctx.arc(tx + 12, ty + 12, 10, 0, Math.PI * 2);
+            ctx.arc(tx + 26, ty + 13, 10, 0, Math.PI * 2);
+            ctx.arc(tx + 19, ty + 25, 11, 0, Math.PI * 2);
             ctx.fill();
           }
         }
@@ -3521,6 +3844,8 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
 
     /**************************************************************
      * 7. GAME 4: "CHESTNUT BOMBERMAN" ("BOMBER-NUT")
+     *    17x11 Grid (44px tiles), 6 Unique Stage Biomes & Pillar
+     *    Architectures, Guaranteed Safe Spawn Corner & Smooth Slide
      **************************************************************/
     const BOMBER_TILE = 44; // 17 cols x 11 rows = 748 x 484 centered on 800x500 canvas
     const BOMBER_COLS = 17;
@@ -3528,14 +3853,101 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
     const BOMBER_OFFSET_X = (canvas.width - BOMBER_COLS * BOMBER_TILE) / 2;  // 26px
     const BOMBER_OFFSET_Y = (canvas.height - BOMBER_ROWS * BOMBER_TILE) / 2; // 8px
 
+    // 6 Distinct Stage Biomes & Architectural Themes for Bomber-Nut
+    const BOMBER_BIOMES = [
+      {
+        name: 'MOSSY FOREST CLEARING',
+        outerBg: '#0e170c',
+        floorEven: '#1b2a18',
+        floorOdd: '#22331e',
+        pillarFill: '#44403c',
+        pillarTop: '#78716c',
+        pillarStroke: '#1c1917',
+        crateFill: '#78350f',
+        crateStroke: '#d97706',
+        crateEmblem: '#65a30d',
+        detailType: 'moss'
+      },
+      {
+        name: 'TWILIGHT MUSHROOM CAVERN',
+        outerBg: '#120b1d',
+        floorEven: '#1e152c',
+        floorOdd: '#271c38',
+        pillarFill: '#3b2754',
+        pillarTop: '#6b4c9a',
+        pillarStroke: '#1a1026',
+        crateFill: '#701a75',
+        crateStroke: '#e879f9',
+        crateEmblem: '#38bdf8',
+        detailType: 'spores'
+      },
+      {
+        name: "KING BURR-GOLEM'S AMBER THRONE",
+        outerBg: '#1a0c07',
+        floorEven: '#2b170f',
+        floorOdd: '#361d13',
+        pillarFill: '#572817',
+        pillarTop: '#9a4424',
+        pillarStroke: '#291008',
+        crateFill: '#92400e',
+        crateStroke: '#facc15',
+        crateEmblem: '#ef4444',
+        detailType: 'throne_ring'
+      },
+      {
+        name: 'FROSTED BIRCH RUINS',
+        outerBg: '#09161c',
+        floorEven: '#12262e',
+        floorOdd: '#18313b',
+        pillarFill: '#334e5c',
+        pillarTop: '#648b9e',
+        pillarStroke: '#0f1e26',
+        crateFill: '#5b3e29',
+        crateStroke: '#7dd3fc',
+        crateEmblem: '#e0f2fe',
+        detailType: 'frost'
+      },
+      {
+        name: 'SUNKEN ROOT LABYRINTH',
+        outerBg: '#170f09',
+        floorEven: '#261a11',
+        floorOdd: '#302217',
+        pillarFill: '#4a3525',
+        pillarTop: '#7c5a3f',
+        pillarStroke: '#1f150e',
+        crateFill: '#654321',
+        crateStroke: '#a3e635',
+        crateEmblem: '#f59e0b',
+        detailType: 'roots'
+      },
+      {
+        name: 'VOLCANIC CINDER PIT',
+        outerBg: '#17090d',
+        floorEven: '#281218',
+        floorOdd: '#34171f',
+        pillarFill: '#3f222a',
+        pillarTop: '#733e4d',
+        pillarStroke: '#1c0b10',
+        crateFill: '#7f1d1d',
+        crateStroke: '#fb923c',
+        crateEmblem: '#facc15',
+        detailType: 'embers'
+      }
+    ];
+
+    function getBomberBiome(lvl) {
+      return BOMBER_BIOMES[(lvl - 1) % BOMBER_BIOMES.length];
+    }
+
     // Bomber Grid: 0 = Floor, 1 = Solid Stone Wall/Pillar, 2 = Destructible Autumn Crate
     let bomberGrid = [];
     let bomberLevel = 1;
     let bomberPlayer = {
       x: 0,
       y: 0,
-      radius: 15,
+      radius: 14,
       speed: 2.6,
+      preferAxis: 'X',
       lives: 3,
       maxLives: 3,
       maxBombs: 1,
@@ -3561,6 +3973,52 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       setupBomberLevel(1);
     }
 
+    // Determines whether an interior cell (r, c) has an indestructible stone pillar for the current stage layout
+    function isStagePillarCell(lvl, r, c) {
+      const layoutIdx = ((lvl - 1) % 6) + 1;
+
+      if (layoutIdx === 1) {
+        // STAGE 1: Classic Checkerboard Pillars
+        return (r % 2 === 0 && c % 2 === 0);
+      } else if (layoutIdx === 2) {
+        // STAGE 2: Cross Avenue & Corner Monoliths (Wide open central cross at r=5 and c=8)
+        if (r === 5 || c === 8) return false;
+        const inLeftMonolith = (c === 3 || c === 4 || c === 6) && (r === 2 || r === 3 || r === 7 || r === 8);
+        const inRightMonolith = (c === 10 || c === 12 || c === 13) && (r === 2 || r === 3 || r === 7 || r === 8);
+        return inLeftMonolith || inRightMonolith;
+      } else if (layoutIdx === 3) {
+        // STAGE 3 (BOSS STAGE): King Burr-Golem's Amber Throne — Open Center Ring + 8 Blast-Shield Pillars
+        const ringPillars = [
+          [2, 4], [2, 8], [2, 12],
+          [5, 3],         [5, 13],
+          [8, 4], [8, 8], [8, 12]
+        ];
+        return ringPillars.some(([pr, pc]) => pr === r && pc === c);
+      } else if (layoutIdx === 4) {
+        // STAGE 4: Frosted Birch Ruins — Staggered 2-Tile Bastion Gates
+        if (r === 2 || r === 8) return (c === 3 || c === 4 || c === 8 || c === 12 || c === 13);
+        if (r === 4 || r === 6) return (c === 2 || c === 6 || c === 7 || c === 9 || c === 10 || c === 14);
+        return false;
+      } else if (layoutIdx === 5) {
+        // STAGE 5: Sunken Root Labyrinth — Concentric Sanctuary Chambers with Gate Openings
+        const onOuterRing =
+          ((r === 2 || r === 8) && c >= 2 && c <= 14 && c !== 5 && c !== 8 && c !== 11) ||
+          ((c === 2 || c === 14) && r >= 2 && r <= 8 && r !== 5);
+        const onInnerSanctuary =
+          ((r === 4 || r === 6) && (c === 6 || c === 7 || c === 9 || c === 10));
+        return onOuterRing || onInnerSanctuary;
+      } else {
+        // STAGE 6 (BOSS & ENDLESS CYCLE): Volcanic Cinder Pit — Octagonal Arena Pillars
+        const cinderPillars = [
+          [2, 3], [2, 6], [2, 10], [2, 13],
+          [4, 4],                  [4, 12],
+          [6, 4],                  [6, 12],
+          [8, 3], [8, 6], [8, 10], [8, 13]
+        ];
+        return cinderPillars.some(([pr, pc]) => pr === r && pc === c);
+      }
+    }
+
     function setupBomberLevel(lvl) {
       bomberLevel = lvl;
       plantedBombs = [];
@@ -3576,6 +4034,7 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       bomberPlayer.invulnerableTimer = 90;
 
       const isBossStage = (lvl % 3 === 0);
+      const biome = getBomberBiome(lvl);
       bomberGrid = Array.from({ length: BOMBER_ROWS }, () => Array(BOMBER_COLS).fill(0));
 
       const crateCoords = [];
@@ -3585,21 +4044,16 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
           // Outer Border is Indestructible Stone
           if (r === 0 || r === BOMBER_ROWS - 1 || c === 0 || c === BOMBER_COLS - 1) {
             bomberGrid[r][c] = 1;
-          } else if (r % 2 === 0 && c % 2 === 0) {
-            // Classic Bomberman Interior Pillars (keep center open during Boss Stages!)
-            if (isBossStage && c >= 6 && c <= 10 && r >= 4 && r <= 6) {
-              bomberGrid[r][c] = 0;
-            } else {
-              bomberGrid[r][c] = 1;
-            }
           } else {
-            // Keep top-left player spawn safe (cols 1..2, rows 1..2)
+            // Guaranteed safe player spawn zone at (1,1), (1,2), (2,1), and (2,2)
             const isSpawnZone = (c <= 2 && r <= 2);
-            // Keep center boss zone clear on boss stages
-            const isBossZone = isBossStage && (c >= 6 && c <= 11 && r >= 3 && r <= 7);
+            // Keep center boss throne zone clear on boss stages
+            const isBossZone = isBossStage && (c >= 6 && c <= 10 && r >= 3 && r <= 7);
 
-            if (!isSpawnZone && !isBossZone) {
-              const crateChance = isBossStage ? 0.25 : 0.42;
+            if (!isSpawnZone && isStagePillarCell(lvl, r, c)) {
+              bomberGrid[r][c] = 1;
+            } else if (!isSpawnZone && !isBossZone) {
+              const crateChance = isBossStage ? 0.28 : 0.44;
               if (Math.random() < crateChance) {
                 bomberGrid[r][c] = 2;
                 crateCoords.push({ c, r });
@@ -3609,7 +4063,7 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         }
       }
 
-      // Place Exit Portal under one random crate (or in center on boss stage)
+      // Place Exit Portal under one random crate (or in bottom-right corner if no crates)
       if (crateCoords.length > 0) {
         const chosen = crateCoords[Math.floor(Math.random() * crateCoords.length)];
         exitPortal = { c: chosen.c, r: chosen.r, revealed: false };
@@ -3619,13 +4073,13 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
 
       if (isBossStage) {
         spawnKingBurrGolem(lvl);
-        showLevelBanner(`STAGE ${lvl}: KING BURR-GOLEM!`, 'Trap the Giant Golem with Chestnut Bombs!');
+        showLevelBanner(`STG.${lvl}: ${biome.name}`, '👑 Trap King Burr-Golem with Chestnut Bombs!');
       } else {
-        // Spawn Woodland Bugs (Level 1) & Smart Chaser Beetles (Level 2+)
+        // Spawn Woodland Bugs (Stage 1) & Smart Chaser Beetles (Stage 2+) away from player spawn
         const enemyCount = 3 + lvl;
         let spawned = 0;
         let attempts = 0;
-        while (spawned < enemyCount && attempts < 200) {
+        while (spawned < enemyCount && attempts < 250) {
           attempts++;
           const ec = 3 + Math.floor(Math.random() * (BOMBER_COLS - 4));
           const er = 1 + Math.floor(Math.random() * (BOMBER_ROWS - 2));
@@ -3646,8 +4100,7 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
             spawned++;
           }
         }
-        const sub = lvl === 1 ? 'Blast Crates & Defeat Woodland Bugs!' : 'Beware of Fast Chaser Beetles!';
-        showLevelBanner(`BOMBER-NUT - STAGE ${lvl}`, sub);
+        showLevelBanner(`STG.${lvl}: ${biome.name}`, 'Blast Crates & Clear All Foes to Open Portal!');
       }
 
       updateHUD();
@@ -3668,8 +4121,7 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         hp: maxHp,
         maxHp: maxHp,
         invulnTimer: 0,
-        throwTimer: 90,
-        aiTimer: 60
+        throwTimer: 90
       };
       bomberEnemies.push(activeBomberBoss);
     }
@@ -3761,7 +4213,147 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       updateHUD();
     }
 
-    function canBomberEntityMoveTo(nx, ny, radius, isPlayer = false) {
+    function isBomberTileOpenForPlayer(c, r) {
+      if (r < 0 || r >= BOMBER_ROWS || c < 0 || c >= BOMBER_COLS) return false;
+      if (bomberGrid[r][c] === 1 || bomberGrid[r][c] === 2) return false;
+      const bombOnTile = plantedBombs.find(b => b.c === c && b.r === r);
+      if (bombOnTile && bombOnTile.playerLeftTile) return false;
+      return true;
+    }
+
+    function stepAlongHorizontalRail(targetRow, dirX, stepDist) {
+      const railY = targetRow * BOMBER_TILE + BOMBER_TILE / 2;
+      const dyToRail = railY - bomberPlayer.y;
+
+      // Snap/step onto the exact horizontal center rail of the tunnel first
+      if (Math.abs(dyToRail) > 0.01) {
+        const curCol = Math.floor(bomberPlayer.x / BOMBER_TILE);
+        bomberPlayer.x = curCol * BOMBER_TILE + BOMBER_TILE / 2;
+        if (Math.abs(dyToRail) <= stepDist) {
+          bomberPlayer.y = railY;
+          stepDist -= Math.abs(dyToRail);
+        } else {
+          bomberPlayer.y += Math.sign(dyToRail) * stepDist;
+          return true;
+        }
+      } else {
+        bomberPlayer.y = railY;
+      }
+
+      if (stepDist <= 0) return true;
+
+      const curCol = Math.floor(bomberPlayer.x / BOMBER_TILE);
+      const centerX = curCol * BOMBER_TILE + BOMBER_TILE / 2;
+      const nextX = bomberPlayer.x + dirX * stepDist;
+
+      if (dirX > 0) {
+        if (nextX > centerX && !isBomberTileOpenForPlayer(curCol + 1, targetRow)) {
+          const moved = bomberPlayer.x < centerX;
+          bomberPlayer.x = centerX;
+          return moved;
+        }
+        bomberPlayer.x = nextX;
+        return true;
+      } else {
+        if (nextX < centerX && !isBomberTileOpenForPlayer(curCol - 1, targetRow)) {
+          const moved = bomberPlayer.x > centerX;
+          bomberPlayer.x = centerX;
+          return moved;
+        }
+        bomberPlayer.x = nextX;
+        return true;
+      }
+    }
+
+    function stepAlongVerticalRail(targetCol, dirY, stepDist) {
+      const railX = targetCol * BOMBER_TILE + BOMBER_TILE / 2;
+      const dxToRail = railX - bomberPlayer.x;
+
+      // Snap/step onto the exact vertical center rail of the tunnel first
+      if (Math.abs(dxToRail) > 0.01) {
+        const curRow = Math.floor(bomberPlayer.y / BOMBER_TILE);
+        bomberPlayer.y = curRow * BOMBER_TILE + BOMBER_TILE / 2;
+        if (Math.abs(dxToRail) <= stepDist) {
+          bomberPlayer.x = railX;
+          stepDist -= Math.abs(dxToRail);
+        } else {
+          bomberPlayer.x += Math.sign(dxToRail) * stepDist;
+          return true;
+        }
+      } else {
+        bomberPlayer.x = railX;
+      }
+
+      if (stepDist <= 0) return true;
+
+      const curRow = Math.floor(bomberPlayer.y / BOMBER_TILE);
+      const centerY = curRow * BOMBER_TILE + BOMBER_TILE / 2;
+      const nextY = bomberPlayer.y + dirY * stepDist;
+
+      if (dirY > 0) {
+        if (nextY > centerY && !isBomberTileOpenForPlayer(targetCol, curRow + 1)) {
+          const moved = bomberPlayer.y < centerY;
+          bomberPlayer.y = centerY;
+          return moved;
+        }
+        bomberPlayer.y = nextY;
+        return true;
+      } else {
+        if (nextY < centerY && !isBomberTileOpenForPlayer(targetCol, curRow - 1)) {
+          const moved = bomberPlayer.y > centerY;
+          bomberPlayer.y = centerY;
+          return moved;
+        }
+        bomberPlayer.y = nextY;
+        return true;
+      }
+    }
+
+    function tryBomberHorizontalMove(dirX) {
+      const curCol = Math.floor(bomberPlayer.x / BOMBER_TILE);
+      const curRow = Math.floor(bomberPlayer.y / BOMBER_TILE);
+      const centerX = curCol * BOMBER_TILE + BOMBER_TILE / 2;
+      const centerY = curRow * BOMBER_TILE + BOMBER_TILE / 2;
+
+      const movingTowardColCenter = (dirX > 0 && bomberPlayer.x < centerX) || (dirX < 0 && bomberPlayer.x > centerX);
+      if (movingTowardColCenter || isBomberTileOpenForPlayer(curCol + dirX, curRow)) {
+        return stepAlongHorizontalRail(curRow, dirX, bomberPlayer.speed);
+      }
+
+      // If current row is blocked by a pillar/wall, guide along the vertical rail into the nearest open row
+      const offY = bomberPlayer.y - centerY;
+      if (Math.abs(offY) > 1) {
+        const adjRow = offY > 0 ? curRow + 1 : curRow - 1;
+        if (isBomberTileOpenForPlayer(curCol, adjRow) && isBomberTileOpenForPlayer(curCol + dirX, adjRow)) {
+          return stepAlongVerticalRail(curCol, Math.sign(offY), bomberPlayer.speed);
+        }
+      }
+      return false;
+    }
+
+    function tryBomberVerticalMove(dirY) {
+      const curCol = Math.floor(bomberPlayer.x / BOMBER_TILE);
+      const curRow = Math.floor(bomberPlayer.y / BOMBER_TILE);
+      const centerX = curCol * BOMBER_TILE + BOMBER_TILE / 2;
+      const centerY = curRow * BOMBER_TILE + BOMBER_TILE / 2;
+
+      const movingTowardRowCenter = (dirY > 0 && bomberPlayer.y < centerY) || (dirY < 0 && bomberPlayer.y > centerY);
+      if (movingTowardRowCenter || isBomberTileOpenForPlayer(curCol, curRow + dirY)) {
+        return stepAlongVerticalRail(curCol, dirY, bomberPlayer.speed);
+      }
+
+      // If current column is blocked by a pillar/wall, guide along the horizontal rail into the nearest open column
+      const offX = bomberPlayer.x - centerX;
+      if (Math.abs(offX) > 1) {
+        const adjCol = offX > 0 ? curCol + 1 : curCol - 1;
+        if (isBomberTileOpenForPlayer(adjCol, curRow) && isBomberTileOpenForPlayer(adjCol, curRow + dirY)) {
+          return stepAlongHorizontalRail(curRow, Math.sign(offX), bomberPlayer.speed);
+        }
+      }
+      return false;
+    }
+
+    function canBomberEnemyMoveTo(nx, ny, radius) {
       const left = Math.floor((nx - radius + 3) / BOMBER_TILE);
       const right = Math.floor((nx + radius - 3) / BOMBER_TILE);
       const top = Math.floor((ny - radius + 3) / BOMBER_TILE);
@@ -3771,57 +4363,41 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         for (let c = left; c <= right; c++) {
           if (r < 0 || r >= BOMBER_ROWS || c < 0 || c >= BOMBER_COLS) return false;
           if (bomberGrid[r][c] === 1 || bomberGrid[r][c] === 2) return false;
-
-          // Solid bomb check (Player can walk off a bomb they just planted)
-          const bombOnTile = plantedBombs.find(b => b.c === c && b.r === r);
-          if (bombOnTile) {
-            if (!isPlayer || bombOnTile.playerLeftTile) {
-              return false;
-            }
-          }
+          if (plantedBombs.some(b => b.c === c && b.r === r)) return false;
         }
       }
       return true;
     }
 
     function updateBomberGame() {
-      // 1. Player Movement with Smooth Corner Sliding
-      let dx = 0, dy = 0;
-      if (keysPressed.up) dy = -bomberPlayer.speed;
-      else if (keysPressed.down) dy = bomberPlayer.speed;
-      if (keysPressed.left) dx = -bomberPlayer.speed;
-      else if (keysPressed.right) dx = bomberPlayer.speed;
+      // 1. Strict Horizontal or Vertical Movement along the Middle of the Tunnel
+      const wantX = (keysPressed.right ? 1 : 0) - (keysPressed.left ? 1 : 0);
+      const wantY = (keysPressed.down ? 1 : 0) - (keysPressed.up ? 1 : 0);
 
-      if (dx !== 0) {
-        if (canBomberEntityMoveTo(bomberPlayer.x + dx, bomberPlayer.y, bomberPlayer.radius, true)) {
-          bomberPlayer.x += dx;
+      if (wantX !== 0 && wantY === 0) {
+        tryBomberHorizontalMove(wantX);
+      } else if (wantY !== 0 && wantX === 0) {
+        tryBomberVerticalMove(wantY);
+      } else if (wantX !== 0 && wantY !== 0) {
+        if (bomberPlayer.preferAxis === 'Y') {
+          if (!tryBomberVerticalMove(wantY)) tryBomberHorizontalMove(wantX);
         } else {
-          // Corner slide assist vertically toward nearest open row center
-          const rowCenterY = Math.floor(bomberPlayer.y / BOMBER_TILE) * BOMBER_TILE + BOMBER_TILE / 2;
-          if (Math.abs(bomberPlayer.y - rowCenterY) > 2) {
-            bomberPlayer.y += Math.sign(rowCenterY - bomberPlayer.y) * 1.8;
-          }
-        }
-      }
-      if (dy !== 0) {
-        if (canBomberEntityMoveTo(bomberPlayer.x, bomberPlayer.y + dy, bomberPlayer.radius, true)) {
-          bomberPlayer.y += dy;
-        } else {
-          // Corner slide assist horizontally toward nearest open col center
-          const colCenterX = Math.floor(bomberPlayer.x / BOMBER_TILE) * BOMBER_TILE + BOMBER_TILE / 2;
-          if (Math.abs(bomberPlayer.x - colCenterX) > 2) {
-            bomberPlayer.x += Math.sign(colCenterX - bomberPlayer.x) * 1.8;
-          }
+          if (!tryBomberHorizontalMove(wantX)) tryBomberVerticalMove(wantY);
         }
       }
 
       if (bomberPlayer.invulnerableTimer > 0) bomberPlayer.invulnerableTimer--;
 
-      // Track when player steps off a newly planted bomb
+      // Only mark a planted bomb as solid once the player's hitbox has completely exited the bomb tile
       const pCol = Math.floor(bomberPlayer.x / BOMBER_TILE);
       const pRow = Math.floor(bomberPlayer.y / BOMBER_TILE);
       plantedBombs.forEach(b => {
-        if (b.c !== pCol || b.r !== pRow) {
+        const bombCenterX = b.c * BOMBER_TILE + BOMBER_TILE / 2;
+        const bombCenterY = b.r * BOMBER_TILE + BOMBER_TILE / 2;
+        if (
+          Math.abs(bomberPlayer.x - bombCenterX) >= BOMBER_TILE * 0.85 ||
+          Math.abs(bomberPlayer.y - bombCenterY) >= BOMBER_TILE * 0.85
+        ) {
           b.playerLeftTile = true;
         }
       });
@@ -3909,7 +4485,7 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         const nx = en.x + en.dir.x * en.speed;
         const ny = en.y + en.dir.y * en.speed;
 
-        if (canBomberEntityMoveTo(nx, ny, en.radius - 2, false)) {
+        if (canBomberEnemyMoveTo(nx, ny, en.radius - 2)) {
           en.x = nx;
           en.y = ny;
 
@@ -3934,7 +4510,7 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
             { x: -1, y: 0 },
             { x: 0, y: 1 },
             { x: 0, y: -1 }
-          ].filter(d => canBomberEntityMoveTo(en.x + d.x * 4, en.y + d.y * 4, en.radius - 2, false));
+          ].filter(d => canBomberEnemyMoveTo(en.x + d.x * 4, en.y + d.y * 4, en.radius - 2));
 
           if (possibleDirs.length > 0) {
             en.dir = possibleDirs[Math.floor(Math.random() * possibleDirs.length)];
@@ -4018,37 +4594,69 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
     }
 
     function drawBomberGame() {
-      ctx.fillStyle = '#120a06';
+      const biome = getBomberBiome(bomberLevel);
+
+      ctx.fillStyle = biome.outerBg;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.save();
       ctx.translate(BOMBER_OFFSET_X, BOMBER_OFFSET_Y);
 
-      // 1. Draw Maze Tiles
+      // 1. Draw Biome Maze Floor, Decorative Biome Details, Stone Pillars & Crates
       for (let r = 0; r < BOMBER_ROWS; r++) {
         for (let c = 0; c < BOMBER_COLS; c++) {
           const tx = c * BOMBER_TILE;
           const ty = r * BOMBER_TILE;
           const tile = bomberGrid[r][c];
 
-          // Woodland Floor Tile
-          ctx.fillStyle = (r + c) % 2 === 0 ? '#1c140d' : '#241a10';
+          // Biome Floor Tile
+          ctx.fillStyle = (r + c) % 2 === 0 ? biome.floorEven : biome.floorOdd;
           ctx.fillRect(tx, ty, BOMBER_TILE, BOMBER_TILE);
 
+          // Subtle Biome Floor Markings
+          if (tile === 0) {
+            if (biome.detailType === 'moss' && (r * 3 + c * 5) % 6 === 0) {
+              ctx.fillStyle = 'rgba(132, 204, 22, 0.14)';
+              ctx.beginPath();
+              ctx.arc(tx + 14, ty + 28, 3.5, 0, Math.PI * 2);
+              ctx.fill();
+            } else if (biome.detailType === 'spores' && (r + c * 3) % 4 === 0) {
+              ctx.fillStyle = (r + c) % 2 === 0 ? 'rgba(56, 189, 248, 0.22)' : 'rgba(232, 121, 249, 0.22)';
+              ctx.beginPath();
+              ctx.arc(tx + 22, ty + 22, 3, 0, Math.PI * 2);
+              ctx.fill();
+            } else if (biome.detailType === 'frost' && (r + c) % 3 === 0) {
+              ctx.strokeStyle = 'rgba(125, 211, 252, 0.14)';
+              ctx.lineWidth = 1;
+              ctx.strokeRect(tx + 10, ty + 10, BOMBER_TILE - 20, BOMBER_TILE - 20);
+            } else if (biome.detailType === 'roots' && (r * 5 + c) % 4 === 0) {
+              ctx.strokeStyle = 'rgba(161, 98, 7, 0.22)';
+              ctx.lineWidth = 1.5;
+              ctx.beginPath();
+              ctx.moveTo(tx + 6, ty + 10);
+              ctx.lineTo(tx + 24, ty + 26);
+              ctx.lineTo(tx + 38, ty + 20);
+              ctx.stroke();
+            } else if (biome.detailType === 'embers' && (r * 7 + c * 2) % 5 === 0) {
+              ctx.fillStyle = 'rgba(251, 146, 60, 0.22)';
+              ctx.fillRect(tx + 18, ty + 18, 4, 4);
+            }
+          }
+
           if (tile === 1) {
-            // Indestructible Stone Pillar
-            ctx.fillStyle = '#44403c';
+            // Indestructible Biome Pillar
+            ctx.fillStyle = biome.pillarFill;
             ctx.fillRect(tx + 1, ty + 1, BOMBER_TILE - 2, BOMBER_TILE - 2);
-            ctx.fillStyle = '#78716c';
-            ctx.fillRect(tx + 4, ty + 4, BOMBER_TILE - 8, BOMBER_TILE - 12);
-            ctx.strokeStyle = '#292524';
+            ctx.fillStyle = biome.pillarTop;
+            ctx.fillRect(tx + 5, ty + 5, BOMBER_TILE - 10, BOMBER_TILE - 14);
+            ctx.strokeStyle = biome.pillarStroke;
             ctx.lineWidth = 2;
             ctx.strokeRect(tx + 1, ty + 1, BOMBER_TILE - 2, BOMBER_TILE - 2);
           } else if (tile === 2) {
-            // Destructible Autumn Leaf / Wood Crate
-            ctx.fillStyle = '#78350f';
+            // Destructible Biome Supply Crate
+            ctx.fillStyle = biome.crateFill;
             ctx.fillRect(tx + 2, ty + 2, BOMBER_TILE - 4, BOMBER_TILE - 4);
-            ctx.strokeStyle = '#d97706';
+            ctx.strokeStyle = biome.crateStroke;
             ctx.lineWidth = 2;
             ctx.strokeRect(tx + 3, ty + 3, BOMBER_TILE - 6, BOMBER_TILE - 6);
             // Diagonal wood plank bracing
@@ -4056,13 +4664,25 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
             ctx.moveTo(tx + 4, ty + 4);
             ctx.lineTo(tx + BOMBER_TILE - 4, ty + BOMBER_TILE - 4);
             ctx.stroke();
-            // Tiny chestnut leaf emblem
-            ctx.fillStyle = '#65a30d';
+            // Center chestnut emblem
+            ctx.fillStyle = biome.crateEmblem;
             ctx.beginPath();
             ctx.arc(tx + BOMBER_TILE / 2, ty + BOMBER_TILE / 2, 5, 0, Math.PI * 2);
             ctx.fill();
           }
         }
+      }
+
+      // Draw Boss Throne Combat Ring Markings on Stage 3 / Boss Stages
+      if (biome.detailType === 'throne_ring') {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(250, 204, 21, 0.22)';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.arc(8.5 * BOMBER_TILE, 5.5 * BOMBER_TILE, 2.7 * BOMBER_TILE, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
       }
 
       // 2. Draw Exit Portal (Glowing Green when all enemies are cleared)
@@ -4389,7 +5009,8 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       } else if (currentMode === 'TANKS') {
         document.getElementById('hudHighScore').textContent = String(highScores.tanks).padStart(4, '0');
         const totalLeft = tanksRemainingToSpawn + enemyTanks.length;
-        document.getElementById('hudSubStatus').textContent = `LEVEL ${tankLevel} // ENEMIES LEFT: ${totalLeft}`;
+        const biomeName = getTankBiome(tankLevel).name;
+        document.getElementById('hudSubStatus').textContent = `LV.${tankLevel} ${biomeName} // FOES: ${totalLeft}`;
         statsPills.innerHTML = `
           <span>🛡️ ${tankPlayer.shieldTimer > 0 ? 'ON' : 'OFF'}</span>
           <span>&bull;</span>
@@ -4399,9 +5020,10 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         updateBossBanner(activeTankBoss);
       } else if (currentMode === 'BOMBER') {
         document.getElementById('hudHighScore').textContent = String(highScores.bomber).padStart(4, '0');
+        const biomeName = getBomberBiome(bomberLevel).name;
         document.getElementById('hudSubStatus').textContent = bomberEnemies.length === 0
-          ? `STAGE ${bomberLevel} // PORTAL OPEN!`
-          : `STAGE ${bomberLevel} // FOES: ${bomberEnemies.length}`;
+          ? `STG.${bomberLevel} ${biomeName} // PORTAL OPEN!`
+          : `STG.${bomberLevel} ${biomeName} // FOES: ${bomberEnemies.length}`;
         statsPills.innerHTML = `
           <span>🌰 BOMBS: ${bomberPlayer.maxBombs}</span>
           <span>&bull;</span>
@@ -4447,10 +5069,22 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       }
 
       // GAMES 2, 3, 4: CONTINUOUS MOVEMENT & ACTION
-      if (e.code === 'ArrowUp' || e.code === 'KeyW') keysPressed.up = true;
-      if (e.code === 'ArrowDown' || e.code === 'KeyS') keysPressed.down = true;
-      if (e.code === 'ArrowLeft' || e.code === 'KeyA') keysPressed.left = true;
-      if (e.code === 'ArrowRight' || e.code === 'KeyD') keysPressed.right = true;
+      if (e.code === 'ArrowUp' || e.code === 'KeyW') {
+        keysPressed.up = true;
+        bomberPlayer.preferAxis = 'Y';
+      }
+      if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+        keysPressed.down = true;
+        bomberPlayer.preferAxis = 'Y';
+      }
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+        keysPressed.left = true;
+        bomberPlayer.preferAxis = 'X';
+      }
+      if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+        keysPressed.right = true;
+        bomberPlayer.preferAxis = 'X';
+      }
 
       if (e.code === 'Space') {
         keysPressed.shoot = true;
@@ -4482,10 +5116,10 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         if (dir === 'LEFT' && lastDir.x === 0) snake.dirQueue.push({ x: -1, y: 0 });
         if (dir === 'RIGHT' && lastDir.x === 0) snake.dirQueue.push({ x: 1, y: 0 });
       } else {
-        if (dir === 'UP') keysPressed.up = true;
-        if (dir === 'DOWN') keysPressed.down = true;
-        if (dir === 'LEFT') keysPressed.left = true;
-        if (dir === 'RIGHT') keysPressed.right = true;
+        if (dir === 'UP') { keysPressed.up = true; bomberPlayer.preferAxis = 'Y'; }
+        if (dir === 'DOWN') { keysPressed.down = true; bomberPlayer.preferAxis = 'Y'; }
+        if (dir === 'LEFT') { keysPressed.left = true; bomberPlayer.preferAxis = 'X'; }
+        if (dir === 'RIGHT') { keysPressed.right = true; bomberPlayer.preferAxis = 'X'; }
       }
     }
 
