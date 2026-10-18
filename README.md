@@ -79,7 +79,6 @@ Features
 * Responsive controls: Supports keyboard (WASD / Arrows / Space), mobile touch D-pads, and an auto-fire toggle.
 * Persistent high scores: LocalStorage integration to save your high scores across sessions.
 
-* 
 
 # Cienie Korony (Shadows of the Crown)
 
