@@ -1,4 +1,4 @@
-# Repozytorium zawiera hobbistyczny zestaw gier: Chestnut Arcade Game Hub (Snake i space impact) oraz Cienie Korony (Shadows of the Crown) w wersji mobilnej i desktopowej
+# Repozytorium zawiera hobbistyczny zestaw gier: Chestnut Arcade Game Hub (Snake, space impact, bomberman and tanks) oraz Cienie Korony (Shadows of the Crown) w wersji mobilnej i desktopowej
 
 
 
@@ -6,21 +6,19 @@
 
 
 
-A retro dual-game HTML5 arcade cabinet built entirely with vanilla JavaScript, HTML5 Canvas, and the Web Audio API.
+A retro hub-game HTML5 arcade cabinet built entirely with vanilla JavaScript, HTML5 Canvas, and the Web Audio API.
 
 
 
 Included Games
 
+Cartridge #01 — Chestnut Snake: A classic grid-based snake game set on an autumn forest floor. Collect glossy chestnuts bursting from spiky green burrs to grow longer and scale up your speed. Every 5th chestnut spawns a Golden Bonus Chestnut (+30 pts).
 
+Cartridge #02 — Space Chestnut: A Nokia Space Impact-inspired horizontal shoot-'em-up. Pilot the Chestnut Starfighter, fire spinning miniature chestnut projectiles, unlock triple spread-shots, and defeat the multi-phase Cosmic Burr Dreadnought Boss.
 
-Chestnut Snake: A classic grid-based snake game set in an autumn forest. Collect glossy chestnuts (and golden bonuses) bursting from spiky burrs to grow longer and scale up your speed.
+Cartridge #03 — Chestnut Tanks: A Battle City-inspired top-down tank arena. Drive your Chestnut Tank (WASD / Arrows), fire high-velocity chestnut shells (Spacebar), blast through destructible wooden brick walls, collect Burr Shields, Rapid Nut Cannons & Base Repair kits, protect the Golden Chestnut Base, and battle the Iron Husk Mega-Tank Boss on every 3rd level.
 
-
-
-Space Chestnut: A Nokia Space Impact-inspired horizontal space shooter. Pilot the Chestnut Starfighter, blast alien bugs and space squirrels, destroy rotating burr-asteroids, and defeat multi-phase cosmic bosses using spinning mini-chestnut projectiles.
-
-
+Cartridge #04 — Chestnut Bomberman ("Bomber-Nut"): A grid-based maze game where you plant ticking Spiky Chestnut Bombs (Spacebar) that detonate in cross-shaped directional blasts. Destroy autumn leaf crates to uncover +Bomb, +Range, and +Speed upgrades, unlock the glowing exit portal, and trap the giant King Burr-Golem Boss!
 
 Features
 
