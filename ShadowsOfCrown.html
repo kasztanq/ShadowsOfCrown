@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Cienie Korony - Edycja Królewska</title>
+<title>Cienie Korony - Bezlitosny Dwór</title>
 <style>
   :root {
-    --bg-dark: #14110f;
+    --bg-dark: #120e0c;
     --parchment: #e8dcb8;
-    --parchment-dark: #c9b789;
-    --ink: #2b2118;
+    --parchment-dark: #c4b07e;
+    --ink: #241a12;
     --gold: #f5c542;
     --crimson: #8f1d1d;
-    --emerald: #1e6b3b;
+    --danger: #ff4d4d;
   }
 
   * {
@@ -31,11 +31,10 @@
     overflow: hidden;
   }
 
-  /* Pełnoekranowy kontener dopasowujący się do każdego urządzenia */
   #game-frame {
     width: 100vw;
     height: 100dvh;
-    background: radial-gradient(circle at center, #2b2019 0%, var(--bg-dark) 75%, #090706 100%);
+    background: radial-gradient(circle at center, #2b2019 0%, var(--bg-dark) 75%, #070504 100%);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -63,10 +62,9 @@
     align-items: center;
   }
 
-  /* Sekcja górna rozciągnięta na całą szerokość z wyśrodkowaną zawartością */
   .header-wrapper {
     width: 100%;
-    background: rgba(12, 9, 8, 0.85);
+    background: rgba(12, 9, 8, 0.9);
     border-bottom: 2px solid #3a2e25;
     display: flex;
     flex-direction: column;
@@ -78,32 +76,39 @@
     max-width: 1100px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 10px 20px;
+    gap: 6px;
+    padding: 10px 20px 6px 20px;
   }
 
   .hud-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: clamp(0.95rem, 1.5vw, 1.2rem);
+    font-size: clamp(0.9rem, 1.4vw, 1.15rem);
     font-weight: bold;
     color: var(--gold);
   }
 
   .rank-banner {
-    font-size: clamp(0.8rem, 1.2vw, 1rem);
+    font-size: clamp(0.76rem, 1.1vw, 0.95rem);
     color: #d9c89e;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: rgba(58, 46, 37, 0.45);
-    padding: 6px 12px;
+    padding: 5px 12px;
     border-radius: 6px;
     border: 1px solid #4a3c31;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
-  .hud-stats { display: flex; gap: clamp(14px, 3vw, 28px); }
+  .upkeep-warning {
+    color: #e67e22;
+    font-size: 0.75rem;
+  }
+
+  .hud-stats { display: flex; gap: clamp(12px, 2.5vw, 24px); }
   .hud-controls { display: flex; gap: 8px; }
 
   .icon-btn {
@@ -111,9 +116,9 @@
     border: 1px solid #4a3c31;
     color: var(--parchment);
     border-radius: 6px;
-    padding: 5px 12px;
+    padding: 4px 10px;
     cursor: pointer;
-    font-size: clamp(0.85rem, 1.2vw, 1.05rem);
+    font-size: clamp(0.82rem, 1.1vw, 1rem);
     transition: border-color 0.2s, background 0.2s;
   }
 
@@ -125,18 +130,25 @@
     max-width: 1100px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: clamp(10px, 2.5vw, 24px);
-    padding: 8px 20px 14px 20px;
+    gap: clamp(10px, 2.2vw, 22px);
+    padding: 6px 20px 12px 20px;
   }
 
   .meter {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: clamp(0.78rem, 1.2vw, 1rem);
+    font-size: clamp(0.75rem, 1.1vw, 0.95rem);
   }
 
-  .meter-label { margin-bottom: 6px; color: #d1c4a5; font-weight: bold; }
+  .meter-label {
+    margin-bottom: 5px;
+    color: #d1c4a5;
+    font-weight: bold;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
 
   .bar-bg {
     width: 100%;
@@ -146,6 +158,7 @@
     overflow: hidden;
     border: 1px solid #4a3c31;
     transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
   }
 
   .bar-fill {
@@ -157,20 +170,25 @@
   #bar-king { background: #9b59b6; }
   #bar-church { background: #f1c40f; }
   #bar-nobility { background: #e74c3c; }
-  #bar-suspicion { background: #34495e; }
+  #bar-suspicion { background: #c0392b; }
 
-  .pulse-up { box-shadow: 0 0 12px #2ecc71; transform: scale(1.05); }
-  .pulse-down { box-shadow: 0 0 12px #e74c3c; transform: scale(1.05); }
+  .danger-zone {
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 8px rgba(255, 77, 77, 0.75);
+  }
 
-  /* Karta Dylematu - elastyczna w pionie i poziomie */
+  .pulse-up { box-shadow: 0 0 12px #2ecc71; transform: scale(1.06); }
+  .pulse-down { box-shadow: 0 0 12px #e74c3c; transform: scale(1.06); }
+
+  /* Karta Dylematu */
   .card-viewport {
     flex: 1;
     width: 100%;
-    max-width: 860px;
+    max-width: 880px;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: clamp(12px, 2.5vh, 28px) 20px;
+    padding: clamp(8px, 2vh, 22px) 20px;
     position: relative;
     min-height: 0;
   }
@@ -180,11 +198,11 @@
     color: var(--ink);
     width: 100%;
     height: 100%;
-    max-height: 420px;
-    padding: clamp(18px, 3.5vh, 36px) clamp(18px, 4vw, 44px);
+    max-height: 410px;
+    padding: clamp(16px, 3vh, 32px) clamp(18px, 4vw, 42px);
     border-radius: 12px;
     border: 4px double #594433;
-    box-shadow: 0 18px 45px rgba(0,0,0,0.8);
+    box-shadow: 0 18px 45px rgba(0,0,0,0.85);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -192,6 +210,7 @@
     text-align: center;
     transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.28s;
     overflow-y: auto;
+    position: relative;
   }
 
   .card-hidden {
@@ -199,74 +218,87 @@
     transform: translateY(35px) scale(0.96);
   }
 
+  .book-badge {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: rgba(58, 46, 37, 0.14);
+    color: #4a3525;
+    padding: 3px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(89, 68, 51, 0.35);
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+
   .portrait-circle {
-    width: clamp(64px, 9vh, 90px);
-    height: clamp(64px, 9vh, 90px);
+    width: clamp(58px, 8vh, 84px);
+    height: clamp(58px, 8vh, 84px);
     border-radius: 50%;
     background: #3a2e25;
     border: 3px solid #594433;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: clamp(1.9rem, 4vh, 2.8rem);
-    margin-bottom: 12px;
+    font-size: clamp(1.7rem, 3.6vh, 2.5rem);
+    margin-bottom: 10px;
     box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
     flex-shrink: 0;
   }
 
   #speaker-name {
-    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    font-size: clamp(1.1rem, 1.9vw, 1.45rem);
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     color: var(--crimson);
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
 
   #event-title {
-    font-size: clamp(0.85rem, 1.3vw, 1.05rem);
+    font-size: clamp(0.84rem, 1.2vw, 1rem);
     font-style: italic;
     color: #594433;
-    margin-bottom: clamp(10px, 2vh, 18px);
+    margin-bottom: clamp(8px, 1.8vh, 14px);
   }
 
   #event-desc {
-    font-size: clamp(0.98rem, 1.6vw, 1.25rem);
-    line-height: 1.5;
-    max-width: 680px;
+    font-size: clamp(0.94rem, 1.5vw, 1.18rem);
+    line-height: 1.48;
+    max-width: 700px;
   }
 
-  /* Przyciski decyzji - 1 kolumna na telefonie, 2-3 kolumny na szerokich ekranach */
+  /* Przyciski decyzji */
   .choices-container {
     width: 100%;
-    max-width: 860px;
+    max-width: 880px;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 0 20px clamp(12px, 2vh, 20px) 20px;
+    gap: 9px;
+    padding: 0 20px clamp(10px, 1.8vh, 18px) 20px;
   }
 
   @media (min-width: 768px) {
     .choices-container {
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
     }
   }
 
   .choice-btn {
-    background: rgba(43, 34, 27, 0.94);
+    background: rgba(43, 34, 27, 0.95);
     color: var(--parchment);
     border: 1px solid #5c4838;
-    padding: clamp(11px, 1.8vh, 16px) 16px;
+    padding: clamp(10px, 1.6vh, 15px) 15px;
     border-radius: 8px;
     text-align: left;
-    font-size: clamp(0.88rem, 1.2vw, 1.02rem);
+    font-size: clamp(0.85rem, 1.15vw, 0.98rem);
     cursor: pointer;
     transition: background 0.15s, transform 0.1s, border-color 0.15s;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 6px;
+    gap: 5px;
   }
 
   .choice-btn:hover:not(:disabled) {
@@ -275,27 +307,27 @@
   }
 
   .choice-btn:active:not(:disabled) { transform: scale(0.98); }
-  .choice-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-  .choice-hint { font-size: clamp(0.74rem, 1vw, 0.85rem); color: var(--gold); opacity: 0.9; }
+  .choice-btn:disabled { opacity: 0.42; cursor: not-allowed; }
+  .choice-hint { font-size: clamp(0.72rem, 0.95vw, 0.82rem); color: var(--gold); opacity: 0.9; }
 
   /* Toast */
   #toast {
     position: absolute;
-    top: 130px;
+    top: 132px;
     left: 50%;
     transform: translateX(-50%) translateY(-20px);
     background: rgba(20, 14, 11, 0.96);
     border: 1px solid var(--gold);
     color: var(--gold);
-    padding: 10px 22px;
+    padding: 9px 20px;
     border-radius: 24px;
-    font-size: clamp(0.85rem, 1.2vw, 1rem);
+    font-size: clamp(0.8rem, 1.1vw, 0.95rem);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s, transform 0.25s;
     z-index: 30;
     white-space: nowrap;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.8);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.85);
   }
 
   #toast.show {
@@ -314,12 +346,12 @@
 
   .nav-btn {
     width: 100%;
-    max-width: 860px;
-    padding: clamp(13px, 2vh, 18px);
+    max-width: 880px;
+    padding: clamp(12px, 1.8vh, 16px);
     background: none;
     border: none;
     color: var(--parchment);
-    font-size: clamp(0.92rem, 1.3vw, 1.1rem);
+    font-size: clamp(0.9rem, 1.25vw, 1.05rem);
     font-weight: bold;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
@@ -327,11 +359,11 @@
 
   .nav-btn:hover { background: #241c17; color: var(--gold); }
 
-  /* Modal Siatki Szpiegów - responsywny na telefonie i laptopie */
+  /* Modal Siatki Szpiegów */
   #spy-modal {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.82);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -346,18 +378,18 @@
 
   .sheet-container {
     width: 100%;
-    max-width: 860px;
+    max-width: 880px;
     background: #1c1613;
     border-top: 3px solid var(--gold);
     border-left: 1px solid #3a2e25;
     border-right: 1px solid #3a2e25;
     border-radius: 16px 16px 0 0;
-    height: 82%;
+    height: 84%;
     display: flex;
     flex-direction: column;
     transform: translateY(100%);
     transition: transform 0.3s ease-out;
-    padding: clamp(16px, 2.5vw, 28px);
+    padding: clamp(14px, 2.2vw, 24px);
   }
 
   #spy-modal.open .sheet-container { transform: translateY(0); }
@@ -366,7 +398,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 12px;
+    padding-bottom: 10px;
     border-bottom: 1px solid #3a2e25;
   }
 
@@ -382,17 +414,17 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 8px;
-    margin: 14px 0;
+    margin: 12px 0;
   }
 
   .tab-btn {
-    padding: 10px 6px;
+    padding: 9px 6px;
     background: #2b221b;
     color: var(--parchment);
     border: 1px solid #4a3c31;
     border-radius: 6px;
     cursor: pointer;
-    font-size: clamp(0.78rem, 1.1vw, 0.95rem);
+    font-size: clamp(0.76rem, 1.05vw, 0.92rem);
   }
 
   .tab-btn.active {
@@ -420,7 +452,7 @@
   .spy-card {
     background: #261f1a;
     border: 1px solid #4a3c31;
-    padding: 16px;
+    padding: 14px;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
@@ -434,13 +466,13 @@
     background: linear-gradient(145deg, #2b2118, #1f1712);
   }
 
-  .spy-card h4 { color: var(--gold); font-size: clamp(0.95rem, 1.3vw, 1.1rem); }
-  .spy-card p { font-size: clamp(0.82rem, 1.1vw, 0.95rem); color: #ccc0a6; line-height: 1.4; }
+  .spy-card h4 { color: var(--gold); font-size: clamp(0.92rem, 1.25vw, 1.08rem); }
+  .spy-card p { font-size: clamp(0.8rem, 1.05vw, 0.92rem); color: #ccc0a6; line-height: 1.4; }
 
   .status-footer {
-    padding-top: 12px;
+    padding-top: 10px;
     border-top: 1px solid #3a2e25;
-    font-size: clamp(0.82rem, 1.1vw, 0.95rem);
+    font-size: clamp(0.8rem, 1.05vw, 0.92rem);
     color: var(--gold);
     text-align: center;
   }
@@ -453,14 +485,13 @@
   <div id="toast">Gra zapisana</div>
 
   <div class="ui-layer">
-    <!-- Sekcja Nagłówka i Wskaźników -->
     <div class="header-wrapper">
       <div class="top-hud">
         <div class="hud-row">
           <div class="hud-stats">
             <span id="turn-display">Runda: 1</span>
-            <span id="intel-display">📜 0</span>
-            <span id="gold-display">💰 100</span>
+            <span id="intel-display">📜 Haki: 0</span>
+            <span id="gold-display">💰 Złoto: 90</span>
           </div>
           <div class="hud-controls">
             <button class="icon-btn" id="mute-btn" onclick="toggleMute()" title="Dźwięk">🔊</button>
@@ -468,26 +499,27 @@
           </div>
         </div>
         <div class="rank-banner">
-          <span id="rank-title">Tytuł: Szeptacz Dworski</span>
-          <span id="plot-progress">Spisek Koronny: 0/4</span>
+          <span id="rank-title">Tytuł: Nowicjusz ze Skryptorium</span>
+          <span class="upkeep-warning" id="upkeep-display">Koszt tury: -4g | +3👁️</span>
+          <span id="plot-progress">Spisek Koronny: 0/5</span>
         </div>
       </div>
 
       <div class="meters-panel">
-        <div class="meter">
-          <span class="meter-label">👑 Król</span>
+        <div class="meter" title="Uwaga: 0% to wygnanie, 100% to egzekucja z paranoi króla!">
+          <span class="meter-label">👑 Król <small id="val-king">50%</small></span>
           <div class="bar-bg" id="bg-king"><div class="bar-fill" id="bar-king"></div></div>
         </div>
-        <div class="meter">
-          <span class="meter-label">⛪ Kościół</span>
+        <div class="meter" title="Uwaga: 0% to ekskomunika, 100% to przejęcie władzy przez Inkwizycję!">
+          <span class="meter-label">⛪ Kościół <small id="val-church">50%</small></span>
           <div class="bar-bg" id="bg-church"><div class="bar-fill" id="bar-church"></div></div>
         </div>
-        <div class="meter">
-          <span class="meter-label">⚔️ Szlachta</span>
+        <div class="meter" title="Uwaga: 0% to bunt baronów, 100% to oligarchia i zamach stanu!">
+          <span class="meter-label">⚔️ Szlachta <small id="val-nobility">50%</small></span>
           <div class="bar-bg" id="bg-nobility"><div class="bar-fill" id="bar-nobility"></div></div>
         </div>
-        <div class="meter">
-          <span class="meter-label">👁️ Spisek</span>
+        <div class="meter" title="Przy 100% zostajesz wtrącony do lochu!">
+          <span class="meter-label">👁️ Spisek <small id="val-suspicion">20%</small></span>
           <div class="bar-bg" id="bg-suspicion"><div class="bar-fill" id="bar-suspicion"></div></div>
         </div>
       </div>
@@ -496,9 +528,10 @@
     <!-- Karta Dylematu -->
     <div class="card-viewport">
       <div id="event-card">
+        <div class="book-badge" id="book-source">Kronika Dworska</div>
         <div class="portrait-circle" id="speaker-icon">⛪</div>
-        <div id="speaker-name">Biskup Anselm</div>
-        <div id="event-title">Przechwycony Posłaniec</div>
+        <div id="speaker-name">Biskup Waleran</div>
+        <div id="event-title">Tytuł wydarzenia</div>
         <div id="event-desc">Opis wydarzenia...</div>
       </div>
     </div>
@@ -508,7 +541,7 @@
 
     <!-- Dolna Nawigacja -->
     <div class="bottom-nav">
-      <button class="nav-btn" onclick="openSpyModal()">🗡️ Siatka Szpiegów i Wielki Spisek</button>
+      <button class="nav-btn" onclick="openSpyModal()">🗡️ Siatka Szpiegów, Lombardy i Wielki Spisek</button>
     </div>
   </div>
 
@@ -521,7 +554,7 @@
       </div>
       <div class="tabs">
         <button class="tab-btn active" id="tab-spies" onclick="switchTab('spies')">👥 Agenci</button>
-        <button class="tab-btn" id="tab-market" onclick="switchTab('market')">🧪 Rynek</button>
+        <button class="tab-btn" id="tab-market" onclick="switchTab('market')">🧪 Alchemia</button>
         <button class="tab-btn" id="tab-assassinations" onclick="switchTab('assassinations')">🗡️ Zamachy</button>
         <button class="tab-btn" id="tab-crown" onclick="switchTab('crown')">👑 Korona</button>
       </div>
@@ -611,7 +644,7 @@
     document.getElementById('mute-btn').innerText = isMuted ? '🔇' : '🔊';
   }
 
-  // --- 2. TŁO CANVAS (RESPONSYWNE) ---
+  // --- 2. TŁO CANVAS ---
   const canvas = document.getElementById('bg-canvas');
   const ctx = canvas.getContext('2d');
   let particles = [];
@@ -641,14 +674,14 @@
   function animateCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (state.stats.suspicion > 50) {
-      const intensity = ((state.stats.suspicion - 50) / 50) * 0.38;
+      const intensity = ((state.stats.suspicion - 50) / 50) * 0.42;
       const radius = Math.max(canvas.width, canvas.height);
       const grad = ctx.createRadialGradient(
         canvas.width / 2, canvas.height / 2, radius * 0.15,
         canvas.width / 2, canvas.height / 2, radius * 0.75
       );
       grad.addColorStop(0, 'rgba(0,0,0,0)');
-      grad.addColorStop(1, `rgba(160, 20, 20, ${intensity})`);
+      grad.addColorStop(1, `rgba(175, 15, 15, ${intensity})`);
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
@@ -664,58 +697,67 @@
     requestAnimationFrame(animateCanvas);
   }
 
-  // --- 3. TYTUŁY DWORSKIE I WIELKI SPISEK KORONNY ---
+  // --- 3. TYTUŁY I 5-ETAPOWY WIELKI SPISEK ---
   const courtRanks = [
-    { minTurn: 1,  title: "Szeptacz Dworski" },
-    { minTurn: 5,  title: "Królewski Szambelan" },
-    { minTurn: 10, title: "Wielki Kanclerz" },
-    { minTurn: 16, title: "Książę Regent" },
-    { minTurn: 22, title: "Szara Eminencja" }
+    { minTurn: 1,  title: "Nowicjusz ze Skryptorium" },
+    { minTurn: 6,  title: "Powiernik Tajemnic" },
+    { minTurn: 12, title: "Królewski Pieczętarz" },
+    { minTurn: 19, title: "Strażnik Żelaznej Korony" },
+    { minTurn: 27, title: "Szara Eminencja Królestwa" }
   ];
 
   const crownPlotStages = [
     {
       stage: 0,
-      name: "Etap I: Przekupstwo Królewskich Kronikarzy",
-      desc: "Zleć skrybom sfałszowanie starych pergaminów, aby wykazać twoje rzekome pokrewieństwo z pierwszą dynastią.",
-      costGold: 80, costIntel: 1, suspicionGain: 10
+      name: "Etap I: Ukryty Manuskrypt z Opactwa („Imię róży”)",
+      desc: "Wykup z tajnego Finis Africae zakazaną księgę i sfabrykuj kroniki podważające prawa obecnej dynastii.",
+      costGold: 85, costIntel: 1, suspicionGain: 12
     },
     {
       stage: 1,
-      name: "Etap II: Tajny Pakt z Baronami",
-      desc: "Obiecaj arystokracji przywileje podatkowe w zamian za poparcie twojej regencji podczas kryzysu.",
-      costGold: 110, costIntel: 2, suspicionGain: 15
+      name: "Etap II: Długi Bankierów Tolomei („Królowie przeklęci”)",
+      desc: "Przejmij weksle królewskie od lombardzkich bankierów ze Sieny, uzależniając skarbiec od twojej woli.",
+      costGold: 115, costIntel: 2, suspicionGain: 15
     },
     {
       stage: 2,
-      name: "Etap III: Neutralizacja Gwardii Przybocznej",
-      desc: "Obsadź swoich ludzi na czele nocnej straży pałacowej i odetnij króla od lojalnych rycerzy.",
-      costGold: 140, costIntel: 2, suspicionGain: 20
+      name: "Etap III: Przywilej Targowy z Kingsbridge („Filary Ziemi”)",
+      desc: "Przekup gildie murarskie i sukienników, aby w dniu przesilenia sparaliżowali stolicę strajkiem.",
+      costGold: 135, costIntel: 2, suspicionGain: 16
     },
     {
       stage: 3,
-      name: "Etap IV: Noc Długich Sztyletów (Uzurpacja)",
-      desc: "Zmuś monarchę do abdykacji i włóż koronę na własną skroń. Zwycięstwo w grze!",
-      costGold: 180, costIntel: 3, suspicionGain: 15
+      name: "Etap IV: Tajny Zjazd Rodów w Gąsawie („Odrodzone Królestwo”)",
+      desc: "Zjednocz zwaśnione rody Nałęczów i Zarembów obietnicą nowych ziem, izolując króla od armii.",
+      costGold: 160, costIntel: 3, suspicionGain: 18
+    },
+    {
+      stage: 4,
+      name: "Etap V: Koronacja w Katedrze Gnieźnieńskiej („Harda”)",
+      desc: "Uwięź monarchę w wieży, ucisz gwardię i przyjmij namaszczenie z rąk arcybiskupa!",
+      costGold: 190, costIntel: 3, suspicionGain: 15
     }
   ];
 
-  const STORAGE_KEY = 'cienie_korony_save_v2';
+  const STORAGE_KEY = 'cienie_korony_hardcore_v3';
 
   const defaultState = {
     turn: 1,
-    gold: 100,
+    gold: 90,
     intel: 0,
     spies: 1,
     maxSpies: 3,
     tojad: 0,
     plotStage: 0,
     rankIndex: 0,
-    stats: { king: 50, church: 50, nobility: 50, suspicion: 15 },
+    lastEventIndex: -1,
+    stats: { king: 50, church: 50, nobility: 50, suspicion: 20 },
     targets: [
-      { id: "marshal", name: "Marszałek Gerard Vane", guard: "Wysoka", baseChance: 0.45, risk: 35 },
-      { id: "bishop", name: "Biskup Anselm", guard: "Średnia", baseChance: 0.65, risk: 25 },
-      { id: "inquisitor", name: "Wielki Inkwizytor", guard: "Bardzo Wysoka", baseChance: 0.35, risk: 40 }
+      { id: "gui", name: "Inkwizytor Bernard Gui („Imię róży”)", guard: "Fanatyczna Straż", baseChance: 0.40, risk: 38 },
+      { id: "waleran", name: "Biskup Waleran Bigod („Filary Ziemi”)", guard: "Zbrojni Kapituły", baseChance: 0.55, risk: 28 },
+      { id: "william", name: "Hrabia Wilhelm Hamleigh („Filary Ziemi”)", guard: "Najemnicy z Shiring", baseChance: 0.45, risk: 32 },
+      { id: "marigny", name: "Szambelan Enguerrand de Marigny („Królowie przeklęci”)", guard: "Gwardia Pałacowa", baseChance: 0.35, risk: 40 },
+      { id: "wincenty", name: "Wojewoda Wincenty z Szamotuł („Odrodzone Królestwo”)", guard: "Drużyna Rycerska", baseChance: 0.42, risk: 35 }
     ]
   };
 
@@ -739,14 +781,14 @@
     state = JSON.parse(JSON.stringify(defaultState));
     updateUI();
     loadNextEvent();
-    showToast("Rozpoczęto nową intrygę");
+    showToast("Rozpoczęto nową intrygę (Tryb Bezlitosny)");
   }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.innerText = msg;
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2200);
+    setTimeout(() => t.classList.remove('show'), 2500);
   }
 
   function checkRankProgression() {
@@ -756,54 +798,134 @@
     });
     if (newIndex > state.rankIndex) {
       state.rankIndex = newIndex;
-      state.gold += 40;
+      state.gold += 35;
       playSound('fanfare');
-      showToast(`Awans! Nowy tytuł: ${courtRanks[newIndex].title} (+40g)`);
+      showToast(`Awans! Tytuł: ${courtRanks[newIndex].title} (+35g)`);
     }
   }
 
-  // --- 4. BAZA KART DYLEMATÓW ---
+  // --- 4. ROZBUDOWANA BAZA KART LITERACKICH ---
   const eventsDB = [
+    // IMIĘ RÓŻY (Umberto Eco)
     {
-      speaker: "Biskup Anselm", icon: "⛪", title: "Przechwycony Posłaniec",
-      text: "W ręce twojej straży wpadł kurier zmierzający do Rzymu z listem obciążającym biskupa stołecznego.",
+      book: "Imię róży", speaker: "Brat Wilhelm z Baskerville", icon: "🔍", title: "Czarne Palce i Język",
+      text: "Uczony franciszkanin bada serię tajemniczych zgonów w klasztornym skryptorium. Podejrzewa, że karty greckiego manuskryptu nasączono trucizną.",
       choices: [
-        { text: "Zaszantażuj biskupa i zażądaj dziesięciny", hint: "+75 Złota, +15 Spisek, -20 Kościół", outcomes: { gold: 75, suspicion: 15, church: -20 } },
-        { text: "Oddaj dowody bezpośrednio monarsze", hint: "+20 Król, -25 Kościół, -5 Spisek", outcomes: { king: 20, church: -25, suspicion: -5 } },
-        { text: "Spal list na oczach biskupa w zamian za haki", hint: "+15 Kościół, +1 Hak, -5 Król", outcomes: { church: 15, intel: 1, king: -5 } }
+        { text: "Pomóż mu wejść nocą do labiryntu biblioteki", hint: "+1 Hak, -15 Kościół, +10 Spisek", outcomes: { intel: 1, church: -15, suspicion: 10 } },
+        { text: "Zatrzyj ślady i spal księgę wraz ze ślepym bibliotekarzem", hint: "+15 Kościół, +18 Spisek, -10 Król", outcomes: { church: 15, suspicion: 18, king: -10 } },
+        { text: "Przekup opata, by odesłał franciszkanina (-35g)", hint: "-35 Złota, -10 Spisek, +10 Kościół", reqGold: 35, outcomes: { gold: -35, suspicion: -10, church: 10 } }
       ]
     },
     {
-      speaker: "Marszałek Vane", icon: "⚔️", title: "Szepty w Krużgankach",
-      text: "Marszałek żąda zwiększenia żołdu dla gwardii królewskiej, grożąc wypowiedzeniem posłuszeństwa.",
+      book: "Imię róży", speaker: "Inkwizytor Bernard Gui", icon: "🔥", title: "Stosy dla Dulcynian",
+      text: "Bernard Gui pojmał w spiżarni brata klucznika oskarżonego o dawną herezję. Żąda wydania go na tortury, by uderzyć w autorytet opactwa.",
       choices: [
-        { text: "Opłać gwardię z własnej szkatuły (Wymaga 50g)", hint: "-50 Złota, +15 Szlachta, +10 Król", reqGold: 50, outcomes: { gold: -50, nobility: 15, king: 10, suspicion: -5 } },
-        { text: "Wykorzystaj zdobyty Hak, by go uciszyć (Wymaga 1 Haka)", hint: "-1 Hak, +15 Król, +10 Spisek", reqIntel: 1, outcomes: { intel: -1, king: 15, suspicion: 10 } },
-        { text: "Oskarż go publicznie o zdradę", hint: "+10 Król, -20 Szlachta, +10 Spisek", outcomes: { king: 10, nobility: -20, suspicion: 10 } }
+        { text: "Wydaj zakonnika i przejmij skonfiskowane złoto", hint: "+65 Złota, +15 Kościół, -15 Szlachta, +8 Spisek", outcomes: { gold: 65, church: 15, nobility: -15, suspicion: 8 } },
+        { text: "Szantażuj inkwizytora dawnym listem z Awinionu (Wymaga 1 Haka)", hint: "-1 Hak, -15 Spisek, +15 Król, -10 Kościół", reqIntel: 1, outcomes: { intel: -1, suspicion: -15, king: 15, church: -10 } },
+        { text: "Odmów wydania więźnia w imię praw lennych", hint: "-20 Kościół, +15 Szlachta", outcomes: { church: -20, nobility: 15 } }
       ]
     },
     {
-      speaker: "Lady Elena", icon: "🍷", title: "Królewska Uczta",
-      text: "Lady Elena proponuje dosypanie środka nasennego do pucharu posła, aby wykraść jego szyfry.",
+      book: "Imię róży", speaker: "Ślepy Jorge z Burgos", icon: "📕", title: "Trucizna Śmiechu",
+      text: "Stary mnich ostrzega, że śmiech niszczy strach przed diabłem, a bez strachu nie ma wiary ani posłuszeństwa wobec władzy.",
       choices: [
-        { text: "Weź udział w spisku", hint: "+45 Złota, +1 Hak, +20 Spisek", outcomes: { gold: 45, intel: 1, suspicion: 20, nobility: 10 } },
-        { text: "Odmów i ostrzeż straż zamkową", hint: "-10 Spisek, +10 Król, -15 Szlachta", outcomes: { suspicion: -10, king: 10, nobility: -15 } }
+        { text: "Wprowadź surową cenzurę ksiąg i pieśni w stolicy", hint: "+15 Kościół, +10 Król, -15 Szlachta", outcomes: { church: 15, king: 10, nobility: -15 } },
+        { text: "Wykup zakazane traktaty i sprzedaj je potajemnie na uniwersytecie", hint: "+70 Złota, -15 Kościół, +14 Spisek", outcomes: { gold: 70, church: -15, suspicion: 14 } }
+      ]
+    },
+
+    // FILARY ZIEMI (Ken Follett)
+    {
+      book: "Filary Ziemi", speaker: "Mistrz Murarski Tom", icon: "🏛️", title: "Zawalona Nawa Katedry",
+      text: "Stara romańska katedra w Kingsbridge runęła w nocy. Przeor Filip i mistrz murarski proszą o fundusze na budowę nowej, gotyckiej świątyni.",
+      choices: [
+        { text: "Sfinansuj kamieniołom ze swojego skarbca (-55g)", hint: "-55 Złota, +20 Kościół, -10 Spisek", reqGold: 55, outcomes: { gold: -55, church: 20, suspicion: -10 } },
+        { text: "Nałóż przymusowe myto na rycerzy i kupców", hint: "+55 Złota, +10 Kościół, -20 Szlachta", outcomes: { gold: 55, church: 10, nobility: -20 } },
+        { text: "Zrabuj kamień przeznaczony na katedrę pod budowę zamku", hint: "+15 Szlachta, +10 Król, -20 Kościół", outcomes: { nobility: 15, king: 10, church: -20 } }
       ]
     },
     {
-      speaker: "Wielki Inkwizytor", icon: "🔥", title: "Polowanie na Heretyków",
-      text: "Inkwizycja domaga się prawa do przeszukania komnat najbogatszych kupców w stolicy.",
+      book: "Filary Ziemi", speaker: "Hrabia Wilhelm Hamleigh", icon: "🐗", title: "Krwawy Najazd na Targ",
+      text: "Brutalny Wilhelm Hamleigh chce spalić składy wełny Aliena z Shiring, by zniszczyć niezależny handel i przejąć hrabstwo siłą.",
       choices: [
-        { text: "Pozwól im działać w zamian za udział w łupach", hint: "+65 Złota, +15 Kościół, -15 Szlachta", outcomes: { gold: 65, church: 15, nobility: -15, suspicion: 10 } },
-        { text: "Zablokuj dekret za plecami króla", hint: "-15 Kościół, +15 Szlachta, +10 Spisek", outcomes: { church: -15, nobility: 15, suspicion: 10 } }
+        { text: "Pozwól mu złupić targ w zamian za połowę łupów", hint: "+75 Złota, +15 Szlachta, -15 Król, +12 Spisek", outcomes: { gold: 75, nobility: 15, king: -15, suspicion: 12 } },
+        { text: "Wyślij gwardię królewską w obronie kupców wełny", hint: "+15 Król, +10 Kościół, -20 Szlachta", outcomes: { king: 15, church: 10, nobility: -20 } }
       ]
     },
     {
-      speaker: "Mistrz Gildii Kupieckiej", icon: "⚖️", title: "Podatek Portowy",
-      text: "Kupcy oferują ci potajemną łapówkę w zamian za obniżenie ceł na przyprawy ze Wschodu.",
+      book: "Filary Ziemi", speaker: "Biskup Waleran Bigod", icon: "🐍", title: "Fałszywe Oskarżenie o Zdradę",
+      text: "Ambitny biskup Waleran proponuje wspólne sfingowanie procesu przeciwko staremu hrabiemu Bartłomiejowi, aby podzielić jego włości.",
       choices: [
-        { text: "Przyjmij złoto i sfałszuj edykt", hint: "+80 Złota, +15 Spisek, -10 Król", outcomes: { gold: 80, suspicion: 15, king: -10 } },
-        { text: "Wymuś na nich zeznania przeciw szlachcie", hint: "+1 Hak, +15 Król, -10 Szlachta", outcomes: { intel: 1, king: 15, nobility: -10 } }
+        { text: "Podpisz fałszywy akt oskarżenia", hint: "+60 Złota, +1 Hak, +16 Spisek, -15 Szlachta", outcomes: { gold: 60, intel: 1, suspicion: 16, nobility: -15 } },
+        { text: "Ostrzeż rodzinę hrabiego w zamian za lojalność", hint: "+15 Szlachta, -15 Kościół, -5 Spisek", outcomes: { nobility: 15, church: -15, suspicion: -5 } }
+      ]
+    },
+
+    // KRÓLOWIE PRZEKLĘCI (Maurice Druon)
+    {
+      book: "Królowie przeklęci", speaker: "Wielki Mistrz Jakub de Molay", icon: "✝️", title: "Klątwa ze Stosu Templariuszy",
+      text: "Król pragnie przejąć złoto zakonu Templariuszy i spalić Wielkiego Mistrza. De Molay z płonącego stosu wzywa króla i papieża przed Sąd Boży!",
+      choices: [
+        { text: "Zagrab skarbiec Templariuszy dla Korony i siebie", hint: "+85 Złota, +15 Król, -20 Kościół, +12 Spisek", outcomes: { gold: 85, king: 15, church: -20, suspicion: 12 } },
+        { text: "Ukryj część zakonnych archiwów i dłużników", hint: "+2 Haki, -10 Król, +15 Spisek", outcomes: { intel: 2, king: -10, suspicion: 15 } }
+      ]
+    },
+    {
+      book: "Królowie przeklęci", speaker: "Królowa Izabela („Wilczyca”)", icon: "🐺", title: "Skandal w Wieży Nesle",
+      text: "Odkryto, że synowe króla oddają się schadzkom z młodymi rycerzami w Wieży Nesle, darowując im sakiewki, które otrzymały w tajemnicy.",
+      choices: [
+        { text: "Ujawnij cudzołóstwo przed całym dworem", hint: "+20 Król, -20 Szlachta, -10 Spisek", outcomes: { king: 20, nobility: -20, suspicion: -10 } },
+        { text: "Zaszantażuj księżniczki i zachowaj dowody dla siebie", hint: "+65 Złota, +1 Hak, +16 Spisek", outcomes: { gold: 65, intel: 1, suspicion: 16 } }
+      ]
+    },
+    {
+      book: "Królowie przeklęci", speaker: "Hrabina Mahaut d'Artois", icon: "🧪", title: "Zatrute Rękawiczki",
+      text: "Potężna hrabina Mahaut chce pozbyć się niewygodnego bratanka, Roberta d'Artois, i prosi twoich alchemików o truciznę działającą z opóźnieniem.",
+      choices: [
+        { text: "Dostarcz jej truciznę w zamian za złoto i sojusz", hint: "+70 Złota, +10 Szlachta, +18 Spisek", outcomes: { gold: 70, nobility: 10, suspicion: 18 } },
+        { text: "Sprzedaj informację o spisku Robertowi d'Artois", hint: "+1 Hak, +10 Król, -15 Szlachta", outcomes: { intel: 1, king: 10, nobility: -15 } }
+      ]
+    },
+    {
+      book: "Królowie przeklęci", speaker: "Spinello Tolomei (Bankier)", icon: "⚖️", title: "Lombardzka Pożyczka",
+      text: "Włoski bankier ze Sieny oferuje natychmiastowy zastrzyk gotówki dla twojej siatki w zamian za monopol na bicie monety w królestwie.",
+      choices: [
+        { text: "Przyjmij złoto Lombardów i obniż próbę srebra", hint: "+90 Złota, -15 Król, -10 Szlachta, +10 Spisek", outcomes: { gold: 90, king: -15, nobility: -10, suspicion: 10 } },
+        { text: "Aresztuj bankierów i umórz swoje długi siłą", hint: "+40 Złota, +10 Król, -15 Kościół, +12 Spisek", outcomes: { gold: 40, king: 10, church: -15, suspicion: 12 } }
+      ]
+    },
+
+    // HARDA / ODRODZONE KRÓLESTWO (Elżbieta Cherezińska)
+    {
+      book: "Harda", speaker: "Świętosława (Sygryda Storrada)", icon: "🛡️", title: "Złoto Wikingów z Jomsborga",
+      text: "Piastówna i królowa Północy przysyła posłów z Jomsborga. Oferuje najemnych wojów do stłumienia buntu możnych w zamian za wsparcie jej syna.",
+      choices: [
+        { text: "Zatrudnij waregów do poskromienia baronów (-45g)", hint: "-45 Złota, +20 Król, -15 Szlachta", reqGold: 45, outcomes: { gold: -45, king: 20, nobility: -15 } },
+        { text: "Wymień tajemnice handlowe Bałtyku ze skaldami", hint: "+50 Złota, +1 Hak, +8 Spisek", outcomes: { gold: 50, intel: 1, suspicion: 8 } }
+      ]
+    },
+    {
+      book: "Odrodzone Królestwo", speaker: "Wójt Albert z Krakowa", icon: "📜", title: "Bunt Niemieckich Mieszczan",
+      text: "Bogaty wójt Albert potajemnie otwiera bramy miasta czeskiemu królowi Janowi Luksemburskiemu, występując przeciwko rządom Łokietka.",
+      choices: [
+        { text: "Stłum bunt żelazem i włócz ciało zdrajcy końmi", hint: "+15 Król, +15 Szlachta, -15 Kościół", outcomes: { king: 15, nobility: 15, church: -15 } },
+        { text: "Przyjmij okup od zbuntowanych rajców za darowanie życia", hint: "+80 Złota, -15 Król, +14 Spisek", outcomes: { gold: 80, king: -15, suspicion: 14 } }
+      ]
+    },
+    {
+      book: "Odrodzone Królestwo", speaker: "Arcybiskup Jakub Świnka", icon: "👑", title: "Poselstwo do Awinionu",
+      text: "Arcybiskup gnieźnieński zbiera świętopietrze, by uzyskać zgodę papieża na koronację, lecz Krzyżacy przekupują kardynałów w kurii.",
+      choices: [
+        { text: "Dołóż złota dla papieskich legatów (-60g)", hint: "-60 Złota, +20 Kościół, +10 Król, -10 Spisek", reqGold: 60, outcomes: { gold: -60, church: 20, king: 10, suspicion: -10 } },
+        { text: "Przechwyć krzyżackich kurierów na Kujawach", hint: "+55 Złota, +1 Hak, +12 Spisek", outcomes: { gold: 55, intel: 1, suspicion: 12 } }
+      ]
+    },
+    {
+      book: "Odrodzone Królestwo", speaker: "Kasztelan z Rodu Zarembów", icon: "🦅", title: "Zmowa Wielkopolskich Możnych",
+      text: "Rody Zarembów i Nałęczów grożą przejściem na stronę Brandenburgii, jeśli król nie cofnie nowych podatków na obronę Pomorza.",
+      choices: [
+        { text: "Ustąp możnym i nadaj im nowe grody", hint: "+20 Szlachta, -20 Król", outcomes: { nobility: 20, king: -20 } },
+        { text: "Skłóć oba rody sfałszowanym listem (Wymaga 1 Haka)", hint: "-1 Hak, +15 Król, -10 Szlachta, +8 Spisek", reqIntel: 1, outcomes: { intel: -1, king: 15, nobility: -10, suspicion: 8 } }
       ]
     }
   ];
@@ -812,17 +934,25 @@
 
   function updateUI() {
     document.getElementById('turn-display').innerText = `Runda: ${state.turn}`;
-    document.getElementById('gold-display').innerText = `💰 ${state.gold}`;
-    document.getElementById('intel-display').innerText = `📜 ${state.intel}`;
+    document.getElementById('gold-display').innerText = `💰 Złoto: ${state.gold}`;
+    document.getElementById('intel-display').innerText = `📜 Haki: ${state.intel}`;
+
+    const upkeepGold = state.spies * 4;
+    document.getElementById('upkeep-display').innerText = `Utrzymanie tury: -${upkeepGold}g | +3👁️`;
 
     const currentRank = courtRanks[state.rankIndex] || courtRanks[0];
     document.getElementById('rank-title').innerText = `Tytuł: ${currentRank.title}`;
-    document.getElementById('plot-progress').innerText = `Spisek Koronny: ${state.plotStage}/4`;
+    document.getElementById('plot-progress').innerText = `Spisek Koronny: ${state.plotStage}/${crownPlotStages.length}`;
 
-    document.getElementById('bar-king').style.width = `${state.stats.king}%`;
-    document.getElementById('bar-church').style.width = `${state.stats.church}%`;
-    document.getElementById('bar-nobility').style.width = `${state.stats.nobility}%`;
-    document.getElementById('bar-suspicion').style.width = `${state.stats.suspicion}%`;
+    ['king', 'church', 'nobility', 'suspicion'].forEach(k => {
+      const val = state.stats[k];
+      document.getElementById(`bar-${k}`).style.width = `${val}%`;
+      document.getElementById(`val-${k}`).innerText = `${val}%`;
+
+      const bg = document.getElementById(`bg-${k}`);
+      const isDanger = (k === 'suspicion') ? (val >= 80) : (val <= 18 || val >= 85);
+      bg.classList.toggle('danger-zone', isDanger);
+    });
   }
 
   function loadNextEvent() {
@@ -830,7 +960,14 @@
     card.classList.add('card-hidden');
 
     setTimeout(() => {
-      const ev = eventsDB[Math.floor(Math.random() * eventsDB.length)];
+      let idx = Math.floor(Math.random() * eventsDB.length);
+      if (idx === state.lastEventIndex && eventsDB.length > 1) {
+        idx = (idx + 1) % eventsDB.length;
+      }
+      state.lastEventIndex = idx;
+      const ev = eventsDB[idx];
+
+      document.getElementById('book-source').innerText = `Inspiracja: ${ev.book}`;
       document.getElementById('speaker-icon').innerText = ev.icon;
       document.getElementById('speaker-name').innerText = ev.speaker;
       document.getElementById('event-title').innerText = ev.title;
@@ -873,11 +1010,25 @@
 
     if (navigator.vibrate) navigator.vibrate(35);
 
+    // 1. Efekt wybranej opcji
     state.gold += outcomes.gold || 0;
     state.intel += outcomes.intel || 0;
     ['king', 'church', 'nobility', 'suspicion'].forEach(k => {
       if (outcomes[k]) state.stats[k] = Math.max(0, Math.min(100, state.stats[k] + outcomes[k]));
     });
+
+    // 2. Koszt utrzymania tury (Hardcore Upkeep)
+    const upkeepCost = state.spies * 4;
+    state.gold -= upkeepCost;
+    state.stats.suspicion = Math.min(100, state.stats.suspicion + 3);
+
+    // Kara za bankructwo (niewypłacony żołd szpiegów)
+    if (state.gold < 0) {
+      state.gold = 0;
+      state.stats.suspicion = Math.min(100, state.stats.suspicion + 8);
+      state.stats.nobility = Math.max(0, state.stats.nobility - 5);
+      showToast("Brak złota na żołd! Nieopłaceni szpiedzy zaczynają sypać (+8👁️)");
+    }
 
     state.turn++;
     checkRankProgression();
@@ -891,11 +1042,12 @@
     playSound('fanfare');
     localStorage.removeItem(STORAGE_KEY);
     closeSpyModal();
+    document.getElementById('book-source').innerText = "Triumf Wielkiego Spisku";
     document.getElementById('speaker-icon').innerText = "👑";
     document.getElementById('speaker-name').innerText = "ZWYCIĘSTWO! NOWY MONARCHA";
     document.getElementById('event-title').innerText = `Zdobyłeś tron w rundzie ${state.turn}`;
     document.getElementById('event-desc').innerText =
-      "Po miesiącach knucia w cieniach pałacu obaliłeś słabego władcę. Gwardia, Kościół i baronowie klękają przed Twoim majestatem!";
+      "Po miesiącach bezwzględnych intryg, przekupstw u Lombardów i tajnych układów w opactwach zasiadasz na tronie. Całe królestwo klęka przed Twoim majestatem!";
 
     const box = document.getElementById('choices-box');
     box.innerHTML = `<button class="choice-btn" onclick="resetGame()">👑 Rozpocznij nowe panowanie</button>`;
@@ -903,14 +1055,27 @@
 
   function checkGameOver() {
     let reason = "";
-    if (state.stats.suspicion >= 100) reason = "Twoja siatka spiskowa została zdemaskowana. Straż królewska wtrąciła cię do lochu!";
-    else if (state.stats.king <= 0) reason = "Król utracił do ciebie resztki zaufania i podpisał wyrok wygnania.";
-    else if (state.stats.church <= 0) reason = "Trybunał Inkwizycji obłożył cię klątwą ekskomuniki.";
-    else if (state.stats.nobility <= 0) reason = "Zbuntowani baronowie wtargnęli do pałacu i obalili twoje rządy.";
+    // Porażki przez 100% Spisku lub skrajności frakcji (0% oraz 100%)
+    if (state.stats.suspicion >= 100) {
+      reason = "Inkwizytor Bernard Gui i straż królewska wdarli się do twoich komnat. Twoja siatka została zdemaskowana, a ty trafiasz na szafot!";
+    } else if (state.stats.king <= 0) {
+      reason = "Król uznał cię za zdrajcę korony i rozkazał uwięzić w twierdzy Château Gaillard.";
+    } else if (state.stats.king >= 100) {
+      reason = "Twoja potęga na dworze urosła tak bardzo, że paranoiczny król z zazdrości kazał cię ściąć, tak jak szambelana de Marigny!";
+    } else if (state.stats.church <= 0) {
+      reason = "Trybunał Inkwizycji obłożył cię klątwą ekskomuniki i posłał na stos jak heretyków z opactwa.";
+    } else if (state.stats.church >= 100) {
+      reason = "Biskup Waleran i kapituła zdominowali państwo. Wprowadzono rządy teokracji, a świecki kanclerz stał się zbędny.";
+    } else if (state.stats.nobility <= 0) {
+      reason = "Zbuntowani możni z rodów Zarembów i Hamleighów wtargnęli do zamku i rozszarpali twoją straż.";
+    } else if (state.stats.nobility >= 100) {
+      reason = "Rozzuchwaleni baronowie stali się potężniejsi od korony, obalili dwór i podzielili królestwo między siebie.";
+    }
 
     if (reason) {
       playSound('gameover');
       localStorage.removeItem(STORAGE_KEY);
+      document.getElementById('book-source').innerText = "Upadek Szarej Eminencji";
       document.getElementById('speaker-icon').innerText = "💀";
       document.getElementById('speaker-name').innerText = "KONIEC GRY";
       document.getElementById('event-title').innerText = `Przetrwałeś rund: ${state.turn} (${courtRanks[state.rankIndex].title})`;
@@ -952,32 +1117,32 @@
         <div class="spy-card">
           <div>
             <h4>Zwerbuj Nowego Szpiega</h4>
-            <p>Zwiększa możliwości operacyjne w zamku. Koszt: 75 Złota.</p>
+            <p>Zwiększa możliwości operacyjne, ale podnosi utrzymanie o 4g/turę. Koszt: 80 Złota.</p>
           </div>
-          <button class="choice-btn" ${state.gold < 75 || state.spies >= state.maxSpies ? 'disabled' : ''} onclick="recruitSpy()">Zwerbuj (-75g)</button>
+          <button class="choice-btn" ${state.gold < 80 || state.spies >= state.maxSpies ? 'disabled' : ''} onclick="recruitSpy()">Zwerbuj (-80g)</button>
         </div>
         <div class="spy-card">
           <div>
-            <h4>Infiltracja Archiwum</h4>
-            <p>Szpieg wykrada tajną korespondencję (+1 Hak 📜, +8 Spisek).</p>
+            <h4>Infiltracja Skryptorium i Kancelarii</h4>
+            <p>Szpieg wykrada tajne pergaminy (+1 Hak 📜, +10 Spisek).</p>
           </div>
-          <button class="choice-btn" ${state.gold < 25 || state.spies <= 0 ? 'disabled' : ''} onclick="gatherIntel()">Wyślij agenta (-25g)</button>
+          <button class="choice-btn" ${state.gold < 30 || state.spies <= 0 ? 'disabled' : ''} onclick="gatherIntel()">Wyślij agenta (-30g)</button>
         </div>`;
     } else if (currentTab === 'market') {
       body.innerHTML += `
         <div class="spy-card">
           <div>
-            <h4>Wywar z Tojadu (Trucizna)</h4>
-            <p>Zwiększa szansę udanego zamachu o 30%. Posiadasz: ${state.tojad}</p>
+            <h4>Maść z Tojadu ze Skryptorium („Imię róży”)</h4>
+            <p>Trucizna nakładana na karty ksiąg lub puchary. Zwiększa szansę zamachu o 30%. Posiadasz: ${state.tojad}</p>
           </div>
-          <button class="choice-btn" ${state.gold < 60 ? 'disabled' : ''} onclick="buyPoison()">Kup truciznę (-60g)</button>
+          <button class="choice-btn" ${state.gold < 65 ? 'disabled' : ''} onclick="buyPoison()">Kup truciznę (-65g)</button>
         </div>
         <div class="spy-card">
           <div>
-            <h4>Przekupstwo Strażników</h4>
-            <p>Zatarcie śladów w śledztwie (-20 Spisek).</p>
+            <h4>Przekupstwo Straży i Świadków</h4>
+            <p>Zatarcie śladów w śledztwie inkwizytorów (-22 Spisek).</p>
           </div>
-          <button class="choice-btn" ${state.gold < 50 || state.stats.suspicion <= 0 ? 'disabled' : ''} onclick="bribeGuards()">Opłać milczenie (-50g)</button>
+          <button class="choice-btn" ${state.gold < 55 || state.stats.suspicion <= 0 ? 'disabled' : ''} onclick="bribeGuards()">Opłać milczenie (-55g)</button>
         </div>`;
     } else if (currentTab === 'assassinations') {
       if (state.targets.length === 0) {
@@ -991,7 +1156,7 @@
               <h4>Cel: ${t.name}</h4>
               <p>Ochrona: ${t.guard} | Szansa sukcesu: <b>${chance}%</b> ${state.tojad > 0 ? '(+Tojad)' : ''}</p>
             </div>
-            <button class="choice-btn" ${state.gold < 90 || state.spies <= 0 ? 'disabled' : ''} onclick="assassinate(${idx}, ${chance})">Zleć zabójstwo (-90g)</button>
+            <button class="choice-btn" ${state.gold < 95 || state.spies <= 0 ? 'disabled' : ''} onclick="assassinate(${idx}, ${chance})">Zleć zabójstwo (-95g)</button>
           </div>`;
       });
     } else if (currentTab === 'crown') {
@@ -1037,22 +1202,22 @@
       triggerVictory();
     } else {
       playSound('fanfare');
-      showToast(`Ukończono etap ${state.plotStage}/4 Wielkiego Spisku!`);
+      showToast(`Ukończono etap ${state.plotStage}/${crownPlotStages.length} Wielkiego Spisku!`);
       renderModalTab();
     }
   }
 
   function recruitSpy() {
     playSound('coin');
-    state.gold -= 75; state.spies++;
+    state.gold -= 80; state.spies++;
     saveGame(); updateUI(); renderModalTab();
     showToast("Zwerbowano nowego szpiega!");
   }
 
   function gatherIntel() {
     playSound('click');
-    state.gold -= 25; state.intel++;
-    state.stats.suspicion = Math.min(100, state.stats.suspicion + 8);
+    state.gold -= 30; state.intel++;
+    state.stats.suspicion = Math.min(100, state.stats.suspicion + 10);
     saveGame(); updateUI(); renderModalTab();
     showToast("Zdobyto nowy Hak (+1 📜)");
     if (checkGameOver()) closeSpyModal();
@@ -1060,32 +1225,32 @@
 
   function buyPoison() {
     playSound('coin');
-    state.gold -= 60; state.tojad++;
+    state.gold -= 65; state.tojad++;
     saveGame(); updateUI(); renderModalTab();
-    showToast("Zakupiono Wywar z Tojadu!");
+    showToast("Zakupiono Maść z Tojadu!");
   }
 
   function bribeGuards() {
     playSound('coin');
-    state.gold -= 50;
-    state.stats.suspicion = Math.max(0, state.stats.suspicion - 20);
+    state.gold -= 55;
+    state.stats.suspicion = Math.max(0, state.stats.suspicion - 22);
     saveGame(); updateUI(); renderModalTab();
-    showToast("Strażnicy przekupieni (-20 Spisek)");
+    showToast("Śledczy przekupieni (-22 Spisek)");
   }
 
   function assassinate(index, chance) {
     playSound('dagger');
     const target = state.targets[index];
-    state.gold -= 90;
+    state.gold -= 95;
     if (state.tojad > 0) state.tojad--;
 
     if (Math.random() * 100 <= chance) {
-      showToast(`Zamach udany! ${target.name} nie żyje (+1 📜).`);
+      showToast(`Zamach udany! ${target.name} wyeliminowany (+1 📜).`);
       state.intel++;
-      state.stats.suspicion = Math.min(100, state.stats.suspicion + 12);
+      state.stats.suspicion = Math.min(100, state.stats.suspicion + 14);
       state.targets.splice(index, 1);
     } else {
-      showToast(`Wpadka! Twój szpieg został pojmany!`);
+      showToast(`Wpadka! Zamachowiec pojmany na gorącym uczynku!`);
       state.spies = Math.max(0, state.spies - 1);
       state.stats.suspicion = Math.min(100, state.stats.suspicion + target.risk);
     }

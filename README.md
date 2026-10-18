@@ -1,4 +1,9 @@
-# Repozytorium zawiera hobbistyczny zestaw gier: Chestnut Arcade Game Hub (Snake, space impact, bomberman and tanks) oraz Cienie Korony (Shadows of the Crown) w wersji webowej
+# Repozytorium zawiera hobbistyczny zestaw gier: Chestnut Arcade Game Hub (Snake, space impact, bomberman and tanks) oraz Cienie Korony (Shadows of the Crown) w wersji webowej.
+
+## Pliki gry
+
+- [chestnut_arcade_game_hub.html](./chestnut_arcade_game_hub.html) — centrum gier arcade z 4 mini-grami: Snake, Space Impact, Tanks i Bomberman.
+- [ShadowsOfCrown.html](./ShadowsOfCrown.html) — strategiczno-narracyjna gra w stylu dworskiego intryganta.
 
 # Chestnut Arcade Game Hub 🌰🚀
 
@@ -31,10 +36,12 @@ A retro hub-game HTML5 arcade cabinet built entirely with vanilla JavaScript, HT
 
 ## 🛠️ Wymagania i uruchomienie
 
-Gra jest samodzielnym plikiem HTML, który zawiera interfejs i kod gry. Nie wymaga silnika, instalacji ani zewnętrznych bibliotek.
+Obie gry są samodzielnymi plikami HTML, które zawierają interfejs i kod gry. Nie wymagają silnika, instalacji ani zewnętrznych bibliotek.
 
 1. Pobierz lub sklonuj repozytorium.
-2. Otwórz plik [ShadowsOfCrown.html](./ShadowsOfCrown.html) w nowoczesnej przeglądarce.
+2. Otwórz odpowiedni plik w nowoczesnej przeglądarce:
+   - [chestnut_arcade_game_hub.html](./chestnut_arcade_game_hub.html) — hub z arcade mini-grami,
+   - [ShadowsOfCrown.html](./ShadowsOfCrown.html) — gra strategiczna.
 3. Gra działa na komputerach i urządzeniach mobilnych. Postęp jest zapisywany lokalnie w pamięci przeglądarki; przycisk nowej gry rozpoczyna rozgrywkę od początku.
 
 Interfejs zawiera również syntetyzowane efekty dźwiękowe, które można wyciszyć w grze.
