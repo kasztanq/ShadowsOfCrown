@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cienie Korony - Edycja Królewska</title>
+<style>
+  :root {
+    --bg-dark: #14110f;
+    --parchment: #e8dcb8;
+    --parchment-dark: #c9b789;
+    --ink: #2b2118;
+    --gold: #f5c542;
+    --crimson: #8f1d1d;
+    --emerald: #1e6b3b;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    font-family: 'Georgia', serif;
+  }
+
+  body {
+    background-color: #080605;
+    color: var(--parchment);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  #game-frame {
+    width: 100%;
+    max-width: 430px;
+    height: 100vh;
+    max-height: 880px;
+    background: radial-gradient(circle at top, #281e18, var(--bg-dark));
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    border: 2px solid #3a2e25;
+    box-shadow: 0 0 50px rgba(0,0,0,0.95);
+    overflow: hidden;
+  }
+
+  #bg-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .ui-layer {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+  }
+
+  /* Górny pasek statusu + Ranga */
+  .top-hud {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.72);
+    border-bottom: 1px solid #3a2e25;
+  }
+
+  .hud-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--gold);
+  }
+
+  .rank-banner {
+    font-size: 0.78rem;
+    color: #d9c89e;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(58, 46, 37, 0.45);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #4a3c31;
+  }
+
+  .hud-stats { display: flex; gap: 12px; }
+  .hud-controls { display: flex; gap: 6px; }
+
+  .icon-btn {
+    background: #261f1a;
+    border: 1px solid #4a3c31;
+    color: var(--parchment);
+    border-radius: 4px;
+    padding: 3px 8px;
+    cursor: pointer;
+    font-size: 0.82rem;
+  }
+
+  .icon-btn:hover { border-color: var(--gold); }
+
+  /* Cztery wskaźniki stanu */
+  .meters-panel {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding: 10px 16px;
+    background: rgba(20, 16, 13, 0.85);
+    border-bottom: 2px solid #3a2e25;
+  }
+
+  .meter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.75rem;
+  }
+
+  .meter-label { margin-bottom: 5px; color: #d1c4a5; }
+
+  .bar-bg {
+    width: 100%;
+    height: 10px;
+    background: #2b231d;
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid #4a3c31;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .bar-fill {
+    height: 100%;
+    width: 50%;
+    transition: width 0.4s ease-out;
+  }
+
+  #bar-king { background: #9b59b6; }
+  #bar-church { background: #f1c40f; }
+  #bar-nobility { background: #e74c3c; }
+  #bar-suspicion { background: #34495e; }
+
+  .pulse-up { box-shadow: 0 0 10px #2ecc71; transform: scale(1.08); }
+  .pulse-down { box-shadow: 0 0 10px #e74c3c; transform: scale(1.08); }
+
+  /* Karta Dylematu */
+  .card-viewport {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 14px 16px;
+    position: relative;
+  }
+
+  #event-card {
+    background: linear-gradient(145deg, var(--parchment), var(--parchment-dark));
+    color: var(--ink);
+    width: 100%;
+    min-height: 250px;
+    padding: 20px 18px;
+    border-radius: 8px;
+    border: 3px double #594433;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.75);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.28s;
+  }
+
+  .card-hidden {
+    opacity: 0;
+    transform: translateY(35px) scale(0.95);
+  }
+
+  .portrait-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #3a2e25;
+    border: 2px solid #594433;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.9rem;
+    margin-bottom: 10px;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
+  }
+
+  #speaker-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--crimson);
+    margin-bottom: 4px;
+  }
+
+  #event-title {
+    font-size: 0.82rem;
+    font-style: italic;
+    color: #594433;
+    margin-bottom: 12px;
+  }
+
+  #event-desc {
+    font-size: 0.95rem;
+    line-height: 1.42;
+  }
+
+  /* Przyciski decyzji */
+  .choices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 16px 12px 16px;
+  }
+
+  .choice-btn {
+    background: rgba(43, 34, 27, 0.94);
+    color: var(--parchment);
+    border: 1px solid #5c4838;
+    padding: 11px 14px;
+    border-radius: 6px;
+    text-align: left;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, border-color 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .choice-btn:hover:not(:disabled) {
+    background: #3d3026;
+    border-color: var(--gold);
+  }
+
+  .choice-btn:active:not(:disabled) { transform: scale(0.98); }
+  .choice-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .choice-hint { font-size: 0.72rem; color: var(--gold); opacity: 0.85; }
+
+  /* Toast */
+  #toast {
+    position: absolute;
+    top: 115px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: rgba(20, 14, 11, 0.96);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 30;
+    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+  }
+
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Dolny pasek nawigacji */
+  .bottom-nav {
+    display: flex;
+    background: #120e0c;
+    border-top: 2px solid #3a2e25;
+  }
+
+  .nav-btn {
+    flex: 1;
+    padding: 14px;
+    background: none;
+    border: none;
+    color: var(--parchment);
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .nav-btn:hover { background: #241c17; color: var(--gold); }
+
+  /* Modal Siatki Szpiegów */
+  #spy-modal {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.78);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+    z-index: 25;
+  }
+
+  #spy-modal.open { opacity: 1; pointer-events: auto; }
+
+  .sheet-container {
+    background: #1c1613;
+    border-top: 3px solid var(--gold);
+    border-radius: 16px 16px 0 0;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+    padding: 16px;
+  }
+
+  #spy-modal.open .sheet-container { transform: translateY(0); }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #3a2e25;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: var(--parchment);
+    font-size: 1.4rem;
+    cursor: pointer;
+  }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin: 10px 0;
+  }
+
+  .tab-btn {
+    padding: 8px 4px;
+    background: #2b221b;
+    color: var(--parchment);
+    border: 1px solid #4a3c31;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.76rem;
+  }
+
+  .tab-btn.active {
+    background: var(--crimson);
+    border-color: var(--gold);
+    font-weight: bold;
+  }
+
+  .modal-content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 4px;
+  }
+
+  .spy-card {
+    background: #261f1a;
+    border: 1px solid #4a3c31;
+    padding: 12px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .spy-card.plot-card {
+    border-color: var(--gold);
+    background: linear-gradient(145deg, #2b2118, #1f1712);
+  }
+
+  .spy-card h4 { color: var(--gold); font-size: 0.92rem; }
+  .spy-card p { font-size: 0.8rem; color: #ccc0a6; line-height: 1.35; }
+
+  .status-footer {
+    padding-top: 10px;
+    border-top: 1px solid #3a2e25;
+    font-size: 0.78rem;
+    color: var(--gold);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div id="game-frame">
+  <canvas id="bg-canvas"></canvas>
+  <div id="toast">Gra zapisana</div>
+
+  <div class="ui-layer">
+    <!-- Górny pasek -->
+    <div class="top-hud">
+      <div class="hud-row">
+        <div class="hud-stats">
+          <span id="turn-display">Runda: 1</span>
+          <span id="intel-display">📜 0</span>
+          <span id="gold-display">💰 100</span>
+        </div>
+        <div class="hud-controls">
+          <button class="icon-btn" id="mute-btn" onclick="toggleMute()" title="Dźwięk">🔊</button>
+          <button class="icon-btn" onclick="resetGame()" title="Nowa gra">🔄</button>
+        </div>
+      </div>
+      <div class="rank-banner">
+        <span id="rank-title">Tytuł: Szeptacz Dworski</span>
+        <span id="plot-progress">Spisek Koronny: 0/4</span>
+      </div>
+    </div>
+
+    <!-- Wskaźniki -->
+    <div class="meters-panel">
+      <div class="meter">
+        <span class="meter-label">👑 Król</span>
+        <div class="bar-bg" id="bg-king"><div class="bar-fill" id="bar-king"></div></div>
+      </div>
+      <div class="meter">
+        <span class="meter-label">⛪ Kościół</span>
+        <div class="bar-bg" id="bg-church"><div class="bar-fill" id="bar-church"></div></div>
+      </div>
+      <div class="meter">
+        <span class="meter-label">⚔️ Szlachta</span>
+        <div class="bar-bg" id="bg-nobility"><div class="bar-fill" id="bar-nobility"></div></div>
+      </div>
+      <div class="meter">
+        <span class="meter-label">👁️ Spisek</span>
+        <div class="bar-bg" id="bg-suspicion"><div class="bar-fill" id="bar-suspicion"></div></div>
+      </div>
+    </div>
+
+    <!-- Karta Dylematu -->
+    <div class="card-viewport">
+      <div id="event-card">
+        <div class="portrait-circle" id="speaker-icon">⛪</div>
+        <div id="speaker-name">Biskup Anselm</div>
+        <div id="event-title">Przechwycony Posłaniec</div>
+        <div id="event-desc">Opis wydarzenia...</div>
+      </div>
+    </div>
+
+    <!-- Przyciski Wyboru -->
+    <div class="choices-container" id="choices-box"></div>
+
+    <!-- Dolna Nawigacja -->
+    <div class="bottom-nav">
+      <button class="nav-btn" onclick="openSpyModal()">🗡️ Siatka Szpiegów i Wielki Spisek</button>
+    </div>
+  </div>
+
+  <!-- Modal Siatki Szpiegów -->
+  <div id="spy-modal">
+    <div class="sheet-container">
+      <div class="modal-header">
+        <h3>OPERACJE W CIENIU</h3>
+        <button class="close-btn" onclick="closeSpyModal()">✕</button>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-spies" onclick="switchTab('spies')">👥 Agenci</button>
+        <button class="tab-btn" id="tab-market" onclick="switchTab('market')">🧪 Rynek</button>
+        <button class="tab-btn" id="tab-assassinations" onclick="switchTab('assassinations')">🗡️ Zamachy</button>
+        <button class="tab-btn" id="tab-crown" onclick="switchTab('crown')">👑 Korona</button>
+      </div>
+      <div class="modal-content" id="modal-body"></div>
+      <div class="status-footer" id="modal-status"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- 1. SYNTEZATOR DŹWIĘKÓW (WEB AUDIO API) ---
+  let audioCtx = null;
+  let isMuted = false;
+
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playSound(type) {
+    if (isMuted) return;
+    initAudio();
+    const now = audioCtx.currentTime;
+
+    if (type === 'click') {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(160, now);
+      osc.frequency.exponentialRampToValueAtTime(60, now + 0.07);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.07);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(now); osc.stop(now + 0.07);
+    } 
+    else if (type === 'coin') {
+      [987.77, 1318.51].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + i * 0.06);
+        gain.gain.setValueAtTime(0.15, now + i * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.008, now + i * 0.06 + 0.18);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now + i * 0.06); osc.stop(now + i * 0.06 + 0.18);
+      });
+    } 
+    else if (type === 'dagger') {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(420, now);
+      osc.frequency.exponentialRampToValueAtTime(90, now + 0.22);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.22);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(now); osc.stop(now + 0.22);
+    }
+    else if (type === 'fanfare') {
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + i * 0.1);
+        gain.gain.setValueAtTime(0.2, now + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.008, now + i * 0.1 + 0.35);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now + i * 0.1); osc.stop(now + i * 0.1 + 0.35);
+      });
+    }
+    else if (type === 'gameover') {
+      [220, 196, 164.81].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now + i * 0.22);
+        gain.gain.setValueAtTime(0.15, now + i * 0.22);
+        gain.gain.exponentialRampToValueAtTime(0.008, now + i * 0.22 + 0.45);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now + i * 0.22); osc.stop(now + i * 0.22 + 0.45);
+      });
+    }
+  }
+
+  function toggleMute() {
+    isMuted = !isMuted;
+    document.getElementById('mute-btn').innerText = isMuted ? '🔇' : '🔊';
+  }
+
+  // --- 2. TŁO CANVAS ---
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+
+  function resizeCanvas() {
+    const frame = document.getElementById('game-frame');
+    canvas.width = frame.clientWidth;
+    canvas.height = frame.clientHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+
+  function initParticles() {
+    resizeCanvas();
+    particles = [];
+    for (let i = 0; i < 28; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2.2 + 0.8,
+        vy: -(Math.random() * 0.6 + 0.2),
+        vx: (Math.random() - 0.5) * 0.4,
+        alpha: Math.random() * 0.65 + 0.15
+      });
+    }
+  }
+
+  function animateCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (state.stats.suspicion > 50) {
+      const intensity = ((state.stats.suspicion - 50) / 50) * 0.35;
+      const grad = ctx.createRadialGradient(
+        canvas.width / 2, canvas.height / 2, canvas.width * 0.2,
+        canvas.width / 2, canvas.height / 2, canvas.width * 0.75
+      );
+      grad.addColorStop(0, 'rgba(0,0,0,0)');
+      grad.addColorStop(1, `rgba(160, 20, 20, ${intensity})`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    particles.forEach(p => {
+      p.y += p.vy; p.x += p.vx;
+      if (p.y < -10) { p.y = canvas.height + 10; p.x = Math.random() * canvas.width; }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(245, 175, 65, ${p.alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(animateCanvas);
+  }
+
+  // --- 3. TYTUŁY DWORSKIE I WIELKI SPISEK KORONNY ---
+  const courtRanks = [
+    { minTurn: 1,  title: "Szeptacz Dworski" },
+    { minTurn: 5,  title: "Królewski Szambelan" },
+    { minTurn: 10, title: "Wielki Kanclerz" },
+    { minTurn: 16, title: "Książę Regent" },
+    { minTurn: 22, title: "Szara Eminencja" }
+  ];
+
+  const crownPlotStages = [
+    {
+      stage: 0,
+      name: "Etap I: Przekupstwo Królewskich Kronikarzy",
+      desc: "Zleć skrybom sfałszowanie starych pergaminów, aby wykazać twoje rzekome pokrewieństwo z pierwszą dynastią.",
+      costGold: 80, costIntel: 1, suspicionGain: 10
+    },
+    {
+      stage: 1,
+      name: "Etap II: Tajny Pakt z Baronami",
+      desc: "Obiecaj arystokracji przywileje podatkowe w zamian za poparcie twojej regencji podczas kryzysu.",
+      costGold: 110, costIntel: 2, suspicionGain: 15
+    },
+    {
+      stage: 2,
+      name: "Etap III: Neutralizacja Gwardii Przybocznej",
+      desc: "Obsadź swoich ludzi na czele nocnej straży pałacowej i odetnij króla od lojalnych rycerzy.",
+      costGold: 140, costIntel: 2, suspicionGain: 20
+    },
+    {
+      stage: 3,
+      name: "Etap IV: Noc Długich Sztyletów (Uzurpacja)",
+      desc: "Zmuś monarchę do abdykacji i włóż koronę na własną skroń. Zwycięstwo w grze!",
+      costGold: 180, costIntel: 3, suspicionGain: 15
+    }
+  ];
+
+  const STORAGE_KEY = 'cienie_korony_save_v2';
+
+  const defaultState = {
+    turn: 1,
+    gold: 100,
+    intel: 0,
+    spies: 1,
+    maxSpies: 3,
+    tojad: 0,
+    plotStage: 0,
+    rankIndex: 0,
+    stats: { king: 50, church: 50, nobility: 50, suspicion: 15 },
+    targets: [
+      { id: "marshal", name: "Marszałek Gerard Vane", guard: "Wysoka", baseChance: 0.45, risk: 35 },
+      { id: "bishop", name: "Biskup Anselm", guard: "Średnia", baseChance: 0.65, risk: 25 },
+      { id: "inquisitor", name: "Wielki Inkwizytor", guard: "Bardzo Wysoka", baseChance: 0.35, risk: 40 }
+    ]
+  };
+
+  let state = loadGame();
+
+  function saveGame() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  function loadGame() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) return Object.assign({}, defaultState, JSON.parse(saved));
+    } catch (e) {}
+    return JSON.parse(JSON.stringify(defaultState));
+  }
+
+  function resetGame() {
+    playSound('click');
+    localStorage.removeItem(STORAGE_KEY);
+    state = JSON.parse(JSON.stringify(defaultState));
+    updateUI();
+    loadNextEvent();
+    showToast("Rozpoczęto nową intrygę");
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function checkRankProgression() {
+    let newIndex = 0;
+    courtRanks.forEach((r, idx) => {
+      if (state.turn >= r.minTurn) newIndex = idx;
+    });
+    if (newIndex > state.rankIndex) {
+      state.rankIndex = newIndex;
+      state.gold += 40;
+      playSound('fanfare');
+      showToast(`Awans! Nowy tytuł: ${courtRanks[newIndex].title} (+40g)`);
+    }
+  }
+
+  // --- 4. BAZA KART DYLEMATÓW ---
+  const eventsDB = [
+    {
+      speaker: "Biskup Anselm", icon: "⛪", title: "Przechwycony Posłaniec",
+      text: "W ręce twojej straży wpadł kurier zmierzający do Rzymu z listem obciążającym biskupa stołecznego.",
+      choices: [
+        { text: "Zaszantażuj biskupa i zażądaj dziesięciny", hint: "+75 Złota, +15 Spisek, -20 Kościół", outcomes: { gold: 75, suspicion: 15, church: -20 } },
+        { text: "Oddaj dowody bezpośrednio monarsze", hint: "+20 Król, -25 Kościół, -5 Spisek", outcomes: { king: 20, church: -25, suspicion: -5 } },
+        { text: "Spal list na oczach biskupa w zamian za haki", hint: "+15 Kościół, +1 Hak, -5 Król", outcomes: { church: 15, intel: 1, king: -5 } }
+      ]
+    },
+    {
+      speaker: "Marszałek Vane", icon: "⚔️", title: "Szepty w Krużgankach",
+      text: "Marszałek żąda zwiększenia żołdu dla gwardii królewskiej, grożąc wypowiedzeniem posłuszeństwa.",
+      choices: [
+        { text: "Opłać gwardię z własnej szkatuły (Wymaga 50g)", hint: "-50 Złota, +15 Szlachta, +10 Król", reqGold: 50, outcomes: { gold: -50, nobility: 15, king: 10, suspicion: -5 } },
+        { text: "Wykorzystaj zdobyty Hak, by go uciszyć (Wymaga 1 Haka)", hint: "-1 Hak, +15 Król, +10 Spisek", reqIntel: 1, outcomes: { intel: -1, king: 15, suspicion: 10 } },
+        { text: "Oskarż go publicznie o zdradę", hint: "+10 Król, -20 Szlachta, +10 Spisek", outcomes: { king: 10, nobility: -20, suspicion: 10 } }
+      ]
+    },
+    {
+      speaker: "Lady Elena", icon: "🍷", title: "Królewska Uczta",
+      text: "Lady Elena proponuje dosypanie środka nasennego do pucharu posła, aby wykraść jego szyfry.",
+      choices: [
+        { text: "Weź udział w spisku", hint: "+45 Złota, +1 Hak, +20 Spisek", outcomes: { gold: 45, intel: 1, suspicion: 20, nobility: 10 } },
+        { text: "Odmów i ostrzeż straż zamkową", hint: "-10 Spisek, +10 Król, -15 Szlachta", outcomes: { suspicion: -10, king: 10, nobility: -15 } }
+      ]
+    },
+    {
+      speaker: "Wielki Inkwizytor", icon: "🔥", title: "Polowanie na Heretyków",
+      text: "Inkwizycja domaga się prawa do przeszukania komnat najbogatszych kupców w stolicy.",
+      choices: [
+        { text: "Pozwól im działać w zamian za udział w łupach", hint: "+65 Złota, +15 Kościół, -15 Szlachta", outcomes: { gold: 65, church: 15, nobility: -15, suspicion: 10 } },
+        { text: "Zablokuj dekret za plecami króla", hint: "-15 Kościół, +15 Szlachta, +10 Spisek", outcomes: { church: -15, nobility: 15, suspicion: 10 } }
+      ]
+    },
+    {
+      speaker: "Mistrz Gildii Kupieckiej", icon: "⚖️", title: "Podatek Portowy",
+      text: "Kupcy oferują ci potajemną łapówkę w zamian za obniżenie ceł na przyprawy ze Wschodu.",
+      choices: [
+        { text: "Przyjmij złoto i sfałszuj edykt", hint: "+80 Złota, +15 Spisek, -10 Król", outcomes: { gold: 80, suspicion: 15, king: -10 } },
+        { text: "Wymuś na nich zeznania przeciw szlachcie", hint: "+1 Hak, +15 Król, -10 Szlachta", outcomes: { intel: 1, king: 15, nobility: -10 } }
+      ]
+    }
+  ];
+
+  let currentTab = 'spies';
+
+  function updateUI() {
+    document.getElementById('turn-display').innerText = `Runda: ${state.turn}`;
+    document.getElementById('gold-display').innerText = `💰 ${state.gold}`;
+    document.getElementById('intel-display').innerText = `📜 ${state.intel}`;
+
+    const currentRank = courtRanks[state.rankIndex] || courtRanks[0];
+    document.getElementById('rank-title').innerText = `Tytuł: ${currentRank.title}`;
+    document.getElementById('plot-progress').innerText = `Spisek Koronny: ${state.plotStage}/4`;
+
+    document.getElementById('bar-king').style.width = `${state.stats.king}%`;
+    document.getElementById('bar-church').style.width = `${state.stats.church}%`;
+    document.getElementById('bar-nobility').style.width = `${state.stats.nobility}%`;
+    document.getElementById('bar-suspicion').style.width = `${state.stats.suspicion}%`;
+  }
+
+  function loadNextEvent() {
+    const card = document.getElementById('event-card');
+    card.classList.add('card-hidden');
+
+    setTimeout(() => {
+      const ev = eventsDB[Math.floor(Math.random() * eventsDB.length)];
+      document.getElementById('speaker-icon').innerText = ev.icon;
+      document.getElementById('speaker-name').innerText = ev.speaker;
+      document.getElementById('event-title').innerText = ev.title;
+      document.getElementById('event-desc').innerText = ev.text;
+
+      const box = document.getElementById('choices-box');
+      box.innerHTML = '';
+
+      ev.choices.forEach(ch => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        const locked = (ch.reqGold && state.gold < ch.reqGold) || (ch.reqIntel && state.intel < ch.reqIntel);
+        btn.disabled = locked;
+        btn.innerHTML = `<span>${ch.text}</span><span class="choice-hint">${ch.hint}</span>`;
+
+        btn.onmouseenter = () => previewOutcome(ch.outcomes, true);
+        btn.onmouseleave = () => previewOutcome(ch.outcomes, false);
+        btn.onclick = () => selectChoice(ch.outcomes);
+        box.appendChild(btn);
+      });
+
+      card.classList.remove('card-hidden');
+    }, 240);
+  }
+
+  function previewOutcome(outcomes, active) {
+    ['king', 'church', 'nobility', 'suspicion'].forEach(key => {
+      const bg = document.getElementById(`bg-${key}`);
+      bg.classList.remove('pulse-up', 'pulse-down');
+      if (active && outcomes[key]) {
+        bg.classList.add(outcomes[key] > 0 ? 'pulse-up' : 'pulse-down');
+      }
+    });
+  }
+
+  function selectChoice(outcomes) {
+    previewOutcome(outcomes, false);
+    if (outcomes.gold && outcomes.gold > 0) playSound('coin');
+    else playSound('click');
+
+    if (navigator.vibrate) navigator.vibrate(35);
+
+    state.gold += outcomes.gold || 0;
+    state.intel += outcomes.intel || 0;
+    ['king', 'church', 'nobility', 'suspicion'].forEach(k => {
+      if (outcomes[k]) state.stats[k] = Math.max(0, Math.min(100, state.stats[k] + outcomes[k]));
+    });
+
+    state.turn++;
+    checkRankProgression();
+    saveGame();
+    updateUI();
+
+    if (!checkGameOver()) loadNextEvent();
+  }
+
+  function triggerVictory() {
+    playSound('fanfare');
+    localStorage.removeItem(STORAGE_KEY);
+    closeSpyModal();
+    document.getElementById('speaker-icon').innerText = "👑";
+    document.getElementById('speaker-name').innerText = "ZWYCIĘSTWO! NOWY MONARCHA";
+    document.getElementById('event-title').innerText = `Zdobyłeś tron w rundzie ${state.turn}`;
+    document.getElementById('event-desc').innerText =
+      "Po miesiącach knucia w cieniach pałacu obaliłeś słabego władcę. Gwardia, Kościół i baronowie klękają przed Twoim majestatem!";
+
+    const box = document.getElementById('choices-box');
+    box.innerHTML = `<button class="choice-btn" onclick="resetGame()">👑 Rozpocznij nowe panowanie</button>`;
+  }
+
+  function checkGameOver() {
+    let reason = "";
+    if (state.stats.suspicion >= 100) reason = "Twoja siatka spiskowa została zdemaskowana. Straż królewska wtrąciła cię do lochu!";
+    else if (state.stats.king <= 0) reason = "Król utracił do ciebie resztki zaufania i podpisał wyrok wygnania.";
+    else if (state.stats.church <= 0) reason = "Trybunał Inkwizycji obłożył cię klątwą ekskomuniki.";
+    else if (state.stats.nobility <= 0) reason = "Zbuntowani baronowie wtargnęli do pałacu i obalili twoje rządy.";
+
+    if (reason) {
+      playSound('gameover');
+      localStorage.removeItem(STORAGE_KEY);
+      document.getElementById('speaker-icon').innerText = "💀";
+      document.getElementById('speaker-name').innerText = "KONIEC GRY";
+      document.getElementById('event-title').innerText = `Przetrwałeś rund: ${state.turn} (${courtRanks[state.rankIndex].title})`;
+      document.getElementById('event-desc').innerText = reason;
+
+      const box = document.getElementById('choices-box');
+      box.innerHTML = `<button class="choice-btn" onclick="resetGame()">🔄 Zacznij nową intrygę</button>`;
+      return true;
+    }
+    return false;
+  }
+
+  // --- 5. LOGIKA MODALA SZPIEGÓW I WIELKIEGO SPISKU ---
+  function openSpyModal() {
+    playSound('click');
+    document.getElementById('spy-modal').classList.add('open');
+    renderModalTab();
+  }
+
+  function closeSpyModal() {
+    playSound('click');
+    document.getElementById('spy-modal').classList.remove('open');
+  }
+
+  function switchTab(tab) {
+    playSound('click');
+    currentTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${tab}`).classList.add('active');
+    renderModalTab();
+  }
+
+  function renderModalTab() {
+    const body = document.getElementById('modal-body');
+    body.innerHTML = '';
+
+    if (currentTab === 'spies') {
+      body.innerHTML += `
+        <div class="spy-card">
+          <h4>Zwerbuj Nowego Szpiega</h4>
+          <p>Zwiększa możliwości operacyjne w zamku. Koszt: 75 Złota.</p>
+          <button class="choice-btn" ${state.gold < 75 || state.spies >= state.maxSpies ? 'disabled' : ''} onclick="recruitSpy()">Zwerbuj (-75g)</button>
+        </div>
+        <div class="spy-card">
+          <h4>Infiltracja Archiwum</h4>
+          <p>Szpieg wykrada tajną korespondencję (+1 Hak 📜, +8 Spisek).</p>
+          <button class="choice-btn" ${state.gold < 25 || state.spies <= 0 ? 'disabled' : ''} onclick="gatherIntel()">Wyślij agenta (-25g)</button>
+        </div>`;
+    } else if (currentTab === 'market') {
+      body.innerHTML += `
+        <div class="spy-card">
+          <h4>Wywar z Tojadu (Trucizna)</h4>
+          <p>Zwiększa szansę udanego zamachu o 30%. Posiadasz: ${state.tojad}</p>
+          <button class="choice-btn" ${state.gold < 60 ? 'disabled' : ''} onclick="buyPoison()">Kup truciznę (-60g)</button>
+        </div>
+        <div class="spy-card">
+          <h4>Przekupstwo Strażników</h4>
+          <p>Zatarcie śladów w śledztwie (-20 Spisek).</p>
+          <button class="choice-btn" ${state.gold < 50 || state.stats.suspicion <= 0 ? 'disabled' : ''} onclick="bribeGuards()">Opłać milczenie (-50g)</button>
+        </div>`;
+    } else if (currentTab === 'assassinations') {
+      if (state.targets.length === 0) {
+        body.innerHTML = `<p style="text-align:center; padding:20px;">Wszyscy główni rywale zostali wyeliminowani.</p>`;
+      }
+      state.targets.forEach((t, idx) => {
+        const chance = Math.min(95, Math.round((t.baseChance + (state.tojad > 0 ? 0.3 : 0)) * 100));
+        body.innerHTML += `
+          <div class="spy-card">
+            <h4>Cel: ${t.name}</h4>
+            <p>Ochrona: ${t.guard} | Szansa sukcesu: <b>${chance}%</b> ${state.tojad > 0 ? '(+Tojad)' : ''}</p>
+            <button class="choice-btn" ${state.gold < 90 || state.spies <= 0 ? 'disabled' : ''} onclick="assassinate(${idx}, ${chance})">Zleć zabójstwo (-90g)</button>
+          </div>`;
+      });
+    } else if (currentTab === 'crown') {
+      if (state.plotStage >= crownPlotStages.length) {
+        body.innerHTML = `<p style="text-align:center; padding:20px;">Korona należy już do Ciebie!</p>`;
+      } else {
+        const st = crownPlotStages[state.plotStage];
+        const canAfford = state.gold >= st.costGold && state.intel >= st.costIntel;
+        body.innerHTML += `
+          <div class="spy-card plot-card">
+            <h4>${st.name}</h4>
+            <p>${st.desc}</p>
+            <p style="color:var(--gold);">Wymogi: ${st.costGold} Złota, ${st.costIntel} Haki 📜 | Ryzyko: +${st.suspicionGain} Spisek</p>
+            <button class="choice-btn" ${!canAfford ? 'disabled' : ''} onclick="advanceCrownPlot()">
+              👑 Zrealizuj etap spisku (-${st.costGold}g, -${st.costIntel} 📜)
+            </button>
+          </div>`;
+      }
+    }
+
+    document.getElementById('modal-status').innerText =
+      `Złoto: ${state.gold} | Haki: ${state.intel} | Szpiedzy: ${state.spies}/${state.maxSpies} | Tojad: ${state.tojad}`;
+  }
+
+  function advanceCrownPlot() {
+    const st = crownPlotStages[state.plotStage];
+    state.gold -= st.costGold;
+    state.intel -= st.costIntel;
+    state.stats.suspicion = Math.min(100, state.stats.suspicion + st.suspicionGain);
+    state.plotStage++;
+
+    saveGame();
+    updateUI();
+
+    if (checkGameOver()) {
+      closeSpyModal();
+      return;
+    }
+
+    if (state.plotStage >= crownPlotStages.length) {
+      triggerVictory();
+    } else {
+      playSound('fanfare');
+      showToast(`Ukończono etap ${state.plotStage}/4 Wielkiego Spisku!`);
+      renderModalTab();
+    }
+  }
+
+  function recruitSpy() {
+    playSound('coin');
+    state.gold -= 75; state.spies++;
+    saveGame(); updateUI(); renderModalTab();
+    showToast("Zwerbowano nowego szpiega!");
+  }
+
+  function gatherIntel() {
+    playSound('click');
+    state.gold -= 25; state.intel++;
+    state.stats.suspicion = Math.min(100, state.stats.suspicion + 8);
+    saveGame(); updateUI(); renderModalTab();
+    showToast("Zdobyto nowy Hak (+1 📜)");
+    if (checkGameOver()) closeSpyModal();
+  }
+
+  function buyPoison() {
+    playSound('coin');
+    state.gold -= 60; state.tojad++;
+    saveGame(); updateUI(); renderModalTab();
+    showToast("Zakupiono Wywar z Tojadu!");
+  }
+
+  function bribeGuards() {
+    playSound('coin');
+    state.gold -= 50;
+    state.stats.suspicion = Math.max(0, state.stats.suspicion - 20);
+    saveGame(); updateUI(); renderModalTab();
+    showToast("Strażnicy przekupieni (-20 Spisek)");
+  }
+
+  function assassinate(index, chance) {
+    playSound('dagger');
+    const target = state.targets[index];
+    state.gold -= 90;
+    if (state.tojad > 0) state.tojad--;
+
+    if (Math.random() * 100 <= chance) {
+      showToast(`Zamach udany! ${target.name} nie żyje (+1 📜).`);
+      state.intel++;
+      state.stats.suspicion = Math.min(100, state.stats.suspicion + 12);
+      state.targets.splice(index, 1);
+    } else {
+      showToast(`Wpadka! Twój szpieg został pojmany!`);
+      state.spies = Math.max(0, state.spies - 1);
+      state.stats.suspicion = Math.min(100, state.stats.suspicion + target.risk);
+    }
+    saveGame(); updateUI(); renderModalTab();
+    if (checkGameOver()) closeSpyModal();
+  }
+
+  // Start gry
+  initParticles();
+  animateCanvas();
+  updateUI();
+  loadNextEvent();
+</script>
+</body>
+</html>
