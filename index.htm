@@ -3,25 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chestnut Christmas Game Portal</title>
+  <title>Chestnut Autumn Game Portal</title>
   <style>
     :root {
-      --bg-1: #0f1720;
-      --bg-2: #1d2a2f;
-      --bg-3: #2c1a13;
-      --panel: rgba(12, 17, 20, 0.68);
-      --panel-strong: rgba(18, 26, 30, 0.88);
-      --card: rgba(25, 20, 17, 0.86);
-      --border: rgba(255, 255, 255, 0.12);
-      --text: #f7f3ee;
-      --muted: #d9c5b5;
-      --gold: #f8c76d;
-      --gold-strong: #f3a70d;
-      --green: #73c58a;
-      --green-strong: #2d9d5d;
-      --red: #d75b4b;
-      --red-strong: #b93a31;
-      --shadow: rgba(1, 4, 6, 0.425);
+      --bg-1: #18120d;
+      --bg-2: #2f1e17;
+      --bg-3: #5b3824;
+      --panel: rgba(24, 18, 13, 0.74);
+      --panel-strong: rgba(28, 20, 16, 0.9);
+      --card: rgba(37, 24, 18, 0.88);
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #f8f1ea;
+      --muted: #e3c7ae;
+      --gold: #f4c274;
+      --gold-strong: #dd8e38;
+      --green: #a8cc7d;
+      --green-strong: #5d8d42;
+      --red: #c2614f;
+      --red-strong: #9d3e30;
+      --shadow: rgba(13, 8, 6, 0.42);
+      --leaf: #7aa95e;
+      --forest: #294d36;
     }
 
     * { box-sizing: border-box; }
@@ -36,9 +38,9 @@
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at top, rgba(243, 167, 13, 0.14), transparent 28%),
-        radial-gradient(circle at bottom left, rgba(115, 197, 138, 0.18), transparent 30%),
-        linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 30%, var(--bg-3) 100%);
+        radial-gradient(circle at top, rgba(244, 194, 116, 0.16), transparent 26%),
+        radial-gradient(circle at bottom left, rgba(122, 169, 94, 0.18), transparent 32%),
+        linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 35%, var(--bg-3) 100%);
       overflow-x: hidden;
     }
 
@@ -47,11 +49,10 @@
       position: fixed;
       inset: 0;
       background-image:
-        radial-gradient(3px 3px at 10% 20%, rgba(255,255,255,0.75) 0, transparent 100%),
-        radial-gradient(2px 2px at 25% 80%, rgba(255,255,255,0.7) 0, transparent 100%),
-        radial-gradient(2.5px 2.5px at 62% 35%, rgba(255,255,255,0.7) 0, transparent 100%),
-        radial-gradient(2px 2px at 80% 70%, rgba(255,255,255,0.7) 0, transparent 100%),
-        radial-gradient(3px 3px at 90% 25%, rgba(255,255,255,0.75) 0, transparent 100%);
+        radial-gradient(2.5px 2.5px at 12% 24%, rgba(255,255,255,0.18) 0, transparent 100%),
+        radial-gradient(2px 2px at 28% 78%, rgba(255,255,255,0.12) 0, transparent 100%),
+        radial-gradient(3px 3px at 65% 26%, rgba(255,255,255,0.12) 0, transparent 100%),
+        radial-gradient(2px 2px at 88% 64%, rgba(255,255,255,0.1) 0, transparent 100%);
       opacity: 0.8;
       pointer-events: none;
     }
@@ -481,11 +482,11 @@
 <body>
   <header class="topbar">
     <div class="container topbar-inner">
-      <div class="brand" aria-label="Chestnut Christmas Game Portal">
+      <div class="brand" aria-label="Chestnut Autumn Game Portal">
         <div class="brand-mark">🌰</div>
         <div class="brand-text">
           <span>Chestnut</span>
-          <small>Christmas Games</small>
+          <small>Autumn Games</small>
         </div>
       </div>
 
@@ -503,16 +504,22 @@
       <div class="hero-panel">
         <div class="hero-inner">
           <div>
-            <div class="eyebrow">🎄 Winter game collection</div>
+            <div class="eyebrow">🍂 Autumn game collection</div>
             <h1>Play every <span class="highlight">Chestnut</span> adventure in one place.</h1>
             <p class="hero-copy">
-              A festive game portal for the repository. Open any subpage and jump directly into the arcade hubs,
-              holiday challenges, story games, and educational mini-games created for this project.
+              A warm, playful gaming portal built around chestnuts, autumn energy, and creative side-projects. These games were created for fun and for self-development purpose — a small playground where experimentation and learning meet creativity.
             </p>
 
             <div class="cta-row">
               <a class="btn primary" href="#games">Explore games</a>
               <a class="btn secondary" href="./ShadowsOfCrown.html">Open Cienie Korony</a>
+            </div>
+
+            <div class="about-box" style="margin-top: 18px; padding: 18px 20px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
+              <div style="font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gold); margin-bottom: 8px;">About the creator</div>
+              <p style="margin: 0; color: var(--muted); line-height: 1.7; font-size: 0.98rem;">
+                I am a test developer with 10 years of experience, and for the last 5 years I have focused on test automation. These games are created for fun and for self-development purpose.
+              </p>
             </div>
           </div>
 
@@ -530,14 +537,14 @@
 
     <div class="section-head" id="games">
       <h2>Repository game hubs</h2>
-      <div class="tiny-badge">🎮 7 subpages available</div>
+      <div class="tiny-badge">🌰 7 subpages available</div>
     </div>
 
     <section class="game-grid" aria-label="Game collection">
       <article class="game-card" id="arcade">
         <div class="game-meta">
           <div class="game-icon">🕹️</div>
-          <div class="game-tag">Arcade</div>
+          <div class="game-tag">Autumn Arcade</div>
         </div>
         <h3>Chestnut Arcade Game Hub</h3>
         <p>Classic retro cabinet with four mini-games: Snake, Space Impact, Tanks and Bomberman in a warm autumn arcade style.</p>
@@ -556,7 +563,7 @@
       <article class="game-card">
         <div class="game-meta">
           <div class="game-icon">✨</div>
-          <div class="game-tag">Arcade</div>
+          <div class="game-tag">Retro Hub</div>
         </div>
         <h3>Chestnut Arcade v2</h3>
         <p>An upgraded version of the four-in-one cabinet with refreshed presentation and gameplay polish.</p>
@@ -573,11 +580,11 @@
 
       <article class="game-card">
         <div class="game-meta">
-          <div class="game-icon">🌟</div>
+          <div class="game-icon">🌿</div>
           <div class="game-tag">2 Player</div>
         </div>
         <h3>Autumn Neon 2P Hub</h3>
-        <p>Neon winter-night local arcade designed for two players in cooperative or competitive mode.</p>
+        <p>Warm neon local arcade designed for two players in cooperative or competitive mode, inspired by forest nights and autumn glow.</p>
         <ul>
           <li>Local 2-player gameplay</li>
           <li>Neon visual style</li>
@@ -591,15 +598,15 @@
 
       <article class="game-card">
         <div class="game-meta">
-          <div class="game-icon">🎁</div>
-          <div class="game-tag">Holiday</div>
+          <div class="game-icon">🍁</div>
+          <div class="game-tag">Autumn</div>
         </div>
         <h3>Grinch Chest Conquest</h3>
-        <p>Holiday arcade challenge with festive visuals, chestnut heroes, wintry atmosphere and seasonal mechanics.</p>
+        <p>Forest-roast challenge with chestnut heroes, autumn tension, and a playful seasonal setting built for quick arcade rounds.</p>
         <ul>
-          <li>Holiday theming</li>
+          <li>Autumn theming</li>
           <li>Arcade progression</li>
-          <li>Festive boss energy</li>
+          <li>Boss-style encounters</li>
         </ul>
         <div class="card-actions">
           <a class="link-btn" href="./grinch_chest_conquest.html">Open</a>
@@ -664,7 +671,7 @@
   </main>
 
   <footer class="footer container">
-    Chestnut Christmas Portal • Built to gather all game hubs in one modern landing page.
+    Chestnut Autumn Portal • Built to gather all game hubs in one modern landing page. These games are created for fun and for self-development purpose.
   </footer>
 </body>
 </html>
