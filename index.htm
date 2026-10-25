@@ -6,24 +6,24 @@
   <title>Chestnut Autumn Game Portal</title>
   <style>
     :root {
-      --bg-1: #18120d;
-      --bg-2: #2f1e17;
-      --bg-3: #5b3824;
-      --panel: rgba(24, 18, 13, 0.74);
-      --panel-strong: rgba(28, 20, 16, 0.9);
-      --card: rgba(37, 24, 18, 0.88);
-      --border: rgba(255, 255, 255, 0.1);
-      --text: #f8f1ea;
-      --muted: #e3c7ae;
-      --gold: #f4c274;
-      --gold-strong: #dd8e38;
-      --green: #a8cc7d;
-      --green-strong: #5d8d42;
-      --red: #c2614f;
-      --red-strong: #9d3e30;
-      --shadow: rgba(13, 8, 6, 0.42);
-      --leaf: #7aa95e;
-      --forest: #294d36;
+      --bg-1: #0f1d1b;
+      --bg-2: #16372c;
+      --bg-3: #234b36;
+      --panel: rgba(12, 22, 18, 0.72);
+      --panel-strong: rgba(15, 29, 24, 0.9);
+      --card: rgba(16, 29, 25, 0.9);
+      --border: rgba(255, 255, 255, 0.09);
+      --text: #edf9ef;
+      --muted: #d5ebd8;
+      --gold: #e7f39a;
+      --gold-strong: #bddb66;
+      --green: #8ed298;
+      --green-strong: #4caf73;
+      --red: #7abf9d;
+      --red-strong: #57a67d;
+      --shadow: rgba(5, 13, 10, 0.42);
+      --leaf: #85cf91;
+      --forest: #1e563d;
     }
 
     * { box-sizing: border-box; }
@@ -38,8 +38,8 @@
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at top, rgba(244, 194, 116, 0.16), transparent 26%),
-        radial-gradient(circle at bottom left, rgba(122, 169, 94, 0.18), transparent 32%),
+        radial-gradient(circle at top, rgba(142, 210, 152, 0.18), transparent 24%),
+        radial-gradient(circle at bottom left, rgba(126, 203, 127, 0.16), transparent 30%),
         linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 35%, var(--bg-3) 100%);
       overflow-x: hidden;
     }
@@ -143,7 +143,7 @@
     }
 
     .hero-panel {
-      background: linear-gradient(180deg, rgba(32, 24, 21, 0.85), rgba(14, 17, 20, 0.9));
+      background: linear-gradient(180deg, rgba(20, 39, 31, 0.9), rgba(10, 18, 16, 0.92));
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 30px;
       overflow: hidden;
@@ -164,9 +164,9 @@
       gap: 8px;
       padding: 8px 14px;
       border-radius: 999px;
-      background: rgba(115, 197, 138, 0.12);
-      border: 1px solid rgba(115, 197, 138, 0.28);
-      color: #b9efc4;
+      background: rgba(136, 218, 165, 0.12);
+      border: 1px solid rgba(136, 218, 165, 0.26);
+      color: #d1f4d5;
       font-size: 0.72rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -182,11 +182,11 @@
     }
 
     .highlight {
-      background: linear-gradient(135deg, #ffe7ab, #f8c76d 35%, #f79e52 70%, #ffd9a6);
+      background: linear-gradient(135deg, #d7f9c1, #87d892 35%, #6bbf95 70%, #cfeea7);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-shadow: 0 4px 26px rgba(248, 199, 109, 0.2);
+      text-shadow: 0 4px 26px rgba(135, 216, 146, 0.18);
     }
 
     .hero-copy {
@@ -219,9 +219,9 @@
     }
 
     .btn.primary {
-      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-strong) 100%);
-      color: #2f160e;
-      box-shadow: 0 18px 40px rgba(248, 199, 109, 0.25);
+      background: linear-gradient(135deg, #9ce5a9 0%, #5bbd7d 100%);
+      color: #0f261a;
+      box-shadow: 0 18px 40px rgba(91, 189, 125, 0.25);
     }
 
     .btn.secondary {
@@ -247,54 +247,73 @@
       position: relative;
       width: min(100%, 340px);
       aspect-ratio: 1;
-      border-radius: 28px;
+      border-radius: 50%;
       background:
-        radial-gradient(circle at 50% 18%, rgba(255,255,255,0.14), transparent 18%),
-        linear-gradient(180deg, rgba(32, 59, 44, 0.9) 0%, rgba(20, 17, 15, 0.9) 100%);
-      border: 1px solid rgba(255,255,255,0.07);
-      box-shadow: inset 0 0 24px rgba(255,255,255,0.03), 0 20px 50px rgba(0,0,0,0.25);
+        radial-gradient(circle at 50% 50%, rgba(146, 255, 175, 0.14), rgba(17, 30, 25, 0.85) 55%, rgba(10, 17, 15, 1) 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: inset 0 0 28px rgba(255,255,255,0.03), 0 24px 60px rgba(0,0,0,0.28);
       overflow: hidden;
     }
 
     .tree-card::before {
       content: "";
       position: absolute;
-      inset: 12% 22% 18% 22%;
-      background: linear-gradient(180deg, #2f9a4e, #1f6f3d 100%);
-      clip-path: polygon(50% 0%, 90% 30%, 75% 30%, 100% 54%, 78% 54%, 100% 82%, 0% 82%, 22% 54%, 0% 54%, 25% 30%, 10% 30%);
-      filter: drop-shadow(0 0 32px rgba(89, 177, 113, 0.25));
-    }
-
-    .tree-card::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      bottom: 10%;
-      width: 70px;
-      height: 90px;
-      transform: translateX(-50%);
-      background: linear-gradient(180deg, #7a4a28, #4a2e1e);
-      border-radius: 12px 12px 8px 8px;
-      box-shadow: inset 0 0 0 2px rgba(255,255,255,0.05);
+      inset: 14%;
+      border-radius: 50%;
+      border: 2px solid rgba(160, 223, 173, 0.26);
+      box-shadow: inset 0 0 0 12px rgba(160, 223, 173, 0.05), 0 0 30px rgba(118, 211, 146, 0.08);
     }
 
     .chestnut {
+      --orbit-radius: 122px;
+      --spin: 0deg;
       position: absolute;
+      left: 50%;
+      top: 50%;
       display: grid;
       place-items: center;
-      width: 68px;
-      height: 68px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      background: radial-gradient(circle at 38% 30%, #d79a5e, #8d4c27 56%, #4f2014 100%);
-      box-shadow: inset -10px -8px 18px rgba(0,0,0,0.18), 0 18px 30px rgba(25,15,12,0.38);
-      font-size: 2rem;
-      border: 2px solid rgba(255,255,255,0.14);
+      background: radial-gradient(circle at 38% 30%, #d5b376, #7d5b37 56%, #3c2618 100%);
+      box-shadow: inset -8px -7px 16px rgba(0,0,0,0.2), 0 14px 26px rgba(31, 23, 17, 0.35);
+      font-size: 1.5rem;
+      border: 2px solid rgba(255,255,255,0.12);
+      transform: translate(-50%, -50%) rotate(var(--spin)) translateX(var(--orbit-radius));
+      animation: floatChestnut 5s ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
     }
 
-    .chestnut.c1 { top: 18%; left: 18%; }
-    .chestnut.c2 { top: 12%; right: 15%; }
-    .chestnut.c3 { bottom: 18%; left: 20%; }
-    .chestnut.c4 { bottom: 16%; right: 18%; }
+    .chestnut.gold {
+      --orbit-radius: 0px;
+      --spin: 0deg;
+      width: 74px;
+      height: 74px;
+      background: radial-gradient(circle at 38% 30%, #fff4bb, #f4c95c 45%, #d89e28 100%);
+      box-shadow: 0 0 28px rgba(244, 201, 92, 0.85), inset -10px -8px 16px rgba(120, 77, 0, 0.22);
+      z-index: 3;
+      font-size: 2.1rem;
+      border-color: rgba(255,255,255,0.35);
+      animation: pulseGold 2.8s ease-in-out infinite;
+    }
+
+    .chestnut.c1 { --spin: 0deg; --delay: 0s; }
+    .chestnut.c2 { --spin: 51deg; --delay: 0.2s; }
+    .chestnut.c3 { --spin: 103deg; --delay: 0.4s; }
+    .chestnut.c4 { --spin: 154deg; --delay: 0.6s; }
+    .chestnut.c5 { --spin: 206deg; --delay: 0.8s; }
+    .chestnut.c6 { --spin: 257deg; --delay: 1s; }
+    .chestnut.c7 { --spin: 309deg; --delay: 1.2s; }
+
+    @keyframes floatChestnut {
+      0%, 100% { transform: translate(-50%, -50%) rotate(var(--spin)) translateX(var(--orbit-radius)) scale(1); }
+      50% { transform: translate(-50%, -50%) rotate(var(--spin)) translateX(var(--orbit-radius)) scale(1.08); }
+    }
+
+    @keyframes pulseGold {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.08); }
+    }
 
     .section-head {
       display: flex;
@@ -355,7 +374,7 @@
       inset: 0 auto auto 0;
       width: 140px;
       height: 140px;
-      background: radial-gradient(circle, rgba(248, 199, 109, 0.18), transparent 60%);
+      background: radial-gradient(circle, rgba(120, 210, 140, 0.18), transparent 60%);
       pointer-events: none;
     }
 
@@ -375,8 +394,8 @@
       border-radius: 16px;
       display: grid;
       place-items: center;
-      background: linear-gradient(135deg, rgba(248, 199, 109, 0.18), rgba(115, 197, 138, 0.12));
-      border: 1px solid rgba(248, 199, 109, 0.22);
+      background: linear-gradient(135deg, rgba(130, 210, 160, 0.18), rgba(91, 189, 125, 0.12));
+      border: 1px solid rgba(130, 210, 160, 0.22);
       font-size: 1.5rem;
     }
 
@@ -437,8 +456,8 @@
       justify-content: center;
       padding: 11px 14px;
       border-radius: 12px;
-      background: linear-gradient(135deg, #d75b4b, #9a3d33);
-      color: white;
+      background: linear-gradient(135deg, #8bd9a0, #499d68);
+      color: #0f261a;
       font-weight: 800;
       border: 1px solid rgba(255,255,255,0.08);
       min-width: 120px;
@@ -448,6 +467,35 @@
       background: rgba(255,255,255,0.04);
       color: var(--text);
       border-color: rgba(255,255,255,0.08);
+    }
+
+    .other-projects {
+      margin: 0 0 28px;
+      padding: 16px 18px;
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 18px;
+      background: rgba(10, 20, 16, 0.48);
+    }
+
+    .other-projects summary {
+      color: #c8e8ce;
+      cursor: pointer;
+      font-weight: 700;
+      list-style-position: inside;
+    }
+
+    .other-projects summary:hover {
+      color: #effff1;
+    }
+
+    .other-projects-note {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .other-projects .game-grid {
+      padding: 18px 0 0;
     }
 
     .footer {
@@ -486,15 +534,14 @@
         <div class="brand-mark">🌰</div>
         <div class="brand-text">
           <span>Chestnut</span>
-          <small>Autumn Games</small>
+          <small>Forest Games</small>
         </div>
       </div>
 
       <nav class="nav-links" aria-label="Main navigation">
         <a href="#games">All Games</a>
         <a href="#arcade">Arcade</a>
-        <a href="#story">Story</a>
-        <a href="#learning">Learning</a>
+        <a href="#other-projects">Other projects</a>
       </nav>
     </div>
   </header>
@@ -504,7 +551,7 @@
       <div class="hero-panel">
         <div class="hero-inner">
           <div>
-            <div class="eyebrow">🍂 Autumn game collection</div>
+            <div class="eyebrow">🌿 Green game collection</div>
             <h1>Play every <span class="highlight">Chestnut</span> adventure in one place.</h1>
             <p class="hero-copy">
               A warm, playful gaming portal built around chestnuts, autumn energy, and creative side-projects. These games were created for fun and for self-development purpose — a small playground where experimentation and learning meet creativity.
@@ -512,7 +559,6 @@
 
             <div class="cta-row">
               <a class="btn primary" href="#games">Explore games</a>
-              <a class="btn secondary" href="./ShadowsOfCrown.html">Open Cienie Korony</a>
             </div>
 
             <div class="about-box" style="margin-top: 18px; padding: 18px 20px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
@@ -529,6 +575,10 @@
               <div class="chestnut c2">🌰</div>
               <div class="chestnut c3">🌰</div>
               <div class="chestnut c4">🌰</div>
+              <div class="chestnut c5">🌰</div>
+              <div class="chestnut c6">🌰</div>
+              <div class="chestnut c7">🌰</div>
+              <div class="chestnut gold">🌰</div>
             </div>
           </div>
         </div>
@@ -537,7 +587,7 @@
 
     <div class="section-head" id="games">
       <h2>Repository game hubs</h2>
-      <div class="tiny-badge">🌰 7 subpages available</div>
+      <div class="tiny-badge">🌰 4 chestnut hubs</div>
     </div>
 
     <section class="game-grid" aria-label="Game collection">
@@ -614,64 +664,56 @@
         </div>
       </article>
 
-      <article class="game-card" id="learning">
-        <div class="game-meta">
-          <div class="game-icon">🗣️</div>
-          <div class="game-tag">Learning</div>
-        </div>
-        <h3>Logopedyczna Akademia Dźwięków</h3>
-        <p>Speech and pronunciation training game focused on sound recognition and word practice.</p>
-        <ul>
-          <li>Sound exercises</li>
-          <li>Listening tasks</li>
-          <li>Pronunciation practice</li>
-        </ul>
-        <div class="card-actions">
-          <a class="link-btn" href="./logopedia.html">Open</a>
-          <a class="link-btn alt" href="./logopedia.html" target="_blank" rel="noopener">New tab</a>
-        </div>
-      </article>
-
-      <article class="game-card" id="story">
-        <div class="game-meta">
-          <div class="game-icon">🦜</div>
-          <div class="game-tag">Learning</div>
-        </div>
-        <h3>Kraina Wyraźnej Mowy</h3>
-        <p>Educational hub for language and speech exercises, with a more playful and structured learning experience.</p>
-        <ul>
-          <li>Speech challenges</li>
-          <li>Phonetic tasks</li>
-          <li>Interactive learning flow</li>
-        </ul>
-        <div class="card-actions">
-          <a class="link-btn" href="./kraina_wyraznej_mowy.html">Open</a>
-          <a class="link-btn alt" href="./kraina_wyraznej_mowy.html" target="_blank" rel="noopener">New tab</a>
-        </div>
-      </article>
-
-      <article class="game-card">
-        <div class="game-meta">
-          <div class="game-icon">👑</div>
-          <div class="game-tag">Story</div>
-        </div>
-        <h3>Cienie Korony</h3>
-        <p>Strategic court intrigue game in a medieval royal narrative with diplomacy, schemes and power struggles.</p>
-        <ul>
-          <li>Political strategy</li>
-          <li>Intrigue and choices</li>
-          <li>Royal court simulation</li>
-        </ul>
-        <div class="card-actions">
-          <a class="link-btn" href="./ShadowsOfCrown.html">Open</a>
-          <a class="link-btn alt" href="./ShadowsOfCrown.html" target="_blank" rel="noopener">New tab</a>
-        </div>
-      </article>
     </section>
+
+    <details class="other-projects" id="other-projects">
+      <summary>View 3 other projects</summary>
+      <p class="other-projects-note">More experiments from the repository, separate from the chestnut arcade collection.</p>
+      <section class="game-grid" aria-label="Other projects">
+        <article class="game-card">
+          <div class="game-meta">
+            <div class="game-icon">🗣️</div>
+            <div class="game-tag">Learning</div>
+          </div>
+          <h3>Logopedyczna Akademia Dźwięków</h3>
+          <p>Speech and pronunciation practice focused on sound recognition and words.</p>
+          <div class="card-actions">
+            <a class="link-btn" href="./logopedia.html">Open</a>
+            <a class="link-btn alt" href="./logopedia.html" target="_blank" rel="noopener">New tab</a>
+          </div>
+        </article>
+
+        <article class="game-card">
+          <div class="game-meta">
+            <div class="game-icon">🦜</div>
+            <div class="game-tag">Learning</div>
+          </div>
+          <h3>Kraina Wyraźnej Mowy</h3>
+          <p>An educational hub with interactive speech and language exercises.</p>
+          <div class="card-actions">
+            <a class="link-btn" href="./kraina_wyraznej_mowy.html">Open</a>
+            <a class="link-btn alt" href="./kraina_wyraznej_mowy.html" target="_blank" rel="noopener">New tab</a>
+          </div>
+        </article>
+
+        <article class="game-card">
+          <div class="game-meta">
+            <div class="game-icon">👑</div>
+            <div class="game-tag">Story</div>
+          </div>
+          <h3>Cienie Korony</h3>
+          <p>A medieval court strategy game about diplomacy, intrigue, and power.</p>
+          <div class="card-actions">
+            <a class="link-btn" href="./ShadowsOfCrown.html">Open</a>
+            <a class="link-btn alt" href="./ShadowsOfCrown.html" target="_blank" rel="noopener">New tab</a>
+          </div>
+        </article>
+      </section>
+    </details>
   </main>
 
   <footer class="footer container">
-    Chestnut Autumn Portal • Built to gather all game hubs in one modern landing page. These games are created for fun and for self-development purpose.
+    Chestnut Forest Portal • Built to gather all game hubs in one modern landing page. These games are created for fun and for self-development purpose.
   </footer>
 </body>
 </html>
