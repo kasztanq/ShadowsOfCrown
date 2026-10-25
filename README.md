@@ -126,7 +126,16 @@ Gry są samodzielnymi plikami HTML, które zawierają interfejs i kod gry. Nie w
 
 Interfejs zawiera również syntetyzowane efekty dźwiękowe, które można wyciszyć w grze.
 
+## Testy projektu
+
+Testy sprawdzają wszystkie samodzielne strony gry: poprawność struktury HTML, unikalność identyfikatorów, działanie lokalnych odnośników i zasobów, ikonę powrotu do strony głównej oraz kluczowe elementy portalu i pierwszego cabinetu.
+
+Python 3.10 lub nowszy jest wymagany. Testy korzystają wyłącznie ze standardowej biblioteki Pythona:
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
 ## 📜 Licencja
 
 Projekt stworzony do celów edukacyjnych i hobbystycznych. Możesz go dowolnie modyfikować i rozwijać.
-
