@@ -77,6 +77,7 @@
     </style>
 </head>
 <body class="min-h-full flex flex-col items-center justify-between p-2 sm:p-4 relative">
+
     <!-- Background Snow Canvas -->
     <canvas id="snow-bg"></canvas>
 
@@ -153,9 +154,6 @@
             <button id="btn-mute" onclick="sound.toggleMute()" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-lime-300 text-xs font-bold border border-lime-500/30 transition">
                 SFX: ON
             </button>
-            <a href="./index.htm" aria-label="Back to home" title="Back to home" class="w-10 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 text-lime-300 border border-lime-500/30 transition flex items-center justify-center">
-                <svg aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
-            </a>
         </div>
     </header>
 
@@ -216,8 +214,8 @@
                             Survive the 15-minute Daily Stand-up maze! Chomp story points, grab Roasted Stars for flashing Catching Mode, and clear the 4 Grinch Impediments!
                         </p>
                         <div class="bg-slate-950/80 border border-emerald-800/60 rounded-xl p-2.5 mb-4 text-[11px] text-slate-300 space-y-1">
-                            <div><strong class="text-lime-400">Engine:</strong> Zero-Block Tile-Center Graph Interpolation</div>
-                            <div><strong class="text-amber-300">1P / 2P Mode:</strong> P1 Arrows | P2 controls Chief Grinch Blocker (WASD)</div>
+                            <div><strong class="text-amber-400">3 Stand-Up Stages:</strong> Morning Sync &bull; Blocker Grid &bull; Crunch Citadel</div>
+                            <div><strong class="text-lime-300">Controls:</strong> P1 Arrows (or WASD in 1P) | P2 Chief Grinch (WASD)</div>
                         </div>
                     </div>
                     <button onclick="app.launchGame('chestpac')" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-400 hover:brightness-110 text-slate-950 font-black text-xs arcade-font tracking-wider shadow-xl transition">
@@ -243,12 +241,12 @@
                             Review what went well across Whoville Rooftops, dive into Fast-Track Candy Pipes, squash Grinch bugs, and drop the Grinch-Dragon Boss to rescue the Product Owner Princess!
                         </p>
                         <div class="bg-slate-950/80 border border-emerald-800/60 rounded-xl p-2.5 mb-4 text-[11px] text-slate-300 space-y-1">
-                            <div><strong class="text-lime-400">3 Retro Worlds:</strong> Went Well &bull; Action Items &bull; Crumpit Keep</div>
-                            <div><strong class="text-amber-300">Controls:</strong> P1 Arrows + Space (Jump) + Z (Roast) + Down (Pipe) | P2 WASD+F</div>
+                            <div><strong class="text-lime-400">12 Seasonal Levels:</strong> 4 Seasons (Winter, Spring, Summer, Autumn) &times; 3 Stages</div>
+                            <div><strong class="text-amber-300">Controls:</strong> P1 Arrows + Space (Jump) + Z/F/Shift (Fireball) | P2 WASD + J/Enter</div>
                         </div>
                     </div>
                     <button onclick="app.launchGame('superchestnut')" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-lime-500 via-emerald-500 to-green-400 hover:brightness-110 text-slate-950 font-black text-xs arcade-font tracking-wider shadow-xl transition">
-                        LAUNCH CHESTNUTS RETROSPECTIVE
+                        LAUNCH 12-LEVEL RETROSPECTIVE
                     </button>
                 </div>
 
@@ -326,12 +324,28 @@
                         <span id="hud-score2" class="text-sm sm:text-base font-bold text-lime-400 arcade-font">00000</span>
                     </div>
                     <div>
-                        <span class="text-[9px] text-slate-400 block arcade-font">STAGE</span>
-                        <span id="hud-level" class="text-sm sm:text-base font-bold text-emerald-400 arcade-font">STAGE 1</span>
+                    <span class="text-[9px] text-slate-400 block arcade-font">STAGE</span>
+                    <span id="hud-level" class="text-sm sm:text-base font-bold text-emerald-400 arcade-font">STAGE 1</span>
+                </div>
+                <!-- Season & Stage Selector for Game 2 (12 Levels: 4 Seasons x 3 Stages) -->
+                <div id="hud-retro-selector" class="hidden flex flex-wrap items-center gap-1.5 bg-slate-900/95 border border-lime-500/40 rounded-xl px-2.5 py-1">
+                    <span class="text-[9px] text-lime-300 arcade-font">SEASON:</span>
+                    <select id="select-season" onchange="app.selectRetroLevel()" class="bg-slate-950 text-amber-300 text-[10px] font-bold rounded px-1.5 py-0.5 border border-amber-500/40 arcade-font cursor-pointer">
+                        <option value="1">S1: WINTER</option>
+                        <option value="2">S2: SPRING</option>
+                        <option value="3">S3: SUMMER</option>
+                        <option value="4">S4: AUTUMN</option>
+                    </select>
+                    <span class="text-[9px] text-lime-300 arcade-font ml-1">STAGE:</span>
+                    <div class="flex gap-1">
+                        <button id="retro-st-1" onclick="app.setRetroStage(1)" class="px-2 py-0.5 rounded bg-lime-500 text-slate-950 text-[10px] font-black arcade-font">1</button>
+                        <button id="retro-st-2" onclick="app.setRetroStage(2)" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 text-[10px] font-black arcade-font">2</button>
+                        <button id="retro-st-3" onclick="app.setRetroStage(3)" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 text-[10px] font-black arcade-font">3</button>
                     </div>
                 </div>
+            </div>
 
-                <!-- Dynamic Status / Boss / Catching Mode Indicator -->
+            <!-- Dynamic Status / Boss / Catching Mode Indicator -->
                 <div id="hud-status" class="text-[11px] sm:text-xs font-bold text-lime-300 arcade-font tracking-wider animate-pulse text-center">
                     FESTIVE READY!
                 </div>
@@ -414,928 +428,881 @@
 
     <script>
         /* ============================================================================
-         * HOLIDAY & GRINCH MULTI-CHANNEL WEB AUDIO SYNTHESIZER (BGM + RICH SFX)
+         * 0. AMBIENT SNOWFALL BACKGROUND, INPUT MANAGER, WEB AUDIO SYNTH & SHARED ART
          * ============================================================================ */
-        class SoundSystem {
-            constructor() {
-                this.ctx = null;
-                this.masterGain = null;
-                this.sfxGain = null;
-                this.bgmGain = null;
-                this.muted = false;
-                this.musicMuted = false;
-                this.unlocked = false;
-                this.currentMode = 'hub'; // 'hub', 'chestpac', 'superchestnut', 'commandos', 'climbers'
-                this.stepIndex = 0;
-                this.seqTimer = null;
-
-                // MIDI-style Note Frequencies
-                this.NOTES = {
-                    'C3': 130.81, 'D3': 146.83, 'Eb3': 155.56, 'E3': 164.81, 'F3': 174.61, 'F#3': 185.00, 'G3': 196.00, 'Ab3': 207.65, 'A3': 220.00, 'Bb3': 233.08, 'B3': 246.94,
-                    'C4': 261.63, 'C#4': 277.18, 'D4': 293.66, 'Eb4': 311.13, 'E4': 329.63, 'F4': 349.23, 'F#4': 369.99, 'G4': 392.00, 'Ab4': 415.30, 'A4': 440.00, 'Bb4': 466.16, 'B4': 493.88,
-                    'C5': 523.25, 'C#5': 554.37, 'D5': 587.33, 'Eb5': 622.25, 'E5': 659.25, 'F5': 698.46, 'F#5': 739.99, 'G5': 783.99, 'A5': 880.00, 'Bb5': 932.33, 'B5': 987.77,
-                    'C6': 1046.50
-                };
-
-                // 1. MAIN HUB CHRISTMAS & GRINCH MEDLEY
-                // Part A: Jingle Bells (16 steps) + Part B: Carol of the Bells / Sneaky Grinch (16 steps)
-                this.HUB_MELODY = [
-                    // Jingle Bells Phrase 1
-                    'E5','E5','E5',null, 'E5','E5','E5',null, 'E5','G5','C5','D5', 'E5',null,null,null,
-                    // Jingle Bells Phrase 2
-                    'F5','F5','F5','F5', 'F5','E5','E5','E5', 'E5','D5','D5','E5', 'D5',null,'G5',null,
-                    // Carol of the Bells Ostinato + Grinch Chromatic Twist
-                    'Bb5','A5','Bb5','G5', 'Bb5','A5','Bb5','G5', 'Bb5','A5','Bb5','G5', 'C6','Bb5','A5','G5',
-                    'F#5','G5','A5','D5',  'G5','A5','Bb5','G5', 'A5','G5','F#5','E5',  'G5',null,'G4',null
-                ];
-                this.HUB_HARMONY = [
-                    'C4',null,'G4',null, 'C4',null,'G4',null, 'C4',null,'E4',null, 'G4',null,'C4',null,
-                    'A4',null,'C5',null, 'G4',null,'C5',null, 'F#4',null,'A4',null, 'B4',null,'D5',null,
-                    'D4',null,'G4',null, 'C4',null,'Eb4',null,'Bb3',null,'D4',null, 'A3',null,'C#4',null,
-                    'D4',null,'F#4',null,'Eb4',null,'G4',null,'D4',null,'F#4',null,'G4',null,null,null
-                ];
-                this.HUB_BASS = [
-                    'C3',null,'G3',null, 'C3',null,'G3',null, 'C3',null,'G3',null, 'C3','D3','E3','G3',
-                    'F3',null,'C3',null, 'C3',null,'G3',null, 'D3',null,'A3',null, 'G3',null,'G3',null,
-                    'G3',null,'G3',null, 'F3',null,'F3',null, 'Eb3',null,'Eb3',null,'D3',null,'D3',null,
-                    'D3',null,'D3',null, 'Eb3',null,'Eb3',null,'D3',null,'D3',null, 'G3',null,'G3',null
-                ];
-
-                // 2. IN-GAME ACTION LOOPS (Fast Festive Arcade Grooves)
-                this.GAME_LOOPS = {
-                    // Chestnuts Daily: Sneaky Carol of the Bells Maze Groove
-                    chestpac: {
-                        tempo: 155,
-                        lead: ['Bb5','A5','Bb5','G5', 'Bb5','A5','Bb5','G5', 'C6','Bb5','C6','A5', 'D5','F#5','A5','C6'],
-                        bass: ['G3','G3','D3','D3',   'F3','F3','C3','C3',   'Eb3','Eb3','Bb3','Bb3','D3','D3','A3','D3']
-                    },
-                    // Chestnuts Retrospective: Upbeat Holiday Platformer Bounce
-                    superchestnut: {
-                        tempo: 165,
-                        lead: ['C5','E5','G5','C6', 'A5','G5','E5','C5', 'F5','A5','C6','A5', 'G5','F5','D5','B4'],
-                        bass: ['C3',null,'G3',null, 'A3',null,'E3',null, 'F3',null,'C3',null, 'G3',null,'D3','G3']
-                    },
-                    // Chestnut Dependencies: Driving Factory Synthwave Action
-                    commandos: {
-                        tempo: 145,
-                        lead: ['E5','E5','G5','E5', 'A5','G5','E5','D5', 'C5','C5','E5','G5', 'F#5','G5','A5','B5'],
-                        bass: ['E3','E3','E3','G3', 'A3','A3','G3','E3', 'C3','C3','C3','E3', 'D3','D3','B3','B3']
-                    },
-                    // Chestnuts Promotion: Sparkling Icy Arpeggio Climb
-                    climbers: {
-                        tempo: 160,
-                        lead: ['G5','D5','B4','D5', 'G5','A5','B5','G5', 'C6','G5','E5','G5', 'F#5','A5','D5','F#5'],
-                        bass: ['G3',null,'D3',null, 'G3',null,'B3',null, 'C3',null,'G3',null, 'D3',null,'A3','D3']
-                    }
-                };
-
-                // Auto-unlock audio on first user interaction anywhere
-                const autoUnlock = () => {
-                    if (!this.unlocked) {
-                        this.unlockAndStart();
-                    }
-                };
-                window.addEventListener('pointerdown', autoUnlock, { once: true });
-                window.addEventListener('keydown', autoUnlock, { once: true });
+        (function initSnowfall() {
+            const snowCanvas = document.getElementById('snow-bg');
+            if (!snowCanvas) return;
+            const sCtx = snowCanvas.getContext('2d');
+            let flakes = [];
+            function resize() {
+                snowCanvas.width = window.innerWidth;
+                snowCanvas.height = window.innerHeight;
             }
-
-            init() {
-                if (!this.ctx) {
-                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                    this.ctx = new AudioCtx();
-
-                    this.masterGain = this.ctx.createGain();
-                    this.masterGain.gain.value = 0.85;
-                    this.masterGain.connect(this.ctx.destination);
-
-                    this.sfxGain = this.ctx.createGain();
-                    this.sfxGain.gain.value = 0.9;
-                    this.sfxGain.connect(this.masterGain);
-
-                    this.bgmGain = this.ctx.createGain();
-                    this.bgmGain.gain.value = 0.42;
-                    this.bgmGain.connect(this.masterGain);
-                }
-                if (this.ctx && this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-            }
-
-            unlockAndStart(playJingle = false) {
-                this.init();
-                this.unlocked = true;
-                if (playJingle) {
-                    this.bell();
-                }
-                if (!this.seqTimer) {
-                    this.startSequencer();
-                }
-                this.updateAudioUI();
-            }
-
-            setMusicMode(mode) {
-                if (this.currentMode !== mode) {
-                    this.currentMode = mode;
-                    this.stepIndex = 0;
-                }
-                this.init();
-                if (!this.seqTimer) {
-                    this.startSequencer();
-                }
-                this.updateAudioUI();
-            }
-
-            updateAudioUI() {
-                const eq = document.getElementById('eq-visualizer');
-                const label = document.getElementById('music-track-label');
-                const hubBtnLabel = document.getElementById('festive-audio-label');
-                const isPlaying = this.unlocked && !this.musicMuted;
-
-                if (eq) {
-                    eq.classList.toggle('eq-playing', isPlaying);
-                }
-                if (label) {
-                    if (!this.unlocked) {
-                        label.innerText = 'CLICK FOR XMAS SYNTH';
-                    } else if (this.musicMuted) {
-                        label.innerText = 'BGM MUTED';
-                    } else {
-                        const trackNames = {
-                            hub: 'XMAS & GRINCH MEDLEY',
-                            chestpac: 'DAILY BELLS GROOVE',
-                            superchestnut: 'CRUMPIT RETRO BEAT',
-                            commandos: 'FACTORY ASSAULT SYNTH',
-                            climbers: 'FROSTY SUMMIT ARPEGGIO'
-                        };
-                        label.innerText = trackNames[this.currentMode] || 'HOLIDAY SYNTH';
-                    }
-                }
-                if (hubBtnLabel) {
-                    hubBtnLabel.innerText = isPlaying ? 'XMAS MEDLEY PLAYING' : 'PLAY XMAS MEDLEY';
-                }
-            }
-
-            toggleMusic() {
-                this.init();
-                this.unlocked = true;
-                this.musicMuted = !this.musicMuted;
-                document.getElementById('btn-music').innerText = this.musicMuted ? 'BGM: OFF' : 'BGM: ON';
-                if (!this.musicMuted && !this.seqTimer) {
-                    this.startSequencer();
-                }
-                this.updateAudioUI();
-            }
-
-            toggleMute() {
-                this.init();
-                this.muted = !this.muted;
-                document.getElementById('btn-mute').innerText = this.muted ? 'SFX: OFF' : 'SFX: ON';
-            }
-
-            startSequencer() {
-                if (this.seqTimer) clearInterval(this.seqTimer);
-                const tick = () => {
-                    if (this.ctx && this.ctx.state === 'running' && !this.musicMuted) {
-                        this.playSequencerStep();
-                    }
-                };
-                this.seqTimer = setInterval(tick, 175);
-            }
-
-            playSequencerStep() {
-                const now = this.ctx.currentTime;
-
-                if (this.currentMode === 'hub') {
-                    const idx = this.stepIndex % this.HUB_MELODY.length;
-                    const mNote = this.HUB_MELODY[idx];
-                    const hNote = this.HUB_HARMONY[idx];
-                    const bNote = this.HUB_BASS[idx];
-
-                    // Lead Chiptune Holiday Bell Voice
-                    if (mNote && this.NOTES[mNote]) {
-                        this.synthNote(this.NOTES[mNote], 0.15, 'square', 0.11, true);
-                    }
-                    // Warm Harmony Voice
-                    if (hNote && this.NOTES[hNote]) {
-                        this.synthNote(this.NOTES[hNote], 0.18, 'sine', 0.08, false);
-                    }
-                    // Sneaky Grinch Triangle Bass
-                    if (bNote && this.NOTES[bNote]) {
-                        this.synthNote(this.NOTES[bNote], 0.19, 'triangle', 0.16, false);
-                    }
-                    // Festive Sleigh Bell Shimmer on every 2nd step
-                    if (idx % 2 === 0) {
-                        this.sleighBellShimmer(idx % 4 === 0 ? 0.055 : 0.028);
-                    }
-                } else {
-                    // Active Game Background Music Loop
-                    if (app && app.paused) return;
-                    const loop = this.GAME_LOOPS[this.currentMode] || this.GAME_LOOPS.chestpac;
-                    const idx = this.stepIndex % loop.lead.length;
-                    const mNote = loop.lead[idx];
-                    const bNote = loop.bass[idx];
-
-                    if (mNote && this.NOTES[mNote]) {
-                        this.synthNote(this.NOTES[mNote], 0.12, 'square', 0.08, false);
-                    }
-                    if (bNote && this.NOTES[bNote]) {
-                        this.synthNote(this.NOTES[bNote], 0.15, 'triangle', 0.13, false);
-                    }
-                    if (idx % 4 === 0) {
-                        this.sleighBellShimmer(0.03);
-                    }
-                }
-
-                this.stepIndex++;
-            }
-
-            synthNote(freq, duration, type = 'square', vol = 0.1, vibrato = false) {
-                if (!this.ctx || this.musicMuted) return;
-                try {
-                    const now = this.ctx.currentTime;
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = type;
-                    osc.frequency.setValueAtTime(freq, now);
-
-                    if (vibrato) {
-                        osc.frequency.setValueAtTime(freq * 1.006, now + duration * 0.5);
-                    }
-
-                    gain.gain.setValueAtTime(0.001, now);
-                    gain.gain.linearRampToValueAtTime(vol, now + 0.012);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-                    osc.connect(gain);
-                    gain.connect(this.bgmGain);
-                    osc.start(now);
-                    osc.stop(now + duration + 0.01);
-                } catch (e) {}
-            }
-
-            sleighBellShimmer(vol = 0.04) {
-                if (!this.ctx || this.musicMuted) return;
-                try {
-                    const now = this.ctx.currentTime;
-                    // Metallic high-frequency chime cluster + noise burst for authentic sleigh bell
-                    [2637, 3135, 3951].forEach(f => {
-                        const osc = this.ctx.createOscillator();
-                        const g = this.ctx.createGain();
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(f, now);
-                        g.gain.setValueAtTime(vol * 0.45, now);
-                        g.gain.exponentialRampToValueAtTime(0.0008, now + 0.065);
-                        osc.connect(g);
-                        g.connect(this.bgmGain);
-                        osc.start(now);
-                        osc.stop(now + 0.07);
-                    });
-                } catch (e) {}
-            }
-
-            // =========================================================================
-            // RICH MULTI-LAYERED SOUND EFFECTS
-            // =========================================================================
-            tone(freq, endFreq, duration, type = 'square', gainVal = 0.12, delayMs = 0) {
-                if (this.muted) return;
-                this.init();
-                try {
-                    const startAt = this.ctx.currentTime + delayMs / 1000;
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = type;
-                    osc.frequency.setValueAtTime(freq, startAt);
-                    if (endFreq) {
-                        osc.frequency.exponentialRampToValueAtTime(Math.max(20, endFreq), startAt + duration);
-                    }
-                    gain.gain.setValueAtTime(gainVal, startAt);
-                    gain.gain.exponentialRampToValueAtTime(0.002, startAt + duration);
-                    osc.connect(gain);
-                    gain.connect(this.sfxGain);
-                    osc.start(startAt);
-                    osc.stop(startAt + duration + 0.01);
-                } catch (e) {}
-            }
-
-            noiseBurst(duration = 0.15, filterFreq = 900, gainVal = 0.14) {
-                if (this.muted) return;
-                this.init();
-                try {
-                    const bufferSize = Math.floor(this.ctx.sampleRate * duration);
-                    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-                    const data = buffer.getChannelData(0);
-                    for (let i = 0; i < bufferSize; i++) {
-                        data[i] = Math.random() * 2 - 1;
-                    }
-                    const noise = this.ctx.createBufferSource();
-                    noise.buffer = buffer;
-
-                    const filter = this.ctx.createBiquadFilter();
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(filterFreq, this.ctx.currentTime);
-
-                    const gain = this.ctx.createGain();
-                    gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.005, this.ctx.currentTime + duration);
-
-                    noise.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(this.sfxGain);
-                    noise.start();
-                } catch (e) {}
-            }
-
-            chomp(alt) {
-                // Crisp dual-harmonic ornament crunch
-                const base = alt ? 440 : 349.23;
-                this.tone(base, base * 1.45, 0.055, 'triangle', 0.12, 0);
-                this.tone(base * 1.5, base * 0.8, 0.045, 'sine', 0.07, 15);
-            }
-
-            bell() {
-                // Sparkling Holiday Coin / Bell Chime
-                this.tone(987.77, 987.77, 0.07, 'sine', 0.14, 0);
-                this.tone(1318.51, 1318.51, 0.22, 'sine', 0.14, 65);
-                this.tone(2637.02, 2637.02, 0.15, 'triangle', 0.06, 65);
-            }
-
-            powerup() {
-                // Festive Sleigh-Bell Power-Up Arpeggio
-                const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
-                notes.forEach((f, i) => {
-                    this.tone(f, f * 1.03, 0.09, 'square', 0.11, i * 48);
-                    this.tone(f * 0.5, f * 0.5, 0.09, 'triangle', 0.09, i * 48);
+            window.addEventListener('resize', resize);
+            resize();
+            for (let i = 0; i < 55; i++) {
+                flakes.push({
+                    x: Math.random() * snowCanvas.width,
+                    y: Math.random() * snowCanvas.height,
+                    r: Math.random() * 2.5 + 1,
+                    vx: (Math.random() - 0.5) * 0.6,
+                    vy: Math.random() * 1.1 + 0.4
                 });
             }
-
-            jump() {
-                // Classic Arcade Rising Pitch Bend with Warm Sub
-                this.tone(185, 620, 0.15, 'square', 0.11, 0);
-                this.tone(92, 310, 0.15, 'triangle', 0.12, 0);
-            }
-
-            stomp() {
-                // Punchy Grinch Squash + Crunch Burst
-                this.tone(520, 95, 0.14, 'sawtooth', 0.15, 0);
-                this.tone(140, 55, 0.16, 'triangle', 0.18, 20);
-                this.noiseBurst(0.11, 1100, 0.14);
-            }
-
-            shoot() {
-                // Peppermint Laser Blaster Pew + Harmonic Tail
-                this.tone(880, 170, 0.085, 'sawtooth', 0.11, 0);
-                this.tone(1320, 260, 0.065, 'square', 0.07, 10);
-                this.noiseBurst(0.04, 2400, 0.06);
-            }
-
-            freeze() {
-                // Crystalline Ice Shimmer
-                [1046.5, 1396.9, 1760.0].forEach((f, i) => {
-                    this.tone(f, f * 1.12, 0.08, 'sine', 0.11, i * 28);
+            function tickSnow() {
+                sCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
+                sCtx.fillStyle = 'rgba(248, 250, 252, 0.45)';
+                flakes.forEach(f => {
+                    f.x += f.vx;
+                    f.y += f.vy;
+                    if (f.y > snowCanvas.height) { f.y = -5; f.x = Math.random() * snowCanvas.width; }
+                    if (f.x < 0) f.x = snowCanvas.width;
+                    if (f.x > snowCanvas.width) f.x = 0;
+                    sCtx.beginPath();
+                    sCtx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+                    sCtx.fill();
                 });
+                requestAnimationFrame(tickSnow);
             }
+            requestAnimationFrame(tickSnow);
+        })();
 
-            kick() {
-                // Heavy Snowball Launch Thump + Whoosh
-                this.tone(130, 480, 0.16, 'triangle', 0.19, 0);
-                this.tone(260, 680, 0.13, 'square', 0.09, 25);
-                this.noiseBurst(0.14, 1500, 0.12);
-            }
-
-            pipe() {
-                // Classic 3-Step Subterranean Candy Warp Pipe
-                [0, 110, 220].forEach(delay => {
-                    this.tone(420, 160, 0.085, 'sawtooth', 0.13, delay);
-                    this.tone(210, 80, 0.085, 'square', 0.09, delay);
-                });
-            }
-
-            grinchLaugh() {
-                // Sinister Grinch Chromatic Laugh Descent
-                const notes = [246.94, 233.08, 220.00, 207.65, 196.00, 146.83];
-                notes.forEach((f, i) => {
-                    this.tone(f, f * 0.82, 0.11, 'sawtooth', 0.14, i * 75);
-                    this.tone(f * 0.5, f * 0.45, 0.11, 'triangle', 0.12, i * 75);
-                });
-            }
-
-            fanfare() {
-                // Grand Holiday Victory Fanfare
-                const melody = [
-                    { f: 523.25, d: 0.12, t: 0 },
-                    { f: 659.25, d: 0.12, t: 120 },
-                    { f: 783.99, d: 0.12, t: 240 },
-                    { f: 1046.50, d: 0.24, t: 360 },
-                    { f: 783.99, d: 0.12, t: 620 },
-                    { f: 1046.50, d: 0.42, t: 750 }
-                ];
-                melody.forEach(n => {
-                    this.tone(n.f, n.f, n.d, 'square', 0.13, n.t);
-                    this.tone(n.f * 0.5, n.f * 0.5, n.d, 'triangle', 0.12, n.t);
-                });
-            }
-        }
-        const sound = new SoundSystem();
-
-        /* ============================================================================
-         * UNIFIED INPUT MANAGER
-         * ============================================================================ */
-        class InputManager {
-            constructor() {
-                this.keys = {};
-                this.justPressed = {};
-                window.addEventListener('keydown', e => {
-                    const k = e.key.toLowerCase();
-                    if (!this.keys[k]) this.justPressed[k] = true;
-                    this.keys[k] = true;
-                    if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k) && app && app.activeGame) {
-                        e.preventDefault();
-                    }
-                });
-                window.addEventListener('keyup', e => {
-                    const k = e.key.toLowerCase();
-                    this.keys[k] = false;
-                });
-            }
-            setKey(k, state) {
-                if (state && !this.keys[k]) this.justPressed[k] = true;
-                this.keys[k] = state;
-            }
+        // Global Keyboard & Touch Input Manager
+        const input = {
+            keys: {},
+            pressed: {},
+            setKey(k, val) {
+                const key = k.toLowerCase();
+                if (val && !this.keys[key]) {
+                    this.pressed[key] = true;
+                }
+                this.keys[key] = val;
+            },
             consumePressed(k) {
-                if (this.justPressed[k]) {
-                    this.justPressed[k] = false;
+                const key = k.toLowerCase();
+                if (this.pressed[key]) {
+                    this.pressed[key] = false;
                     return true;
                 }
                 return false;
-            }
+            },
             clearFrame() {
-                this.justPressed = {};
+                this.pressed = {};
             }
-        }
-        const input = new InputManager();
+        };
+
+        window.addEventListener('keydown', e => {
+            const k = e.key.toLowerCase();
+            if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) {
+                e.preventDefault();
+            }
+            input.setKey(k, true);
+            sound.unlockAndStart();
+        });
+        window.addEventListener('keyup', e => {
+            input.setKey(e.key.toLowerCase(), false);
+        });
+
+        // Procedural Web Audio API Holiday Chiptune Sequencer & Arcade SFX
+        const sound = {
+            ctx: null,
+            muted: false,
+            musicOn: true,
+            playing: false,
+            mode: 'hub',
+            stepIndex: 0,
+            timer: null,
+
+            // Note frequency table
+            NOTES: {
+                C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00, B3: 246.94,
+                C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, F4s: 369.99, G4: 392.00, A4: 440.00, B4: 493.88,
+                C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00
+            },
+
+            TRACKS: {
+                hub: {
+                    name: 'XMAS MEDLEY',
+                    tempo: 185,
+                    lead: ['E5','E5','E5',null,'E5','E5','E5',null,'E5','G5','C5','D5','E5',null,null,null,
+                           'F5','F5','F5','F5','F5','E5','E5','E5','E5','D5','D5','E5','D5',null,'G5',null],
+                    bass: ['C3',null,'G3',null,'C3',null,'G3',null,'C3',null,'E3',null,'G3',null,'C3',null,
+                           'F3',null,'C3',null,'C3',null,'G3',null,'D3',null,'G3',null,'C3',null,'G3',null]
+                },
+                chestpac: {
+                    name: 'DAILY BELLS',
+                    tempo: 165,
+                    lead: ['G5','F5','G5','E5','G5','F5','G5','E5','A5','G5','A5','F5','A5','G5','A5','F5'],
+                    bass: ['E3','E3','B3','B3','E3','E3','B3','B3','F3','F3','C4','C4','F3','F3','C4','C4']
+                },
+                superchestnut: {
+                    name: 'CRUMPIT RETRO',
+                    tempo: 170,
+                    lead: ['C5','E5','G5','E5','F5','A5','G5','E5','D5','F5','E5','C5','D5','B4','C5',null],
+                    bass: ['C3','G3','C3','G3','F3','C4','C3','G3','D3','A3','C3','G3','G3','D3','C3',null]
+                },
+                commandos: {
+                    name: 'FACTORY SYNTH',
+                    tempo: 150,
+                    lead: ['E4','E4','G4','E4','A4','G4','E4','D4','E4','E4','B4','A4','G4','F4s','E4',null],
+                    bass: ['E3','E3','E3','E3','A3','A3','E3','E3','B3','B3','A3','A3','G3','B3','E3',null]
+                },
+                climbers: {
+                    name: 'SUMMIT FROST',
+                    tempo: 175,
+                    lead: ['C5','G4','E5','C5','D5','B4','G5','D5','E5','C5','A5','E5','G5','E5','C5',null],
+                    bass: ['C3','E3','G3','E3','G3','B3','D4','B3','A3','C4','E4','C4','G3','B3','C4',null]
+                }
+            },
+
+            ensureCtx() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume().catch(() => {});
+                }
+            },
+
+            unlockAndStart(toggleIfPlaying = false) {
+                this.ensureCtx();
+                if (!this.ctx) return;
+                if (toggleIfPlaying && this.playing) {
+                    this.toggleMusic();
+                    return;
+                }
+                if (!this.playing && this.musicOn) {
+                    this.startSequencer();
+                }
+                this.syncUI();
+            },
+
+            setMusicMode(modeKey) {
+                this.mode = this.TRACKS[modeKey] ? modeKey : 'hub';
+                this.stepIndex = 0;
+                if (this.playing) {
+                    this.startSequencer();
+                }
+                this.syncUI();
+            },
+
+            startSequencer() {
+                if (this.timer) clearInterval(this.timer);
+                if (!this.musicOn || !this.ctx) {
+                    this.playing = false;
+                    this.syncUI();
+                    return;
+                }
+                this.playing = true;
+                const track = this.TRACKS[this.mode] || this.TRACKS.hub;
+                this.timer = setInterval(() => {
+                    if (!this.musicOn || !this.ctx || this.ctx.state !== 'running') return;
+                    const idx = this.stepIndex % track.lead.length;
+                    const lNote = track.lead[idx];
+                    const bNote = track.bass[idx % track.bass.length];
+                    if (lNote && this.NOTES[lNote]) {
+                        this.tone(this.NOTES[lNote], 0.12, 'square', 0.045);
+                    }
+                    if (bNote && this.NOTES[bNote]) {
+                        this.tone(this.NOTES[bNote], 0.15, 'triangle', 0.06);
+                    }
+                    this.stepIndex++;
+                }, track.tempo);
+                this.syncUI();
+            },
+
+            toggleMusic() {
+                this.ensureCtx();
+                this.musicOn = !this.musicOn;
+                if (this.musicOn) {
+                    this.startSequencer();
+                } else {
+                    if (this.timer) clearInterval(this.timer);
+                    this.playing = false;
+                }
+                this.syncUI();
+            },
+
+            toggleMute() {
+                this.ensureCtx();
+                this.muted = !this.muted;
+                const btn = document.getElementById('btn-mute');
+                if (btn) btn.innerText = `SFX: ${this.muted ? 'OFF' : 'ON'}`;
+            },
+
+            syncUI() {
+                const track = this.TRACKS[this.mode] || this.TRACKS.hub;
+                const eq = document.getElementById('eq-visualizer');
+                const lbl = document.getElementById('music-track-label');
+                const btnMusic = document.getElementById('btn-music');
+                const festiveLbl = document.getElementById('festive-audio-label');
+
+                if (eq) eq.classList.toggle('eq-playing', this.playing && this.musicOn);
+                if (lbl) lbl.innerText = (this.playing && this.musicOn) ? `♫ ${track.name}` : 'BGM PAUSED';
+                if (btnMusic) btnMusic.innerText = `BGM: ${this.musicOn ? 'ON' : 'OFF'}`;
+                if (festiveLbl) festiveLbl.innerText = (this.playing && this.musicOn) ? 'PAUSE XMAS MEDLEY' : 'PLAY XMAS MEDLEY';
+            },
+
+            tone(freq, dur, type = 'square', vol = 0.08, slideTo = null) {
+                if (!this.ctx || this.ctx.state !== 'running') return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, now);
+                if (slideTo) {
+                    osc.frequency.exponentialRampToValueAtTime(slideTo, now + dur);
+                }
+                gain.gain.setValueAtTime(vol, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + dur);
+            },
+
+            chomp() { if (!this.muted) this.tone(540, 0.07, 'triangle', 0.08, 780); },
+            jump() { if (!this.muted) this.tone(280, 0.14, 'square', 0.08, 620); },
+            shoot() { if (!this.muted) this.tone(720, 0.10, 'sawtooth', 0.07, 220); },
+            stomp() { if (!this.muted) this.tone(180, 0.15, 'square', 0.10, 90); },
+            bell() { if (!this.muted) this.tone(1046.5, 0.16, 'sine', 0.09, 1318.5); },
+            pipe() { if (!this.muted) this.tone(400, 0.22, 'square', 0.09, 160); },
+            freeze() { if (!this.muted) this.tone(980, 0.11, 'sine', 0.08, 1480); },
+            kick() { if (!this.muted) this.tone(160, 0.18, 'triangle', 0.12, 420); },
+            powerup() {
+                if (this.muted) return;
+                [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => this.tone(f, 0.1, 'square', 0.08), i * 55));
+            },
+            grinchLaugh() {
+                if (this.muted) return;
+                [310, 275, 240, 195].forEach((f, i) => setTimeout(() => this.tone(f, 0.12, 'sawtooth', 0.09), i * 70));
+            },
+            fanfare() {
+                if (this.muted) return;
+                [523, 659, 784, 1046, 1318].forEach((f, i) => setTimeout(() => this.tone(f, 0.16, 'square', 0.09), i * 80));
+            }
+        };
+
+        // Attempt auto-start on load + fallback on first pointer click
+        window.addEventListener('load', () => {
+            setTimeout(() => sound.unlockAndStart(), 150);
+        });
+        window.addEventListener('pointerdown', () => sound.unlockAndStart(), { once: true });
 
         /* ============================================================================
-         * SHARED VECTOR DRAWING HELPERS (Grinch & Holiday Chestnut Sprites)
+         * SHARED FESTIVE VECTOR SPRITE RENDERERS (HERO CHESTNUT & GRINCH MINION)
          * ============================================================================ */
-        function drawChestnutHero(ctx, x, y, r, facing, hatColor = '#dc2626', isPowered = false, label = '') {
+        function drawChestnutHero(ctx, cx, cy, r, facing = 1, hatColor = '#dc2626', powered = false, badge = '') {
             ctx.save();
-            ctx.translate(x, y);
-            if (isPowered) {
-                ctx.shadowColor = '#fde047';
-                ctx.shadowBlur = 14;
+            ctx.translate(cx, cy);
+
+            // Power aura
+            if (powered) {
+                ctx.strokeStyle = '#fde047';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(0, 0, r + 4 + Math.sin(Date.now() * 0.015) * 2, 0, Math.PI * 2);
+                ctx.stroke();
             }
-            // Chestnut Glossy Shell
-            ctx.fillStyle = isPowered ? '#f59e0b' : '#92400e';
+
+            // Roasted Chestnut Glossy Shell
+            ctx.fillStyle = '#92400e';
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.arc(0, 2, r, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = isPowered ? '#fef08a' : '#fbbf24';
-            ctx.lineWidth = 2;
             ctx.stroke();
 
-            // Lower Roasted Cream Belly
+            // Lighter Chestnut Base
             ctx.fillStyle = '#fde68a';
             ctx.beginPath();
-            ctx.arc(0, 4, r * 0.7, 0.15 * Math.PI, 0.85 * Math.PI);
+            ctx.arc(0, 4, r * 0.65, 0.15 * Math.PI, 0.85 * Math.PI);
             ctx.fill();
 
-            // Festive Hat / Bandana
+            // Expressive Eyes
+            const ex = (facing >= 0 ? 1 : -1) * 3;
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(ex - 4, -1, 3.2, 0, Math.PI * 2);
+            ctx.arc(ex + 4, -1, 3.2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(ex - 3.2, -1, 1.6, 0, Math.PI * 2);
+            ctx.arc(ex + 4.8, -1, 1.6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Festive Santa / Elf Cap
             ctx.fillStyle = hatColor;
             ctx.beginPath();
-            ctx.arc(0, -1, r, Math.PI, 0);
+            ctx.moveTo(-r * 0.9, -r * 0.45);
+            ctx.lineTo(r * 0.9, -r * 0.45);
+            ctx.lineTo(-facing * r * 0.5, -r * 1.35);
+            ctx.closePath();
             ctx.fill();
-            // White Fur Trim & Pom
+
+            // White Fur Trim & Pom-Pom
             ctx.fillStyle = '#f8fafc';
-            ctx.fillRect(-r, -4, r * 2, 4);
+            ctx.fillRect(-r * 0.95, -r * 0.55, r * 1.9, 4.5);
             ctx.beginPath();
-            ctx.arc(-facing * (r * 0.7), -r * 0.85, 4, 0, Math.PI * 2);
+            ctx.arc(-facing * r * 0.5, -r * 1.35, 3.8, 0, Math.PI * 2);
             ctx.fill();
 
-            // Hero Eyes
-            ctx.fillStyle = '#ffffff';
-            const ex = facing * 3.5;
-            ctx.fillRect(ex - 4, -1, 3.5, 4.5);
-            ctx.fillRect(ex + 2, -1, 3.5, 4.5);
-
-            if (label) {
+            if (badge) {
                 ctx.fillStyle = '#fde047';
-                ctx.font = '8px "Press Start 2P"';
+                ctx.font = '7px "Press Start 2P"';
                 ctx.textAlign = 'center';
-                ctx.fillText(label, 0, -r - 7);
+                ctx.fillText(badge, 0, -r - 9);
             }
             ctx.restore();
         }
 
-        function drawGrinchMinion(ctx, x, y, r, variantColor = '#84cc16', isScared = false, isFrozen = 0) {
+        // High-Detail Organic Vector Grinch Minion & Variant Renderer
+        function drawGrinchMinion(ctx, cx, cy, r, color = '#84cc16', scared = false, freezeLevel = 0, variant = 'classic', facing = -1) {
             ctx.save();
-            ctx.translate(x, y);
+            ctx.translate(cx, cy);
 
-            if (isFrozen > 0) {
-                // Encased in Snowball (Game 4 mechanic)
-                ctx.fillStyle = isFrozen >= 2 ? '#f8fafc' : 'rgba(224, 242, 254, 0.75)';
+            // If frozen into a giant crystalline snowball (Game 4: Frosty Peak Climbers)
+            if (freezeLevel >= 2) {
+                const iceGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, 2, 0, 0, r + 3);
+                iceGrad.addColorStop(0, '#ffffff');
+                iceGrad.addColorStop(0.55, '#bae6fd');
+                iceGrad.addColorStop(1, '#0284c7');
+                ctx.fillStyle = iceGrad;
                 ctx.strokeStyle = '#38bdf8';
                 ctx.lineWidth = 2.5;
                 ctx.beginPath();
                 ctx.arc(0, 0, r + 3, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.stroke();
-                if (isFrozen >= 2) {
-                    ctx.restore();
-                    return;
+
+                // Faintly visible trapped Grinch eyes inside the snowball
+                ctx.fillStyle = 'rgba(254, 240, 138, 0.55)';
+                ctx.beginPath();
+                ctx.ellipse(-4, -2, 3, 2, 0.2, 0, Math.PI * 2);
+                ctx.ellipse(4, -2, 3, 2, -0.2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+                return;
+            }
+
+            const tick = Date.now() * 0.008;
+            const dir = facing >= 0 ? 1 : -1;
+
+            // Variant Back Attachments: Hover Rotor / Bat Wings / Spikes
+            if (variant === 'flyer' || variant === 'drone') {
+                const flap = Math.sin(tick * 2.5) * 8;
+                ctx.fillStyle = '#dc2626';
+                ctx.strokeStyle = '#fde047';
+                ctx.lineWidth = 1.5;
+                // Candy-striped helicopter blades or bat-ears
+                ctx.beginPath();
+                ctx.ellipse(0, -r - 7, 13 * Math.abs(Math.cos(tick * 3)) + 4, 3, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                // Rotor mast
+                ctx.strokeStyle = '#94a3b8';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, -r);
+                ctx.lineTo(0, -r - 7);
+                ctx.stroke();
+
+                // Small side bat-glider fins
+                ctx.fillStyle = '#14532d';
+                ctx.beginPath();
+                ctx.moveTo(-r * 0.7, 0);
+                ctx.quadraticCurveTo(-r * 1.6, -6 + flap, -r * 1.2, 7);
+                ctx.moveTo(r * 0.7, 0);
+                ctx.quadraticCurveTo(r * 1.6, -6 + flap, r * 1.2, 7);
+                ctx.fill();
+            } else if (variant === 'spikybot') {
+                // Menacing Metallic / Crimson Collar Spikes around the Grinch
+                ctx.fillStyle = '#ef4444';
+                ctx.strokeStyle = '#fde047';
+                ctx.lineWidth = 1.2;
+                for (let a = -2; a <= 2; a++) {
+                    const ang = (a * 0.45) - Math.PI / 2;
+                    const sx = Math.cos(ang) * (r + 1);
+                    const sy = Math.sin(ang) * (r + 1);
+                    const tx = Math.cos(ang) * (r + 8);
+                    const ty = Math.sin(ang) * (r + 8);
+                    ctx.beginPath();
+                    ctx.moveTo(sx - 3, sy);
+                    ctx.lineTo(tx, ty);
+                    ctx.lineTo(sx + 3, sy);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
                 }
             }
 
-            // Grinch Shaggy Head
-            ctx.fillStyle = isScared ? '#3b82f6' : variantColor;
-            ctx.beginPath();
-            ctx.arc(0, 1, r, 0, Math.PI * 2);
-            ctx.fill();
+            // Sculpted Pear-Shaped Shaggy Grinch Head & Cheek Tufts (Organic Bezier Silhouette)
+            const flashScared = scared && Math.floor(Date.now() / 140) % 2 === 0;
+            const furGrad = ctx.createRadialGradient(-r * 0.25, -r * 0.25, 2, 0, 2, r * 1.25);
+            if (scared) {
+                furGrad.addColorStop(0, flashScared ? '#93c5fd' : '#fde047');
+                furGrad.addColorStop(0.7, flashScared ? '#2563eb' : '#d97706');
+                furGrad.addColorStop(1, '#1e3a8a');
+            } else {
+                furGrad.addColorStop(0, '#bef264');
+                furGrad.addColorStop(0.55, color || '#84cc16');
+                furGrad.addColorStop(1, '#365314');
+            }
 
-            // Stolen Santa Hat tuft
-            ctx.fillStyle = isScared ? '#93c5fd' : '#dc2626';
+            ctx.fillStyle = furGrad;
+            ctx.strokeStyle = scared ? '#e0f2fe' : '#1a2e05';
+            ctx.lineWidth = 2;
+
             ctx.beginPath();
-            ctx.moveTo(-r * 0.7, -r * 0.5);
-            ctx.lineTo(0, -r * 1.35);
-            ctx.lineTo(r * 0.7, -r * 0.5);
+            // Narrower cranium top
+            ctx.moveTo(0, -r * 0.95);
+            ctx.bezierCurveTo(r * 0.65, -r * 0.95, r * 0.78, -r * 0.35, r * 0.85, -r * 0.05);
+            // Right shaggy cheek tuft1 & tuft2
+            ctx.lineTo(r * 1.22, r * 0.12);
+            ctx.lineTo(r * 0.96, r * 0.28);
+            ctx.lineTo(r * 1.18, r * 0.48);
+            // Wide Grinch jowls & pointed chin
+            ctx.bezierCurveTo(r * 0.82, r * 0.98, r * 0.32, r * 1.08, 0, r * 1.05);
+            ctx.bezierCurveTo(-r * 0.32, r * 1.08, -r * 0.82, r * 0.98, -r * 1.18, r * 0.48);
+            // Left shaggy cheek tuft2 & tuft1
+            ctx.lineTo(-r * 0.96, r * 0.28);
+            ctx.lineTo(-r * 1.22, r * 0.12);
+            ctx.lineTo(-r * 0.85, -r * 0.05);
+            ctx.bezierCurveTo(-r * 0.78, -r * 0.35, -r * 0.65, -r * 0.95, 0, -r * 0.95);
             ctx.closePath();
             ctx.fill();
+            ctx.stroke();
 
-            // Yellow Grinch Eyes & Scowl
-            ctx.fillStyle = isScared ? '#ffffff' : '#fef08a';
+            // Red Santa Coat Collar / Parka Trim at bottom
+            if (variant === 'climber' || variant === 'commando' || variant === 'ghost') {
+                ctx.fillStyle = variant === 'climber' ? '#0284c7' : '#dc2626';
+                ctx.beginPath();
+                ctx.ellipse(0, r * 0.92, r * 0.72, r * 0.25, 0, 0, Math.PI);
+                ctx.fill();
+                ctx.strokeStyle = '#f8fafc';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(-r * 0.65, r * 0.9);
+                ctx.lineTo(r * 0.65, r * 0.9);
+                ctx.stroke();
+            }
+
+            // Iconic Sinister Slanted Yellow Eyes with Glowing Red Pupils
+            const eyeShift = dir * 1.2;
+            ctx.fillStyle = scared ? '#ffffff' : '#fef08a';
             ctx.beginPath();
-            ctx.arc(-4, -1, 3, 0, Math.PI * 2);
-            ctx.arc(4, -1, 3, 0, Math.PI * 2);
+            ctx.ellipse(-r * 0.34 + eyeShift, -r * 0.12, r * 0.25, r * 0.17, 0.28, 0, Math.PI * 2);
+            ctx.ellipse(r * 0.34 + eyeShift, -r * 0.12, r * 0.25, r * 0.17, -0.28, 0, Math.PI * 2);
             ctx.fill();
 
-            ctx.strokeStyle = '#1e293b';
-            ctx.lineWidth = 2;
+            ctx.fillStyle = scared ? '#1d4ed8' : '#dc2626';
             ctx.beginPath();
-            if (isScared) {
-                ctx.moveTo(-5, 6);
-                ctx.lineTo(5, 6);
+            ctx.arc(-r * 0.32 + eyeShift * 1.4, -r * 0.12, r * 0.10, 0, Math.PI * 2);
+            ctx.arc(r * 0.32 + eyeShift * 1.4, -r * 0.12, r * 0.10, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Deeply Furrowed Scowling Grinch Unibrow
+            ctx.strokeStyle = '#14532d';
+            ctx.lineWidth = 2.6;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            if (scared) {
+                // Worried wavy brow when Chest-Pac is in Catching Mode
+                ctx.moveTo(-r * 0.62, -r * 0.25);
+                ctx.lineTo(-r * 0.15, -r * 0.38);
+                ctx.moveTo(r * 0.62, -r * 0.25);
+                ctx.lineTo(r * 0.15, -r * 0.38);
             } else {
-                // Mean Grinch Brow & Smirk
-                ctx.moveTo(-7, -5); ctx.lineTo(-1, -2);
-                ctx.moveTo(7, -5);  ctx.lineTo(1, -2);
-                ctx.moveTo(-5, 6);  ctx.quadraticCurveTo(0, 9, 6, 4);
+                // Classic mean V-scowl
+                ctx.moveTo(-r * 0.65, -r * 0.38);
+                ctx.lineTo(-r * 0.06, -r * 0.16);
+                ctx.lineTo(r * 0.06, -r * 0.16);
+                ctx.lineTo(r * 0.65, -r * 0.38);
             }
             ctx.stroke();
+
+            // Wrinkled Snub Green Grinch Nose
+            ctx.fillStyle = '#3f6212';
+            ctx.beginPath();
+            ctx.arc(eyeShift * 0.8, r * 0.08, r * 0.13, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Iconic WideEar-to-Ear Crooked Grinch Smirk & Cheek Creases
+            ctx.strokeStyle = '#14532d';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            if (scared) {
+                // Zig-zag panic mouth
+                ctx.moveTo(-r * 0.45, r * 0.52);
+                ctx.lineTo(-r * 0.2, r * 0.38);
+                ctx.lineTo(0, r * 0.52);
+                ctx.lineTo(r * 0.2, r * 0.38);
+                ctx.lineTo(r * 0.45, r * 0.52);
+            } else {
+                // Mischievous curled smirk
+                ctx.moveTo(-r * 0.58, r * 0.32);
+                ctx.quadraticCurveTo(0, r * 0.78, r * 0.62, r * 0.28);
+                // Devious corner curllines
+                ctx.moveTo(-r * 0.66, r * 0.22);
+                ctx.lineTo(-r * 0.50, r * 0.42);
+                ctx.moveTo(r * 0.68, r * 0.18);
+                ctx.lineTo(r * 0.54, r * 0.38);
+            }
+            ctx.stroke();
+
+            // Stolen Slouching Red Santa Hat OR Commando Bandana on Crown
+            if (variant !== 'spikybot') {
+                if (variant === 'commando') {
+                    // Tactical Crimson Rambo-Grinch Bandana + Scruffy Green Hair Tuft
+                    ctx.fillStyle = '#e11d48';
+                    ctx.fillRect(-r * 0.78, -r * 0.68, r * 1.56, r * 0.26);
+                    // Bandana knot tails fluttering behind
+                    ctx.beginPath();
+                    ctx.moveTo(-dir * r * 0.75, -r * 0.6);
+                    ctx.lineTo(-dir * (r * 1.25), -r * 0.75 + Math.sin(tick * 2) * 3);
+                    ctx.lineTo(-dir * (r * 1.15), -r * 0.42);
+                    ctx.closePath();
+                    ctx.fill();
+                } else {
+                    // Drooping Stolen Santa Hat with White Fur Trim & Pom-Pom
+                    ctx.fillStyle = '#dc2626';
+                    ctx.beginPath();
+                    ctx.moveTo(-r * 0.72, -r * 0.58);
+                    ctx.quadraticCurveTo(0, -r * 1.48, -dir * r * 0.85, -r * 1.05);
+                    ctx.lineTo(r * 0.72, -r * 0.58);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Fluffy white hat brim
+                    ctx.fillStyle = '#f8fafc';
+                    ctx.beginPath();
+                    ctx.roundRect(-r * 0.78, -r * 0.68, r * 1.56, r * 0.24, 3);
+                    ctx.fill();
+
+                    // Pom-pom
+                    ctx.beginPath();
+                    ctx.arc(-dir * r * 0.85, -r * 1.05, r * 0.22, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Half-Frozen Frost Glaze Overlay (when freezeLevel === 1)
+            if (freezeLevel === 1) {
+                ctx.fillStyle = 'rgba(186, 230, 253, 0.58)';
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(0, 2, r + 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+
             ctx.restore();
         }
 
         /* ============================================================================
-         * GAME 1: CHEST-PAC: GRINCH MAZE HEIST
-         * (Strict Tile-Center Node Interpolation Engine - Never clips or gets stuck)
+         * GAME 1: CHEST-PAC: CHESTNUTS DAILY
+         * (Strict Tile-Center Node Interpolation Engine — Never clips or gets stuck!)
          * ============================================================================ */
         class ChestPacGrinchGame {
             constructor(canvas, ctx) {
                 this.canvas = canvas;
                 this.ctx = ctx;
-                this.COLS = 28;
-                this.ROWS = 25;
-                this.TILE = 20;
-                this.offsetX = (canvas.width - this.COLS * this.TILE) / 2;
-                this.offsetY = 10;
+                this.COLS = 21;
+                this.ROWS = 15;
+                this.TILE = 32;
+                this.OFFSET_X = Math.floor((800 - this.COLS * this.TILE) / 2);
+                this.OFFSET_Y = 22;
 
-                // 1 = Candy Wall, 2 = Holiday Ornament, 3 = Roasted Star Power-Up, 0 = Path, 4 = Grinch Lair Gate
-                this.TEMPLATE = [
-                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                    [1,3,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,3,1],
-                    [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-                    [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-                    [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-                    [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
-                    [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
-                    [1,1,1,1,1,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,1,1],
-                    [0,0,0,0,0,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,0,0,0,0,0],
-                    [1,1,1,1,1,1,2,1,1,0,1,1,1,4,4,1,1,1,0,1,1,2,1,1,1,1,1,1],
-                    [0,0,0,0,0,0,2,0,0,0,1,0,0,0,0,0,0,1,0,0,0,2,0,0,0,0,0,0],
-                    [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
-                    [0,0,0,0,0,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,0,0,0,0,0],
-                    [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
-                    [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
-                    [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-                    [1,3,2,2,1,1,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,1,1,2,2,3,1],
-                    [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
-                    [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
-                    [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
-                    [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-                    [1,2,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,2,1],
-                    [1,2,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,2,1],
-                    [1,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1],
-                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+                this.MAZES = [
+                    [
+                        "111111111111111111111",
+                        "130000000010000000031",
+                        "101110111010111011101",
+                        "101110111010111011101",
+                        "100000000000000000001",
+                        "101110101111101011101",
+                        "100000100010001000001",
+                        "001110111222111011100",
+                        "100000102222201000001",
+                        "101110101111101011101",
+                        "100000000020000000001",
+                        "101110111010111011101",
+                        "100010000000000010001",
+                        "131010101111101010131",
+                        "111111111111111111111"
+                    ],
+                    [
+                        "111111111111111111111",
+                        "130000100000001000031",
+                        "101110101111101011101",
+                        "101000000010000000101",
+                        "101011111010111110101",
+                        "100000000000000000001",
+                        "111010111222111010111",
+                        "000010102222201010000",
+                        "111010111111111010111",
+                        "100000000020000000001",
+                        "101111101111101111101",
+                        "100000100010001000001",
+                        "101110111010111011101",
+                        "130000000000000000031",
+                        "111111111111111111111"
+                    ],
+                    [
+                        "111111111111111111111",
+                        "130000000111000000031",
+                        "101111110111011111101",
+                        "101000000000000000101",
+                        "101011101111101110101",
+                        "100010000010000010001",
+                        "101110111222111011101",
+                        "000000102222201000000",
+                        "101110111111111011101",
+                        "100010000020000010001",
+                        "101011101111101110101",
+                        "101000000010000000101",
+                        "101111110111011111101",
+                        "130000000000000000031",
+                        "111111111111111111111"
+                    ]
                 ];
-
-                this.DIRS = {
-                    UP:    { dx: 0, dy: -1, opp: 'DOWN' },
-                    DOWN:  { dx: 0, dy:  1, opp: 'UP' },
-                    LEFT:  { dx: -1, dy: 0, opp: 'RIGHT' },
-                    RIGHT: { dx: 1, dy:  0, opp: 'LEFT' }
-                };
             }
 
             init(numPlayers) {
                 this.numPlayers = numPlayers;
+                this.stage = 1;
+                this.lives = 3;
                 this.score1 = 0;
                 this.score2 = 0;
-                this.lives = 3;
-                this.level = 1;
-                this.powerTimer = 0;
-                this.maxPowerTime = 420;
-                this.particles = [];
-                this.floatTexts = [];
-                this.loadLevel();
+                this.loadStage(1);
             }
 
-            loadLevel() {
-                this.map = this.TEMPLATE.map(r => [...r]);
-                this.pelletsRemaining = 0;
+            loadStage(st) {
+                this.stage = st;
+                const template = this.MAZES[(st - 1) % this.MAZES.length];
+                this.grid = [];
+                this.pelletsLeft = 0;
+                this.powerTimer = 0;
+                this.maxPowerTime = Math.max(240, 380 - (st - 1) * 50);
+                this.mouthTick = 0;
+                this.floatTexts = [];
+
                 for (let r = 0; r < this.ROWS; r++) {
+                    this.grid[r] = [];
                     for (let c = 0; c < this.COLS; c++) {
-                        if (this.map[r][c] === 2 || this.map[r][c] === 3) this.pelletsRemaining++;
+                        const ch = template[r][c];
+                        if (ch === '1') this.grid[r][c] = 1; // Wall
+                        else if (ch === '0') { this.grid[r][c] = 2; this.pelletsLeft++; } // Story Point Dot
+                        else if (ch === '3') { this.grid[r][c] = 3; this.pelletsLeft++; } // Roasted Star Power-up
+                        else this.grid[r][c] = 0; // Empty Corridor
                     }
                 }
-                this.resetEntities();
+
+                this.resetPositions();
             }
 
-            resetEntities() {
-                // Player 1 starts stationary at exact center of tile (13, 16)
-                this.player = {
-                    gridX: 13, gridY: 16,
-                    targetX: 13, targetY: 16,
-                    progress: 0,
-                    dir: null, nextDir: null,
-                    baseSpeed: 0.11 + Math.min(0.03, (this.level - 1) * 0.01),
-                    mouthPhase: 0
+            resetPositions() {
+                // Player 1: Chest-Pac starts stationary on exact tile node (10, 10)
+                this.pac = {
+                    gx: 10, gy: 10,
+                    tx: 10, ty: 10,
+                    prog: 0,
+                    dir: null,
+                    nextDir: null,
+                    facing: { x: 1, y: 0 },
+                    speed: 0.135
                 };
 
-                // 4 Grinch Minions positioned on open corridor tiles
-                const grinchConfigs = [
-                    { name: 'Chief Grinch', color: '#84cc16', gx: 13, gy: 8,  dir: 'LEFT',  isP2: this.numPlayers === 2 },
-                    { name: 'Robo-Grinch',  color: '#10b981', gx: 14, gy: 8,  dir: 'RIGHT', isP2: false },
-                    { name: 'Frost-Grinch', color: '#38bdf8', gx: 12, gy: 10, dir: 'UP',    isP2: false },
-                    { name: 'Pyro-Grinch',  color: '#f43f5e', gx: 15, gy: 10, dir: 'UP',    isP2: false }
+                const spd = 0.095 + (this.stage - 1) * 0.012;
+                const colors = ['#84cc16', '#f43f5e', '#38bdf8', '#fb923c'];
+                const starts = [
+                    { x: 9, y: 8, d: { x: 0, y: -1 } },
+                    { x: 10, y: 8, d: { x: 0, y: -1 } },
+                    { x: 11, y: 8, d: { x: 0, y: -1 } },
+                    { x: 10, y: 6, d: { x: 1, y: 0 } }
                 ];
 
-                this.ghosts = grinchConfigs.map((cfg, idx) => {
-                    const g = {
-                        id: idx,
-                        name: cfg.name,
-                        color: cfg.color,
-                        gridX: cfg.gx, gridY: cfg.gy,
-                        targetX: cfg.gx, targetY: cfg.gy,
-                        progress: 0,
-                        dir: cfg.dir, nextDir: null,
-                        isP2: cfg.isP2,
-                        baseSpeed: 0.084 + Math.min(0.035, (this.level - 1) * 0.008)
-                    };
-                    this.assignNextGrinchTile(g);
-                    return g;
-                });
+                this.ghosts = starts.map((s, idx) => ({
+                    id: idx,
+                    gx: s.x, gy: s.y,
+                    tx: s.x, ty: s.y,
+                    prog: 0,
+                    dir: s.d,
+                    nextDir: s.d,
+                    speed: spd,
+                    color: colors[idx],
+                    isP2: this.numPlayers === 2 && idx === 0
+                }));
             }
 
-            wrapX(x) {
-                if (x < 0) return this.COLS - 1;
-                if (x >= this.COLS) return 0;
-                return x;
+            isWalkable(c, r) {
+                if (r < 0 || r >= this.ROWS) return false;
+                const wrappedC = (c + this.COLS) % this.COLS;
+                return this.grid[r][wrappedC] !== 1;
             }
 
-            isTileWalkable(gx, gy, isGhost = false) {
-                const wx = this.wrapX(gx);
-                if (gy < 0 || gy >= this.ROWS) return false;
-                const cell = this.map[gy][wx];
-                if (cell === 1) return false;
-                if (cell === 4 && !isGhost) return false;
-                return true;
+            getCoords(ent) {
+                let dx = ent.tx - ent.gx;
+                if (dx > 1) dx = -1;
+                if (dx < -1) dx = 1;
+                const x = (ent.gx + dx * ent.prog) * this.TILE + this.OFFSET_X + this.TILE / 2;
+                const y = (ent.gy + (ent.ty - ent.gy) * ent.prog) * this.TILE + this.OFFSET_Y + this.TILE / 2;
+                return { x, y };
             }
 
-            canStep(gx, gy, dirName, isGhost = false) {
-                if (!dirName || !this.DIRS[dirName]) return false;
-                const d = this.DIRS[dirName];
-                return this.isTileWalkable(gx + d.dx, gy + d.dy, isGhost);
-            }
-
-            assignNextGrinchTile(g) {
-                if (g.isP2) {
-                    if (g.nextDir && this.canStep(g.gridX, g.gridY, g.nextDir, true)) {
-                        g.dir = g.nextDir;
+            stepNodeEntity(ent, isPac) {
+                if (ent.gx === ent.tx && ent.gy === ent.ty) {
+                    // Consume pellet when Pac lands on node center
+                    if (isPac) {
+                        const cell = this.grid[ent.gy][ent.gx];
+                        if (cell === 2) {
+                            this.grid[ent.gy][ent.gx] = 0;
+                            this.pelletsLeft--;
+                            this.score1 += 20;
+                            sound.chomp();
+                        } else if (cell === 3) {
+                            this.grid[ent.gy][ent.gx] = 0;
+                            this.pelletsLeft--;
+                            this.score1 += 100;
+                            this.powerTimer = this.maxPowerTime;
+                            sound.powerup();
+                            this.floatTexts.push({ x: this.getCoords(ent).x, y: this.getCoords(ent).y - 12, text: 'CATCHING MODE!', color: '#fde047', life: 45 });
+                        }
                     }
-                    if (g.dir && this.canStep(g.gridX, g.gridY, g.dir, true)) {
-                        const d = this.DIRS[g.dir];
-                        g.targetX = this.wrapX(g.gridX + d.dx);
-                        g.targetY = g.gridY + d.dy;
+
+                    // Choose next tile target
+                    if (isPac || ent.isP2) {
+                        if (ent.nextDir && this.isWalkable(ent.gx + ent.nextDir.x, ent.gy + ent.nextDir.y)) {
+                            ent.dir = ent.nextDir;
+                        }
+                        if (ent.dir && this.isWalkable(ent.gx + ent.dir.x, ent.gy + ent.dir.y)) {
+                            ent.tx = (ent.gx + ent.dir.x + this.COLS) % this.COLS;
+                            ent.ty = ent.gy + ent.dir.y;
+                            ent.prog = 0;
+                            if (isPac) ent.facing = ent.dir;
+                        } else {
+                            ent.dir = null;
+                        }
                     } else {
-                        g.targetX = g.gridX;
-                        g.targetY = g.gridY;
+                        // Independent AI Ghost Pathfinding — never gets stuck!
+                        const dirs = [
+                            { x: 0, y: -1 },
+                            { x: 0, y: 1 },
+                            { x: -1, y: 0 },
+                            { x: 1, y: 0 }
+                        ];
+                        const valid = dirs.filter(d => this.isWalkable(ent.gx + d.x, ent.gy + d.y));
+                        const nonRev = valid.filter(d => !ent.dir || !(d.x === -ent.dir.x && d.y === -ent.dir.y));
+                        const pool = nonRev.length > 0 ? nonRev : valid;
+                        if (pool.length > 0) {
+                            let chosen = pool[Math.floor(Math.random() * pool.length)];
+                            // Slight chase bias when not in power mode
+                            if (this.powerTimer <= 0 && Math.random() < 0.45) {
+                                pool.sort((a, b) => {
+                                    const da = Math.hypot((ent.gx + a.x) - this.pac.gx, (ent.gy + a.y) - this.pac.gy);
+                                    const db = Math.hypot((ent.gx + b.x) - this.pac.gx, (ent.gy + b.y) - this.pac.gy);
+                                    return da - db;
+                                });
+                                chosen = pool[0];
+                            }
+                            ent.dir = chosen;
+                            ent.tx = (ent.gx + chosen.x + this.COLS) % this.COLS;
+                            ent.ty = ent.gy + chosen.y;
+                            ent.prog = 0;
+                        }
                     }
-                    return;
                 }
 
-                // Independent Graph-Node AI Decision at each tile center
-                const allDirs = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
-                const validDirs = allDirs.filter(d => this.canStep(g.gridX, g.gridY, d, true));
-                if (validDirs.length === 0) {
-                    g.targetX = g.gridX; g.targetY = g.gridY;
-                    return;
+                // Interpolate smoothly along corridor center
+                if (ent.gx !== ent.tx || ent.gy !== ent.ty) {
+                    const spd = (!isPac && this.powerTimer > 0) ? ent.speed * 0.68 : ent.speed;
+                    ent.prog += spd;
+                    if (ent.prog >= 1) {
+                        ent.gx = ent.tx;
+                        ent.gy = ent.ty;
+                        ent.prog = 0;
+                    }
                 }
-
-                const oppDir = g.dir ? this.DIRS[g.dir].opp : null;
-                let candidates = validDirs.filter(d => d !== oppDir);
-                if (candidates.length === 0) candidates = validDirs;
-
-                let chosen = candidates[Math.floor(Math.random() * candidates.length)];
-                if (candidates.length > 1 && Math.random() < 0.35 && this.player) {
-                    const px = this.player.gridX, py = this.player.gridY;
-                    candidates.sort((a, b) => {
-                        const da = this.DIRS[a], db = this.DIRS[b];
-                        const distA = Math.hypot((g.gridX + da.dx) - px, (g.gridY + da.dy) - py);
-                        const distB = Math.hypot((g.gridX + db.dx) - px, (g.gridY + db.dy) - py);
-                        return this.powerTimer > 0 ? (distB - distA) : (distA - distB);
-                    });
-                    chosen = candidates[0];
-                }
-
-                g.dir = chosen;
-                const delta = this.DIRS[chosen];
-                g.targetX = this.wrapX(g.gridX + delta.dx);
-                g.targetY = g.gridY + delta.dy;
-            }
-
-            getRenderCoords(entity) {
-                let startX = entity.gridX;
-                let endX = entity.targetX;
-                if (startX === this.COLS - 1 && endX === 0) endX = this.COLS;
-                else if (startX === 0 && endX === this.COLS - 1) endX = -1;
-
-                const rx = (startX + (endX - startX) * entity.progress + 0.5) * this.TILE + this.offsetX;
-                const ry = (entity.gridY + (entity.targetY - entity.gridY) * entity.progress + 0.5) * this.TILE + this.offsetY;
-                return { x: rx, y: ry };
             }
 
             update() {
-                // 1. P1 Input
-                let p1Input = null;
-                if (input.keys['arrowup']    || (this.numPlayers === 1 && input.keys['w'])) p1Input = 'UP';
-                if (input.keys['arrowdown']  || (this.numPlayers === 1 && input.keys['s'])) p1Input = 'DOWN';
-                if (input.keys['arrowleft']  || (this.numPlayers === 1 && input.keys['a'])) p1Input = 'LEFT';
-                if (input.keys['arrowright'] || (this.numPlayers === 1 && input.keys['d'])) p1Input = 'RIGHT';
-
-                if (p1Input) {
-                    this.player.nextDir = p1Input;
-                    if (this.player.dir && this.DIRS[this.player.dir].opp === p1Input && this.player.progress > 0) {
-                        const tx = this.player.gridX, ty = this.player.gridY;
-                        this.player.gridX = this.player.targetX;
-                        this.player.gridY = this.player.targetY;
-                        this.player.targetX = tx;
-                        this.player.targetY = ty;
-                        this.player.progress = 1.0 - this.player.progress;
-                        this.player.dir = p1Input;
-                    }
-                }
-
-                // 2. P2 Chief Grinch Input (WASD)
-                if (this.numPlayers === 2) {
-                    const p2G = this.ghosts[0];
-                    let p2Input = null;
-                    if (input.keys['w']) p2Input = 'UP';
-                    if (input.keys['s']) p2Input = 'DOWN';
-                    if (input.keys['a']) p2Input = 'LEFT';
-                    if (input.keys['d']) p2Input = 'RIGHT';
-                    if (p2Input) {
-                        p2G.nextDir = p2Input;
-                        if (p2G.dir && this.DIRS[p2G.dir].opp === p2Input && p2G.progress > 0) {
-                            const tx = p2G.gridX, ty = p2G.gridY;
-                            p2G.gridX = p2G.targetX;
-                            p2G.gridY = p2G.targetY;
-                            p2G.targetX = tx;
-                            p2G.targetY = ty;
-                            p2G.progress = 1.0 - p2G.progress;
-                            p2G.dir = p2Input;
-                        }
-                    }
-                }
-
+                this.mouthTick += 0.22;
                 if (this.powerTimer > 0) this.powerTimer--;
 
-                // 3. Player Tile-Center Interpolation
-                const p = this.player;
-                const currentSpeed = p.baseSpeed * (this.powerTimer > 0 ? 1.22 : 1.0);
+                // Player 1 Input (Arrows, or WASD in 1P mode)
+                if (input.keys['arrowup'] || (this.numPlayers === 1 && input.keys['w'])) this.pac.nextDir = { x: 0, y: -1 };
+                else if (input.keys['arrowdown'] || (this.numPlayers === 1 && input.keys['s'])) this.pac.nextDir = { x: 0, y: 1 };
+                else if (input.keys['arrowleft'] || (this.numPlayers === 1 && input.keys['a'])) this.pac.nextDir = { x: -1, y: 0 };
+                else if (input.keys['arrowright'] || (this.numPlayers === 1 && input.keys['d'])) this.pac.nextDir = { x: 1, y: 0 };
 
-                if (p.targetX === p.gridX && p.targetY === p.gridY) {
-                    if (p.nextDir && this.canStep(p.gridX, p.gridY, p.nextDir, false)) p.dir = p.nextDir;
-                    if (p.dir && this.canStep(p.gridX, p.gridY, p.dir, false)) {
-                        const d = this.DIRS[p.dir];
-                        p.targetX = this.wrapX(p.gridX + d.dx);
-                        p.targetY = p.gridY + d.dy;
-                        p.progress = 0;
-                    }
+                // Allow immediate 180-degree reversal mid-corridor
+                if (this.pac.dir && this.pac.nextDir &&
+                    this.pac.dir.x === -this.pac.nextDir.x && this.pac.dir.y === -this.pac.nextDir.y &&
+                    (this.pac.gx !== this.pac.tx || this.pac.gy !== this.pac.ty)) {
+                    const tmpX = this.pac.gx; const tmpY = this.pac.gy;
+                    this.pac.gx = this.pac.tx; this.pac.gy = this.pac.ty;
+                    this.pac.tx = tmpX; this.pac.ty = tmpY;
+                    this.pac.prog = 1 - this.pac.prog;
+                    this.pac.dir = this.pac.nextDir;
+                    this.pac.facing = this.pac.dir;
                 }
 
-                if (p.targetX !== p.gridX || p.targetY !== p.gridY) {
-                    p.progress += currentSpeed;
-                    p.mouthPhase += 0.28;
-                    if (Math.floor(p.mouthPhase) !== Math.floor(p.mouthPhase - 0.28)) {
-                        sound.chomp(Math.floor(p.mouthPhase) % 2 === 0);
-                    }
-                    if (p.progress >= 1.0) {
-                        p.gridX = p.targetX;
-                        p.gridY = p.targetY;
-                        p.progress = 0;
-
-                        const cell = this.map[p.gridY][p.gridX];
-                        const coords = this.getRenderCoords(p);
-                        if (cell === 2) {
-                            this.map[p.gridY][p.gridX] = 0;
-                            this.score1 += 10;
-                            this.pelletsRemaining--;
-                            this.spawnParticles(coords.x, coords.y, '#facc15', 4);
-                        } else if (cell === 3) {
-                            this.map[p.gridY][p.gridX] = 0;
-                            this.score1 += 50;
-                            this.pelletsRemaining--;
-                            this.powerTimer = this.maxPowerTime;
-                            sound.powerup();
-                            this.spawnParticles(coords.x, coords.y, '#84cc16', 16);
-                            this.floatTexts.push({ x: coords.x, y: coords.y, text: 'ROASTING MODE!', color: '#bef264', life: 45 });
-                        }
-
-                        if (p.nextDir && this.canStep(p.gridX, p.gridY, p.nextDir, false)) p.dir = p.nextDir;
-                        if (p.dir && this.canStep(p.gridX, p.gridY, p.dir, false)) {
-                            const d = this.DIRS[p.dir];
-                            p.targetX = this.wrapX(p.gridX + d.dx);
-                            p.targetY = p.gridY + d.dy;
-                        } else {
-                            p.targetX = p.gridX;
-                            p.targetY = p.gridY;
-                        }
-                    }
+                // Player 2 Chief Grinch Input (WASD in 2P mode)
+                if (this.numPlayers === 2) {
+                    const g0 = this.ghosts[0];
+                    if (input.keys['w']) g0.nextDir = { x: 0, y: -1 };
+                    else if (input.keys['s']) g0.nextDir = { x: 0, y: 1 };
+                    else if (input.keys['a']) g0.nextDir = { x: -1, y: 0 };
+                    else if (input.keys['d']) g0.nextDir = { x: 1, y: 0 };
                 }
 
-                // 4. Grinch Minions Tile-Center Interpolation
-                const pCoords = this.getRenderCoords(p);
+                this.stepNodeEntity(this.pac, true);
+                this.ghosts.forEach(g => this.stepNodeEntity(g, false));
+
+                // Check Pac vs Ghosts Collision
+                const pPos = this.getCoords(this.pac);
                 this.ghosts.forEach(g => {
-                    const gSpeed = g.baseSpeed * (this.powerTimer > 0 ? 0.62 : 1.0);
-                    if (g.targetX === g.gridX && g.targetY === g.gridY) {
-                        this.assignNextGrinchTile(g);
-                    }
-                    if (g.targetX !== g.gridX || g.targetY !== g.gridY) {
-                        g.progress += gSpeed;
-                        if (g.progress >= 1.0) {
-                            g.gridX = g.targetX;
-                            g.gridY = g.targetY;
-                            g.progress = 0;
-                            this.assignNextGrinchTile(g);
-                        }
-                    }
-
-                    const gCoords = this.getRenderCoords(g);
-                    if (Math.hypot(pCoords.x - gCoords.x, pCoords.y - gCoords.y) < this.TILE * 0.72) {
+                    const gPos = this.getCoords(g);
+                    if (Math.hypot(pPos.x - gPos.x, pPos.y - gPos.y) < 20) {
                         if (this.powerTimer > 0) {
                             sound.stomp();
                             this.score1 += 250;
-                            this.spawnParticles(gCoords.x, gCoords.y, '#84cc16', 18);
-                            this.floatTexts.push({ x: gCoords.x, y: gCoords.y, text: 'UNBLOCKED +250', color: '#fde047', life: 40 });
-                            g.gridX = 13; g.gridY = 10;
-                            g.targetX = 13; g.targetY = 8;
-                            g.progress = 0;
+                            this.floatTexts.push({ x: gPos.x, y: gPos.y, text: '+250 ROASTED!', color: '#84cc16', life: 40 });
+                            g.gx = 10; g.gy = 8; g.tx = 10; g.ty = 8; g.prog = 0;
                         } else {
                             sound.grinchLaugh();
-                            this.lives--;
                             if (this.numPlayers === 2) this.score2 += 300;
-                            this.spawnParticles(pCoords.x, pCoords.y, '#ef4444', 24);
+                            this.lives--;
                             if (this.lives <= 0) {
-                                app.triggerEndScreen(false, 'DAILY STAND-UP BLOCKED!', 'The Grinch Impediments derailed Chestnuts Daily!', this.score1, this.score2);
+                                app.triggerEndScreen(false, 'STAND-UP BLOCKED!', 'The Grinch Impediments derailed Chestnuts Daily!', this.score1, this.score2);
                             } else {
-                                this.resetEntities();
+                                this.resetPositions();
                             }
                         }
                     }
                 });
 
-                if (this.pelletsRemaining <= 0) {
-                    this.level++;
+                if (this.pelletsLeft <= 0) {
                     sound.fanfare();
-                    this.floatTexts.push({ x: this.canvas.width / 2, y: this.canvas.height / 2, text: `DAILY SPRINT ${this.level}!`, color: '#bef264', life: 60 });
-                    this.loadLevel();
+                    if (this.stage < 3) {
+                        this.loadStage(this.stage + 1);
+                    } else {
+                        app.triggerEndScreen(true, 'DAILY STAND-UP CLEARED!', 'You cleared all 3 Chestnuts Daily Mazes and roasted the Grinch Impediments!', this.score1, this.score2);
+                    }
                 }
 
-                this.particles.forEach(pt => { pt.x += pt.vx; pt.y += pt.vy; pt.life--; });
-                this.particles = this.particles.filter(pt => pt.life > 0);
-                this.floatTexts.forEach(ft => { ft.y -= 0.6; ft.life--; });
+                this.floatTexts.forEach(ft => { ft.y -= 0.5; ft.life--; });
                 this.floatTexts = this.floatTexts.filter(ft => ft.life > 0);
 
-                const statusMsg = this.powerTimer > 0
-                    ? `IMPEDIMENT ROAST MODE! (${Math.ceil(this.powerTimer / 60)}s)`
-                    : (this.player.dir ? 'CHESTNUTS DAILY IN PROGRESS' : 'PRESS ARROWS / WASD TO START DAILY');
-                app.updateHUD(this.score1, this.score2, `DAILY ${this.level}`, this.lives, statusMsg);
-            }
-
-            spawnParticles(x, y, color, count) {
-                for (let i = 0; i < count; i++) {
-                    const a = Math.random() * Math.PI * 2;
-                    const s = Math.random() * 2.5 + 0.8;
-                    this.particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, color, life: 25 });
-                }
+                const status = this.powerTimer > 0
+                    ? `CATCHING MODE: ${Math.ceil(this.powerTimer / 60)}S`
+                    : `STORY POINTS LEFT: ${this.pelletsLeft}`;
+                app.updateHUD(this.score1, this.score2, `DAILY ${this.stage}/3`, this.lives, status);
             }
 
             draw() {
@@ -1345,102 +1312,85 @@
 
                 for (let r = 0; r < this.ROWS; r++) {
                     for (let c = 0; c < this.COLS; c++) {
-                        const cell = this.map[r][c];
-                        const x = this.offsetX + c * this.TILE;
-                        const y = this.offsetY + r * this.TILE;
-
+                        const x = this.OFFSET_X + c * this.TILE;
+                        const y = this.OFFSET_Y + r * this.TILE;
+                        const cell = this.grid[r][c];
                         if (cell === 1) {
                             ctx.fillStyle = '#064e3b';
-                            ctx.fillRect(x + 1, y + 1, this.TILE - 2, this.TILE - 2);
-                            ctx.strokeStyle = (r + c) % 2 === 0 ? '#dc2626' : '#22c55e';
+                            ctx.fillRect(x + 2, y + 2, this.TILE - 4, this.TILE - 4);
+                            ctx.strokeStyle = '#84cc16';
                             ctx.lineWidth = 1.5;
-                            ctx.strokeRect(x + 2, y + 2, this.TILE - 4, this.TILE - 4);
+                            ctx.strokeRect(x + 3, y + 3, this.TILE - 6, this.TILE - 6);
                         } else if (cell === 2) {
-                            ctx.fillStyle = (r * c) % 3 === 0 ? '#ef4444' : '#fbbf24';
+                            ctx.fillStyle = '#fde047';
                             ctx.beginPath();
-                            ctx.arc(x + this.TILE / 2, y + this.TILE / 2, 3.2, 0, Math.PI * 2);
+                            ctx.arc(x + this.TILE / 2, y + this.TILE / 2, 4, 0, Math.PI * 2);
                             ctx.fill();
                         } else if (cell === 3) {
-                            const pulse = 5.5 + Math.sin(Date.now() * 0.01) * 1.8;
-                            ctx.save();
-                            ctx.fillStyle = '#fde047';
-                            ctx.shadowColor = '#84cc16';
-                            ctx.shadowBlur = 12;
+                            ctx.fillStyle = Math.floor(Date.now() / 180) % 2 === 0 ? '#f97316' : '#fde047';
                             ctx.beginPath();
-                            ctx.arc(x + this.TILE / 2, y + this.TILE / 2, pulse, 0, Math.PI * 2);
+                            ctx.arc(x + this.TILE / 2, y + this.TILE / 2, 8.5, 0, Math.PI * 2);
                             ctx.fill();
-                            ctx.restore();
-                        } else if (cell === 4) {
-                            ctx.fillStyle = '#84cc16';
-                            ctx.fillRect(x, y + 8, this.TILE, 4);
                         }
                     }
                 }
 
-                // Draw Player 1 (Chest-Pac with Flashing Catching Mode Battery Bar)
-                const pPos = this.getRenderCoords(this.player);
+                // Draw Chest-Pac
+                const pPos = this.getCoords(this.pac);
                 ctx.save();
                 ctx.translate(pPos.x, pPos.y);
-
-                const isPower = this.powerTimer > 0;
-                const blinkFast = isPower && (Math.floor(Date.now() / 85) % 2 === 0);
-
-                if (isPower) {
-                    ctx.strokeStyle = blinkFast ? '#84cc16' : '#fde047';
-                    ctx.lineWidth = 2.5;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.TILE * 0.72 + Math.sin(Date.now() * 0.02) * 2, 0, Math.PI * 2);
-                    ctx.stroke();
-
-                    // Overhead Battery Charge Meter
-                    const ratio = this.powerTimer / this.maxPowerTime;
+                if (this.powerTimer > 0) {
+                    // Flashing Catching Battery Bar above Chest-Pac
                     ctx.fillStyle = '#0f172a';
-                    ctx.fillRect(-12, -17, 24, 5);
-                    ctx.fillStyle = ratio > 0.3 ? '#84cc16' : '#ef4444';
-                    ctx.fillRect(-11, -16, 22 * ratio, 3);
+                    ctx.fillRect(-16, -24, 32, 5);
+                    ctx.fillStyle = '#84cc16';
+                    ctx.fillRect(-15, -23, 30 * (this.powerTimer / this.maxPowerTime), 3);
                 }
-
-                let angle = 0;
-                if (this.player.dir === 'DOWN') angle = Math.PI / 2;
-                if (this.player.dir === 'LEFT') angle = Math.PI;
-                if (this.player.dir === 'UP') angle = -Math.PI / 2;
+                const angle = Math.atan2(this.pac.facing.y, this.pac.facing.x);
                 ctx.rotate(angle);
-
-                const mouthOpen = this.player.dir ? (Math.abs(Math.sin(this.player.mouthPhase)) * 0.38) : 0.12;
-                ctx.fillStyle = isPower ? (blinkFast ? '#fde047' : '#84cc16') : '#d97706';
-                ctx.shadowColor = ctx.fillStyle;
-                ctx.shadowBlur = isPower ? 14 : 6;
-
+                const mouth = this.pac.dir ? Math.abs(Math.sin(this.mouthTick)) * 0.35 : 0.08;
+                ctx.fillStyle = this.powerTimer > 0 && Math.floor(Date.now() / 100) % 2 === 0 ? '#fde047' : '#d97706';
+                ctx.strokeStyle = '#fef08a';
+                ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(0, 0, this.TILE * 0.46, mouthOpen * Math.PI, (2 - mouthOpen) * Math.PI);
+                ctx.arc(0, 0, 13, mouth * Math.PI, (2 - mouth) * Math.PI);
                 ctx.lineTo(0, 0);
                 ctx.closePath();
                 ctx.fill();
+                ctx.stroke();
 
-                // Santa Hat Cap on Chest-Pac
+                // Chest-Pac Eye & Festive Santa Hat
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.arc(2, -6, 2.3, 0, Math.PI * 2);
+                ctx.fill();
                 ctx.fillStyle = '#dc2626';
                 ctx.beginPath();
-                ctx.arc(-2, 0, this.TILE * 0.44, Math.PI * 0.65, Math.PI * 1.35);
+                ctx.moveTo(-9, -9);
+                ctx.lineTo(7, -9);
+                ctx.lineTo(-4, -19);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = '#f8fafc';
+                ctx.beginPath();
+                ctx.arc(-4, -19, 2.8, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.restore();
 
-                // Draw Grinch Minions
-                this.ghosts.forEach(g => {
-                    const gPos = this.getRenderCoords(g);
-                    const scared = this.powerTimer > 0;
-                    drawGrinchMinion(ctx, gPos.x, gPos.y, this.TILE * 0.44, g.color, scared, 0);
+                // Draw Ghosts (4 Distinct Grinch Impediment Personalities)
+                const ghostVariants = ['ghost', 'spikybot', 'climber', 'commando'];
+                this.ghosts.forEach((g, idx) => {
+                    const gPos = this.getCoords(g);
+                    const gFacing = g.dir ? g.dir.x : -1;
+                    drawGrinchMinion(ctx, gPos.x, gPos.y, 13, g.color, this.powerTimer > 0, 0, ghostVariants[idx % 4], gFacing);
                     if (g.isP2) {
                         ctx.fillStyle = '#fde047';
                         ctx.font = '8px "Press Start 2P"';
                         ctx.textAlign = 'center';
-                        ctx.fillText('P2 GRINCH', gPos.x, gPos.y - 14);
+                        ctx.fillText('P2', gPos.x, gPos.y - 18);
                     }
                 });
 
-                this.particles.forEach(pt => {
-                    ctx.fillStyle = pt.color;
-                    ctx.fillRect(pt.x, pt.y, 3, 3);
-                });
                 this.floatTexts.forEach(ft => {
                     ctx.fillStyle = ft.color;
                     ctx.font = '10px "Press Start 2P"';
@@ -1451,47 +1401,89 @@
         }
 
         /* ============================================================================
-         * GAME 2: SUPER CHESTNUT: MOUNT CRUMPIT RESCUE
-         * (3 Worlds, Holiday Warp Pipes, Mecha-Grinch Dragon Boss & Princess Rescue)
+         * GAME 2: SUPER CHESTNUT: CHESTNUTS RETROSPECTIVE
+         * (12 Total Levels = 4 Seasons x 3 Stages, Blazing Fireballs, Organic Bezier
+         *  Grinch-Dragon Wyvern Boss, Floor-Skimming Siege Rockets & Wing Shield!)
          * ============================================================================ */
         class SuperChestnutCrumpitGame {
             constructor(canvas, ctx) {
                 this.canvas = canvas;
                 this.ctx = ctx;
-                this.GRAVITY = 0.52;
+                this.GRAVITY = 0.50;
+
+                this.SEASONS = {
+                    1: {
+                        name: 'WINTER SPRINT',
+                        sub: ['WHOVILLE SNOWY ROOFTOPS', 'CANDY PIPE CAVERNS', 'FROST CRUMPIT KEEP'],
+                        sky: [['#022c22', '#0f172a'], ['#090d16', '#064e3b'], ['#1a050d', '#064e3b']],
+                        groundTop: '#f8fafc', groundFill: '#451a03', accent: '#38bdf8', weather: 'snow'
+                    },
+                    2: {
+                        name: 'SPRING PI PLANNING',
+                        sub: ['BLOSSOM CHESTNUT MEADOWS', 'EMERALD ROOT PIPES', 'POLLEN WYVERN FORTRESS'],
+                        sky: [['#064e3b', '#065f46'], ['#022c22', '#14532d'], ['#1e1b4b', '#064e3b']],
+                        groundTop: '#4ade80', groundFill: '#3f2e18', accent: '#f472b6', weather: 'petals'
+                    },
+                    3: {
+                        name: 'SUMMER CRUNCH',
+                        sub: ['SCORCHING DESERT DUNES', 'MOLTEN PIPE FOUNDRY', 'MAGMA CITADEL KEEP'],
+                        sky: [['#451a03', '#7c2d12'], ['#1c1917', '#431407'], ['#2e0505', '#451a03']],
+                        groundTop: '#fbbf24', groundFill: '#78350f', accent: '#f97316', weather: 'embers'
+                    },
+                    4: {
+                        name: 'AUTUMN RELEASE TRAIN',
+                        sub: ['GOLDEN LEAF CANOPY', 'HARVEST WARP TUNNELS', 'GRAND DRAGON SANCTUM'],
+                        sky: [['#3b0764', '#7c2d12'], ['#1e1b4b', '#451a03'], ['#090514', '#3b0764']],
+                        groundTop: '#f97316', groundFill: '#451a03', accent: '#eab308', weather: 'leaves'
+                    }
+                };
             }
 
             init(numPlayers) {
                 this.numPlayers = numPlayers;
-                this.world = 1;
-                this.lives = 4;
+                this.season = 1;
+                this.stage = 1;
+                this.lives = 5;
                 this.score1 = 0;
                 this.score2 = 0;
                 this.cameraX = 0;
                 this.particles = [];
                 this.projectiles = [];
+                this.rockets = [];
                 this.floatTexts = [];
-                this.loadWorld(1);
+                this.weatherParticles = Array.from({ length: 45 }, () => ({
+                    x: Math.random() * 800,
+                    y: Math.random() * 520,
+                    s: Math.random() * 3 + 1.5,
+                    vx: (Math.random() - 0.5) * 1.2,
+                    vy: Math.random() * 1.2 + 0.6
+                }));
+                this.loadSeasonStage(1, 1);
             }
 
             createPlayer(id, x, y) {
                 return {
                     id, x, y, vx: 0, vy: 0,
-                    w: 28, h: 28,
+                    w: 28, h: 32,
                     facing: 1, grounded: false,
-                    powerState: 1, invuln: 0
+                    powerState: 2, // Start with Blazing Roast Fireball capability!
+                    invuln: 0, fireCooldown: 0
                 };
             }
 
-            loadWorld(w) {
-                this.world = w;
+            loadSeasonStage(season, stage) {
+                this.season = Math.max(1, Math.min(4, season));
+                this.stage = Math.max(1, Math.min(3, stage));
+                this.world = (this.season - 1) * 3 + this.stage; // 1..12
                 this.cameraX = 0;
                 this.projectiles = [];
+                this.rockets = [];
                 this.particles = [];
                 this.floatTexts = [];
+                this.checkpointX = 80;
 
-                const p1P = this.players && this.players[0] ? this.players[0].powerState : 1;
-                const p2P = this.players && this.players[1] ? this.players[1].powerState : 1;
+                const p1P = this.players && this.players[0] ? Math.max(2, this.players[0].powerState) : 2;
+                const p2P = this.players && this.players[1] ? Math.max(2, this.players[1].powerState) : 2;
 
                 this.players = [this.createPlayer(1, 80, 360)];
                 this.players[0].powerState = p1P;
@@ -1502,155 +1494,255 @@
                 }
 
                 this.platforms = [];
+                this.bouncyMushrooms = [];
                 this.qBlocks = [];
                 this.pipes = [];
                 this.coins = [];
                 this.powerups = [];
                 this.enemies = [];
                 this.slimeVats = [];
+                this.checkpoints = [];
                 this.goalFlag = null;
                 this.boss = null;
                 this.axeSwitch = null;
                 this.princess = null;
 
-                if (w === 1) this.buildWorld1();
-                else if (w === 2) this.buildWorld2();
-                else if (w === 3) this.buildWorld3();
+                const sCfg = this.SEASONS[this.season];
+                this.skyColor = sCfg.sky[this.stage - 1];
+
+                if (this.stage === 1) this.buildStage1(this.season);
+                else if (this.stage === 2) this.buildStage2(this.season);
+                else this.buildStage3BossKeep(this.season);
+
+                if (app && app.syncRetroUI) app.syncRetroUI(this.season, this.stage);
             }
 
-            buildWorld1() {
-                this.levelWidth = 2900;
-                this.skyColor = ['#022c22', '#0f172a'];
+            buildStage1(season) {
+                this.levelWidth = 3400;
+                const spdMult = 1 + (season - 1) * 0.18;
 
-                this.platforms.push({ x: 0, y: 450, w: 920, h: 70, type: 'snow' });
-                this.platforms.push({ x: 1020, y: 450, w: 880, h: 70, type: 'snow' });
-                this.platforms.push({ x: 2000, y: 450, w: 900, h: 70, type: 'snow' });
+                // Expansive Seasonal Overworld Grounds
+                this.platforms.push({ x: 0, y: 450, w: 980, h: 70, type: 'seasonal' });
+                this.platforms.push({ x: 1090, y: 450, w: 1020, h: 70, type: 'seasonal' });
+                this.platforms.push({ x: 2220, y: 450, w: 1180, h: 70, type: 'seasonal' });
 
-                this.platforms.push({ x: 260, y: 330, w: 130, h: 26, type: 'candy' });
-                this.qBlocks.push({ x: 305, y: 225, w: 34, h: 34, hit: false, content: 'roast' });
-                this.qBlocks.push({ x: 640, y: 320, w: 34, h: 34, hit: false, content: 'coin' });
+                // Tiered Platforms & Bouncy Seasonal Pads
+                this.platforms.push({ x: 240, y: 335, w: 150, h: 24, type: 'candy' });
+                this.qBlocks.push({ x: 295, y: 230, w: 34, h: 34, hit: false, content: 'roast' });
+                this.qBlocks.push({ x: 620, y: 325, w: 34, h: 34, hit: false, content: 'coin' });
 
-                this.platforms.push({ x: 1180, y: 340, w: 180, h: 26, type: 'candy' });
-                this.platforms.push({ x: 1460, y: 255, w: 160, h: 26, type: 'candy' });
-                this.qBlocks.push({ x: 1520, y: 155, w: 34, h: 34, hit: false, content: 'roast' });
+                // Bouncy Spring/Seasonal Mushroom Pads
+                this.bouncyMushrooms.push({ x: 995, y: 415, w: 78, h: 22 });
+                this.bouncyMushrooms.push({ x: 2125, y: 415, w: 78, h: 22 });
 
-                // Holiday Warp Pipe Shortcut
-                this.pipes.push({ x: 470, y: 370, w: 56, h: 80, warpToX: 1620, warpToY: 340, label: 'WARP PIPE' });
-                this.pipes.push({ x: 1620, y: 370, w: 56, h: 80, warpToX: null });
+                this.platforms.push({ x: 1200, y: 330, w: 200, h: 24, type: 'candy' });
+                this.platforms.push({ x: 1480, y: 245, w: 190, h: 24, type: 'gold' });
+                this.qBlocks.push({ x: 1555, y: 145, w: 34, h: 34, hit: false, content: 'roast' });
 
-                for (let i = 0; i < 12; i++) {
-                    this.coins.push({ x: 740 + i * 36, y: 265 - Math.sin(i * 0.5) * 40, collected: false });
+                this.platforms.push({ x: 2420, y: 335, w: 220, h: 24, type: 'candy' });
+                this.platforms.push({ x: 2700, y: 250, w: 200, h: 24, type: 'gold' });
+
+                // Holiday Shortcut Warp Pipe
+                this.pipes.push({ x: 460, y: 370, w: 56, h: 80, warpToX: 1740, warpToY: 340, label: 'WARP PIPE' });
+                this.pipes.push({ x: 1740, y: 370, w: 56, h: 80, warpToX: null });
+
+                this.checkpoints.push({ x: 1660, y: 380, reached: false });
+
+                for (let i = 0; i < 18; i++) {
+                    this.coins.push({ x: 700 + i * 110, y: 275 - Math.sin(i * 0.6) * 45, collected: false });
                 }
 
-                this.enemies.push({ type: 'grinchling', x: 560, y: 422, vx: -1.4, w: 28, h: 28, minX: 400, maxX: 880 });
-                this.enemies.push({ type: 'grinchling', x: 1300, y: 422, vx: 1.5, w: 28, h: 28, minX: 1050, maxX: 1580 });
-                this.enemies.push({ type: 'spikybot',   x: 1780, y: 422, vx: -1.5, w: 28, h: 28, minX: 1690, maxX: 1880 });
-                this.enemies.push({ type: 'grinchling', x: 2300, y: 422, vx: -1.6, w: 28, h: 28, minX: 2050, maxX: 2600 });
+                this.enemies.push({ type: 'grinchling', x: 580, y: 422, vx: -1.5 * spdMult, w: 28, h: 28, minX: 380, maxX: 920 });
+                this.enemies.push({ type: 'grinchling', x: 1320, y: 422, vx: 1.6 * spdMult, w: 28, h: 28, minX: 1120, maxX: 1680 });
+                this.enemies.push({ type: 'spikybot',   x: 1920, y: 422, vx: -1.7 * spdMult, w: 28, h: 28, minX: 1810, maxX: 2080 });
+                this.enemies.push({ type: 'grinchling', x: 2540, y: 422, vx: -1.8 * spdMult, w: 28, h: 28, minX: 2260, maxX: 2950 });
+                this.enemies.push({ type: 'flyer',      x: 1520, y: 190, baseY: 190, vx: -1.6 * spdMult, w: 30, h: 30, minX: 1200, maxX: 1850 });
 
-                this.goalFlag = { x: 2720, y: 170, h: 280 };
+                this.goalFlag = { x: 3200, y: 170, h: 280 };
             }
 
-            buildWorld2() {
-                this.levelWidth = 3000;
-                this.skyColor = ['#090d16', '#064e3b'];
+            buildStage2(season) {
+                this.levelWidth = 3500;
+                const spdMult = 1.1 + (season - 1) * 0.2;
 
-                this.platforms.push({ x: 0, y: 450, w: 760, h: 70, type: 'ice' });
-                this.platforms.push({ x: 900, y: 450, w: 840, h: 70, type: 'ice' });
-                this.platforms.push({ x: 1880, y: 450, w: 1120, h: 70, type: 'ice' });
+                this.platforms.push({ x: 0, y: 450, w: 820, h: 70, type: 'seasonal' });
+                this.platforms.push({ x: 960, y: 450, w: 940, h: 70, type: 'seasonal' });
+                this.platforms.push({ x: 2040, y: 450, w: 1460, h: 70, type: 'seasonal' });
 
-                this.platforms.push({ x: 280, y: 330, w: 160, h: 26, type: 'candy' });
-                this.qBlocks.push({ x: 340, y: 220, w: 34, h: 34, hit: false, content: 'roast' });
+                // Moving Vertical & Horizontal Platforms
+                this.platforms.push({ x: 845, y: 360, w: 95, h: 22, type: 'gold', vx: 1.4, minX: 825, maxX: 945 });
+                this.platforms.push({ x: 1920, y: 350, w: 95, h: 22, type: 'gold', vx: -1.5, minX: 1905, maxX: 2025 });
 
-                this.pipes.push({ x: 560, y: 365, w: 58, h: 85, warpToX: 2080, warpToY: 150, label: 'SECRET VAULT' });
-                this.platforms.push({ x: 2040, y: 215, w: 460, h: 24, type: 'gold' });
-                for (let i = 0; i < 10; i++) {
-                    this.coins.push({ x: 2070 + i * 40, y: 170, collected: false });
+                this.platforms.push({ x: 280, y: 330, w: 180, h: 26, type: 'candy' });
+                this.qBlocks.push({ x: 350, y: 220, w: 34, h: 34, hit: false, content: 'roast' });
+                this.qBlocks.push({ x: 1280, y: 220, w: 34, h: 34, hit: false, content: 'roast' });
+
+                this.pipes.push({ x: 580, y: 365, w: 58, h: 85, warpToX: 2180, warpToY: 145, label: 'SECRET VAULT' });
+                this.platforms.push({ x: 2140, y: 215, w: 540, h: 24, type: 'gold' });
+                for (let i = 0; i < 14; i++) {
+                    this.coins.push({ x: 2170 + i * 36, y: 170, collected: false });
                 }
 
-                this.platforms.push({ x: 790, y: 355, w: 85, h: 22, type: 'ice' });
-                this.platforms.push({ x: 1770, y: 350, w: 85, h: 22, type: 'ice' });
+                this.checkpoints.push({ x: 1750, y: 380, reached: false });
+                this.bouncyMushrooms.push({ x: 1480, y: 428, w: 76, h: 22 });
 
-                this.enemies.push({ type: 'grinchling', x: 440, y: 422, vx: 1.5, w: 28, h: 28, minX: 180, maxX: 530 });
-                this.enemies.push({ type: 'spikybot',   x: 1250, y: 422, vx: -1.7, w: 28, h: 28, minX: 930, maxX: 1650 });
-                this.enemies.push({ type: 'grinchling', x: 2200, y: 422, vx: 1.8, w: 28, h: 28, minX: 1920, maxX: 2600 });
+                this.enemies.push({ type: 'grinchling', x: 440, y: 422, vx: 1.6 * spdMult, w: 28, h: 28, minX: 180, maxX: 550 });
+                this.enemies.push({ type: 'spikybot',   x: 1320, y: 422, vx: -1.8 * spdMult, w: 28, h: 28, minX: 990, maxX: 1720 });
+                this.enemies.push({ type: 'flyer',      x: 1650, y: 210, baseY: 210, vx: 1.8 * spdMult, w: 30, h: 30, minX: 1300, maxX: 1950 });
+                this.enemies.push({ type: 'grinchling', x: 2450, y: 422, vx: 1.9 * spdMult, w: 28, h: 28, minX: 2080, maxX: 2950 });
+                this.enemies.push({ type: 'spikybot',   x: 2880, y: 422, vx: -2.0 * spdMult, w: 28, h: 28, minX: 2650, maxX: 3150 });
 
-                this.goalFlag = { x: 2820, y: 170, h: 280 };
+                this.goalFlag = { x: 3320, y: 170, h: 280 };
             }
 
-            buildWorld3() {
-                this.levelWidth = 3150;
-                this.skyColor = ['#1a050d', '#064e3b'];
+            buildStage3BossKeep(season) {
+                this.levelWidth = 3600;
+                const spdMult = 1.15 + (season - 1) * 0.22;
 
-                this.platforms.push({ x: 0, y: 450, w: 680, h: 70, type: 'fortress' });
-                this.slimeVats.push({ x: 680, y: 475, w: 180, h: 45 });
-                this.platforms.push({ x: 860, y: 450, w: 720, h: 70, type: 'fortress' });
-                this.slimeVats.push({ x: 1580, y: 475, w: 190, h: 45 });
-                this.platforms.push({ x: 1770, y: 450, w: 430, h: 70, type: 'fortress' });
+                this.platforms.push({ x: 0, y: 450, w: 720, h: 70, type: 'fortress' });
+                this.slimeVats.push({ x: 720, y: 475, w: 180, h: 45 });
+                this.platforms.push({ x: 900, y: 450, w: 760, h: 70, type: 'fortress' });
+                this.slimeVats.push({ x: 1660, y: 475, w: 190, h: 45 });
+                this.platforms.push({ x: 1850, y: 450, w: 470, h: 70, type: 'fortress' });
 
-                // Boss Bridge over Sour Grinch Slime
-                this.bridgePlatform = { x: 2200, y: 430, w: 500, h: 22, type: 'bridge', active: true };
-                this.platforms.push(this.bridgePlatform);
-                this.slimeVats.push({ x: 2200, y: 480, w: 500, h: 40 });
+                this.checkpoints.push({ x: 1920, y: 380, reached: false });
 
-                this.platforms.push({ x: 2700, y: 430, w: 450, h: 90, type: 'fortress' });
+                // Segmented Boss Bridge over Bubbling Grinch Slime/Magma
+                this.bridgeSegments = [];
+                for (let i = 0; i < 16; i++) {
+                    const seg = { x: 2320 + i * 34, y: 430, w: 32, h: 22, type: 'bridge', active: true, fallVy: 0 };
+                    this.bridgeSegments.push(seg);
+                    this.platforms.push(seg);
+                }
+                this.slimeVats.push({ x: 2320, y: 480, w: 544, h: 40 });
 
-                this.qBlocks.push({ x: 320, y: 320, w: 34, h: 34, hit: false, content: 'roast' });
-                this.qBlocks.push({ x: 1120, y: 320, w: 34, h: 34, hit: false, content: 'roast' });
-                this.platforms.push({ x: 720, y: 360, w: 100, h: 22, type: 'fortress' });
-                this.platforms.push({ x: 1620, y: 350, w: 100, h: 22, type: 'fortress' });
-                this.platforms.push({ x: 2320, y: 290, w: 140, h: 20, type: 'fortress' });
+                this.platforms.push({ x: 2864, y: 430, w: 736, h: 90, type: 'fortress' });
 
-                this.enemies.push({ type: 'spikybot',   x: 1150, y: 422, vx: -1.7, w: 28, h: 28, minX: 900, maxX: 1500 });
-                this.enemies.push({ type: 'grinchling', x: 1920, y: 422, vx: 1.6, w: 28, h: 28, minX: 1800, maxX: 2140 });
+                // Tactical Upper Battle Platforms (To dodge floor-skimming rockets & shoot high!)
+                this.platforms.push({ x: 320, y: 330, w: 140, h: 22, type: 'fortress' });
+                this.qBlocks.push({ x: 370, y: 220, w: 34, h: 34, hit: false, content: 'roast' });
+                this.platforms.push({ x: 755, y: 355, w: 110, h: 22, type: 'fortress' });
+                this.qBlocks.push({ x: 1220, y: 320, w: 34, h: 34, hit: false, content: 'roast' });
+                this.platforms.push({ x: 1695, y: 350, w: 120, h: 22, type: 'fortress' });
+                this.qBlocks.push({ x: 2020, y: 315, w: 34, h: 34, hit: false, content: 'roast' });
 
-                // Giant Grinch-Dragon Boss
+                // Boss Arena Tactical Aerial Platforms & Bouncy Pad
+                this.bouncyMushrooms.push({ x: 2235, y: 428, w: 68, h: 22 });
+                this.platforms.push({ x: 2350, y: 305, w: 125, h: 20, type: 'gold' });
+                this.platforms.push({ x: 2540, y: 245, w: 125, h: 20, type: 'gold' });
+
+                this.enemies.push({ type: 'spikybot',   x: 1180, y: 422, vx: -1.8 * spdMult, w: 28, h: 28, minX: 940, maxX: 1580 });
+                this.enemies.push({ type: 'grinchling', x: 2040, y: 422, vx: 1.7 * spdMult, w: 28, h: 28, minX: 1880, maxX: 2260 });
+
+                // ORGANIC WYVERN GRINCH-DRAGON BOSS
+                const maxHp = 12 + season * 4;
                 this.boss = {
-                    x: 2460, y: 340,
-                    vx: -1.7, vy: 0,
-                    w: 74, h: 86,
-                    hp: 8, maxHp: 8,
-                    minX: 2230, maxX: 2600,
-                    fireCooldown: 85,
-                    jumpCooldown: 105,
+                    x: 2630, y: 310,
+                    baseY: 310,
+                    vx: -1.8 * spdMult, vy: 0,
+                    w: 96, h: 110,
+                    hp: maxHp, maxHp: maxHp,
+                    minX: 2380, maxX: 2740,
+                    wingPhase: 0,
+                    jawOpen: 0,
+                    // Anti-camping & dual attack timers
+                    fireCooldown: 95,
+                    rocketCooldown: 70, // Fires low floor-skimming rockets!
+                    rocketLockTimer: 0,
+                    swoopTimer: 160,
+                    swooping: false,
+                    shieldTimer: 0,     // Reflective Wing Shield when hit rapidly on ground
+                    recentHits: 0,
+                    collapseStarted: false,
                     alive: true
                 };
 
-                this.axeSwitch = { x: 2665, y: 380, w: 32, h: 48, triggered: false };
-                this.princess = { x: 2840, y: 382, rescued: false };
+                this.axeSwitch = { x: 2830, y: 376, w: 34, h: 52, triggered: false };
+                this.princess = { x: 3020, y: 382, rescued: false };
+            }
+
+            spawnFireballBurst(x, y, color1 = '#fde047', color2 = '#ef4444', count = 14) {
+                for (let i = 0; i < count; i++) {
+                    const a = Math.random() * Math.PI * 2;
+                    const s = Math.random() * 4.2 + 1.0;
+                    this.particles.push({
+                        x, y,
+                        vx: Math.cos(a) * s,
+                        vy: Math.sin(a) * s - 0.8,
+                        r: Math.random() * 4 + 2,
+                        color: i % 2 === 0 ? color1 : color2,
+                        life: 18 + Math.floor(Math.random() * 12)
+                    });
+                }
             }
 
             update() {
+                // Weather particles
+                this.weatherParticles.forEach(wp => {
+                    wp.x += wp.vx;
+                    wp.y += wp.vy;
+                    if (wp.y > this.canvas.height) { wp.y = -10; wp.x = Math.random() * this.canvas.width; }
+                    if (wp.x < 0) wp.x = this.canvas.width;
+                    if (wp.x > this.canvas.width) wp.x = 0;
+                });
+
+                // Moving platforms
+                this.platforms.forEach(pl => {
+                    if (pl.vx) {
+                        pl.x += pl.vx;
+                        if (pl.x < pl.minX || pl.x > pl.maxX) pl.vx *= -1;
+                    }
+                    if (pl.falling) {
+                        pl.fallVy += 0.45;
+                        pl.y += pl.fallVy;
+                        if (pl.y > 540) pl.active = false;
+                    }
+                });
+
                 this.players.forEach(p => {
                     if (p.invuln > 0) p.invuln--;
-                    p.h = p.powerState >= 2 ? 36 : 28;
+                    if (p.fireCooldown > 0) p.fireCooldown--;
+                    p.h = p.powerState >= 2 ? 34 : 28;
 
                     const isP1 = p.id === 1;
                     const left  = isP1 ? (input.keys['arrowleft']  || (this.numPlayers === 1 && input.keys['a'])) : input.keys['a'];
                     const right = isP1 ? (input.keys['arrowright'] || (this.numPlayers === 1 && input.keys['d'])) : input.keys['d'];
                     const jump  = isP1 ? (input.keys['arrowup'] || input.keys[' '] || (this.numPlayers === 1 && input.keys['w'])) : input.keys['w'];
                     const down  = isP1 ? (input.keys['arrowdown']  || (this.numPlayers === 1 && input.keys['s'])) : input.keys['s'];
-                    const fire  = isP1 ? (input.consumePressed('z') || input.consumePressed('shift')) : (input.consumePressed('f') || input.consumePressed('e'));
+                    const fire  = isP1
+                        ? (input.consumePressed('z') || input.consumePressed('f') || input.consumePressed('shift'))
+                        : (input.consumePressed('j') || input.consumePressed('enter') || input.consumePressed('e'));
 
-                    if (left)  { p.vx = -4.3; p.facing = -1; }
-                    else if (right) { p.vx = 4.3; p.facing = 1; }
+                    if (left)  { p.vx = -4.5; p.facing = -1; }
+                    else if (right) { p.vx = 4.5; p.facing = 1; }
                     else { p.vx *= 0.78; if (Math.abs(p.vx) < 0.1) p.vx = 0; }
 
                     if (jump && p.grounded) {
-                        p.vy = -11.6;
+                        p.vy = -11.8;
                         p.grounded = false;
                         sound.jump();
                     }
 
-                    if (fire) {
+                    // BLAZING ROAST FIREBALL SHOOTING (Bouncing & Comet Trail!)
+                    if (fire && p.fireCooldown <= 0) {
+                        p.fireCooldown = 14;
                         sound.shoot();
+                        const fx = p.x + (p.facing > 0 ? p.w + 4 : -8);
+                        const fy = p.y + p.h * 0.42;
                         this.projectiles.push({
-                            x: p.x + (p.facing > 0 ? p.w : -8),
-                            y: p.y + p.h * 0.4,
-                            vx: p.facing * 8.5,
-                            vy: -1.2,
+                            x: fx, y: fy,
+                            vx: p.facing * 9.2,
+                            vy: 1.8, // Slight downward arc so it bounces along platforms like classic Super Mario fireballs!
+                            bounces: 0,
+                            maxBounces: 4,
+                            r: 8,
+                            angle: 0,
+                            trail: [],
                             fromPlayer: p.id,
-                            life: 85
+                            enemyFire: false,
+                            life: 105
                         });
+                        this.spawnFireballBurst(fx, fy, '#fde047', '#f97316', 6);
                     }
 
                     p.vy += this.GRAVITY;
@@ -1681,6 +1773,7 @@
                                 p.y = s.y - p.h;
                                 p.vy = 0;
                                 p.grounded = true;
+                                if (s.vx) p.x += s.vx;
                                 if (down && s.warpToX) {
                                     sound.pipe();
                                     this.players.forEach(pl => {
@@ -1699,10 +1792,31 @@
                                     if (s.content === 'coin') {
                                         this.addScore(p.id, 100);
                                     } else {
-                                        this.powerups.push({ x: s.x + 4, y: s.y - 26, w: 24, h: 24, vx: 1.5, vy: -3 });
+                                        this.powerups.push({ x: s.x + 4, y: s.y - 26, w: 24, h: 24, vx: 1.6, vy: -3.5 });
                                     }
                                 }
                             }
+                        }
+                    });
+
+                    // Bouncy Mushroom Pads
+                    this.bouncyMushrooms.forEach(bm => {
+                        if (p.vy >= 0 && this.overlap(p, bm)) {
+                            p.y = bm.y - p.h;
+                            p.vy = -14.8;
+                            p.grounded = false;
+                            sound.jump();
+                            this.spawnFireballBurst(bm.x + bm.w / 2, bm.y, '#4ade80', '#fde047', 8);
+                        }
+                    });
+
+                    // Checkpoints
+                    this.checkpoints.forEach(cp => {
+                        if (!cp.reached && p.x >= cp.x) {
+                            cp.reached = true;
+                            this.checkpointX = cp.x;
+                            sound.bell();
+                            this.floatTexts.push({ x: cp.x, y: cp.y - 25, text: 'SPRINT CHECKPOINT!', color: '#fde047', life: 50 });
                         }
                     });
 
@@ -1713,6 +1827,7 @@
                 const targetCam = Math.max(0, Math.min(this.levelWidth - this.canvas.width, leadX - 260));
                 this.cameraX += (targetCam - this.cameraX) * 0.12;
 
+                // Coins
                 this.coins.forEach(c => {
                     if (c.collected) return;
                     this.players.forEach(p => {
@@ -1724,6 +1839,7 @@
                     });
                 });
 
+                // Powerups
                 this.powerups.forEach(pw => {
                     pw.vy += this.GRAVITY * 0.7;
                     pw.x += pw.vx;
@@ -1740,52 +1856,99 @@
                             sound.powerup();
                             p.powerState = 2;
                             this.addScore(p.id, 250);
-                            this.floatTexts.push({ x: p.x, y: p.y - 12, text: 'ROAST FIRE POWER!', color: '#fde047', life: 45 });
+                            this.floatTexts.push({ x: p.x, y: p.y - 12, text: 'BLAZING FIREBALLS!', color: '#fde047', life: 45 });
                         }
                     });
                 });
                 this.powerups = this.powerups.filter(pw => !pw.collected);
 
+                // Update Blazing Fireballs (Player & Dragon Hellfire)
                 this.projectiles.forEach(pr => {
+                    pr.trail.push({ x: pr.x, y: pr.y });
+                    if (pr.trail.length > 7) pr.trail.shift();
+
                     pr.x += pr.vx;
                     pr.y += pr.vy;
+                    pr.angle += 0.35;
                     pr.life--;
 
+                    // Emit ambient ember sparks
+                    if (Math.random() < 0.45) {
+                        this.particles.push({
+                            x: pr.x + (Math.random() - 0.5) * 6,
+                            y: pr.y + (Math.random() - 0.5) * 6,
+                            vx: -pr.vx * 0.15 + (Math.random() - 0.5),
+                            vy: (Math.random() - 0.5) * 1.5,
+                            r: 2.5,
+                            color: pr.enemyFire ? '#bef264' : '#fb923c',
+                            life: 12
+                        });
+                    }
+
                     if (!pr.enemyFire) {
+                        pr.vy += 0.28; // Gravity arc for bouncing fireballs
                         this.platforms.forEach(pl => {
-                            if (pl.active !== false && pr.x > pl.x && pr.x < pl.x + pl.w && pr.y > pl.y - 6 && pr.y < pl.y + 12) {
-                                pr.y = pl.y - 6;
-                                pr.vy = -4;
+                            if (pl.active !== false && pr.x > pl.x && pr.x < pl.x + pl.w && pr.y + pr.r >= pl.y && pr.y - pr.r <= pl.y + 16 && pr.vy > 0) {
+                                pr.y = pl.y - pr.r;
+                                pr.vy = -5.6; // Energetic bounce!
+                                pr.bounces++;
+                                this.spawnFireballBurst(pr.x, pr.y, '#fde047', '#f97316', 5);
+                                if (pr.bounces > pr.maxBounces) pr.life = 0;
                             }
                         });
-                        pr.vy += 0.25;
 
+                        // Hit Enemies
                         this.enemies.forEach(en => {
-                            if (!en.dead && pr.x > en.x && pr.x < en.x + en.w && pr.y > en.y && pr.y < en.y + en.h) {
+                            if (!en.dead && pr.x + pr.r > en.x && pr.x - pr.r < en.x + en.w && pr.y + pr.r > en.y && pr.y - pr.r < en.y + en.h) {
                                 en.dead = true;
                                 pr.life = 0;
                                 sound.stomp();
+                                this.spawnFireballBurst(en.x + 14, en.y + 14, '#fde047', '#ef4444', 16);
                                 this.addScore(pr.fromPlayer, 150);
                             }
                         });
 
+                        // Hit Wyvern Dragon Boss
                         if (this.boss && this.boss.alive) {
                             const b = this.boss;
-                            if (pr.x > b.x && pr.x < b.x + b.w && pr.y > b.y && pr.y < b.y + b.h) {
-                                b.hp--;
-                                pr.life = 0;
-                                sound.stomp();
-                                if (b.hp <= 0) {
-                                    b.alive = false;
-                                    sound.fanfare();
-                                    this.addScore(pr.fromPlayer, 2000);
+                            if (pr.x + pr.r > b.x && pr.x - pr.r < b.x + b.w && pr.y + pr.r > b.y && pr.y - pr.r < b.y + b.h) {
+                                if (b.shieldTimer > 0) {
+                                    // Reflective Wing Shield deflects ground spam!
+                                    pr.vx *= -1;
+                                    pr.vy = -4;
+                                    pr.enemyFire = true;
+                                    sound.bell();
+                                    this.floatTexts.push({ x: b.x, y: b.y - 10, text: 'WING SHIELD DEFLECT!', color: '#38bdf8', life: 30 });
+                                } else {
+                                    b.hp--;
+                                    b.recentHits++;
+                                    b.jawOpen = 15;
+                                    pr.life = 0;
+                                    sound.stomp();
+                                    this.spawnFireballBurst(pr.x, pr.y, '#fde047', '#84cc16', 18);
+
+                                    // Activate brief Wing Shield + Rocket Barrage if player spams ground shots
+                                    if (b.recentHits >= 3) {
+                                        b.recentHits = 0;
+                                        b.shieldTimer = 75;
+                                        b.rocketCooldown = 8; // Immediate low rocket counter-attack!
+                                    }
+
+                                    if (b.hp <= 0) {
+                                        b.alive = false;
+                                        sound.fanfare();
+                                        this.spawnFireballBurst(b.x + b.w / 2, b.y + b.h / 2, '#84cc16', '#fde047', 45);
+                                        this.addScore(pr.fromPlayer, 2500);
+                                    }
                                 }
                             }
                         }
                     } else {
+                        // Enemy Hellfire Fireball hits Player
                         this.players.forEach(p => {
-                            if (pr.x > p.x && pr.x < p.x + p.w && pr.y > p.y && pr.y < p.y + p.h) {
+                            if (pr.x + pr.r > p.x && pr.x - pr.r < p.x + p.w && pr.y + pr.r > p.y && pr.y - pr.r < p.y + p.h) {
                                 pr.life = 0;
+                                this.spawnFireballBurst(pr.x, pr.y, '#84cc16', '#ef4444', 12);
                                 this.damagePlayer(p, false);
                             }
                         });
@@ -1793,16 +1956,56 @@
                 });
                 this.projectiles = this.projectiles.filter(pr => pr.life > 0);
 
+                // Update Floor-Skimming Grinch Siege Rockets (Lower-Level Anti-Camp Hazard!)
+                this.rockets.forEach(rk => {
+                    rk.x += rk.vx;
+                    rk.life--;
+
+                    // Rocket exhaust smoke & flame particles
+                    this.particles.push({
+                        x: rk.x + rk.w + 2,
+                        y: rk.y + rk.h / 2 + (Math.random() - 0.5) * 6,
+                        vx: 2.5 + Math.random() * 2,
+                        vy: (Math.random() - 0.5) * 1.2,
+                        r: Math.random() * 4 + 2.5,
+                        color: Math.random() < 0.5 ? '#f97316' : '#94a3b8',
+                        life: 16
+                    });
+
+                    // Player can jump-stomp rockets OR shoot them with a direct low fireball, otherwise gets blasted!
+                    this.players.forEach(p => {
+                        if (this.overlap(p, rk)) {
+                            if (p.vy > 0 && p.y + p.h - p.vy <= rk.y + 10) {
+                                rk.life = 0;
+                                p.vy = -9.5;
+                                sound.stomp();
+                                this.spawnFireballBurst(rk.x, rk.y, '#fde047', '#ef4444', 18);
+                                this.addScore(p.id, 200);
+                            } else {
+                                rk.life = 0;
+                                this.spawnFireballBurst(rk.x, rk.y, '#ef4444', '#f97316', 22);
+                                this.damagePlayer(p, false);
+                            }
+                        }
+                    });
+                });
+                this.rockets = this.rockets.filter(rk => rk.life > 0);
+
+                // Enemies update
                 this.enemies.forEach(en => {
                     if (en.dead) return;
                     en.x += en.vx;
                     if (en.x < en.minX || en.x > en.maxX) en.vx *= -1;
+                    if (en.type === 'flyer') {
+                        en.y = en.baseY + Math.sin(Date.now() * 0.006 + en.x * 0.03) * 35;
+                    }
                     this.players.forEach(p => {
                         if (this.overlap(p, en)) {
-                            if (p.vy > 0 && p.y + p.h - p.vy <= en.y + 12 && en.type !== 'spikybot') {
+                            if (p.vy > 0 && p.y + p.h - p.vy <= en.y + 14 && en.type !== 'spikybot') {
                                 en.dead = true;
-                                p.vy = -8.5;
+                                p.vy = -9.0;
                                 sound.stomp();
+                                this.spawnFireballBurst(en.x + 14, en.y + 14, '#84cc16', '#fde047', 12);
                                 this.addScore(p.id, 150);
                             } else {
                                 this.damagePlayer(p, false);
@@ -1812,80 +2015,165 @@
                 });
                 this.enemies = this.enemies.filter(en => !en.dead);
 
+                // Organic Wyvern Grinch-Dragon Boss AI & Physics
                 if (this.boss && this.boss.alive) {
                     const b = this.boss;
+                    b.wingPhase += 0.16;
+                    if (b.jawOpen > 0) b.jawOpen--;
+                    if (b.shieldTimer > 0) b.shieldTimer--;
+
                     b.x += b.vx;
                     if (b.x < b.minX || b.x > b.maxX) b.vx *= -1;
-                    b.jumpCooldown--;
-                    if (b.jumpCooldown <= 0 && b.y >= 340) {
-                        b.vy = -9.5;
-                        b.jumpCooldown = 105;
-                    }
-                    b.vy += 0.38;
-                    b.y += b.vy;
 
-                    if (this.bridgePlatform && this.bridgePlatform.active) {
-                        if (b.y + b.h > this.bridgePlatform.y) {
-                            b.y = this.bridgePlatform.y - b.h;
-                            b.vy = 0;
+                    // Dynamic Vertical Swooping & Hovering Motion
+                    b.swoopTimer--;
+                    if (b.swoopTimer <= 0 && !b.collapseStarted) {
+                        b.swooping = !b.swooping;
+                        b.swoopTimer = b.swooping ? 95 : 140;
+                    }
+
+                    if (!b.collapseStarted) {
+                        const targetY = b.swooping
+                            ? 200 + Math.sin(b.wingPhase * 0.7) * 35
+                            : 315 + Math.sin(b.wingPhase * 0.5) * 14;
+                        b.y += (targetY - b.y) * 0.08;
+                    } else {
+                        // Bridge collapsed! Dragon plummets into the slime vat!
+                        b.vy += 0.48;
+                        b.y += b.vy;
+                        if (b.y > 520) {
+                            b.alive = false;
+                            sound.fanfare();
+                            this.spawnFireballBurst(b.x + 48, 470, '#84cc16', '#fde047', 50);
+                            this.addScore(1, 3000);
                         }
-                    } else if (b.y > 540) {
-                        b.alive = false;
-                        sound.fanfare();
-                        this.addScore(1, 2000);
                     }
 
+                    // 1. LOWER-LEVEL FLOOR-SKIMMING GRINCH SIEGE ROCKETS (Prevents standing still on the bridge!)
+                    b.rocketCooldown--;
+                    if (b.rocketCooldown === 25 && Math.abs(b.x - leadX) < 680) {
+                        b.rocketLockTimer = 25; // Laser lock-on warning along the bridge floor!
+                    }
+                    if (b.rocketLockTimer > 0) b.rocketLockTimer--;
+
+                    if (b.rocketCooldown <= 0 && Math.abs(b.x - leadX) < 680 && !b.collapseStarted) {
+                        b.rocketCooldown = Math.max(55, 105 - this.season * 12);
+                        sound.kick();
+                        // Launch a low-altitude floor-skimming rocket right at player standing height (y = 398)
+                        this.rockets.push({
+                            x: b.x - 16,
+                            y: 398,
+                            w: 38,
+                            h: 18,
+                            vx: -(6.4 + this.season * 0.55),
+                            life: 120
+                        });
+                    }
+
+                    // 2. UPPER/SPREAD EMERALD HELLFIRE BREATH
                     b.fireCooldown--;
-                    if (b.fireCooldown <= 0) {
-                        b.fireCooldown = 90;
+                    if (b.fireCooldown <= 0 && Math.abs(b.x - leadX) < 680 && !b.collapseStarted) {
+                        b.fireCooldown = Math.max(65, 110 - this.season * 10);
+                        b.jawOpen = 28;
                         sound.shoot();
-                        this.projectiles.push({ x: b.x - 10, y: b.y + 32, vx: -5.4, vy: 0, enemyFire: true, life: 110 });
+                        const spreadAngles = this.season >= 3 ? [-1.8, 0, 1.8] : [-1.2, 1.2];
+                        spreadAngles.forEach(vyVal => {
+                            this.projectiles.push({
+                                x: b.x - 12,
+                                y: b.y + 28,
+                                vx: -6.2,
+                                vy: vyVal,
+                                r: 9,
+                                angle: 0,
+                                trail: [],
+                                enemyFire: true,
+                                life: 110
+                            });
+                        });
                     }
 
                     this.players.forEach(p => {
-                        if (this.overlap(p, b)) this.damagePlayer(p, false);
+                        if (this.overlap(p, b)) {
+                            // Allow heroic jump-stomp on the dragon's head when unshielded!
+                            if (p.vy > 0 && p.y + p.h - p.vy <= b.y + 24 && b.shieldTimer <= 0) {
+                                b.hp -= 2;
+                                p.vy = -11.5;
+                                b.jawOpen = 20;
+                                sound.stomp();
+                                this.spawnFireballBurst(b.x + 30, b.y + 10, '#fde047', '#84cc16', 20);
+                                this.addScore(p.id, 300);
+                                if (b.hp <= 0) {
+                                    b.alive = false;
+                                    sound.fanfare();
+                                    this.addScore(p.id, 2500);
+                                }
+                            } else {
+                                this.damagePlayer(p, false);
+                            }
+                        }
                     });
                 }
 
+                // Scrum Axe Switch triggers sequential bridge collapse!
                 if (this.axeSwitch && !this.axeSwitch.triggered) {
                     this.players.forEach(p => {
                         if (this.overlap(p, this.axeSwitch)) {
                             this.axeSwitch.triggered = true;
-                            if (this.bridgePlatform) this.bridgePlatform.active = false;
                             sound.powerup();
-                            this.floatTexts.push({ x: this.axeSwitch.x, y: this.axeSwitch.y - 20, text: 'SLIME BRIDGE DROPPED!', color: '#84cc16', life: 55 });
+                            if (this.boss) this.boss.collapseStarted = true;
+                            if (this.bridgeSegments) {
+                                this.bridgeSegments.forEach((seg, idx) => {
+                                    setTimeout(() => {
+                                        seg.falling = true;
+                                        sound.stomp();
+                                    }, idx * 45);
+                                });
+                            }
+                            this.floatTexts.push({ x: this.axeSwitch.x, y: this.axeSwitch.y - 24, text: 'SCRUM AXE: BRIDGE DROPPED!', color: '#84cc16', life: 60 });
                         }
                     });
                 }
 
+                // Rescue Princess at end of Stage 3 of each Season
                 if (this.princess && !this.princess.rescued && (!this.boss || !this.boss.alive)) {
                     this.players.forEach(p => {
-                        if (Math.abs(p.x - this.princess.x) < 48) {
+                        if (Math.abs(p.x - this.princess.x) < 52) {
                             this.princess.rescued = true;
                             sound.fanfare();
                             this.addScore(p.id, 3000);
                             setTimeout(() => {
-                                app.triggerEndScreen(true, 'RETROSPECTIVE COMPLETE!', 'You completed Chestnuts Retrospective, dropped the Grinch-Dragon, and rescued the Chestnut Princess!', this.score1, this.score2);
-                            }, 800);
+                                if (this.season < 4) {
+                                    this.floatTexts.push({ x: p.x, y: p.y - 40, text: `SEASON ${this.season} COMPLETE!`, color: '#fde047', life: 60 });
+                                    this.loadSeasonStage(this.season + 1, 1);
+                                } else {
+                                    app.triggerEndScreen(true, 'ALL 4 SEASONS SAVED!', 'You conquered all 12 Seasonal Retrospective Levels, defeated the Wyvern Grinch-Dragon, and rescued the Chestnut Princess!', this.score1, this.score2);
+                                }
+                            }, 950);
                         }
                     });
                 }
 
+                // Goal Flag advances to next stage in current Season
                 if (this.goalFlag) {
                     this.players.forEach(p => {
                         if (p.x + p.w >= this.goalFlag.x) {
                             sound.fanfare();
-                            this.addScore(p.id, 500);
-                            this.loadWorld(this.world + 1);
+                            this.addScore(p.id, 600);
+                            this.loadSeasonStage(this.season, this.stage + 1);
                         }
                     });
                 }
 
+                this.particles.forEach(pt => { pt.x += pt.vx; pt.y += pt.vy; pt.life--; });
+                this.particles = this.particles.filter(pt => pt.life > 0);
                 this.floatTexts.forEach(ft => { ft.y -= 0.6; ft.life--; });
                 this.floatTexts = this.floatTexts.filter(ft => ft.life > 0);
 
-                const wNames = { 1: 'RETRO 1: WENT WELL', 2: 'RETRO 2: ACTION ITEMS', 3: 'RETRO 3: CRUMPIT KEEP' };
-                app.updateHUD(this.score1, this.score2, `RETRO 1-${this.world}`, this.lives, wNames[this.world]);
+                const sCfg = this.SEASONS[this.season];
+                const statusStr = this.boss && this.boss.alive
+                    ? `WYVERN HP: ${Math.max(0, this.boss.hp)}/${this.boss.maxHp} ${this.boss.shieldTimer > 0 ? '[SHIELDED]' : ''}`
+                    : `${sCfg.name} • ${sCfg.sub[this.stage - 1]}`;
+                app.updateHUD(this.score1, this.score2, `S${this.season}-${this.stage} (${this.world}/12)`, this.lives, statusStr);
             }
 
             addScore(id, pts) {
@@ -1899,16 +2187,19 @@
                     p.powerState = 1;
                     p.invuln = 90;
                     sound.grinchLaugh();
+                    this.floatTexts.push({ x: p.x, y: p.y - 15, text: 'SHIELD HIT!', color: '#f97316', life: 35 });
                     return;
                 }
                 sound.grinchLaugh();
                 this.lives--;
                 if (this.lives <= 0) {
-                    app.triggerEndScreen(false, 'RETROSPECTIVE FAILED', 'Unresolved Grinch action items stopped the Sprint Retrospective!', this.score1, this.score2);
+                    app.triggerEndScreen(false, 'RETROSPECTIVE FAILED', 'The Wyvern Grinch-Dragon & Siege Rockets stopped the Sprint Retrospective!', this.score1, this.score2);
                 } else {
-                    p.x = Math.max(60, this.cameraX + 60);
-                    p.y = 220;
-                    p.vx = 0; p.vy = 0; p.invuln = 90;
+                    p.x = Math.max(this.checkpointX, this.cameraX + 40);
+                    p.y = 200;
+                    p.vx = 0; p.vy = 0;
+                    p.powerState = 2;
+                    p.invuln = 95;
                 }
             }
 
@@ -1916,23 +2207,464 @@
                 return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
             }
 
+            /* =========================================================================
+             * ORGANIC MULTI-PART VECTOR WYVERN / GRINCH-DRAGON RENDERER (NO BOXES!)
+             * ========================================================================= */
+            drawOrganicGrinchDragon(ctx, b) {
+                ctx.save();
+                const cx = b.x + b.w * 0.5;
+                const cy = b.y + b.h * 0.52;
+                const t = b.wingPhase;
+                const flap = Math.sin(t) * 34;
+
+                // Track closest player for sinister eye pupils
+                const p1 = this.players[0] || { x: cx - 200, y: cy };
+                const lookAngle = Math.atan2(p1.y - (cy - 28), p1.x - (cx - 26));
+
+                // 1. Reflective Wing Shield Aura (when active)
+                if (b.shieldTimer > 0) {
+                    ctx.save();
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.fillStyle = 'rgba(56, 189, 248, 0.18)';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.ellipse(cx, cy, 66, 62, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                // 2. Whipping Spiked Serpentine Tail (Bezier S-Curve behind body)
+                ctx.save();
+                ctx.strokeStyle = '#3f6212';
+                ctx.lineWidth = 14;
+                ctx.lineCap = 'round';
+                const tailWag = Math.sin(t * 0.8) * 18;
+                ctx.beginPath();
+                ctx.moveTo(cx + 22, cy + 18);
+                ctx.bezierCurveTo(cx + 58, cy + 32 + tailWag * 0.4, cx + 82, cy - 8 + tailWag, cx + 106, cy + 10 + tailWag);
+                ctx.stroke();
+
+                // Tail Spade Tip
+                ctx.fillStyle = '#dc2626';
+                ctx.beginPath();
+                ctx.moveTo(cx + 104, cy + 10 + tailWag);
+                ctx.lineTo(cx + 122, cy + 2 + tailWag);
+                ctx.lineTo(cx + 116, cy + 18 + tailWag);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+
+                // 3. Back Leathery Bat Wing
+                ctx.save();
+                ctx.fillStyle = '#14532d';
+                ctx.strokeStyle = '#4d7c0f';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(cx + 4, cy - 10);
+                ctx.quadraticCurveTo(cx + 38, cy - 68 - flap * 0.7, cx + 76, cy - 42 - flap * 0.8);
+                ctx.quadraticCurveTo(cx + 55, cy - 12 - flap * 0.3, cx + 42, cy + 6);
+                ctx.quadraticCurveTo(cx + 22, cy - 2, cx + 4, cy - 10);
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+
+                // 4. Sinuous Scaled Dragon Torso & Armored Belly (Organic Ovals & Curves)
+                ctx.save();
+                const bodyGrad = ctx.createRadialGradient(cx - 6, cy - 4, 8, cx, cy + 6, 48);
+                bodyGrad.addColorStop(0, '#84cc16');
+                bodyGrad.addColorStop(0.65, '#4d7c0f');
+                bodyGrad.addColorStop(1, '#1a2e05');
+                ctx.fillStyle = bodyGrad;
+                ctx.beginPath();
+                ctx.ellipse(cx + 4, cy + 8, 36, 42, -0.22, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Ribbed Golden-Green Dragon Belly Plates
+                ctx.strokeStyle = '#bef264';
+                ctx.lineWidth = 2;
+                for (let i = -2; i <= 2; i++) {
+                    ctx.beginPath();
+                    ctx.arc(cx - 10, cy + 8 + i * 9, 18 - Math.abs(i) * 2, 0.65 * Math.PI, 1.35 * Math.PI);
+                    ctx.stroke();
+                }
+
+                // Dorsal Spines along back
+                ctx.fillStyle = '#dc2626';
+                for (let i = 0; i < 5; i++) {
+                    const sy = cy - 24 + i * 13;
+                    const sx = cx + 24 + Math.sin(i * 0.6) * 8;
+                    ctx.beginPath();
+                    ctx.moveTo(sx, sy);
+                    ctx.lineTo(sx + 14, sy - 6);
+                    ctx.lineTo(sx + 4, sy + 7);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                ctx.restore();
+
+                // 5. Lower-Level Chest-Mounted Grinch Rocket Pod Launcher!
+                ctx.save();
+                ctx.fillStyle = '#334155';
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.roundRect(cx - 32, cy + 16, 28, 16, 5);
+                ctx.fill();
+                ctx.stroke();
+                // Glowing Rocket Muzzle
+                ctx.fillStyle = b.rocketLockTimer > 0 ? '#ef4444' : '#f97316';
+                ctx.beginPath();
+                ctx.arc(cx - 32, cy + 24, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+
+                // 6. Clawed Hind Legs & Talons
+                ctx.save();
+                ctx.strokeStyle = '#3f6212';
+                ctx.lineWidth = 8;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(cx + 6, cy + 38);
+                ctx.quadraticCurveTo(cx - 8, cy + 48, cx - 4, cy + 56);
+                ctx.stroke();
+                // Golden Claws
+                ctx.strokeStyle = '#fde047';
+                ctx.lineWidth = 2.5;
+                [-10, -4, 2].forEach(ox => {
+                    ctx.beginPath();
+                    ctx.moveTo(cx + ox, cy + 56);
+                    ctx.lineTo(cx + ox - 5, cy + 62);
+                    ctx.stroke();
+                });
+                ctx.restore();
+
+                // 7. Foreground Articulated Leathery Bat Wing (Dynamic Flap)
+                ctx.save();
+                const wingGrad = ctx.createLinearGradient(cx, cy - 50 - flap, cx + 60, cy + 20);
+                wingGrad.addColorStop(0, '#65a30d');
+                wingGrad.addColorStop(1, '#15803d');
+                ctx.fillStyle = wingGrad;
+                ctx.strokeStyle = '#bef264';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(cx - 2, cy - 8);
+                ctx.bezierCurveTo(cx + 18, cy - 75 - flap, cx + 65, cy - 65 - flap, cx + 88, cy - 28 - flap * 0.7);
+                // Scalloped bat-wing membrane arches
+                ctx.quadraticCurveTo(cx + 64, cy - 18 - flap * 0.4, cx + 58, cy + 4 - flap * 0.2);
+                ctx.quadraticCurveTo(cx + 36, cy - 8 - flap * 0.2, cx + 28, cy + 12);
+                ctx.quadraticCurveTo(cx + 12, cy + 2, cx - 2, cy - 8);
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+
+                // 8. Sinuous Neck & Unmistakable Grinch-Dragon Hybrid Head (Shaggy Cheek Tufts, Snub Nose, Evil Smirk & Santa Hat)
+                ctx.save();
+                ctx.strokeStyle = '#4d7c0f';
+                ctx.lineWidth = 18;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(cx - 8, cy - 18);
+                ctx.quadraticCurveTo(cx - 22, cy - 36, cx - 28, cy - 34);
+                ctx.stroke();
+
+                // Red Plush Santa Collar around Dragon Neck
+                ctx.fillStyle = '#dc2626';
+                ctx.strokeStyle = '#f8fafc';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.ellipse(cx - 16, cy - 24, 15, 7, -0.45, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                const hx = cx - 32;
+                const hy = cy - 38;
+                const jawDrop = (b.jawOpen / 28) * 14;
+
+                // Lower Articulated Grinch-Dragon Jaw & Fangs
+                ctx.fillStyle = '#3f6212';
+                ctx.beginPath();
+                ctx.moveTo(hx + 14, hy + 4);
+                ctx.quadraticCurveTo(hx - 14, hy + 20 + jawDrop, hx - 34, hy + 8 + jawDrop);
+                ctx.lineTo(hx - 8, hy + 2);
+                ctx.closePath();
+                ctx.fill();
+
+                // Glowing Hellfire Throat Core when jaw opens
+                if (b.jawOpen > 2) {
+                    ctx.fillStyle = '#bef264';
+                    ctx.beginPath();
+                    ctx.arc(hx - 14, hy + 4 + jawDrop * 0.4, 7.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Sculpted Grinch Cranium with Iconic Shaggy Cheek Jowl Tufts
+                const headGrad = ctx.createRadialGradient(hx - 8, hy - 8, 3, hx, hy, 32);
+                headGrad.addColorStop(0, '#bef264');
+                headGrad.addColorStop(0.6, '#65a30d');
+                headGrad.addColorStop(1, '#365314');
+                ctx.fillStyle = headGrad;
+                ctx.strokeStyle = '#1a2e05';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(hx + 16, hy - 12);
+                // Rear shaggy Grinch cheek tufts
+                ctx.lineTo(hx + 28, hy - 4);
+                ctx.lineTo(hx + 19, hy + 2);
+                ctx.lineTo(hx + 26, hy + 9);
+                // Jowl & snout contour
+                ctx.quadraticCurveTo(hx + 4, hy + 12, hx - 34, hy + 4);
+                ctx.quadraticCurveTo(hx - 38, hy - 7, hx - 16, hy - 11);
+                ctx.quadraticCurveTo(hx - 4, hy - 26, hx + 16, hy - 12);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Wrinkled Green Grinch Snub Nose on Snout Tip
+                ctx.fillStyle = '#365314';
+                ctx.beginPath();
+                ctx.arc(hx - 28, hy - 5, 4.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Wicked Curled Grinch Smirk Crease & Sharp Ivory Fangs
+                ctx.strokeStyle = '#14532d';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(hx - 32, hy + 3);
+                ctx.quadraticCurveTo(hx - 10, hy + 9, hx + 8, hy - 2);
+                ctx.moveTo(hx + 5, hy - 6);
+                ctx.lineTo(hx + 10, hy + 2);
+                ctx.stroke();
+
+                ctx.fillStyle = '#fefce8';
+                [-28, -20, -12].forEach(fx => {
+                    ctx.beginPath();
+                    ctx.moveTo(hx + fx, hy + 4);
+                    ctx.lineTo(hx + fx + 3, hy + 11);
+                    ctx.lineTo(hx + fx + 6, hy + 4);
+                    ctx.fill();
+                });
+
+                // Curved Dragon Horns + Stolen Santa Hat perched on Crown
+                ctx.strokeStyle = '#fde047';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(hx + 10, hy - 15);
+                ctx.quadraticCurveTo(hx + 28, hy - 34, hx + 40, hy - 24);
+                ctx.stroke();
+
+                ctx.fillStyle = '#dc2626';
+                ctx.beginPath();
+                ctx.moveTo(hx - 8, hy - 17);
+                ctx.quadraticCurveTo(hx + 8, hy - 42, hx + 28, hy - 28);
+                ctx.lineTo(hx + 14, hy - 15);
+                ctx.closePath();
+                ctx.fill();
+                // Fluffy white Santa Hat brim & pom-pom
+                ctx.fillStyle = '#f8fafc';
+                ctx.beginPath();
+                ctx.roundRect(hx - 10, hy - 19, 26, 5, 2.5);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(hx + 28, hy - 28, 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Glowing Yellow/Red Slitted Grinch Eye & Heavy Scowling Green Brow
+                ctx.fillStyle = '#fef08a';
+                ctx.shadowColor = '#ef4444';
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.ellipse(hx - 8, hy - 8, 7, 5, -0.22, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Slitted Reptilian Pupil tracking Player
+                ctx.fillStyle = '#dc2626';
+                const pxOff = Math.cos(lookAngle) * 2;
+                const pyOff = Math.sin(lookAngle) * 1.5;
+                ctx.beginPath();
+                ctx.ellipse(hx - 8 + pxOff, hy - 8 + pyOff, 2.2, 4.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Heavy Furrowed Grinch Eyebrow Ridge
+                ctx.strokeStyle = '#14532d';
+                ctx.lineWidth = 3.5;
+                ctx.beginPath();
+                ctx.moveTo(hx - 18, hy - 10);
+                ctx.lineTo(hx + 2, hy - 16);
+                ctx.stroke();
+                ctx.restore();
+
+                // 9. Lower-Level Laser Sight Warning before Siege Rocket fires!
+                if (b.rocketLockTimer > 0 && Math.floor(b.rocketLockTimer / 3) % 2 === 0) {
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(239, 68, 68, 0.85)';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([8, 6]);
+                    ctx.beginPath();
+                    ctx.moveTo(cx - 34, 406);
+                    ctx.lineTo(cx - 520, 406);
+                    ctx.stroke();
+                    ctx.fillStyle = '#ef4444';
+                    ctx.font = '8px "Press Start 2P"';
+                    ctx.fillText('LOW ROCKET LOCK!', cx - 150, 392);
+                    ctx.restore();
+                }
+
+                // 10. Floating Boss Health Bar
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(b.x, b.y - 28, b.w, 9);
+                ctx.fillStyle = b.shieldTimer > 0 ? '#38bdf8' : '#84cc16';
+                ctx.fillRect(b.x + 1, b.y - 27, (b.w - 2) * (Math.max(0, b.hp) / b.maxHp), 7);
+                ctx.restore();
+            }
+
+            drawBlazingFireball(ctx, pr) {
+                ctx.save();
+                // Draw flickering flame comet trail
+                for (let i = 0; i < pr.trail.length; i++) {
+                    const pt = pr.trail[i];
+                    const ratio = (i + 1) / pr.trail.length;
+                    ctx.fillStyle = pr.enemyFire
+                        ? `rgba(132, 204, 22, ${ratio * 0.48})`
+                        : `rgba(249, 115, 22, ${ratio * 0.52})`;
+                    ctx.beginPath();
+                    ctx.arc(pt.x, pt.y, pr.r * ratio * 0.85, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.translate(pr.x, pr.y);
+                ctx.rotate(pr.angle);
+
+                // Outer Blazing Flame Aura Gradient
+                const r = pr.r;
+                const grad = ctx.createRadialGradient(0, 0, 1, 0, 0, r * 1.45);
+                if (pr.enemyFire) {
+                    grad.addColorStop(0, '#fefce8');
+                    grad.addColorStop(0.45, '#bef264');
+                    grad.addColorStop(0.8, '#16a34a');
+                    grad.addColorStop(1, 'rgba(22, 163, 74, 0)');
+                } else {
+                    grad.addColorStop(0, '#ffffff');
+                    grad.addColorStop(0.35, '#fde047');
+                    grad.addColorStop(0.75, '#f97316');
+                    grad.addColorStop(1, 'rgba(220, 38, 38, 0)');
+                }
+
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(0, 0, r * 1.45, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Rotating 4-Point Flame Crown Tongues
+                ctx.fillStyle = pr.enemyFire ? '#84cc16' : '#ef4444';
+                ctx.beginPath();
+                for (let i = 0; i < 8; i++) {
+                    const a = (i * Math.PI) / 4;
+                    const rad = i % 2 === 0 ? r * 1.2 : r * 0.55;
+                    const px = Math.cos(a) * rad;
+                    const py = Math.sin(a) * rad;
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.fill();
+
+                // Incandescent White-Hot Core
+                ctx.fillStyle = '#fef9c3';
+                ctx.beginPath();
+                ctx.arc(0, 0, r * 0.45, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            drawSiegeRocket(ctx, rk) {
+                ctx.save();
+                ctx.translate(rk.x, rk.y);
+
+                // Fiery Exhaust Plume
+                const flameLen = 14 + Math.random() * 10;
+                ctx.fillStyle = '#f97316';
+                ctx.beginPath();
+                ctx.moveTo(rk.w, 3);
+                ctx.lineTo(rk.w + flameLen, rk.h / 2);
+                ctx.lineTo(rk.w, rk.h - 3);
+                ctx.closePath();
+                ctx.fill();
+
+                // Armored Missile Fuselage
+                ctx.fillStyle = '#1e293b';
+                ctx.strokeStyle = '#84cc16';
+                ctx.lineWidth = 1.5;
+                ctx.fillRect(8, 2, rk.w - 8, rk.h - 4);
+                ctx.strokeRect(8, 2, rk.w - 8, rk.h - 4);
+
+                // Crimson Warhead Nosecone
+                ctx.fillStyle = '#dc2626';
+                ctx.beginPath();
+                ctx.moveTo(8, 1);
+                ctx.lineTo(-4, rk.h / 2);
+                ctx.lineTo(8, rk.h - 1);
+                ctx.closePath();
+                ctx.fill();
+
+                // Stabilizer Tail Fins
+                ctx.fillStyle = '#dc2626';
+                ctx.beginPath();
+                ctx.moveTo(rk.w - 6, 2);
+                ctx.lineTo(rk.w + 2, -4);
+                ctx.lineTo(rk.w, 2);
+                ctx.moveTo(rk.w - 6, rk.h - 2);
+                ctx.lineTo(rk.w + 2, rk.h + 4);
+                ctx.lineTo(rk.w, rk.h - 2);
+                ctx.fill();
+
+                // Sinister Grinch Shark-Grin Decal on Rocket
+                ctx.fillStyle = '#fde047';
+                ctx.fillRect(12, 5, 4, 4);
+                ctx.restore();
+            }
+
             draw() {
                 const ctx = this.ctx;
+                const sCfg = this.SEASONS[this.season];
+
+                // Seasonal Sky Gradient
                 const grad = ctx.createLinearGradient(0, 0, 0, this.canvas.height);
                 grad.addColorStop(0, this.skyColor[0]);
                 grad.addColorStop(1, this.skyColor[1]);
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+                // Parallax Seasonal Mountain Silhouette
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+                for (let i = 0; i < 6; i++) {
+                    const mx = ((i * 260) - (this.cameraX * 0.25) % 1560);
+                    ctx.beginPath();
+                    ctx.moveTo(mx, 460);
+                    ctx.lineTo(mx + 140, 190 + (i % 2) * 45);
+                    ctx.lineTo(mx + 280, 460);
+                    ctx.fill();
+                }
+
+                // Seasonal Weather Overlay (Snow, Spring Petals, Summer Embers, Autumn Leaves)
+                this.weatherParticles.forEach(wp => {
+                    ctx.fillStyle = sCfg.accent;
+                    ctx.beginPath();
+                    ctx.arc(wp.x, wp.y, wp.s, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
                 ctx.save();
                 ctx.translate(-Math.floor(this.cameraX), 0);
 
+                // Platforms
                 this.platforms.forEach(pl => {
                     if (pl.active === false) return;
-                    if (pl.type === 'snow') {
-                        ctx.fillStyle = '#451a03';
+                    if (pl.type === 'seasonal') {
+                        ctx.fillStyle = sCfg.groundFill;
                         ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
-                        ctx.fillStyle = '#f8fafc';
+                        ctx.fillStyle = sCfg.groundTop;
                         ctx.fillRect(pl.x, pl.y, pl.w, 10);
                     } else if (pl.type === 'candy') {
                         ctx.fillStyle = '#991b1b';
@@ -1942,25 +2674,51 @@
                     } else if (pl.type === 'gold') {
                         ctx.fillStyle = '#eab308';
                         ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
+                        ctx.strokeStyle = '#fef08a';
+                        ctx.strokeRect(pl.x, pl.y, pl.w, pl.h);
                     } else if (pl.type === 'bridge') {
                         ctx.fillStyle = '#dc2626';
-                        for (let bx = pl.x; bx < pl.x + pl.w; bx += 26) {
-                            ctx.fillRect(bx, pl.y, 22, pl.h);
-                        }
+                        ctx.fillRect(pl.x + 1, pl.y, pl.w - 2, pl.h);
+                        ctx.fillStyle = '#fde047';
+                        ctx.fillRect(pl.x + 4, pl.y + 4, pl.w - 8, 4);
                     } else {
                         ctx.fillStyle = '#1e293b';
                         ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
-                        ctx.strokeStyle = '#38bdf8';
+                        ctx.strokeStyle = sCfg.accent;
                         ctx.strokeRect(pl.x, pl.y, pl.w, pl.h);
                     }
                 });
 
+                // Bouncy Mushroom Pads
+                this.bouncyMushrooms.forEach(bm => {
+                    ctx.fillStyle = '#fde68a';
+                    ctx.fillRect(bm.x + bm.w * 0.35, bm.y + 8, bm.w * 0.3, 18);
+                    ctx.fillStyle = '#ec4899';
+                    ctx.beginPath();
+                    ctx.ellipse(bm.x + bm.w / 2, bm.y + 8, bm.w / 2, 10, 0, Math.PI, 0);
+                    ctx.fill();
+                    ctx.strokeStyle = '#fbcfe8';
+                    ctx.stroke();
+                });
+
                 // Sour Grinch Slime Vats
                 this.slimeVats.forEach(sv => {
-                    ctx.fillStyle = '#65a30d';
+                    ctx.fillStyle = this.season === 3 ? '#ea580c' : '#65a30d';
                     ctx.fillRect(sv.x, sv.y, sv.w, sv.h);
-                    ctx.fillStyle = '#bef264';
+                    ctx.fillStyle = this.season === 3 ? '#fde047' : '#bef264';
                     ctx.fillRect(sv.x, sv.y, sv.w, 6);
+                });
+
+                // Checkpoints
+                this.checkpoints.forEach(cp => {
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.fillRect(cp.x, cp.y, 4, 70);
+                    ctx.fillStyle = cp.reached ? '#84cc16' : '#f43f5e';
+                    ctx.beginPath();
+                    ctx.moveTo(cp.x + 4, cp.y);
+                    ctx.lineTo(cp.x + 36, cp.y + 14);
+                    ctx.lineTo(cp.x + 4, cp.y + 28);
+                    ctx.fill();
                 });
 
                 this.qBlocks.forEach(qb => {
@@ -1998,14 +2756,13 @@
                 });
 
                 this.powerups.forEach(pw => {
-                    ctx.fillStyle = '#fde047';
-                    ctx.beginPath();
-                    ctx.arc(pw.x + 12, pw.y + 12, 11, 0, Math.PI * 2);
-                    ctx.fill();
+                    this.drawBlazingFireball(ctx, { x: pw.x + 12, y: pw.y + 12, r: 9, angle: Date.now() * 0.01, trail: [], enemyFire: false });
                 });
 
                 this.enemies.forEach(en => {
-                    drawGrinchMinion(ctx, en.x + 14, en.y + 14, 14, en.type === 'spikybot' ? '#ef4444' : '#84cc16', false, 0);
+                    const col = en.type === 'spikybot' ? '#65a30d' : (en.type === 'flyer' ? '#84cc16' : '#84cc16');
+                    const variant = en.type === 'spikybot' ? 'spikybot' : (en.type === 'flyer' ? 'flyer' : 'classic');
+                    drawGrinchMinion(ctx, en.x + 14, en.y + 14, 14, col, false, 0, variant, en.vx >= 0 ? 1 : -1);
                 });
 
                 if (this.goalFlag) {
@@ -2021,30 +2778,19 @@
 
                 if (this.axeSwitch && !this.axeSwitch.triggered) {
                     ctx.fillStyle = '#facc15';
-                    ctx.fillRect(this.axeSwitch.x, this.axeSwitch.y, 8, 48);
+                    ctx.fillRect(this.axeSwitch.x, this.axeSwitch.y, 8, 52);
                     ctx.beginPath();
-                    ctx.arc(this.axeSwitch.x + 14, this.axeSwitch.y + 14, 14, 0, Math.PI * 2);
+                    ctx.arc(this.axeSwitch.x + 15, this.axeSwitch.y + 14, 15, -0.6, 1.8);
                     ctx.fill();
                     ctx.fillStyle = '#fde047';
                     ctx.font = '8px "Press Start 2P"';
                     ctx.textAlign = 'center';
-                    ctx.fillText('CANDY AXE', this.axeSwitch.x + 12, this.axeSwitch.y - 8);
+                    ctx.fillText('SCRUM AXE', this.axeSwitch.x + 12, this.axeSwitch.y - 8);
                 }
 
+                // Draw Organic Vector Wyvern Grinch-Dragon Boss!
                 if (this.boss && this.boss.alive) {
-                    const b = this.boss;
-                    ctx.fillStyle = '#65a30d';
-                    ctx.fillRect(b.x, b.y, b.w, b.h);
-                    ctx.fillStyle = '#dc2626';
-                    ctx.fillRect(b.x + 6, b.y - 12, b.w - 12, 14);
-                    ctx.fillStyle = '#fef08a';
-                    ctx.fillRect(b.x + 14, b.y + 18, 12, 12);
-                    ctx.fillRect(b.x + 42, b.y + 18, 12, 12);
-                    // Boss HP
-                    ctx.fillStyle = '#0f172a';
-                    ctx.fillRect(b.x, b.y - 26, b.w, 8);
-                    ctx.fillStyle = '#84cc16';
-                    ctx.fillRect(b.x + 1, b.y - 25, (b.w - 2) * (b.hp / b.maxHp), 6);
+                    this.drawOrganicGrinchDragon(ctx, this.boss);
                 }
 
                 if (this.princess) {
@@ -2057,15 +2803,27 @@
                     }
                 }
 
+                // Players
                 this.players.forEach(p => {
                     if (p.invuln > 0 && Math.floor(p.invuln / 4) % 2 === 0) return;
                     drawChestnutHero(ctx, p.x + p.w / 2, p.y + p.h / 2, p.w / 2, p.facing, p.id === 1 ? '#dc2626' : '#0284c7', p.powerState >= 2, `P${p.id}`);
                 });
 
+                // Draw Blazing Fireballs
                 this.projectiles.forEach(pr => {
-                    ctx.fillStyle = pr.enemyFire ? '#84cc16' : '#fde047';
+                    this.drawBlazingFireball(ctx, pr);
+                });
+
+                // Draw Floor-Skimming Grinch Siege Rockets
+                this.rockets.forEach(rk => {
+                    this.drawSiegeRocket(ctx, rk);
+                });
+
+                // Ember & Explosion Particles
+                this.particles.forEach(pt => {
+                    ctx.fillStyle = pt.color;
                     ctx.beginPath();
-                    ctx.arc(pr.x, pr.y, pr.enemyFire ? 7 : 5, 0, Math.PI * 2);
+                    ctx.arc(pt.x, pt.y, pt.r || 3, 0, Math.PI * 2);
                     ctx.fill();
                 });
 
@@ -2400,29 +3158,114 @@
                     ctx.fillRect(wc.x, wc.y + 11, wc.w, 6);
                 });
 
-                // Enemies
+                // Enemies (Grinch Commando Troopers & Hovering Grinch Chopper-Drones)
                 this.enemies.forEach(en => {
-                    drawGrinchMinion(ctx, en.x + 15, en.y + 15, 14, en.isDrone ? '#38bdf8' : '#84cc16', false, 0);
+                    const variant = en.isDrone ? 'drone' : 'commando';
+                    drawGrinchMinion(ctx, en.x + 15, en.y + 15, 14, '#84cc16', false, 0, variant, -1);
+                    if (!en.isDrone) {
+                        // Candy-Cane Pepper-Blaster held by Grinch Trooper
+                        ctx.fillStyle = '#dc2626';
+                        ctx.fillRect(en.x - 6, en.y + 16, 14, 5);
+                        ctx.fillStyle = '#fde047';
+                        ctx.fillRect(en.x - 8, en.y + 15, 4, 7);
+                    }
                 });
 
-                // Mecha-Grinch Vacuum Tank Boss
+                // Organic Sculpted Mecha-Grinch Vacuum Tank Boss
                 if (this.boss && this.boss.alive) {
                     const bs = this.boss;
-                    ctx.fillStyle = '#3f6212';
-                    ctx.fillRect(bs.x, bs.y + 30, bs.w, bs.h - 30);
-                    ctx.strokeStyle = '#bef264';
+                    const cx = bs.x + bs.w * 0.5;
+                    const cy = bs.y + bs.h * 0.55;
+                    const wheelSpin = Date.now() * 0.01;
+
+                    ctx.save();
+                    // 1. Heavy Armored Caterpillar Treads & Bogie Wheels
+                    ctx.fillStyle = '#1e293b';
+                    ctx.strokeStyle = '#65a30d';
                     ctx.lineWidth = 3;
-                    ctx.strokeRect(bs.x, bs.y + 30, bs.w, bs.h - 30);
-                    // Grinch Pilot Dome
-                    drawGrinchMinion(ctx, bs.x + 55, bs.y + 20, 22, '#84cc16', false, 0);
-                    // Cannon Barrel
+                    ctx.beginPath();
+                    ctx.roundRect(bs.x - 6, bs.y + bs.h - 34, bs.w + 12, 34, 16);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    for (let i = 0; i < 4; i++) {
+                        const wx = bs.x + 14 + i * 27;
+                        const wy = bs.y + bs.h - 17;
+                        ctx.fillStyle = '#334155';
+                        ctx.beginPath();
+                        ctx.arc(wx, wy, 11, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = '#fde047';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(wx - Math.cos(wheelSpin) * 8, wy - Math.sin(wheelSpin) * 8);
+                        ctx.lineTo(wx + Math.cos(wheelSpin) * 8, wy + Math.sin(wheelSpin) * 8);
+                        ctx.stroke();
+                    }
+
+                    // 2. Sculpted Grinch-Face Armored Tank Hull (Curved Emerald Steel + Shark-Grinch Grin)
+                    const hullGrad = ctx.createRadialGradient(cx - 15, cy - 10, 10, cx, cy, 65);
+                    hullGrad.addColorStop(0, '#84cc16');
+                    hullGrad.addColorStop(0.6, '#3f6212');
+                    hullGrad.addColorStop(1, '#14532d');
+                    ctx.fillStyle = hullGrad;
+                    ctx.strokeStyle = '#bef264';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(bs.x + 8, bs.y + bs.h - 32);
+                    ctx.quadraticCurveTo(bs.x - 10, cy, bs.x + 14, bs.y + 34);
+                    ctx.lineTo(bs.x + bs.w - 12, bs.y + 34);
+                    ctx.quadraticCurveTo(bs.x + bs.w + 8, cy, bs.x + bs.w - 6, bs.y + bs.h - 32);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Sinister Painted Grinch Smirk & Yellow Headlight Eyes on Hull
+                    ctx.fillStyle = '#fef08a';
+                    ctx.beginPath();
+                    ctx.ellipse(bs.x + 24, cy - 8, 9, 6, 0.25, 0, Math.PI * 2);
+                    ctx.fill();
                     ctx.fillStyle = '#dc2626';
-                    ctx.fillRect(bs.x - 28, bs.y + 52, 34, 16);
-                    // Boss HP Bar
+                    ctx.beginPath();
+                    ctx.arc(bs.x + 22, cy - 8, 3.5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#14532d';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(bs.x + 12, cy + 12);
+                    ctx.quadraticCurveTo(bs.x + 42, cy + 26, bs.x + 76, cy + 8);
+                    ctx.stroke();
+
+                    // 3. Candy-Striped Heavy Siege Cannon Barrel
+                    ctx.fillStyle = '#dc2626';
+                    ctx.strokeStyle = '#fde047';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.roundRect(bs.x - 34, bs.y + 52, 44, 18, 5);
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.fillStyle = '#f8fafc';
+                    ctx.fillRect(bs.x - 22, bs.y + 53, 8, 16);
+                    ctx.fillRect(bs.x - 6, bs.y + 53, 8, 16);
+
+                    // 4. Glass Cockpit Dome & Large Scowling Grinch Commander Pilot
+                    ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+                    ctx.strokeStyle = '#bae6fd';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(cx, bs.y + 34, 30, Math.PI, 0);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    drawGrinchMinion(ctx, cx, bs.y + 18, 20, '#84cc16', false, 0, 'commando', -1);
+
+                    // 5. Boss HP Bar
                     ctx.fillStyle = '#0f172a';
-                    ctx.fillRect(bs.x, bs.y - 22, bs.w, 10);
+                    ctx.fillRect(bs.x, bs.y - 24, bs.w, 10);
                     ctx.fillStyle = '#f43f5e';
-                    ctx.fillRect(bs.x + 1, bs.y - 21, (bs.w - 2) * (bs.hp / bs.maxHp), 8);
+                    ctx.fillRect(bs.x + 1, bs.y - 23, (bs.w - 2) * (Math.max(0, bs.hp) / bs.maxHp), 8);
+                    ctx.restore();
                 }
 
                 // Commando Chestnut Players
@@ -2741,21 +3584,6 @@
                 }
             }
 
-            addScore(id, pts) {
-                if (id === 2) this.score2 += pts;
-                else this.score1 += pts;
-            }
-
-            hurtClimber(p) {
-                if (p.invuln > 0) return;
-                p.invuln = 85;
-                sound.grinchLaugh();
-                this.lives--;
-                if (this.lives <= 0) {
-                    app.triggerEndScreen(false, 'AVALANCHE DEFEAT!', 'The Grinch defending the icy summit stopped your climb!', this.score1, this.score2);
-                }
-            }
-
             spawnParticles(x, y, color, count) {
                 for (let i = 0; i < count; i++) {
                     const a = Math.random() * Math.PI * 2;
@@ -2789,23 +3617,67 @@
                     ctx.fillRect(pl.x, pl.y, pl.w, 6);
                 });
 
-                // Summit Grinch Sleigh Boss
+                // Organic Curved Mount Crumpit Grinch Sleigh Boss
                 const sb = this.sleighBoss;
-                ctx.fillStyle = '#dc2626';
-                ctx.fillRect(sb.x, sb.y + 16, sb.w, 32);
+                ctx.save();
+                const scx = sb.x + sb.w * 0.5;
+                const scy = sb.y + sb.h * 0.55;
+
+                // 1. Golden Curved Sleigh Runners & Struts
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(sb.x - 10, sb.y + 52);
+                ctx.quadraticCurveTo(sb.x - 22, sb.y + 42, sb.x - 14, sb.y + 34);
+                ctx.moveTo(sb.x - 10, sb.y + 52);
+                ctx.lineTo(sb.x + sb.w + 10, sb.y + 52);
+                ctx.quadraticCurveTo(sb.x + sb.w + 20, sb.y + 44, sb.x + sb.w + 12, sb.y + 36);
+                ctx.stroke();
+
+                // 2. Overstuffed Stolen Toy Sack in Rear of Sleigh
+                const sackGrad = ctx.createRadialGradient(sb.x + sb.w - 18, sb.y + 10, 4, sb.x + sb.w - 18, sb.y + 14, 24);
+                sackGrad.addColorStop(0, '#fb923c');
+                sackGrad.addColorStop(1, '#9a3412');
+                ctx.fillStyle = sackGrad;
+                ctx.strokeStyle = '#fde047';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(sb.x + sb.w - 18, sb.y + 14, 20, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // 3. Sculpted Crimson & Gold Sleigh Body (Bezier Curves)
+                const sleighGrad = ctx.createLinearGradient(sb.x, sb.y + 12, sb.x, sb.y + 48);
+                sleighGrad.addColorStop(0, '#ef4444');
+                sleighGrad.addColorStop(1, '#991b1b');
+                ctx.fillStyle = sleighGrad;
                 ctx.strokeStyle = '#fde047';
                 ctx.lineWidth = 2.5;
-                ctx.strokeRect(sb.x, sb.y + 16, sb.w, 32);
-                drawGrinchMinion(ctx, sb.x + 48, sb.y + 10, 16, '#84cc16', false, 0);
-                // Sleigh HP Bar
+                ctx.beginPath();
+                ctx.moveTo(sb.x + 8, sb.y + 46);
+                ctx.quadraticCurveTo(sb.x - 12, sb.y + 28, sb.x + 4, sb.y + 12);
+                ctx.lineTo(sb.x + 28, sb.y + 22);
+                ctx.lineTo(sb.x + sb.w - 22, sb.y + 22);
+                ctx.quadraticCurveTo(sb.x + sb.w + 8, sb.y + 10, sb.x + sb.w + 4, sb.y + 32);
+                ctx.quadraticCurveTo(sb.x + sb.w - 2, sb.y + 46, sb.x + sb.w - 12, sb.y + 46);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // 4. Pilot: The Grinch himself grinning over the Sleigh edge
+                drawGrinchMinion(ctx, scx - 6, sb.y + 10, 18, '#84cc16', false, 0, 'climber', sb.vx >= 0 ? 1 : -1);
+
+                // 5. Sleigh HP Bar
                 ctx.fillStyle = '#0f172a';
-                ctx.fillRect(sb.x, sb.y - 16, sb.w, 8);
+                ctx.fillRect(sb.x, sb.y - 20, sb.w, 8);
                 ctx.fillStyle = '#84cc16';
-                ctx.fillRect(sb.x + 1, sb.y - 15, (sb.w - 2) * (sb.hp / sb.maxHp), 6);
+                ctx.fillRect(sb.x + 1, sb.y - 19, (sb.w - 2) * (Math.max(0, sb.hp) / sb.maxHp), 6);
+                ctx.restore();
 
                 // Minions & Frozen Snowballs
                 this.minions.forEach(m => {
-                    drawGrinchMinion(ctx, m.x + 14, m.y + 14, 14, '#84cc16', false, m.freeze);
+                    drawGrinchMinion(ctx, m.x + 14, m.y + 14, 14, '#84cc16', false, m.freeze, 'climber', m.vx >= 0 ? 1 : -1);
                 });
 
                 // Players
@@ -2906,15 +3778,21 @@
                 if (this.numPlayers === 2) p2Box.classList.remove('hidden');
                 else p2Box.classList.add('hidden');
 
+                // Show 12-Level Season & Stage Selector when playing Game 2 (Super Chestnut)
+                const retroSel = document.getElementById('hud-retro-selector');
+                if (retroSel) {
+                    retroSel.classList.toggle('hidden', gameKey !== 'superchestnut');
+                }
+
                 const titles = {
                     chestpac:      'CHEST-PAC: CHESTNUTS DAILY',
-                    superchestnut: 'SUPER CHESTNUT: CHESTNUTS RETROSPECTIVE',
+                    superchestnut: 'SUPER CHESTNUT: CHESTNUTS RETROSPECTIVE (12 SEASONAL LEVELS)',
                     commandos:     'SLEIGH BELL COMMANDOS: CHESTNUT DEPENDENCIES',
                     climbers:      'FROSTY PEAK CLIMBERS: CHESTNUTS PROMOTION'
                 };
                 const legends = {
                     chestpac:      'CHESTNUTS DAILY — P1: Arrows (or WASD in 1P) | P2: Chief Grinch Blocker (WASD)',
-                    superchestnut: 'CHESTNUTS RETROSPECTIVE — P1: Arrows + Space (Jump) + Z (Roast) + Down (Pipe) | P2: WASD + F',
+                    superchestnut: 'RETROSPECTIVE — P1: Arrows + Space (Jump) + Z/F/Shift (Fireball) + Down (Pipe) | P2: WASD + J/Enter',
                     commandos:     'CHESTNUT DEPENDENCIES — P1: Arrows + Space (Jump) + Z (Blaster) | P2: A/D + W (Jump) + F',
                     climbers:      'CHESTNUTS PROMOTION — P1: Arrows + Space (Jump) + Z (Frost Freeze & Kick!) | P2: WASD + F'
                 };
@@ -2924,6 +3802,31 @@
 
                 this.activeGame = this.games[gameKey];
                 this.activeGame.init(this.numPlayers);
+            }
+
+            selectRetroLevel() {
+                if (this.activeGameKey !== 'superchestnut' || !this.activeGame) return;
+                const s = parseInt(document.getElementById('select-season').value, 10) || 1;
+                this.activeGame.loadSeasonStage(s, this.activeGame.stage || 1);
+            }
+
+            setRetroStage(st) {
+                if (this.activeGameKey !== 'superchestnut' || !this.activeGame) return;
+                const s = parseInt(document.getElementById('select-season').value, 10) || this.activeGame.season || 1;
+                this.activeGame.loadSeasonStage(s, st);
+            }
+
+            syncRetroUI(season, stage) {
+                const sel = document.getElementById('select-season');
+                if (sel) sel.value = String(season);
+                [1, 2, 3].forEach(n => {
+                    const btn = document.getElementById(`retro-st-${n}`);
+                    if (btn) {
+                        btn.className = n === stage
+                            ? 'px-2 py-0.5 rounded bg-lime-500 text-slate-950 text-[10px] font-black arcade-font'
+                            : 'px-2 py-0.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 text-[10px] font-black arcade-font';
+                    }
+                });
             }
 
             togglePause() {
