@@ -426,6 +426,47 @@
 
       </div>
 
+      <section aria-labelledby="leaderboardHeading" class="mb-8 rounded-2xl border-2 border-amber-700/60 bg-stone-950/80 p-4 sm:p-6 shadow-2xl">
+        <div class="mb-4 text-center">
+          <span class="font-arcade text-[10px] text-amber-400">PERSONAL BESTS</span>
+          <h3 id="leaderboardHeading" class="mt-2 font-arcade text-sm sm:text-base text-amber-200">ARCADE LEADERBOARD</h3>
+          <p class="mt-2 text-xs text-amber-100/70">Top score for each game on this device</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[420px] text-left text-xs sm:text-sm">
+            <thead>
+              <tr class="border-b border-amber-800/70 text-[10px] uppercase tracking-wider text-amber-300/70">
+                <th scope="col" class="px-3 py-3">Game</th>
+                <th scope="col" class="px-3 py-3 text-right">Top Score</th>
+                <th scope="col" class="px-3 py-3 text-right">Play</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-amber-900/50 text-amber-100">
+              <tr>
+                <th scope="row" class="px-3 py-3 font-semibold text-lime-300">CHESTNUT SNAKE</th>
+                <td id="leaderboardSnakeHigh" class="px-3 py-3 text-right font-arcade text-lime-400">0000</td>
+                <td class="px-3 py-3 text-right"><button onclick="launchGame('snake')" class="rounded-md border border-lime-700/70 px-3 py-1 text-lime-300 hover:bg-lime-900/50">PLAY</button></td>
+              </tr>
+              <tr>
+                <th scope="row" class="px-3 py-3 font-semibold text-amber-300">SPACE CHESTNUT</th>
+                <td id="leaderboardSpaceHigh" class="px-3 py-3 text-right font-arcade text-amber-400">0000</td>
+                <td class="px-3 py-3 text-right"><button onclick="launchGame('space')" class="rounded-md border border-amber-700/70 px-3 py-1 text-amber-300 hover:bg-amber-900/50">PLAY</button></td>
+              </tr>
+              <tr>
+                <th scope="row" class="px-3 py-3 font-semibold text-red-300">CHESTNUT TANKS</th>
+                <td id="leaderboardTanksHigh" class="px-3 py-3 text-right font-arcade text-red-400">0000</td>
+                <td class="px-3 py-3 text-right"><button onclick="launchGame('tanks')" class="rounded-md border border-red-700/70 px-3 py-1 text-red-300 hover:bg-red-900/50">PLAY</button></td>
+              </tr>
+              <tr>
+                <th scope="row" class="px-3 py-3 font-semibold text-purple-300">BOMBER-NUT</th>
+                <td id="leaderboardBomberHigh" class="px-3 py-3 text-right font-arcade text-purple-400">0000</td>
+                <td class="px-3 py-3 text-right"><button onclick="launchGame('bomber')" class="rounded-md border border-purple-700/70 px-3 py-1 text-purple-300 hover:bg-purple-900/50">PLAY</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <!-- Bottom Quick Info Bar -->
       <div class="bg-amber-950/50 border border-amber-800/60 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-amber-200/80">
         <div class="flex items-center gap-3">
@@ -839,6 +880,10 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       document.getElementById('menuSpaceHigh').textContent = String(highScores.space).padStart(4, '0');
       document.getElementById('menuTanksHigh').textContent = String(highScores.tanks).padStart(4, '0');
       document.getElementById('menuBomberHigh').textContent = String(highScores.bomber).padStart(4, '0');
+      document.getElementById('leaderboardSnakeHigh').textContent = String(highScores.snake).padStart(4, '0');
+      document.getElementById('leaderboardSpaceHigh').textContent = String(highScores.space).padStart(4, '0');
+      document.getElementById('leaderboardTanksHigh').textContent = String(highScores.tanks).padStart(4, '0');
+      document.getElementById('leaderboardBomberHigh').textContent = String(highScores.bomber).padStart(4, '0');
     }
     updateMenuHighScores();
 
