@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chestnut Christmas Game Portal</title>
+  <style>
+    :root {
+      --bg-1: #0f1720;
+      --bg-2: #1d2a2f;
+      --bg-3: #2c1a13;
+      --panel: rgba(12, 17, 20, 0.68);
+      --panel-strong: rgba(18, 26, 30, 0.88);
+      --card: rgba(25, 20, 17, 0.86);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #f7f3ee;
+      --muted: #d9c5b5;
+      --gold: #f8c76d;
+      --gold-strong: #f3a70d;
+      --green: #73c58a;
+      --green-strong: #2d9d5d;
+      --red: #d75b4b;
+      --red-strong: #b93a31;
+      --shadow: rgba(1, 4, 6, 0.425);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(243, 167, 13, 0.14), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(115, 197, 138, 0.18), transparent 30%),
+        linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 30%, var(--bg-3) 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(3px 3px at 10% 20%, rgba(255,255,255,0.75) 0, transparent 100%),
+        radial-gradient(2px 2px at 25% 80%, rgba(255,255,255,0.7) 0, transparent 100%),
+        radial-gradient(2.5px 2.5px at 62% 35%, rgba(255,255,255,0.7) 0, transparent 100%),
+        radial-gradient(2px 2px at 80% 70%, rgba(255,255,255,0.7) 0, transparent 100%),
+        radial-gradient(3px 3px at 90% 25%, rgba(255,255,255,0.75) 0, transparent 100%);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    a { text-decoration: none; }
+
+    .container {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      background: rgba(10, 14, 16, 0.5);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text);
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #d18d2a, #8b4319 50%, #4b2c1c);
+      box-shadow: 0 10px 25px rgba(129, 77, 18, 0.45);
+      font-size: 1.6rem;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .brand-text small {
+      color: var(--muted);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: #f4e1d3;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      transition: 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      transform: translateY(-1px);
+      border-color: rgba(248, 199, 109, 0.45);
+      box-shadow: 0 10px 20px rgba(248, 199, 109, 0.12);
+    }
+
+    .hero {
+      padding: 60px 0 28px;
+      position: relative;
+    }
+
+    .hero-panel {
+      background: linear-gradient(180deg, rgba(32, 24, 21, 0.85), rgba(14, 17, 20, 0.9));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: 0 28px 90px rgba(0,0,0,0.28);
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+      padding: 32px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(115, 197, 138, 0.12);
+      border: 1px solid rgba(115, 197, 138, 0.28);
+      color: #b9efc4;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 18px 0 14px;
+      font-size: clamp(2.5rem, 4vw, 4.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      font-weight: 900;
+    }
+
+    .highlight {
+      background: linear-gradient(135deg, #ffe7ab, #f8c76d 35%, #f79e52 70%, #ffd9a6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 4px 26px rgba(248, 199, 109, 0.2);
+    }
+
+    .hero-copy {
+      color: var(--muted);
+      font-size: 1.08rem;
+      max-width: 56ch;
+      line-height: 1.7;
+      margin: 0 0 20px;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-strong) 100%);
+      color: #2f160e;
+      box-shadow: 0 18px 40px rgba(248, 199, 109, 0.25);
+    }
+
+    .btn.secondary {
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      border-color: rgba(255,255,255,0.09);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 30px rgba(0,0,0,0.18);
+    }
+
+    .hero-art {
+      position: relative;
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tree-card {
+      position: relative;
+      width: min(100%, 340px);
+      aspect-ratio: 1;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 50% 18%, rgba(255,255,255,0.14), transparent 18%),
+        linear-gradient(180deg, rgba(32, 59, 44, 0.9) 0%, rgba(20, 17, 15, 0.9) 100%);
+      border: 1px solid rgba(255,255,255,0.07);
+      box-shadow: inset 0 0 24px rgba(255,255,255,0.03), 0 20px 50px rgba(0,0,0,0.25);
+      overflow: hidden;
+    }
+
+    .tree-card::before {
+      content: "";
+      position: absolute;
+      inset: 12% 22% 18% 22%;
+      background: linear-gradient(180deg, #2f9a4e, #1f6f3d 100%);
+      clip-path: polygon(50% 0%, 90% 30%, 75% 30%, 100% 54%, 78% 54%, 100% 82%, 0% 82%, 22% 54%, 0% 54%, 25% 30%, 10% 30%);
+      filter: drop-shadow(0 0 32px rgba(89, 177, 113, 0.25));
+    }
+
+    .tree-card::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 10%;
+      width: 70px;
+      height: 90px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, #7a4a28, #4a2e1e);
+      border-radius: 12px 12px 8px 8px;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,0.05);
+    }
+
+    .chestnut {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 30%, #d79a5e, #8d4c27 56%, #4f2014 100%);
+      box-shadow: inset -10px -8px 18px rgba(0,0,0,0.18), 0 18px 30px rgba(25,15,12,0.38);
+      font-size: 2rem;
+      border: 2px solid rgba(255,255,255,0.14);
+    }
+
+    .chestnut.c1 { top: 18%; left: 18%; }
+    .chestnut.c2 { top: 12%; right: 15%; }
+    .chestnut.c3 { bottom: 18%; left: 20%; }
+    .chestnut.c4 { bottom: 16%; right: 18%; }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 30px 0 18px;
+      flex-wrap: wrap;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(1.5rem, 2vw, 2.2rem);
+      letter-spacing: -0.04em;
+    }
+
+    .tiny-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      padding-bottom: 40px;
+    }
+
+    .game-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 260px;
+      padding: 18px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(24, 18, 17, 0.93), rgba(13, 18, 22, 0.92));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 18px 34px rgba(0,0,0,0.14);
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .game-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(248, 199, 109, 0.3);
+    }
+
+    .game-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(248, 199, 109, 0.18), transparent 60%);
+      pointer-events: none;
+    }
+
+    .game-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .game-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(248, 199, 109, 0.18), rgba(115, 197, 138, 0.12));
+      border: 1px solid rgba(248, 199, 109, 0.22);
+      font-size: 1.5rem;
+    }
+
+    .game-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 7px 9px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      color: #e9dccd;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .game-card h3 {
+      margin: 0 0 10px;
+      font-size: 1.35rem;
+      letter-spacing: -0.04em;
+      position: relative;
+      z-index: 1;
+    }
+
+    .game-card p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.97rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .game-card ul {
+      margin: 0 0 18px;
+      padding-left: 18px;
+      color: #f0dfd1;
+      font-size: 0.87rem;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-actions {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .link-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 14px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #d75b4b, #9a3d33);
+      color: white;
+      font-weight: 800;
+      border: 1px solid rgba(255,255,255,0.08);
+      min-width: 120px;
+    }
+
+    .link-btn.alt {
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      border-color: rgba(255,255,255,0.08);
+    }
+
+    .footer {
+      padding: 18px 0 42px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 760px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+        padding: 22px 18px;
+      }
+
+      .topbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav-links {
+        width: 100%;
+      }
+
+      .nav-links a {
+        flex: 1 1 auto;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand" aria-label="Chestnut Christmas Game Portal">
+        <div class="brand-mark">🌰</div>
+        <div class="brand-text">
+          <span>Chestnut</span>
+          <small>Christmas Games</small>
+        </div>
+      </div>
+
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#games">All Games</a>
+        <a href="#arcade">Arcade</a>
+        <a href="#story">Story</a>
+        <a href="#learning">Learning</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-panel">
+        <div class="hero-inner">
+          <div>
+            <div class="eyebrow">🎄 Winter game collection</div>
+            <h1>Play every <span class="highlight">Chestnut</span> adventure in one place.</h1>
+            <p class="hero-copy">
+              A festive game portal for the repository. Open any subpage and jump directly into the arcade hubs,
+              holiday challenges, story games, and educational mini-games created for this project.
+            </p>
+
+            <div class="cta-row">
+              <a class="btn primary" href="#games">Explore games</a>
+              <a class="btn secondary" href="./ShadowsOfCrown.html">Open Cienie Korony</a>
+            </div>
+          </div>
+
+          <div class="hero-art" aria-hidden="true">
+            <div class="tree-card">
+              <div class="chestnut c1">🌰</div>
+              <div class="chestnut c2">🌰</div>
+              <div class="chestnut c3">🌰</div>
+              <div class="chestnut c4">🌰</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-head" id="games">
+      <h2>Repository game hubs</h2>
+      <div class="tiny-badge">🎮 7 subpages available</div>
+    </div>
+
+    <section class="game-grid" aria-label="Game collection">
+      <article class="game-card" id="arcade">
+        <div class="game-meta">
+          <div class="game-icon">🕹️</div>
+          <div class="game-tag">Arcade</div>
+        </div>
+        <h3>Chestnut Arcade Game Hub</h3>
+        <p>Classic retro cabinet with four mini-games: Snake, Space Impact, Tanks and Bomberman in a warm autumn arcade style.</p>
+        <ul>
+          <li>Snake</li>
+          <li>Space Impact</li>
+          <li>Tanks</li>
+          <li>Bomberman</li>
+        </ul>
+        <div class="card-actions">
+          <a class="link-btn" href="./chestnut_arcade_game_hub.html">Open</a>
+          <a class="link-btn alt" href="./chestnut_arcade_game_hub.html" target="_blank" rel="noopener">New tab</a>
+        </div>
+      </article>
+
+      <article class="game-card">
+        <div class="game-meta">
+          <div class="game-icon">✨</div>
+          <div class="game-tag">Arcade</div>
+        </div>
+        <h3>Chestnut Arcade v2</h3>
+        <p>An upgraded version of the four-in-one cabinet with refreshed presentation and gameplay polish.</p>
+        <ul>
+          <li>Modernized interface</li>
+          <li>Improved game flow</li>
+          <li>Refined game selection</li>
+        </ul>
+        <div class="card-actions">
+          <a class="link-btn" href="./chestnut_arcade_game_hub_v2.html">Open</a>
+          <a class="link-btn alt" href="./chestnut_arcade_game_hub_v2.html" target="_blank" rel="noopener">New tab</a>
+        </div>
+      </article>
+
+      <article class="game-card">
+        <div class="game-meta">
+          <div class="game-icon">🌟</div>
+          <div class="game-tag">2 Player</div>
+        </div>
+        <h3>Autumn Neon 2P Hub</h3>
+        <p>Neon winter-night local arcade designed for two players in cooperative or competitive mode.</p>
+        <ul>
+          <li>Local 2-player gameplay</li>
+          <li>Neon visual style</li>
+          <li>Co-op and rivalry</li>
+        </ul>
+        <div class="card-actions">
+          <a class="link-btn" href="./autumn_neon_chestnut_2p_arcade_hub.html">Open</a>
+          <a class="link-btn alt" href="./autumn_neon_chestnut_2p_arcade_hub.html" target="_blank" rel="noopener">New tab</a>
+        </div>
+      </article>
+
+      <article class="game-card">
+        <div class="game-meta">
+          <div class="game-icon">🎁</div>
+          <div class="game-tag">Holiday</div>
+        </div>
+        <h3>Grinch Chest Conquest</h3>
+        <p>Holiday arcade challenge with festive visuals, chestnut heroes, wintry atmosphere and seasonal mechanics.</p>
+        <ul>
+          <li>Holiday theming</li>
+          <li>Arcade progression</li>
+          <li>Festive boss energy</li>
+        </ul>
+        <div class="card-actions">
+          <a class="link-btn" href="./grinch_chest_conquest.html">Open</a>
+          <a class="link-btn alt" href="./grinch_chest_conquest.html" target="_blank" rel="noopener">New tab</a>
+        </div>
+      </article>
+
+      <article class="game-card" id="learning">
+        <div class="game-meta">
+          <div class="game-icon">🗣️</div>
+          <div class="game-tag">Learning</div>
+        </div>
+        <h3>Logopedyczna Akademia Dźwięków</h3>
+        <p>Speech and pronunciation training game focused on sound recognition and word practice.</p>
+        <ul>
+          <li>Sound exercises</li>
+          <li>Listening tasks</li>
+          <li>Pronunciation practice</li>
+        </ul>
+        <div class="card-actions">
+          <a class="link-btn" href="./logopedia.html">Open</a>
+          <a class="link-btn alt" href="./logopedia.html" target="_blank" rel="noopener">New tab</a>
+        </div>
+      </article>
+
+      <article class="game-card" id="story">
+        <div class="game-meta">
+          <div class="game-icon">🦜</div>
+          <div class="game-tag">Learning</div>
+        </div>
+        <h3>Kraina Wyraźnej Mowy</h3>
+        <p>Educational hub for language and speech exercises, with a more playful and structured learning experience.</p>
+        <ul>
+          <li>Speech challenges</li>
+          <li>Phonetic tasks</li>
+          <li>Interactive learning flow</li>
+        </ul>
+        <div class="card-actions">
+          <a class="link-btn" href="./kraina_wyraznej_mowy.html">Open</a>
+          <a class="link-btn alt" href="./kraina_wyraznej_mowy.html" target="_blank" rel="noopener">New tab</a>
+        </div>
+      </article>
+
+      <article class="game-card">
+        <div class="game-meta">
+          <div class="game-icon">👑</div>
+          <div class="game-tag">Story</div>
+        </div>
+        <h3>Cienie Korony</h3>
+        <p>Strategic court intrigue game in a medieval royal narrative with diplomacy, schemes and power struggles.</p>
+        <ul>
+          <li>Political strategy</li>
+          <li>Intrigue and choices</li>
+          <li>Royal court simulation</li>
+        </ul>
+        <div class="card-actions">
+          <a class="link-btn" href="./ShadowsOfCrown.html">Open</a>
+          <a class="link-btn alt" href="./ShadowsOfCrown.html" target="_blank" rel="noopener">New tab</a>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer container">
+    Chestnut Christmas Portal • Built to gather all game hubs in one modern landing page.
+  </footer>
+</body>
+</html>
