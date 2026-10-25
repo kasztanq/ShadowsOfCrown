@@ -276,6 +276,9 @@
     .hero-caption {
       position: relative;
       z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       margin: -44px 24px 20px auto;
       width: max-content;
       padding: 7px 10px;
@@ -705,6 +708,53 @@
       background: #493020;
     }
 
+    .chess-egg {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      flex: 0 0 auto;
+      opacity: 0.62;
+      transition: opacity 0.2s ease, filter 0.2s ease;
+    }
+
+    .chess-egg:hover,
+    .chess-egg:focus-visible {
+      opacity: 1;
+      filter: drop-shadow(0 0 7px rgba(239, 189, 119, 0.55));
+    }
+
+    .chestnut-stage {
+      position: relative;
+      width: 30px;
+      height: 30px;
+    }
+
+    .orbit-nut {
+      position: absolute;
+      z-index: 1;
+      font-size: 6px;
+      line-height: 1;
+    }
+
+    .orbit-nut:nth-child(1) { top: 1px; left: 13px; }
+    .orbit-nut:nth-child(2) { top: 4px; left: 22px; }
+    .orbit-nut:nth-child(3) { top: 12px; left: 25px; }
+    .orbit-nut:nth-child(4) { top: 21px; left: 21px; }
+    .orbit-nut:nth-child(5) { top: 23px; left: 10px; }
+    .orbit-nut:nth-child(6) { top: 18px; left: 2px; }
+    .orbit-nut:nth-child(7) { top: 7px; left: 1px; }
+
+    .gold-chestnut {
+      position: absolute;
+      z-index: 2;
+      top: 8px;
+      left: 8px;
+      width: 15px;
+      height: 18px;
+    }
+
     .footer {
       padding: 18px 0 42px;
       color: var(--paper-muted);
@@ -774,6 +824,7 @@
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
       }
+
     }
   </style>
 </head>
@@ -820,7 +871,25 @@
           </div>
 
         </div>
-        <div class="hero-caption">An autumn corner of the internet</div>
+        <div class="hero-caption">
+          <span>An autumn corner of the internet</span>
+          <a class="chess-egg" href="./chess_nuts.html" aria-label="Play hidden Chess-Nuts" title="Play hidden Chess-Nuts">
+            <span class="chestnut-stage" aria-hidden="true">
+              <span class="orbit-nut">🌰</span>
+              <span class="orbit-nut">🌰</span>
+              <span class="orbit-nut">🌰</span>
+              <span class="orbit-nut">🌰</span>
+              <span class="orbit-nut">🌰</span>
+              <span class="orbit-nut">🌰</span>
+              <span class="orbit-nut">🌰</span>
+              <svg class="gold-chestnut" viewBox="0 0 120 140">
+                <path d="M18 59C19 34 36 19 60 18C84 19 101 34 102 59C103 89 84 119 60 128C36 119 17 89 18 59Z" fill="#e6a93b" stroke="#ffe7a0" stroke-width="5" />
+                <path d="M20 55C29 39 43 32 60 32C77 32 91 39 100 55C85 49 73 47 60 47C47 47 35 49 20 55Z" fill="#bd741f" stroke="#ffdf83" stroke-width="3" />
+                <path d="M34 66C39 56 48 52 59 52" fill="none" stroke="#fff4c7" stroke-linecap="round" stroke-width="6" opacity="0.8" />
+              </svg>
+            </span>
+          </a>
+        </div>
       </div>
     </section>
 
@@ -837,12 +906,12 @@
           <div class="game-tag">Classic arcade</div>
         </div>
         <h3>Chestnut Arcade Game Hub</h3>
-        <p>Classic retro cabinet with four mini-games: Snake, Space Impact, Tanks and Bomberman in a warm autumn arcade style.</p>
+        <p>Ten classic arcade adventures with five-level progression, collectible golden chestnuts, family trophies, and cozy autumn vibes.</p>
         <ul>
-          <li>Snake</li>
-          <li>Space Impact</li>
-          <li>Tanks</li>
-          <li>Bomberman</li>
+          <li>10 arcade games</li>
+          <li>5 levels each</li>
+          <li>Golden chestnuts</li>
+          <li>Family trophies</li>
         </ul>
         <div class="card-actions">
           <a class="link-btn" href="./chestnut_arcade_game_hub.html">Open</a>
