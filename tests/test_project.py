@@ -138,8 +138,14 @@ class ProjectPagesTests(unittest.TestCase):
             with self.subTest(page=path.name):
                 contents = path.read_text(encoding="utf-8")
                 parser = parse_page(path)
-                self.assertIn('aria-label="Back to home"', contents)
-                self.assertIn("./index.htm", parser.links)
+                has_home_button = (
+                    'aria-label="Back to home"' in contents
+                    and "./index.htm" in parser.links
+                )
+                self.assertTrue(
+                    has_home_button,
+                    f"{path.stem}: missing home page button",
+                )
 
     def test_homepage_has_a_discreet_chess_nuts_easter_egg(self):
         parser = parse_page(ROOT / "index.htm")
