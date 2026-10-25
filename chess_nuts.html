@@ -377,7 +377,7 @@
               Oak Sage (3)
             </button>
           </div>
-          <p id="ai-desc" class="text-[11px] text-amber-400/70 mt-1 italic leading-snug">Level 2: 2-ply Minimax evaluation with botanical piece-square positioning.</p>
+          <p id="ai-desc" class="text-[11px] text-amber-400/70 mt-1 italic leading-snug">Level 2: 3-ply Alpha-Beta + Quiescence capture resolution &amp; positional tables.</p>
         </div>
       </div>
 
@@ -739,10 +739,15 @@
   const sound = new WoodlandSoundEngine();
 
     /* ==========================================================================
-       2. CUSTOM CHESTNUT / BOTANICAL PIECE SVG GENERATION
+       2. CUSTOM CHESTNUT / BOTANICAL PIECE SVG GENERATION (WITH CACHE)
        ========================================================================== */
+    const PIECE_SVG_CACHE = {};
+
     // Generates distinctive vector pieces fitting the chestnut/autumn lore
     function getPieceSvg(type, color) {
+      const cacheKey = `${type.toLowerCase()}_${color}`;
+      if (PIECE_SVG_CACHE[cacheKey]) return PIECE_SVG_CACHE[cacheKey];
+
       const isWhite = color === 'w';
       // Colors: White side = Golden Hazel / Honey Amber; Black side = Roasted Chestnut / Deep Mahogany
       const primary = isWhite ? '#f5d58f' : '#452213';
@@ -826,11 +831,13 @@
           break;
       }
 
-      return `
+      const svgMarkup = `
         <svg viewBox="0 0 50 50" class="w-full h-full piece-svg ${isWhite ? 'white-piece' : 'black-piece'}" xmlns="http://www.w3.org/2000/svg">
           ${inner}
         </svg>
       `;
+      PIECE_SVG_CACHE[cacheKey] = svgMarkup;
+      return svgMarkup;
     }
 
     /* ==========================================================================
@@ -880,6 +887,19 @@
         copy.halfmoveClock = this.halfmoveClock;
         copy.fullmoveNumber = this.fullmoveNumber;
         return copy;
+      }
+
+      // Fast incremental king position tracking to avoid 64-square scans during search
+      getKingPos(color, customBoard = this.board) {
+        for (let r = 0; r < 8; r++) {
+          for (let c = 0; c < 8; c++) {
+            const p = customBoard[r][c];
+            if (p && p.type === 'k' && p.color === color) {
+              return { r, c };
+            }
+          }
+        }
+        return null;
       }
 
       inBounds(r, c) {
@@ -1128,13 +1148,130 @@
       }
 
       isMoveLegal(move) {
-        // Execute virtually on cloned board and verify own king is safe
-        const testEngine = this.clone();
-        testEngine.makeMove(move, true); // virtual move
-        return !testEngine.isInCheck(this.turn);
+        // Fast in-place make/unmake on current board (zero heap allocations)
+        const movingColor = this.turn;
+        const undoRecord = this.makeVirtualMove(move);
+        const legal = !this.isInCheck(movingColor);
+        this.unmakeVirtualMove(undoRecord);
+        return legal;
+      }
+
+      // Ultra-fast in-place virtual move for legality checks & AI Minimax search
+      makeVirtualMove(move) {
+        const fromR = move.from.r, fromC = move.from.c;
+        const toR = move.to.r, toC = move.to.c;
+        const piece = this.board[fromR][fromC];
+        const capturedOnTarget = this.board[toR][toC];
+        let epCapturedPiece = null;
+
+        const record = {
+          move,
+          piece,
+          capturedOnTarget,
+          epCapturedPiece: null,
+          prevTurn: this.turn,
+          prevEnPassant: this.enPassant,
+          prevHalfmove: this.halfmoveClock,
+          prevFullmove: this.fullmoveNumber,
+          wCastleK: this.castling.w.k,
+          wCastleQ: this.castling.w.q,
+          bCastleK: this.castling.b.k,
+          bCastleQ: this.castling.b.q
+        };
+
+        this.board[fromR][fromC] = null;
+
+        if (move.isEnPassant) {
+          epCapturedPiece = this.board[fromR][toC];
+          record.epCapturedPiece = epCapturedPiece;
+          this.board[fromR][toC] = null;
+        }
+
+        if (move.promo) {
+          this.board[toR][toC] = { type: move.promo, color: piece.color };
+        } else {
+          this.board[toR][toC] = piece;
+        }
+
+        if (move.isCastleK) {
+          const baseRank = piece.color === 'w' ? 7 : 0;
+          this.board[baseRank][5] = this.board[baseRank][7];
+          this.board[baseRank][7] = null;
+        } else if (move.isCastleQ) {
+          const baseRank = piece.color === 'w' ? 7 : 0;
+          this.board[baseRank][3] = this.board[baseRank][0];
+          this.board[baseRank][0] = null;
+        }
+
+        // Update Castling Rights
+        if (piece.type === 'k') {
+          this.castling[piece.color].k = false;
+          this.castling[piece.color].q = false;
+        } else if (piece.type === 'r') {
+          if (fromR === 7 && fromC === 7) this.castling.w.k = false;
+          else if (fromR === 7 && fromC === 0) this.castling.w.q = false;
+          else if (fromR === 0 && fromC === 7) this.castling.b.k = false;
+          else if (fromR === 0 && fromC === 0) this.castling.b.q = false;
+        }
+        if (capturedOnTarget && capturedOnTarget.type === 'r') {
+          if (toR === 7 && toC === 7) this.castling.w.k = false;
+          else if (toR === 7 && toC === 0) this.castling.w.q = false;
+          else if (toR === 0 && toC === 7) this.castling.b.k = false;
+          else if (toR === 0 && toC === 0) this.castling.b.q = false;
+        }
+
+        this.enPassant = move.isDoublePawn
+          ? { r: (fromR + toR) >> 1, c: fromC }
+          : null;
+
+        if (piece.type === 'p' || capturedOnTarget || epCapturedPiece) {
+          this.halfmoveClock = 0;
+        } else {
+          this.halfmoveClock++;
+        }
+
+        if (this.turn === 'b') this.fullmoveNumber++;
+        this.turn = this.turn === 'w' ? 'b' : 'w';
+
+        return record;
+      }
+
+      unmakeVirtualMove(record) {
+        const { move, piece, capturedOnTarget, epCapturedPiece } = record;
+        const fromR = move.from.r, fromC = move.from.c;
+        const toR = move.to.r, toC = move.to.c;
+
+        this.turn = record.prevTurn;
+        this.enPassant = record.prevEnPassant;
+        this.halfmoveClock = record.prevHalfmove;
+        this.fullmoveNumber = record.prevFullmove;
+        this.castling.w.k = record.wCastleK;
+        this.castling.w.q = record.wCastleQ;
+        this.castling.b.k = record.bCastleK;
+        this.castling.b.q = record.bCastleQ;
+
+        this.board[fromR][fromC] = piece;
+        this.board[toR][toC] = capturedOnTarget;
+
+        if (move.isEnPassant) {
+          this.board[fromR][toC] = epCapturedPiece;
+        }
+
+        if (move.isCastleK) {
+          const baseRank = piece.color === 'w' ? 7 : 0;
+          this.board[baseRank][7] = this.board[baseRank][5];
+          this.board[baseRank][5] = null;
+        } else if (move.isCastleQ) {
+          const baseRank = piece.color === 'w' ? 7 : 0;
+          this.board[baseRank][0] = this.board[baseRank][3];
+          this.board[baseRank][3] = null;
+        }
       }
 
       makeMove(move, isVirtual = false) {
+        if (isVirtual) {
+          return this.makeVirtualMove(move);
+        }
         const piece = this.board[move.from.r][move.from.c];
         const capturedPiece = move.capture || this.board[move.to.r][move.to.c];
 
@@ -1454,128 +1591,282 @@
             [-10,-20,-20,-20,-20,-20,-20,-10],
             [20, 20,  0,  0,  0,  0, 20, 20],
             [20, 30, 10,  0,  0, 10, 30, 20]
+          ],
+          k_endgame: [
+            [-50,-40,-30,-20,-20,-30,-40,-50],
+            [-30,-20,-10,  0,  0,-10,-20,-30],
+            [-30,-10, 20, 30, 30, 20,-10,-30],
+            [-30,-10, 30, 40, 40, 30,-10,-30],
+            [-30,-10, 30, 40, 40, 30,-10,-30],
+            [-30,-10, 20, 30, 30, 20,-10,-30],
+            [-30,-30,  0,  0,  0,  0,-30,-30],
+            [-50,-30,-30,-30,-30,-30,-30,-50]
           ]
         };
       }
 
       evaluate(engine) {
         let score = 0;
+        let whiteBishops = 0;
+        let blackBishops = 0;
+        let nonPawnMaterial = 0;
+
         for (let r = 0; r < 8; r++) {
           for (let c = 0; c < 8; c++) {
             const p = engine.board[r][c];
-            if (p) {
-              const val = this.pieceValues[p.type];
-              // Positional table indexing
-              const tableRow = p.color === 'w' ? r : 7 - r;
-              const pstVal = this.pst[p.type] ? this.pst[p.type][tableRow][c] : 0;
-              const total = val + pstVal;
-              if (p.color === 'w') score += total;
-              else score -= total;
+            if (p && p.type !== 'k' && p.type !== 'p') {
+              nonPawnMaterial += this.pieceValues[p.type];
             }
           }
         }
+        const isEndgame = nonPawnMaterial <= 2600;
+
+        for (let r = 0; r < 8; r++) {
+          for (let c = 0; c < 8; c++) {
+            const p = engine.board[r][c];
+            if (!p) continue;
+
+            const val = this.pieceValues[p.type];
+            const tableRow = p.color === 'w' ? r : 7 - r;
+            let pstVal = 0;
+            if (p.type === 'k' && isEndgame) {
+              pstVal = this.pst.k_endgame[tableRow][c];
+            } else if (this.pst[p.type]) {
+              pstVal = this.pst[p.type][tableRow][c];
+            }
+
+            let total = val + pstVal;
+
+            // Track bishop pair bonus
+            if (p.type === 'b') {
+              if (p.color === 'w') whiteBishops++;
+              else blackBishops++;
+            }
+
+            // Center control & advanced passed-pawn encouragement
+            if (p.type === 'p') {
+              if (p.color === 'w' && r <= 3) total += (4 - r) * 12;
+              else if (p.color === 'b' && r >= 4) total += (r - 3) * 12;
+            }
+
+            if (p.color === 'w') score += total;
+            else score -= total;
+          }
+        }
+
+        // Bishop pair synergy bonus
+        if (whiteBishops >= 2) score += 35;
+        if (blackBishops >= 2) score -= 35;
+
+        // Check pressure bonus
+        if (engine.isInCheck('b')) score += 25;
+        if (engine.isInCheck('w')) score -= 25;
+
         return score;
       }
 
+      scoreMove(m, engine) {
+        let priority = 0;
+        const attacker = engine.board[m.from.r][m.from.c];
+
+        // 1. MVV-LVA (Most Valuable Victim - Least Valuable Attacker) for captures
+        const victim = m.capture || engine.board[m.to.r][m.to.c];
+        if (victim) {
+          const victimValue = this.pieceValues[victim.type] || 100;
+          const attackerValue = attacker ? this.pieceValues[attacker.type] : 100;
+          priority += 10000 + victimValue * 10 - (attackerValue / 10);
+        }
+
+        // 2. Promotions
+        if (m.promo) {
+          priority += 9000 + (this.pieceValues[m.promo] || 900);
+        }
+
+        // 3. Castling bonus
+        if (m.isCastleK || m.isCastleQ) {
+          priority += 600;
+        }
+
+        // 4. Positional PST delta (prefer developing moves to strong squares early in search)
+        if (attacker && this.pst[attacker.type]) {
+          const fromRow = attacker.color === 'w' ? m.from.r : 7 - m.from.r;
+          const toRow = attacker.color === 'w' ? m.to.r : 7 - m.to.r;
+          priority += (this.pst[attacker.type][toRow][m.to.c] - this.pst[attacker.type][fromRow][m.from.c]);
+        }
+
+        return priority;
+      }
+
       orderMoves(moves, engine) {
-        // Move ordering heuristic: Captures with high value target & checks first
-        return moves.map(m => {
-          let priority = 0;
-          if (m.capture) {
-            const victimValue = this.pieceValues[m.capture.type] || 100;
-            const attacker = engine.board[m.from.r][m.from.c];
-            const attackerValue = attacker ? this.pieceValues[attacker.type] : 100;
-            priority += victimValue * 10 - attackerValue;
+        const scored = new Array(moves.length);
+        for (let i = 0; i < moves.length; i++) {
+          scored[i] = { move: moves[i], priority: this.scoreMove(moves[i], engine) };
+        }
+        scored.sort((a, b) => b.priority - a.priority);
+        const result = new Array(moves.length);
+        for (let i = 0; i < scored.length; i++) {
+          result[i] = scored[i].move;
+        }
+        return result;
+      }
+
+      // Quiescence Search: resolves pending tactical captures & promotions at leaf nodes
+      // so the AI never falls for "horizon effect" bait (e.g. Queen takes defended Pawn)
+      quiescence(engine, alpha, beta, isMaximizing, qDepth = 0) {
+        const standPat = this.evaluate(engine);
+
+        // Limit quiescence depth to keep response crisp
+        if (qDepth >= 3) return standPat;
+
+        if (isMaximizing) {
+          if (standPat >= beta) return beta;
+          if (standPat > alpha) alpha = standPat;
+        } else {
+          if (standPat <= alpha) return alpha;
+          if (standPat < beta) beta = standPat;
+        }
+
+        // Generate only tactical forcing moves (captures & promotions)
+        const allLegal = engine.getAllLegalMoves(engine.turn);
+        if (allLegal.length === 0) {
+          if (engine.isInCheck(engine.turn)) {
+            return isMaximizing ? -99000 : 99000;
           }
-          if (m.promo) priority += 900;
-          return { move: m, priority };
-        }).sort((a, b) => b.priority - a.priority).map(item => item.move);
+          return 0;
+        }
+
+        const tacticalMoves = [];
+        for (let i = 0; i < allLegal.length; i++) {
+          const m = allLegal[i];
+          if (m.capture || m.promo || m.isEnPassant || engine.board[m.to.r][m.to.c]) {
+            tacticalMoves.push(m);
+          }
+        }
+
+        if (tacticalMoves.length === 0) return standPat;
+        const ordered = this.orderMoves(tacticalMoves, engine);
+
+        if (isMaximizing) {
+          for (let i = 0; i < ordered.length; i++) {
+            const undoRecord = engine.makeVirtualMove(ordered[i]);
+            const score = this.quiescence(engine, alpha, beta, false, qDepth + 1);
+            engine.unmakeVirtualMove(undoRecord);
+            if (score >= beta) return beta;
+            if (score > alpha) alpha = score;
+          }
+          return alpha;
+        } else {
+          for (let i = 0; i < ordered.length; i++) {
+            const undoRecord = engine.makeVirtualMove(ordered[i]);
+            const score = this.quiescence(engine, alpha, beta, true, qDepth + 1);
+            engine.unmakeVirtualMove(undoRecord);
+            if (score <= alpha) return alpha;
+            if (score < beta) beta = score;
+          }
+          return beta;
+        }
       }
 
       minimax(engine, depth, alpha, beta, isMaximizing) {
-        const status = engine.getGameStatus();
-        if (status.over) {
-          if (status.result === 'checkmate') {
-            return isMaximizing ? -99999 + (3 - depth) : 99999 - (3 - depth);
-          }
-          return 0; // Draw
-        }
+        if (engine.halfmoveClock >= 100) return 0;
 
-        if (depth === 0) {
-          return this.evaluate(engine);
+        if (depth <= 0) {
+          return this.quiescence(engine, alpha, beta, isMaximizing, 0);
         }
 
         const rawMoves = engine.getAllLegalMoves(engine.turn);
+        if (rawMoves.length === 0) {
+          if (engine.isInCheck(engine.turn)) {
+            // Prefer faster checkmates (higher remaining depth = sooner mate)
+            return isMaximizing ? -99999 - depth * 100 : 99999 + depth * 100;
+          }
+          return 0; // Stalemate draw
+        }
+
         const moves = this.orderMoves(rawMoves, engine);
 
         if (isMaximizing) {
           let maxEval = -Infinity;
-          for (const move of moves) {
-            const nextEngine = engine.clone();
-            nextEngine.makeMove(move, true);
-            const ev = this.minimax(nextEngine, depth - 1, alpha, beta, false);
-            maxEval = Math.max(maxEval, ev);
-            alpha = Math.max(alpha, ev);
+          for (let i = 0; i < moves.length; i++) {
+            const undoRecord = engine.makeVirtualMove(moves[i]);
+            const ev = this.minimax(engine, depth - 1, alpha, beta, false);
+            engine.unmakeVirtualMove(undoRecord);
+            if (ev > maxEval) maxEval = ev;
+            if (ev > alpha) alpha = ev;
             if (beta <= alpha) break;
           }
           return maxEval;
         } else {
           let minEval = Infinity;
-          for (const move of moves) {
-            const nextEngine = engine.clone();
-            nextEngine.makeMove(move, true);
-            const ev = this.minimax(nextEngine, depth - 1, alpha, beta, true);
-            minEval = Math.min(minEval, ev);
-            beta = Math.min(beta, ev);
+          for (let i = 0; i < moves.length; i++) {
+            const undoRecord = engine.makeVirtualMove(moves[i]);
+            const ev = this.minimax(engine, depth - 1, alpha, beta, true);
+            engine.unmakeVirtualMove(undoRecord);
+            if (ev < minEval) minEval = ev;
+            if (ev < beta) beta = ev;
             if (beta <= alpha) break;
           }
           return minEval;
         }
       }
 
-      findBestMove(engine, depth = 2) {
+      findBestMove(engine, level = 2) {
         const moves = engine.getAllLegalMoves(engine.turn);
         if (moves.length === 0) return null;
-
-        // Level 1: Quick & slightly random captures
-        if (depth === 1) {
-          const captures = moves.filter(m => m.capture);
-          if (captures.length > 0 && Math.random() < 0.7) {
-            return captures[Math.floor(Math.random() * captures.length)];
-          }
-          return moves[Math.floor(Math.random() * moves.length)];
-        }
+        if (moves.length === 1) return moves[0];
 
         const isMaximizing = engine.turn === 'w';
-        let bestMove = null;
-        let bestScore = isMaximizing ? -Infinity : Infinity;
+
+        // Level 1 (Forager): 2-ply tactical lookahead with slight natural variety among top moves
+        if (level === 1) {
+          const ordered = this.orderMoves(moves, engine);
+          let bestMove = ordered[0];
+          let bestScore = isMaximizing ? -Infinity : Infinity;
+          for (let i = 0; i < ordered.length; i++) {
+            const m = ordered[i];
+            const undoRecord = engine.makeVirtualMove(m);
+            const score = this.evaluate(engine) + (Math.random() * 30 - 15);
+            engine.unmakeVirtualMove(undoRecord);
+            if ((isMaximizing && score > bestScore) || (!isMaximizing && score < bestScore)) {
+              bestScore = score;
+              bestMove = m;
+            }
+          }
+          return bestMove;
+        }
+
+        // Level 2 (Forester): 3-ply Alpha-Beta + Quiescence capture resolution
+        // Level 3 (Oak Sage): 4-ply Alpha-Beta + Quiescence capture resolution
+        const searchDepth = level === 2 ? 3 : 4;
         const orderedMoves = this.orderMoves(moves, engine);
 
-        // Alpha-Beta search over roots
+        let bestMove = orderedMoves[0];
+        let bestScore = isMaximizing ? -Infinity : Infinity;
         let alpha = -Infinity;
         let beta = Infinity;
 
-        for (const move of orderedMoves) {
-          const next = engine.clone();
-          next.makeMove(move, true);
-          const score = this.minimax(next, depth - 1, alpha, beta, !isMaximizing);
+        for (let i = 0; i < orderedMoves.length; i++) {
+          const move = orderedMoves[i];
+          const undoRecord = engine.makeVirtualMove(move);
+          const score = this.minimax(engine, searchDepth - 1, alpha, beta, !isMaximizing);
+          engine.unmakeVirtualMove(undoRecord);
 
           if (isMaximizing) {
             if (score > bestScore) {
               bestScore = score;
               bestMove = move;
             }
-            alpha = Math.max(alpha, score);
+            if (score > alpha) alpha = score;
           } else {
             if (score < bestScore) {
               bestScore = score;
               bestMove = move;
             }
-            beta = Math.min(beta, score);
+            if (score < beta) beta = score;
           }
         }
 
-        return bestMove || moves[0];
+        return bestMove || orderedMoves[0];
       }
     }
 
@@ -1597,6 +1888,8 @@
         this.legalMovesForSelected = [];
         this.lastMove = null;
         this.pendingPromotionMove = null;
+        this.squareCells = []; // Pre-allocated 64 DOM elements for instant updates
+        this.cachedGameStatus = null;
 
         // Custom Editable Player Names
         this.playerNames = {
@@ -1805,6 +2098,15 @@
 
         // PGN Copy
         document.getElementById('copy-pgn').addEventListener('click', () => this.copyPGN());
+
+        // Single delegated click/pointer listener on chessboard for zero-lag response
+        this.boardEl.addEventListener('pointerdown', (e) => {
+          const sq = e.target.closest('[data-row]');
+          if (!sq) return;
+          const r = parseInt(sq.dataset.row, 10);
+          const c = parseInt(sq.dataset.col, 10);
+          this.handleSquareClick(r, c);
+        });
       }
 
       /* ----------------------------------------------------------------------
@@ -1841,7 +2143,7 @@
           return;
         }
 
-        const status = this.engine.getGameStatus();
+        const status = this.cachedGameStatus || this.engine.getGameStatus();
         if (status.over) return;
 
         const sec = this.getTurnLimitSecondsForColor(this.engine.turn);
@@ -1859,8 +2161,7 @@
 
         this.timerInterval = setInterval(() => {
           if (this.timerPaused) return;
-          const st = this.engine.getGameStatus();
-          if (st.over) {
+          if (this.cachedGameStatus && this.cachedGameStatus.over) {
             clearInterval(this.timerInterval);
             return;
           }
@@ -2074,9 +2375,9 @@
         });
 
         const descs = {
-          1: 'Level 1: Fast instinctive foraging with occasional tactical blunders.',
-          2: 'Level 2: 2-ply Minimax evaluation with botanical piece-square positioning.',
-          3: 'Level 3: Deep 3-ply Alpha-Beta search with captures ordering & sharp tactical vision.'
+          1: 'Level 1: 1-ply positional & capture evaluator with natural variety.',
+          2: 'Level 2: 3-ply Alpha-Beta + Quiescence capture resolution & positional tables.',
+          3: 'Level 3: Deep 4-ply Alpha-Beta + Quiescence search, MVV-LVA & endgame tables.'
         };
         document.getElementById('ai-desc').textContent = descs[lvl];
         this.syncPlayerCardLabels();
@@ -2118,78 +2419,102 @@
       handleUndo() {
         if (this.engine.history.length === 0) return;
         if (this.mode === 'pve') {
-          // If in AI mode, undo twice so it's user's turn again (unless AI is thinking)
+          // Undo both AI move and Player move
           this.engine.undoMove();
-          if (this.engine.history.length > 0 && this.engine.turn === this.aiColor) {
+          if (this.engine.turn === this.aiColor && this.engine.history.length > 0) {
             this.engine.undoMove();
           }
         } else {
           this.engine.undoMove();
         }
+        const prev = this.engine.history[this.engine.history.length - 1];
+        this.lastMove = prev ? prev.move : null;
         this.selectedSquare = null;
         this.legalMovesForSelected = [];
-        this.lastMove = this.engine.history.length > 0 ? this.engine.history[this.engine.history.length - 1].move : null;
+        this.cachedGameStatus = this.engine.getGameStatus();
         this.renderBoard();
         this.updateUI();
         this.startOrResetTurnTimer();
-        sound.playMove();
+      }
+
+      initBoardDOM() {
+        this.boardEl.innerHTML = '';
+        this.squareCells = [];
+        for (let i = 0; i < 64; i++) {
+          const sq = document.createElement('div');
+          const pieceWrapper = document.createElement('div');
+          pieceWrapper.className = 'w-[84%] h-[84%] pointer-events-none flex items-center justify-center';
+          const marker = document.createElement('div');
+          marker.className = 'hidden';
+          sq.appendChild(pieceWrapper);
+          sq.appendChild(marker);
+          this.boardEl.appendChild(sq);
+          this.squareCells.push({
+            sq,
+            pieceWrapper,
+            marker,
+            renderedKey: ''
+          });
+        }
       }
 
       renderBoard() {
-        this.boardEl.innerHTML = '';
+        if (this.squareCells.length !== 64) {
+          this.initBoardDOM();
+        }
+
         const inCheck = this.engine.isInCheck(this.engine.turn);
         const kingPos = inCheck ? this.engine.getKingPos(this.engine.turn) : null;
 
+        // Fast lookup map for legal destination squares
+        const legalMap = new Map();
+        for (let i = 0; i < this.legalMovesForSelected.length; i++) {
+          const m = this.legalMovesForSelected[i];
+          legalMap.set((m.to.r << 3) | m.to.c, m);
+        }
+
+        let cellIdx = 0;
         for (let rowIdx = 0; rowIdx < 8; rowIdx++) {
           for (let colIdx = 0; colIdx < 8; colIdx++) {
             const r = this.isFlipped ? 7 - rowIdx : rowIdx;
             const c = this.isFlipped ? 7 - colIdx : colIdx;
+            const cell = this.squareCells[cellIdx++];
+            const { sq, pieceWrapper, marker } = cell;
 
-            const sq = document.createElement('div');
             const isLight = (r + c) % 2 === 0;
-            sq.className = `relative flex items-center justify-center transition-colors cursor-pointer ${isLight ? 'sq-light' : 'sq-dark'}`;
+            let cls = `relative flex items-center justify-center cursor-pointer ${isLight ? 'sq-light' : 'sq-dark'}`;
+
+            if (this.selectedSquare && this.selectedSquare.r === r && this.selectedSquare.c === c) {
+              cls += ' sq-selected';
+            }
+            if (this.lastMove && ((this.lastMove.from.r === r && this.lastMove.from.c === c) || (this.lastMove.to.r === r && this.lastMove.to.c === c))) {
+              cls += ' sq-last-move';
+            }
+            if (kingPos && kingPos.r === r && kingPos.c === c) {
+              cls += ' sq-check';
+            }
+
+            if (sq.className !== cls) sq.className = cls;
             sq.dataset.row = r;
             sq.dataset.col = c;
 
-            // Highlight selected square
-            if (this.selectedSquare && this.selectedSquare.r === r && this.selectedSquare.c === c) {
-              sq.classList.add('sq-selected');
-            }
-
-            // Highlight previous move
-            if (this.lastMove && ((this.lastMove.from.r === r && this.lastMove.from.c === c) || (this.lastMove.to.r === r && this.lastMove.to.c === c))) {
-              sq.classList.add('sq-last-move');
-            }
-
-            // Highlight King in check
-            if (kingPos && kingPos.r === r && kingPos.c === c) {
-              sq.classList.add('sq-check');
-            }
-
-            // Piece Rendering
+            // Only update SVG DOM when the piece on this square actually changed
             const piece = this.engine.board[r][c];
-            if (piece) {
-              const svgMarkup = getPieceSvg(piece.type, piece.color);
-              const pieceWrapper = document.createElement('div');
-              pieceWrapper.className = 'w-[84%] h-[84%] pointer-events-none flex items-center justify-center';
-              pieceWrapper.innerHTML = svgMarkup;
-              sq.appendChild(pieceWrapper);
+            const pieceKey = piece ? `${piece.type}_${piece.color}` : '';
+            if (cell.renderedKey !== pieceKey) {
+              cell.renderedKey = pieceKey;
+              pieceWrapper.innerHTML = piece ? getPieceSvg(piece.type, piece.color) : '';
             }
 
-            // Legal move hints
-            const isLegal = this.legalMovesForSelected.find(m => m.to.r === r && m.to.c === c);
+            // Update legal move indicator dot/ring
+            const isLegal = legalMap.get((r << 3) | c);
             if (isLegal) {
-              const marker = document.createElement('div');
-              if (piece || isLegal.isEnPassant) {
-                marker.className = 'legal-capture-ring absolute';
-              } else {
-                marker.className = 'legal-dot absolute';
-              }
-              sq.appendChild(marker);
+              marker.className = (piece || isLegal.isEnPassant)
+                ? 'legal-capture-ring absolute'
+                : 'legal-dot absolute';
+            } else if (marker.className !== 'hidden') {
+              marker.className = 'hidden';
             }
-
-            sq.addEventListener('click', () => this.handleSquareClick(r, c));
-            this.boardEl.appendChild(sq);
           }
         }
       }
@@ -2286,15 +2611,20 @@
           sound.playMove();
         }
 
+        // Compute game status once per move and cache it
+        this.cachedGameStatus = this.engine.getGameStatus();
+
         this.renderBoard();
         this.updateUI();
 
         // Check for Game Over
-        const status = this.engine.getGameStatus();
-        if (status.over) {
+        if (this.cachedGameStatus.over) {
           if (this.timerInterval) clearInterval(this.timerInterval);
           sound.playVictory();
-          this.showGameOverModal(status.result === 'checkmate' ? '👑 Checkmate!' : '🌾 Stalemate / Draw', status.message);
+          this.showGameOverModal(
+            this.cachedGameStatus.result === 'checkmate' ? '👑 Checkmate!' : '🌾 Stalemate / Draw',
+            this.cachedGameStatus.message
+          );
           return;
         }
 
@@ -2311,23 +2641,25 @@
         this.aiThinkingPill.classList.remove('hidden');
         this.aiThinkingPill.classList.add('flex');
 
-        setTimeout(() => {
-          const depth = this.aiLevel;
-          const bestMove = this.ai.findBestMove(this.engine, depth);
-          this.aiThinkingPill.classList.add('hidden');
-          this.aiThinkingPill.classList.remove('flex');
+        // Let the browser paint the player's move first, then compute AI move immediately
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            const depth = this.aiLevel;
+            const bestMove = this.ai.findBestMove(this.engine, depth);
+            this.aiThinkingPill.classList.add('hidden');
+            this.aiThinkingPill.classList.remove('flex');
 
-          if (bestMove) {
-            // Auto queen if promotion
-            if (!bestMove.promo) {
-              const movingPiece = this.engine.board[bestMove.from.r][bestMove.from.c];
-              if (movingPiece && movingPiece.type === 'p' && (bestMove.to.r === 7 || bestMove.to.r === 0)) {
-                bestMove.promo = 'q';
+            if (bestMove) {
+              if (!bestMove.promo) {
+                const movingPiece = this.engine.board[bestMove.from.r][bestMove.from.c];
+                if (movingPiece && movingPiece.type === 'p' && (bestMove.to.r === 7 || bestMove.to.r === 0)) {
+                  bestMove.promo = 'q';
+                }
               }
+              this.executeMove(bestMove);
             }
-            this.executeMove(bestMove);
-          }
-        }, 320);
+          }, 30);
+        });
       }
 
       showGameOverModal(title, subtitle) {
@@ -2366,7 +2698,8 @@
         updateLastTimeBadge(topColor, this.topLastTimeEl);
         updateLastTimeBadge(botColor, this.bottomLastTimeEl);
 
-        const status = this.engine.getGameStatus();
+        const status = this.cachedGameStatus || this.engine.getGameStatus();
+        this.cachedGameStatus = status;
         this.statusTextEl.textContent = status.message;
 
         this.clockHalfEl.textContent = this.engine.halfmoveClock;
