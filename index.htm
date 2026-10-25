@@ -4,26 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chestnut Autumn Game Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-1: #0f1d1b;
-      --bg-2: #16372c;
-      --bg-3: #234b36;
-      --panel: rgba(12, 22, 18, 0.72);
-      --panel-strong: rgba(15, 29, 24, 0.9);
-      --card: rgba(16, 29, 25, 0.9);
-      --border: rgba(255, 255, 255, 0.09);
-      --text: #edf9ef;
-      --muted: #d5ebd8;
-      --gold: #e7f39a;
-      --gold-strong: #bddb66;
-      --green: #8ed298;
-      --green-strong: #4caf73;
-      --red: #7abf9d;
-      --red-strong: #57a67d;
-      --shadow: rgba(5, 13, 10, 0.42);
-      --leaf: #85cf91;
-      --forest: #1e563d;
+      --paper: #f5ead7;
+      --paper-muted: #e9d9c0;
+      --ink: #33231b;
+      --ink-soft: #624b3c;
+      --chestnut: #7c3f24;
+      --chestnut-dark: #482719;
+      --amber: #d49a4d;
+      --line: rgba(74, 47, 30, 0.18);
     }
 
     * { box-sizing: border-box; }
@@ -35,29 +28,25 @@
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top, rgba(142, 210, 152, 0.18), transparent 24%),
-        radial-gradient(circle at bottom left, rgba(126, 203, 127, 0.16), transparent 30%),
-        linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 35%, var(--bg-3) 100%);
+      font-family: "DM Sans", "Segoe UI", sans-serif;
+      color: var(--paper);
+      background-color: #33271e;
+      background-image:
+        linear-gradient(180deg, rgba(36, 27, 20, 0.42), rgba(36, 27, 20, 0.66)),
+        url("./background.jpg");
+      background-position: center, center 42%;
+      background-size: cover;
+      background-attachment: fixed;
       overflow-x: hidden;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-image:
-        radial-gradient(2.5px 2.5px at 12% 24%, rgba(255,255,255,0.18) 0, transparent 100%),
-        radial-gradient(2px 2px at 28% 78%, rgba(255,255,255,0.12) 0, transparent 100%),
-        radial-gradient(3px 3px at 65% 26%, rgba(255,255,255,0.12) 0, transparent 100%),
-        radial-gradient(2px 2px at 88% 64%, rgba(255,255,255,0.1) 0, transparent 100%);
-      opacity: 0.8;
-      pointer-events: none;
-    }
-
     a { text-decoration: none; }
+
+    a:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid #efbd77;
+      outline-offset: 3px;
+    }
 
     .container {
       width: min(1180px, calc(100% - 32px));
@@ -68,9 +57,8 @@
       position: sticky;
       top: 0;
       z-index: 20;
-      backdrop-filter: blur(14px);
-      background: rgba(10, 14, 16, 0.5);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(43, 30, 21, 0.92);
+      border-bottom: 1px solid rgba(245, 234, 215, 0.2);
     }
 
     .topbar-inner {
@@ -85,7 +73,7 @@
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      color: var(--text);
+      color: var(--paper);
       font-weight: 800;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -96,9 +84,9 @@
       height: 42px;
       display: grid;
       place-items: center;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #d18d2a, #8b4319 50%, #4b2c1c);
-      box-shadow: 0 10px 25px rgba(129, 77, 18, 0.45);
+      border-radius: 10px;
+      background: var(--chestnut);
+      border: 1px solid rgba(245, 234, 215, 0.28);
       font-size: 1.6rem;
     }
 
@@ -109,7 +97,7 @@
     }
 
     .brand-text small {
-      color: var(--muted);
+      color: var(--paper-muted);
       font-size: 0.68rem;
       letter-spacing: 0.14em;
     }
@@ -122,79 +110,102 @@
     }
 
     .nav-links a {
-      color: #f4e1d3;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
+      color: var(--paper);
+      border: 1px solid rgba(245, 234, 215, 0.22);
+      background: transparent;
       padding: 10px 14px;
-      border-radius: 999px;
+      border-radius: 7px;
       font-size: 0.84rem;
       transition: 0.2s ease;
     }
 
     .nav-links a:hover {
-      transform: translateY(-1px);
-      border-color: rgba(248, 199, 109, 0.45);
-      box-shadow: 0 10px 20px rgba(248, 199, 109, 0.12);
+      background: rgba(245, 234, 215, 0.1);
+      border-color: var(--amber);
     }
 
     .hero {
-      padding: 60px 0 28px;
+      padding: 42px 0 24px;
       position: relative;
     }
 
     .hero-panel {
-      background: linear-gradient(180deg, rgba(20, 39, 31, 0.9), rgba(10, 18, 16, 0.92));
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 30px;
+      position: relative;
+      background:
+        linear-gradient(90deg, rgba(38, 27, 19, 0.94) 0%, rgba(38, 27, 19, 0.82) 46%, rgba(38, 27, 19, 0.16) 100%),
+        url("./background.jpg") center 44% / cover;
+      border: 1px solid rgba(245, 234, 215, 0.24);
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 28px 90px rgba(0,0,0,0.28);
+      box-shadow: 0 18px 48px rgba(24, 16, 10, 0.28);
     }
 
     .hero-inner {
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 24px;
-      padding: 32px;
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 390px;
+      padding: clamp(28px, 5vw, 58px);
       align-items: center;
+      max-width: 790px;
     }
 
     .eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: rgba(136, 218, 165, 0.12);
-      border: 1px solid rgba(136, 218, 165, 0.26);
-      color: #d1f4d5;
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
+      padding: 7px 11px;
+      border-radius: 4px;
+      background: rgba(212, 154, 77, 0.17);
+      border: 1px solid rgba(212, 154, 77, 0.44);
+      color: #f0d3a5;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       font-weight: 700;
     }
 
     h1 {
       margin: 18px 0 14px;
-      font-size: clamp(2.5rem, 4vw, 4.5rem);
-      line-height: 0.95;
-      letter-spacing: -0.06em;
-      font-weight: 900;
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: clamp(2.7rem, 5.3vw, 5rem);
+      line-height: 1.02;
+      letter-spacing: -0.035em;
+      font-weight: 400;
     }
 
     .highlight {
-      background: linear-gradient(135deg, #d7f9c1, #87d892 35%, #6bbf95 70%, #cfeea7);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 4px 26px rgba(135, 216, 146, 0.18);
+      color: #efbd77;
     }
 
     .hero-copy {
-      color: var(--muted);
+      color: #f0e3d2;
       font-size: 1.08rem;
       max-width: 56ch;
       line-height: 1.7;
       margin: 0 0 20px;
+    }
+
+    .about-box {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-left: 2px solid var(--amber);
+      background: rgba(28, 20, 15, 0.52);
+    }
+
+    .about-label {
+      margin-bottom: 7px;
+      color: #efbd77;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .about-box p {
+      margin: 0;
+      color: #f0e3d2;
+      font-size: 0.94rem;
+      line-height: 1.65;
     }
 
     .cta-row {
@@ -210,109 +221,41 @@
       justify-content: center;
       gap: 8px;
       padding: 14px 20px;
-      border-radius: 14px;
+      border-radius: 6px;
       border: 1px solid transparent;
       font-weight: 800;
       letter-spacing: 0.02em;
-      transition: 0.2s ease;
+      transition: background-color 0.2s ease, transform 0.2s ease;
       cursor: pointer;
     }
 
     .btn.primary {
-      background: linear-gradient(135deg, #9ce5a9 0%, #5bbd7d 100%);
-      color: #0f261a;
-      box-shadow: 0 18px 40px rgba(91, 189, 125, 0.25);
+      background: #d49a4d;
+      color: #2e1d12;
+      box-shadow: none;
     }
 
     .btn.secondary {
-      background: rgba(255,255,255,0.03);
-      color: var(--text);
-      border-color: rgba(255,255,255,0.09);
+      background: rgba(43, 30, 21, 0.52);
+      color: var(--paper);
+      border-color: rgba(245, 234, 215, 0.28);
     }
 
     .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 16px 30px rgba(0,0,0,0.18);
+      transform: translateY(-1px);
+      background-color: #e5ad61;
     }
 
-    .hero-art {
+    .hero-caption {
       position: relative;
-      min-height: 300px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .tree-card {
-      position: relative;
-      width: min(100%, 340px);
-      aspect-ratio: 1;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 50% 50%, rgba(146, 255, 175, 0.14), rgba(17, 30, 25, 0.85) 55%, rgba(10, 17, 15, 1) 100%);
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: inset 0 0 28px rgba(255,255,255,0.03), 0 24px 60px rgba(0,0,0,0.28);
-      overflow: hidden;
-    }
-
-    .tree-card::before {
-      content: "";
-      position: absolute;
-      inset: 14%;
-      border-radius: 50%;
-      border: 2px solid rgba(160, 223, 173, 0.26);
-      box-shadow: inset 0 0 0 12px rgba(160, 223, 173, 0.05), 0 0 30px rgba(118, 211, 146, 0.08);
-    }
-
-    .chestnut {
-      --orbit-radius: 122px;
-      --spin: 0deg;
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      display: grid;
-      place-items: center;
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 38% 30%, #d5b376, #7d5b37 56%, #3c2618 100%);
-      box-shadow: inset -8px -7px 16px rgba(0,0,0,0.2), 0 14px 26px rgba(31, 23, 17, 0.35);
-      font-size: 1.5rem;
-      border: 2px solid rgba(255,255,255,0.12);
-      transform: translate(-50%, -50%) rotate(var(--spin)) translateX(var(--orbit-radius));
-      animation: floatChestnut 5s ease-in-out infinite;
-      animation-delay: var(--delay, 0s);
-    }
-
-    .chestnut.gold {
-      --orbit-radius: 0px;
-      --spin: 0deg;
-      width: 74px;
-      height: 74px;
-      background: radial-gradient(circle at 38% 30%, #fff4bb, #f4c95c 45%, #d89e28 100%);
-      box-shadow: 0 0 28px rgba(244, 201, 92, 0.85), inset -10px -8px 16px rgba(120, 77, 0, 0.22);
-      z-index: 3;
-      font-size: 2.1rem;
-      border-color: rgba(255,255,255,0.35);
-      animation: pulseGold 2.8s ease-in-out infinite;
-    }
-
-    .chestnut.c1 { --spin: 0deg; --delay: 0s; }
-    .chestnut.c2 { --spin: 51deg; --delay: 0.2s; }
-    .chestnut.c3 { --spin: 103deg; --delay: 0.4s; }
-    .chestnut.c4 { --spin: 154deg; --delay: 0.6s; }
-    .chestnut.c5 { --spin: 206deg; --delay: 0.8s; }
-    .chestnut.c6 { --spin: 257deg; --delay: 1s; }
-    .chestnut.c7 { --spin: 309deg; --delay: 1.2s; }
-
-    @keyframes floatChestnut {
-      0%, 100% { transform: translate(-50%, -50%) rotate(var(--spin)) translateX(var(--orbit-radius)) scale(1); }
-      50% { transform: translate(-50%, -50%) rotate(var(--spin)) translateX(var(--orbit-radius)) scale(1.08); }
-    }
-
-    @keyframes pulseGold {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); }
-      50% { transform: translate(-50%, -50%) scale(1.08); }
+      margin: -44px 24px 20px auto;
+      width: max-content;
+      padding: 7px 10px;
+      color: #f3e4d0;
+      background: rgba(43, 30, 21, 0.62);
+      border-left: 2px solid var(--amber);
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
     }
 
     .section-head {
@@ -326,8 +269,11 @@
 
     .section-head h2 {
       margin: 0;
-      font-size: clamp(1.5rem, 2vw, 2.2rem);
-      letter-spacing: -0.04em;
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: clamp(1.7rem, 2.5vw, 2.5rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      color: var(--paper);
     }
 
     .tiny-badge {
@@ -335,10 +281,10 @@
       align-items: center;
       gap: 8px;
       padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: var(--muted);
+      border-radius: 4px;
+      background: rgba(43, 30, 21, 0.72);
+      border: 1px solid rgba(245, 234, 215, 0.22);
+      color: var(--paper);
       font-size: 0.8rem;
     }
 
@@ -354,28 +300,19 @@
       display: flex;
       flex-direction: column;
       min-height: 260px;
-      padding: 18px;
-      border-radius: 22px;
-      background: linear-gradient(180deg, rgba(24, 18, 17, 0.93), rgba(13, 18, 22, 0.92));
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 18px 34px rgba(0,0,0,0.14);
+      padding: 20px;
+      border-radius: 8px;
+      background: rgba(245, 234, 215, 0.96);
+      color: var(--ink);
+      border: 1px solid rgba(74, 47, 30, 0.22);
+      box-shadow: 0 8px 22px rgba(24, 16, 10, 0.16);
       overflow: hidden;
       transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
     .game-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(248, 199, 109, 0.3);
-    }
-
-    .game-card::before {
-      content: "";
-      position: absolute;
-      inset: 0 auto auto 0;
-      width: 140px;
-      height: 140px;
-      background: radial-gradient(circle, rgba(120, 210, 140, 0.18), transparent 60%);
-      pointer-events: none;
+      transform: translateY(-3px);
+      border-color: var(--amber);
     }
 
     .game-meta {
@@ -391,11 +328,11 @@
     .game-icon {
       width: 48px;
       height: 48px;
-      border-radius: 16px;
+      border-radius: 8px;
       display: grid;
       place-items: center;
-      background: linear-gradient(135deg, rgba(130, 210, 160, 0.18), rgba(91, 189, 125, 0.12));
-      border: 1px solid rgba(130, 210, 160, 0.22);
+      background: #ead9bd;
+      border: 1px solid var(--line);
       font-size: 1.5rem;
     }
 
@@ -403,27 +340,30 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: transparent;
+      border: 1px solid rgba(74, 47, 30, 0.22);
       padding: 7px 9px;
       border-radius: 999px;
       font-size: 0.7rem;
-      color: #e9dccd;
+      color: var(--ink-soft);
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
 
     .game-card h3 {
       margin: 0 0 10px;
-      font-size: 1.35rem;
-      letter-spacing: -0.04em;
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: 1.55rem;
+      font-weight: 400;
+      letter-spacing: -0.015em;
+      color: var(--ink);
       position: relative;
       z-index: 1;
     }
 
     .game-card p {
       margin: 0 0 18px;
-      color: var(--muted);
+      color: var(--ink-soft);
       line-height: 1.6;
       font-size: 0.97rem;
       position: relative;
@@ -433,7 +373,7 @@
     .game-card ul {
       margin: 0 0 18px;
       padding-left: 18px;
-      color: #f0dfd1;
+      color: var(--ink-soft);
       font-size: 0.87rem;
       line-height: 1.6;
       position: relative;
@@ -454,43 +394,54 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 11px 14px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #8bd9a0, #499d68);
-      color: #0f261a;
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 11px 8px;
+      border-radius: 5px;
+      background: var(--chestnut);
+      color: #fff7eb;
       font-weight: 800;
-      border: 1px solid rgba(255,255,255,0.08);
-      min-width: 120px;
+      border: 1px solid var(--chestnut);
+      white-space: nowrap;
+      transition: background-color 0.2s ease;
+    }
+
+    .link-btn:hover {
+      background: var(--chestnut-dark);
     }
 
     .link-btn.alt {
-      background: rgba(255,255,255,0.04);
-      color: var(--text);
-      border-color: rgba(255,255,255,0.08);
+      background: transparent;
+      color: var(--chestnut-dark);
+      border-color: rgba(74, 47, 30, 0.28);
+    }
+
+    .link-btn.alt:hover {
+      background: #ead9bd;
     }
 
     .other-projects {
       margin: 0 0 28px;
       padding: 16px 18px;
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 18px;
-      background: rgba(10, 20, 16, 0.48);
+      border: 1px solid rgba(245, 234, 215, 0.24);
+      border-radius: 8px;
+      background: rgba(43, 30, 21, 0.82);
     }
 
     .other-projects summary {
-      color: #c8e8ce;
+      color: var(--paper);
       cursor: pointer;
       font-weight: 700;
       list-style-position: inside;
     }
 
     .other-projects summary:hover {
-      color: #effff1;
+      color: #efbd77;
     }
 
     .other-projects-note {
       margin: 12px 0 0;
-      color: var(--muted);
+      color: var(--paper-muted);
       font-size: 0.92rem;
     }
 
@@ -500,15 +451,24 @@
 
     .footer {
       padding: 18px 0 42px;
-      color: var(--muted);
+      color: var(--paper-muted);
       text-align: center;
       font-size: 0.92rem;
     }
 
     @media (max-width: 760px) {
       .hero-inner {
-        grid-template-columns: 1fr;
-        padding: 22px 18px;
+        min-height: 380px;
+        padding: 28px 22px 56px;
+      }
+
+      .hero-panel {
+        background-position: center, 58% center;
+      }
+
+      .hero-caption {
+        margin: -44px 12px 14px auto;
+        max-width: calc(100% - 24px);
       }
 
       .topbar-inner {
@@ -523,6 +483,36 @@
       .nav-links a {
         flex: 1 1 auto;
         text-align: center;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .hero {
+        padding-top: 24px;
+      }
+
+      .hero-inner {
+        min-height: 410px;
+      }
+
+      .cta-row .btn {
+        width: 100%;
+      }
+
+      .card-actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .card-actions .link-btn {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
       }
     }
   </style>
@@ -551,7 +541,7 @@
       <div class="hero-panel">
         <div class="hero-inner">
           <div>
-            <div class="eyebrow">🌿 Green game collection</div>
+            <div class="eyebrow">🌰 An autumn game collection</div>
             <h1>Play every <span class="highlight">Chestnut</span> adventure in one place.</h1>
             <p class="hero-copy">
               A warm, playful gaming portal built around chestnuts, autumn energy, and creative side-projects. These games were created for fun and for self-development purpose — a small playground where experimentation and learning meet creativity.
@@ -561,27 +551,16 @@
               <a class="btn primary" href="#games">Explore games</a>
             </div>
 
-            <div class="about-box" style="margin-top: 18px; padding: 18px 20px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
-              <div style="font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gold); margin-bottom: 8px;">About the creator</div>
-              <p style="margin: 0; color: var(--muted); line-height: 1.7; font-size: 0.98rem;">
+            <div class="about-box">
+              <div class="about-label">About the creator</div>
+              <p>
                 I am a test developer with 10 years of experience, and for the last 5 years I have focused on test automation. These games are created for fun and for self-development purpose.
               </p>
             </div>
           </div>
 
-          <div class="hero-art" aria-hidden="true">
-            <div class="tree-card">
-              <div class="chestnut c1">🌰</div>
-              <div class="chestnut c2">🌰</div>
-              <div class="chestnut c3">🌰</div>
-              <div class="chestnut c4">🌰</div>
-              <div class="chestnut c5">🌰</div>
-              <div class="chestnut c6">🌰</div>
-              <div class="chestnut c7">🌰</div>
-              <div class="chestnut gold">🌰</div>
-            </div>
-          </div>
         </div>
+        <div class="hero-caption">An autumn corner of the internet</div>
       </div>
     </section>
 
