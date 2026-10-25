@@ -1,0 +1,3009 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grinch Chest Conquest - 4-Game Holiday Arcade Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            background: radial-gradient(circle at 50% 15%, #064e3b 0%, #0f172a 55%, #020617 100%);
+            color: #f8fafc;
+            overflow-x: hidden;
+            user-select: none;
+        }
+        .arcade-font {
+            font-family: 'Press Start 2P', monospace;
+        }
+        .neon-grinch {
+            text-shadow: 0 0 10px rgba(132, 204, 22, 0.85), 0 0 22px rgba(22, 163, 74, 0.6);
+        }
+        .neon-gold {
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.85), 0 0 20px rgba(217, 119, 6, 0.5);
+        }
+        .neon-crimson {
+            text-shadow: 0 0 10px rgba(244, 63, 94, 0.85), 0 0 20px rgba(225, 29, 72, 0.5);
+        }
+        .candy-border {
+            background: repeating-linear-gradient(
+                45deg,
+                #dc2626,
+                #dc2626 12px,
+                #f8fafc 12px,
+                #f8fafc 24px,
+                #16a34a 24px,
+                #16a34a 36px,
+                #f8fafc 36px,
+                #f8fafc 48px
+            );
+            padding: 4px;
+            border-radius: 1.25rem;
+            box-shadow: 0 0 35px rgba(132, 204, 22, 0.28);
+        }
+        .card-holiday {
+            background: linear-gradient(155deg, rgba(15, 23, 42, 0.95) 0%, rgba(6, 78, 59, 0.55) 100%);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-holiday:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 28px rgba(132, 204, 22, 0.45), inset 0 0 16px rgba(251, 191, 36, 0.15);
+        }
+        /* Animated Equalizer Bars for Holiday Music Badge */
+        @keyframes eqPulse {
+            0%, 100% { transform: scaleY(0.25); }
+            50% { transform: scaleY(1); }
+        }
+        .eq-bar {
+            width: 3px;
+            height: 14px;
+            background: #84cc16;
+            border-radius: 2px;
+            transform-origin: bottom;
+            transition: transform 0.15s ease;
+        }
+        .eq-playing .eq-bar:nth-child(1) { animation: eqPulse 0.55s infinite ease-in-out 0.0s; background: #ef4444; }
+        .eq-playing .eq-bar:nth-child(2) { animation: eqPulse 0.42s infinite ease-in-out 0.15s; background: #facc15; }
+        .eq-playing .eq-bar:nth-child(3) { animation: eqPulse 0.65s infinite ease-in-out 0.25s; background: #84cc16; }
+        .eq-playing .eq-bar:nth-child(4) { animation: eqPulse 0.48s infinite ease-in-out 0.1s; background: #38bdf8; }
+        /* Subtle CSS Snowfall Overlay */
+        #snow-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="min-h-full flex flex-col items-center justify-between p-2 sm:p-4 relative">
+
+    <!-- Background Snow Canvas -->
+    <canvas id="snow-bg"></canvas>
+
+    <!-- PERSISTENT TOP HOLIDAY ARCADE NAVIGATION BAR -->
+    <header class="w-full max-w-6xl flex flex-wrap justify-between items-center bg-slate-950/90 border-2 border-lime-500/40 rounded-2xl px-3 sm:px-5 py-3 shadow-2xl backdrop-blur-md z-30 gap-3">
+        <!-- Brand Emblem & Title -->
+        <div class="flex items-center gap-3 cursor-pointer group" onclick="app.returnToHub()">
+            <!-- Custom SVG Chestnut wearing Santa Hat vs Grinch Brow -->
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-900/50 via-emerald-950 to-lime-900/50 border-2 border-lime-400/60 flex items-center justify-center shadow-inner group-hover:scale-105 transition">
+                <svg class="w-9 h-9" viewBox="0 0 64 64" fill="none">
+                    <!-- Chestnut Body -->
+                    <path d="M32 14C16 14 8 28 8 42C8 54 19 60 32 60C45 60 56 54 56 42C56 28 48 14 32 14Z" fill="#92400E" stroke="#FBBF24" stroke-width="2.5"/>
+                    <path d="M16 48C21 54 43 54 48 48C42 44 22 44 16 48Z" fill="#FDE68A"/>
+                    <!-- Santa Hat -->
+                    <path d="M12 24C18 8 42 6 52 18L58 26L12 24Z" fill="#DC2626"/>
+                    <rect x="10" y="21" width="44" height="6" rx="3" fill="#F8FAFC"/>
+                    <circle cx="57" cy="25" r="5" fill="#F8FAFC"/>
+                    <!-- Grinchy Mean Green Glow Eyes -->
+                    <path d="M19 32L29 36" stroke="#84CC16" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M45 32L35 36" stroke="#84CC16" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="24" cy="38" r="3" fill="#FEF08A"/>
+                    <circle cx="40" cy="38" r="3" fill="#FEF08A"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-sm sm:text-lg md:text-xl font-black tracking-wider text-lime-400 neon-grinch uppercase arcade-font">
+                    GRINCH CHEST CONQUEST
+                </h1>
+                <p id="header-subtitle" class="text-[10px] sm:text-xs text-amber-300 font-semibold tracking-widest uppercase">
+                    AGILE ROASTED CHESTNUTS VS. MOUNT CRUMPIT GRINCH BLOCKERS
+                </p>
+            </div>
+        </div>
+
+        <!-- Global Mode Toggle & In-Game Controls -->
+        <div class="flex flex-wrap items-center gap-2">
+            <!-- Live Holiday Synthesizer Equalizer & Track Badge -->
+            <div id="audio-status-badge" onclick="sound.unlockAndStart()" class="cursor-pointer flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-emerald-950/90 hover:bg-emerald-900 border border-lime-500/40 transition shadow-inner" title="Click to start or cycle Holiday Synth">
+                <div id="eq-visualizer" class="flex items-end gap-0.5 h-3.5">
+                    <div class="eq-bar"></div>
+                    <div class="eq-bar"></div>
+                    <div class="eq-bar"></div>
+                    <div class="eq-bar"></div>
+                </div>
+                <span id="music-track-label" class="text-[10px] font-bold text-lime-300 tracking-wide">CLICK FOR XMAS SYNTH</span>
+            </div>
+
+            <!-- Persistent 1P / 2P Toggle -->
+            <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl p-1">
+                <button id="top-1p" onclick="app.setPlayers(1)" class="px-2.5 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-black text-[10px] arcade-font transition">
+                    1P
+                </button>
+                <button id="top-2p" onclick="app.setPlayers(2)" class="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white font-black text-[10px] arcade-font transition">
+                    2P CO-OP/VS
+                </button>
+            </div>
+
+            <button id="btn-hub" onclick="app.returnToHub()" class="hidden px-3 py-2 rounded-xl bg-emerald-900/70 hover:bg-emerald-800 text-lime-200 text-xs font-bold border border-lime-500/50 transition flex items-center gap-1.5 shadow">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3"/></svg>
+                <span>Return to Hub</span>
+            </button>
+            <button id="btn-pause" onclick="app.togglePause()" class="hidden px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold border border-amber-500/40 transition shadow">
+                <span id="pause-label">Pause</span>
+            </button>
+            <button id="btn-restart" onclick="app.restartCurrentGame()" class="hidden px-3 py-2 rounded-xl bg-amber-950/70 hover:bg-amber-900 text-amber-300 text-xs font-bold border border-amber-600/50 transition shadow">
+                Restart Level
+            </button>
+            <button id="btn-end" onclick="app.endCurrentGame()" class="hidden px-3 py-2 rounded-xl bg-red-950/80 hover:bg-red-900 text-red-200 text-xs font-bold border border-red-600/50 transition shadow">
+                Finish Game
+            </button>
+            <button id="btn-music" onclick="sound.toggleMusic()" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 text-xs font-bold border border-amber-500/40 transition">
+                BGM: ON
+            </button>
+            <button id="btn-mute" onclick="sound.toggleMute()" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-lime-300 text-xs font-bold border border-lime-500/30 transition">
+                SFX: ON
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="w-full max-w-6xl flex-grow flex flex-col items-center justify-center my-3 z-20">
+
+        <!-- =================================================================== -->
+        <!-- 1. 4-GAME HOLIDAY HUB VIEW                                          -->
+        <!-- =================================================================== -->
+        <div id="hub-view" class="w-full flex flex-col items-center justify-center py-2">
+
+            <!-- Hero Mode Banner -->
+            <div class="w-full bg-gradient-to-r from-red-950/80 via-emerald-950/90 to-red-950/80 border border-lime-400/40 rounded-2xl p-4 mb-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+                <div class="flex items-center gap-3">
+                    <svg class="w-10 h-10 shrink-0" viewBox="0 0 64 64">
+                        <circle cx="32" cy="32" r="28" fill="#65A30D" stroke="#BEF264" stroke-width="3"/>
+                        <path d="M16 22L28 28M48 22L36 28" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/>
+                        <circle cx="24" cy="31" r="4" fill="#FEF08A"/>
+                        <circle cx="40" cy="31" r="4" fill="#FEF08A"/>
+                        <path d="M18 44Q32 54 46 44" stroke="#1E293B" stroke-width="4" fill="none" stroke-linecap="round"/>
+                    </svg>
+                    <div>
+                        <h2 class="text-xs sm:text-sm font-bold text-lime-300 arcade-font">THE GRINCH BLOCKED THE HOLIDAY SPRINT BACKLOG!</h2>
+                        <p class="text-xs text-slate-300 mt-0.5">Clear the 4 Scrum Ceremonies below (Daily, Retrospective, Dependencies &amp; Promotion) with full Holiday Chiptune Audio!</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 shrink-0">
+                    <button id="btn-festive-audio" onclick="sound.unlockAndStart(true)" class="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 via-emerald-600 to-lime-600 hover:brightness-110 text-white font-black text-[10px] arcade-font shadow-lg border border-lime-300/50 transition flex items-center gap-1.5">
+                        <span>♫</span> <span id="festive-audio-label">PLAY XMAS MEDLEY</span>
+                    </button>
+                    <button id="hub-1p" onclick="app.setPlayers(1)" class="px-4 py-2.5 rounded-xl bg-amber-500 text-slate-950 font-black text-xs arcade-font shadow-lg transition">
+                        1 PLAYER
+                    </button>
+                    <button id="hub-2p" onclick="app.setPlayers(2)" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-black text-xs arcade-font border border-slate-600 transition">
+                        2 PLAYERS
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4-GAME GRID -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
+
+                <!-- GAME 1: CHEST-PAC: CHESTNUTS DAILY -->
+                <div class="card-holiday border-2 border-amber-500/50 rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden group">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-amber-950/90 text-amber-300 border border-amber-500/40 arcade-font">CEREMONY 01 &bull; DAILY STAND-UP</span>
+                            <!-- SVG Festive Chest-Pac vs Grinch Ghost -->
+                            <svg class="w-12 h-12" viewBox="0 0 64 64">
+                                <circle cx="26" cy="34" r="20" fill="#D97706" stroke="#FDE047" stroke-width="2.5"/>
+                                <polygon points="26,34 48,22 48,46" fill="#0F172A"/>
+                                <path d="M10 20L28 10L40 20Z" fill="#DC2626"/>
+                                <circle cx="52" cy="34" r="9" fill="#84CC16"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-black text-amber-400 arcade-font mb-2 neon-gold">CHEST-PAC: CHESTNUTS DAILY</h3>
+                        <p class="text-slate-300 text-xs sm:text-sm mb-3 leading-relaxed">
+                            Survive the 15-minute Daily Stand-up maze! Chomp story points, grab Roasted Stars for flashing Catching Mode, and clear the 4 Grinch Impediments!
+                        </p>
+                        <div class="bg-slate-950/80 border border-emerald-800/60 rounded-xl p-2.5 mb-4 text-[11px] text-slate-300 space-y-1">
+                            <div><strong class="text-lime-400">Engine:</strong> Zero-Block Tile-Center Graph Interpolation</div>
+                            <div><strong class="text-amber-300">1P / 2P Mode:</strong> P1 Arrows | P2 controls Chief Grinch Blocker (WASD)</div>
+                        </div>
+                    </div>
+                    <button onclick="app.launchGame('chestpac')" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-400 hover:brightness-110 text-slate-950 font-black text-xs arcade-font tracking-wider shadow-xl transition">
+                        LAUNCH CHESTNUTS DAILY
+                    </button>
+                </div>
+
+                <!-- GAME 2: SUPER CHESTNUT: CHESTNUTS RETROSPECTIVE -->
+                <div class="card-holiday border-2 border-lime-500/50 rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden group">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-lime-950/90 text-lime-300 border border-lime-500/40 arcade-font">CEREMONY 02 &bull; SPRINT RETRO</span>
+                            <!-- SVG Super Chestnut & Candy Pipe -->
+                            <svg class="w-12 h-12" viewBox="0 0 64 64">
+                                <rect x="40" y="28" width="18" height="28" fill="#16A34A" stroke="#86EFAC" stroke-width="2"/>
+                                <rect x="38" y="22" width="22" height="8" fill="#22C55E"/>
+                                <circle cx="22" cy="38" r="14" fill="#B45309" stroke="#FBBF24" stroke-width="2"/>
+                                <path d="M10 30H34L28 18H16Z" fill="#DC2626"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-black text-lime-400 arcade-font mb-2 neon-grinch">SUPER CHESTNUT: CHESTNUTS RETROSPECTIVE</h3>
+                        <p class="text-slate-300 text-xs sm:text-sm mb-3 leading-relaxed">
+                            Review what went well across Whoville Rooftops, dive into Fast-Track Candy Pipes, squash Grinch bugs, and drop the Grinch-Dragon Boss to rescue the Product Owner Princess!
+                        </p>
+                        <div class="bg-slate-950/80 border border-emerald-800/60 rounded-xl p-2.5 mb-4 text-[11px] text-slate-300 space-y-1">
+                            <div><strong class="text-lime-400">3 Retro Worlds:</strong> Went Well &bull; Action Items &bull; Crumpit Keep</div>
+                            <div><strong class="text-amber-300">Controls:</strong> P1 Arrows + Space (Jump) + Z (Roast) + Down (Pipe) | P2 WASD+F</div>
+                        </div>
+                    </div>
+                    <button onclick="app.launchGame('superchestnut')" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-lime-500 via-emerald-500 to-green-400 hover:brightness-110 text-slate-950 font-black text-xs arcade-font tracking-wider shadow-xl transition">
+                        LAUNCH CHESTNUTS RETROSPECTIVE
+                    </button>
+                </div>
+
+                <!-- GAME 3: SLEIGH BELL COMMANDOS: CHESTNUT DEPENDENCIES -->
+                <div class="card-holiday border-2 border-rose-500/50 rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden group">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-rose-950/90 text-rose-300 border border-rose-500/40 arcade-font">CEREMONY 03 &bull; DEPENDENCIES</span>
+                            <!-- SVG Commando Chestnut with Bandana & Blaster -->
+                            <svg class="w-12 h-12" viewBox="0 0 64 64">
+                                <circle cx="28" cy="34" r="18" fill="#92400E" stroke="#F43F5E" stroke-width="2.5"/>
+                                <rect x="11" y="22" width="34" height="7" fill="#E11D48"/>
+                                <rect x="28" y="34" width="28" height="8" rx="3" fill="#FACC15" stroke="#0F172A" stroke-width="2"/>
+                                <circle cx="24" cy="31" r="3" fill="#FFF"/>
+                                <circle cx="34" cy="31" r="3" fill="#FFF"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-black text-rose-400 arcade-font mb-2 neon-crimson">SLEIGH BELL COMMANDOS: CHESTNUT DEPENDENCIES</h3>
+                        <p class="text-slate-300 text-xs sm:text-sm mb-3 leading-relaxed">
+                            Break cross-team Grinch blockers in an explosive Run-and-Gun assault! Unlock Peppermint Spread-Guns on CI/CD conveyor belts and smash the Monolith Grinch Tank!
+                        </p>
+                        <div class="bg-slate-950/80 border border-emerald-800/60 rounded-xl p-2.5 mb-4 text-[11px] text-slate-300 space-y-1">
+                            <div><strong class="text-rose-400">Arsenal:</strong> Rapid Hotfix Rifle &bull; 3-Way Peppermint Spread &bull; Heavy Roaster</div>
+                            <div><strong class="text-amber-300">1P / 2P Co-op:</strong> P1 Arrows + Space (Jump) + Z (Shoot) | P2 WASD + F (Shoot)</div>
+                        </div>
+                    </div>
+                    <button onclick="app.launchGame('commandos')" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 via-red-500 to-amber-500 hover:brightness-110 text-white font-black text-xs arcade-font tracking-wider shadow-xl transition">
+                        LAUNCH CHESTNUT DEPENDENCIES
+                    </button>
+                </div>
+
+                <!-- GAME 4: FROSTY PEAK CLIMBERS: CHESTNUTS PROMOTION -->
+                <div class="card-holiday border-2 border-cyan-400/50 rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden group">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-cyan-950/90 text-cyan-300 border border-cyan-500/40 arcade-font">CEREMONY 04 &bull; PROD PROMOTION</span>
+                            <!-- SVG Ice Climber Chestnut & Giant Snowball -->
+                            <svg class="w-12 h-12" viewBox="0 0 64 64">
+                                <circle cx="44" cy="30" r="14" fill="#E0F2FE" stroke="#38BDF8" stroke-width="2.5"/>
+                                <circle cx="22" cy="38" r="14" fill="#B45309" stroke="#38BDF8" stroke-width="2.5"/>
+                                <path d="M12 28C16 20 28 20 32 28" stroke="#F8FAFC" stroke-width="4" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-black text-cyan-300 arcade-font mb-2">FROSTY PEAK CLIMBERS: CHESTNUTS PROMOTION</h3>
+                        <p class="text-slate-300 text-xs sm:text-sm mb-3 leading-relaxed">
+                            Promote your release from Dev to Staging to Production Summit! Freeze Grinch regressions into giant snowballs, kick off chain avalanches, and deploy over the Grinch's Sleigh!
+                        </p>
+                        <div class="bg-slate-950/80 border border-emerald-800/60 rounded-xl p-2.5 mb-4 text-[11px] text-slate-300 space-y-1">
+                            <div><strong class="text-cyan-300">Environments:</strong> Dev Tier &bull; QA Ice Staging &bull; Production Summit Boss</div>
+                            <div><strong class="text-amber-300">1P / 2P Co-op:</strong> P1 Arrows + Space (Jump) + Z (Frost Shot) | P2 WASD + F</div>
+                        </div>
+                    </div>
+                    <button onclick="app.launchGame('climbers')" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 hover:brightness-110 text-slate-950 font-black text-xs arcade-font tracking-wider shadow-xl transition">
+                        LAUNCH CHESTNUTS PROMOTION
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- 2. ACTIVE GAME STAGE VIEW                                           -->
+        <!-- =================================================================== -->
+        <div id="game-view" class="hidden w-full flex flex-col items-center justify-center">
+
+            <!-- Universal Holiday HUD Bar -->
+            <div class="w-full max-w-[820px] flex flex-wrap justify-between items-center bg-slate-950/90 border-2 border-lime-500/40 rounded-2xl px-4 py-2.5 mb-2 shadow-xl backdrop-blur gap-3">
+                <div class="flex items-center gap-5">
+                    <div>
+                        <span class="text-[9px] text-amber-300/80 block arcade-font">P1 ROAST SCORE</span>
+                        <span id="hud-score1" class="text-sm sm:text-base font-bold text-amber-400 arcade-font">00000</span>
+                    </div>
+                    <div id="hud-p2-box" class="hidden">
+                        <span class="text-[9px] text-lime-300/80 block arcade-font">P2 SCORE</span>
+                        <span id="hud-score2" class="text-sm sm:text-base font-bold text-lime-400 arcade-font">00000</span>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-slate-400 block arcade-font">STAGE</span>
+                        <span id="hud-level" class="text-sm sm:text-base font-bold text-emerald-400 arcade-font">STAGE 1</span>
+                    </div>
+                </div>
+
+                <!-- Dynamic Status / Boss / Catching Mode Indicator -->
+                <div id="hud-status" class="text-[11px] sm:text-xs font-bold text-lime-300 arcade-font tracking-wider animate-pulse text-center">
+                    FESTIVE READY!
+                </div>
+
+                <!-- Lives Display -->
+                <div class="flex items-center gap-3">
+                    <div>
+                        <span class="text-[9px] text-slate-400 block arcade-font text-right">CHESTNUT LIVES</span>
+                        <div id="hud-lives" class="flex items-center gap-1 pt-0.5 justify-end"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candy-Cane Framed Game Canvas -->
+            <div class="candy-border max-w-full overflow-hidden">
+                <div class="relative bg-slate-950 rounded-2xl flex items-center justify-center overflow-hidden">
+                    <canvas id="gameCanvas" width="800" height="520" class="block max-w-full h-auto rounded-xl"></canvas>
+
+                    <!-- Pause Modal Overlay -->
+                    <div id="overlay-pause" class="hidden absolute inset-0 bg-slate-950/88 backdrop-blur-md flex flex-col items-center justify-center p-6 z-20 text-center">
+                        <h3 class="text-2xl sm:text-3xl font-black text-lime-400 arcade-font mb-2 neon-grinch">HOLIDAY PAUSE</h3>
+                        <p class="text-xs text-amber-200 mb-6">The Grinch is waiting... Ready to jump back in?</p>
+                        <div class="flex flex-col gap-3 w-64">
+                            <button onclick="app.togglePause()" class="py-3 rounded-xl bg-lime-500 hover:bg-lime-400 text-slate-950 font-black arcade-font text-xs shadow-lg">RESUME CONQUEST</button>
+                            <button onclick="app.restartCurrentGame()" class="py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black arcade-font text-xs shadow-lg">RESTART STAGE</button>
+                            <button onclick="app.returnToHub()" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-black arcade-font text-xs border border-slate-600">RETURN TO HUB</button>
+                        </div>
+                    </div>
+
+                    <!-- Victory / Game Over Modal Overlay -->
+                    <div id="overlay-end" class="hidden absolute inset-0 bg-slate-950/92 backdrop-blur-md flex flex-col items-center justify-center p-6 z-20 text-center">
+                        <h3 id="end-title" class="text-2xl sm:text-4xl font-black text-lime-400 arcade-font mb-2 neon-grinch">CHRISTMAS SAVED!</h3>
+                        <p id="end-subtitle" class="text-slate-200 text-xs sm:text-sm max-w-md mb-6">You roasted the Grinch's plans!</p>
+                        <div class="bg-slate-900 border border-lime-500/40 rounded-2xl p-4 mb-6 w-64 space-y-2 text-xs">
+                            <div class="flex justify-between"><span class="text-slate-400">P1 Score:</span><span id="end-score1" class="text-amber-400 font-bold arcade-font">0</span></div>
+                            <div id="end-p2-row" class="flex justify-between hidden"><span class="text-slate-400">P2 Score:</span><span id="end-score2" class="text-lime-400 font-bold arcade-font">0</span></div>
+                        </div>
+                        <div class="flex gap-3 w-72">
+                            <button onclick="app.restartCurrentGame()" class="flex-1 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black arcade-font text-xs shadow-lg">PLAY AGAIN</button>
+                            <button onclick="app.returnToHub()" class="flex-1 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black arcade-font text-xs shadow-lg">GAME HUB</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile / Touch Arcade Pad -->
+            <div class="flex flex-wrap justify-center items-center gap-4 mt-3 sm:hidden">
+                <div class="grid grid-cols-3 gap-1.5 w-36">
+                    <div></div>
+                    <button onpointerdown="input.setKey('arrowup',true)" onpointerup="input.setKey('arrowup',false)" class="bg-slate-800 active:bg-lime-600 p-3 rounded-lg text-xs font-bold border border-slate-600">UP</button>
+                    <div></div>
+                    <button onpointerdown="input.setKey('arrowleft',true)" onpointerup="input.setKey('arrowleft',false)" class="bg-slate-800 active:bg-lime-600 p-3 rounded-lg text-xs font-bold border border-slate-600">LT</button>
+                    <button onpointerdown="input.setKey('arrowdown',true)" onpointerup="input.setKey('arrowdown',false)" class="bg-slate-800 active:bg-lime-600 p-3 rounded-lg text-xs font-bold border border-slate-600">DN</button>
+                    <button onpointerdown="input.setKey('arrowright',true)" onpointerup="input.setKey('arrowright',false)" class="bg-slate-800 active:bg-lime-600 p-3 rounded-lg text-xs font-bold border border-slate-600">RT</button>
+                </div>
+                <div class="flex gap-2">
+                    <button onpointerdown="input.setKey(' ',true)" onpointerup="input.setKey(' ',false)" class="bg-emerald-700 active:bg-emerald-500 px-4 py-4 rounded-xl text-xs font-bold arcade-font">JUMP</button>
+                    <button onpointerdown="input.setKey('z',true)" onpointerup="input.setKey('z',false)" class="bg-amber-600 active:bg-amber-500 px-4 py-4 rounded-xl text-xs font-bold arcade-font">FIRE</button>
+                </div>
+            </div>
+
+            <!-- Quick Game Switcher Strip & Control Guide -->
+            <div class="w-full max-w-[820px] flex flex-wrap items-center justify-between gap-2 mt-2 px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] text-slate-300">
+                <span id="controls-footer" class="text-amber-300 font-medium">Controls</span>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-slate-500">Quick Ceremony:</span>
+                    <button onclick="app.launchGame('chestpac')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-amber-500 hover:text-slate-950 transition font-bold">1.Daily</button>
+                    <button onclick="app.launchGame('superchestnut')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-lime-500 hover:text-slate-950 transition font-bold">2.Retro</button>
+                    <button onclick="app.launchGame('commandos')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-rose-500 hover:text-white transition font-bold">3.Dependencies</button>
+                    <button onclick="app.launchGame('climbers')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-cyan-400 hover:text-slate-950 transition font-bold">4.Promotion</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-center text-[11px] text-slate-400 py-1 z-20">
+        Grinch Chest Conquest &bull; Scrum Holiday Arcade Hub (Daily, Retrospective, Dependencies &amp; Promotion) &bull; 1P &amp; 2P
+    </footer>
+
+    <script>
+        /* ============================================================================
+         * HOLIDAY & GRINCH MULTI-CHANNEL WEB AUDIO SYNTHESIZER (BGM + RICH SFX)
+         * ============================================================================ */
+        class SoundSystem {
+            constructor() {
+                this.ctx = null;
+                this.masterGain = null;
+                this.sfxGain = null;
+                this.bgmGain = null;
+                this.muted = false;
+                this.musicMuted = false;
+                this.unlocked = false;
+                this.currentMode = 'hub'; // 'hub', 'chestpac', 'superchestnut', 'commandos', 'climbers'
+                this.stepIndex = 0;
+                this.seqTimer = null;
+
+                // MIDI-style Note Frequencies
+                this.NOTES = {
+                    'C3': 130.81, 'D3': 146.83, 'Eb3': 155.56, 'E3': 164.81, 'F3': 174.61, 'F#3': 185.00, 'G3': 196.00, 'Ab3': 207.65, 'A3': 220.00, 'Bb3': 233.08, 'B3': 246.94,
+                    'C4': 261.63, 'C#4': 277.18, 'D4': 293.66, 'Eb4': 311.13, 'E4': 329.63, 'F4': 349.23, 'F#4': 369.99, 'G4': 392.00, 'Ab4': 415.30, 'A4': 440.00, 'Bb4': 466.16, 'B4': 493.88,
+                    'C5': 523.25, 'C#5': 554.37, 'D5': 587.33, 'Eb5': 622.25, 'E5': 659.25, 'F5': 698.46, 'F#5': 739.99, 'G5': 783.99, 'A5': 880.00, 'Bb5': 932.33, 'B5': 987.77,
+                    'C6': 1046.50
+                };
+
+                // 1. MAIN HUB CHRISTMAS & GRINCH MEDLEY
+                // Part A: Jingle Bells (16 steps) + Part B: Carol of the Bells / Sneaky Grinch (16 steps)
+                this.HUB_MELODY = [
+                    // Jingle Bells Phrase 1
+                    'E5','E5','E5',null, 'E5','E5','E5',null, 'E5','G5','C5','D5', 'E5',null,null,null,
+                    // Jingle Bells Phrase 2
+                    'F5','F5','F5','F5', 'F5','E5','E5','E5', 'E5','D5','D5','E5', 'D5',null,'G5',null,
+                    // Carol of the Bells Ostinato + Grinch Chromatic Twist
+                    'Bb5','A5','Bb5','G5', 'Bb5','A5','Bb5','G5', 'Bb5','A5','Bb5','G5', 'C6','Bb5','A5','G5',
+                    'F#5','G5','A5','D5',  'G5','A5','Bb5','G5', 'A5','G5','F#5','E5',  'G5',null,'G4',null
+                ];
+                this.HUB_HARMONY = [
+                    'C4',null,'G4',null, 'C4',null,'G4',null, 'C4',null,'E4',null, 'G4',null,'C4',null,
+                    'A4',null,'C5',null, 'G4',null,'C5',null, 'F#4',null,'A4',null, 'B4',null,'D5',null,
+                    'D4',null,'G4',null, 'C4',null,'Eb4',null,'Bb3',null,'D4',null, 'A3',null,'C#4',null,
+                    'D4',null,'F#4',null,'Eb4',null,'G4',null,'D4',null,'F#4',null,'G4',null,null,null
+                ];
+                this.HUB_BASS = [
+                    'C3',null,'G3',null, 'C3',null,'G3',null, 'C3',null,'G3',null, 'C3','D3','E3','G3',
+                    'F3',null,'C3',null, 'C3',null,'G3',null, 'D3',null,'A3',null, 'G3',null,'G3',null,
+                    'G3',null,'G3',null, 'F3',null,'F3',null, 'Eb3',null,'Eb3',null,'D3',null,'D3',null,
+                    'D3',null,'D3',null, 'Eb3',null,'Eb3',null,'D3',null,'D3',null, 'G3',null,'G3',null
+                ];
+
+                // 2. IN-GAME ACTION LOOPS (Fast Festive Arcade Grooves)
+                this.GAME_LOOPS = {
+                    // Chestnuts Daily: Sneaky Carol of the Bells Maze Groove
+                    chestpac: {
+                        tempo: 155,
+                        lead: ['Bb5','A5','Bb5','G5', 'Bb5','A5','Bb5','G5', 'C6','Bb5','C6','A5', 'D5','F#5','A5','C6'],
+                        bass: ['G3','G3','D3','D3',   'F3','F3','C3','C3',   'Eb3','Eb3','Bb3','Bb3','D3','D3','A3','D3']
+                    },
+                    // Chestnuts Retrospective: Upbeat Holiday Platformer Bounce
+                    superchestnut: {
+                        tempo: 165,
+                        lead: ['C5','E5','G5','C6', 'A5','G5','E5','C5', 'F5','A5','C6','A5', 'G5','F5','D5','B4'],
+                        bass: ['C3',null,'G3',null, 'A3',null,'E3',null, 'F3',null,'C3',null, 'G3',null,'D3','G3']
+                    },
+                    // Chestnut Dependencies: Driving Factory Synthwave Action
+                    commandos: {
+                        tempo: 145,
+                        lead: ['E5','E5','G5','E5', 'A5','G5','E5','D5', 'C5','C5','E5','G5', 'F#5','G5','A5','B5'],
+                        bass: ['E3','E3','E3','G3', 'A3','A3','G3','E3', 'C3','C3','C3','E3', 'D3','D3','B3','B3']
+                    },
+                    // Chestnuts Promotion: Sparkling Icy Arpeggio Climb
+                    climbers: {
+                        tempo: 160,
+                        lead: ['G5','D5','B4','D5', 'G5','A5','B5','G5', 'C6','G5','E5','G5', 'F#5','A5','D5','F#5'],
+                        bass: ['G3',null,'D3',null, 'G3',null,'B3',null, 'C3',null,'G3',null, 'D3',null,'A3','D3']
+                    }
+                };
+
+                // Auto-unlock audio on first user interaction anywhere
+                const autoUnlock = () => {
+                    if (!this.unlocked) {
+                        this.unlockAndStart();
+                    }
+                };
+                window.addEventListener('pointerdown', autoUnlock, { once: true });
+                window.addEventListener('keydown', autoUnlock, { once: true });
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioCtx();
+
+                    this.masterGain = this.ctx.createGain();
+                    this.masterGain.gain.value = 0.85;
+                    this.masterGain.connect(this.ctx.destination);
+
+                    this.sfxGain = this.ctx.createGain();
+                    this.sfxGain.gain.value = 0.9;
+                    this.sfxGain.connect(this.masterGain);
+
+                    this.bgmGain = this.ctx.createGain();
+                    this.bgmGain.gain.value = 0.42;
+                    this.bgmGain.connect(this.masterGain);
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            unlockAndStart(playJingle = false) {
+                this.init();
+                this.unlocked = true;
+                if (playJingle) {
+                    this.bell();
+                }
+                if (!this.seqTimer) {
+                    this.startSequencer();
+                }
+                this.updateAudioUI();
+            }
+
+            setMusicMode(mode) {
+                if (this.currentMode !== mode) {
+                    this.currentMode = mode;
+                    this.stepIndex = 0;
+                }
+                this.init();
+                if (!this.seqTimer) {
+                    this.startSequencer();
+                }
+                this.updateAudioUI();
+            }
+
+            updateAudioUI() {
+                const eq = document.getElementById('eq-visualizer');
+                const label = document.getElementById('music-track-label');
+                const hubBtnLabel = document.getElementById('festive-audio-label');
+                const isPlaying = this.unlocked && !this.musicMuted;
+
+                if (eq) {
+                    eq.classList.toggle('eq-playing', isPlaying);
+                }
+                if (label) {
+                    if (!this.unlocked) {
+                        label.innerText = 'CLICK FOR XMAS SYNTH';
+                    } else if (this.musicMuted) {
+                        label.innerText = 'BGM MUTED';
+                    } else {
+                        const trackNames = {
+                            hub: 'XMAS & GRINCH MEDLEY',
+                            chestpac: 'DAILY BELLS GROOVE',
+                            superchestnut: 'CRUMPIT RETRO BEAT',
+                            commandos: 'FACTORY ASSAULT SYNTH',
+                            climbers: 'FROSTY SUMMIT ARPEGGIO'
+                        };
+                        label.innerText = trackNames[this.currentMode] || 'HOLIDAY SYNTH';
+                    }
+                }
+                if (hubBtnLabel) {
+                    hubBtnLabel.innerText = isPlaying ? 'XMAS MEDLEY PLAYING' : 'PLAY XMAS MEDLEY';
+                }
+            }
+
+            toggleMusic() {
+                this.init();
+                this.unlocked = true;
+                this.musicMuted = !this.musicMuted;
+                document.getElementById('btn-music').innerText = this.musicMuted ? 'BGM: OFF' : 'BGM: ON';
+                if (!this.musicMuted && !this.seqTimer) {
+                    this.startSequencer();
+                }
+                this.updateAudioUI();
+            }
+
+            toggleMute() {
+                this.init();
+                this.muted = !this.muted;
+                document.getElementById('btn-mute').innerText = this.muted ? 'SFX: OFF' : 'SFX: ON';
+            }
+
+            startSequencer() {
+                if (this.seqTimer) clearInterval(this.seqTimer);
+                const tick = () => {
+                    if (this.ctx && this.ctx.state === 'running' && !this.musicMuted) {
+                        this.playSequencerStep();
+                    }
+                };
+                this.seqTimer = setInterval(tick, 175);
+            }
+
+            playSequencerStep() {
+                const now = this.ctx.currentTime;
+
+                if (this.currentMode === 'hub') {
+                    const idx = this.stepIndex % this.HUB_MELODY.length;
+                    const mNote = this.HUB_MELODY[idx];
+                    const hNote = this.HUB_HARMONY[idx];
+                    const bNote = this.HUB_BASS[idx];
+
+                    // Lead Chiptune Holiday Bell Voice
+                    if (mNote && this.NOTES[mNote]) {
+                        this.synthNote(this.NOTES[mNote], 0.15, 'square', 0.11, true);
+                    }
+                    // Warm Harmony Voice
+                    if (hNote && this.NOTES[hNote]) {
+                        this.synthNote(this.NOTES[hNote], 0.18, 'sine', 0.08, false);
+                    }
+                    // Sneaky Grinch Triangle Bass
+                    if (bNote && this.NOTES[bNote]) {
+                        this.synthNote(this.NOTES[bNote], 0.19, 'triangle', 0.16, false);
+                    }
+                    // Festive Sleigh Bell Shimmer on every 2nd step
+                    if (idx % 2 === 0) {
+                        this.sleighBellShimmer(idx % 4 === 0 ? 0.055 : 0.028);
+                    }
+                } else {
+                    // Active Game Background Music Loop
+                    if (app && app.paused) return;
+                    const loop = this.GAME_LOOPS[this.currentMode] || this.GAME_LOOPS.chestpac;
+                    const idx = this.stepIndex % loop.lead.length;
+                    const mNote = loop.lead[idx];
+                    const bNote = loop.bass[idx];
+
+                    if (mNote && this.NOTES[mNote]) {
+                        this.synthNote(this.NOTES[mNote], 0.12, 'square', 0.08, false);
+                    }
+                    if (bNote && this.NOTES[bNote]) {
+                        this.synthNote(this.NOTES[bNote], 0.15, 'triangle', 0.13, false);
+                    }
+                    if (idx % 4 === 0) {
+                        this.sleighBellShimmer(0.03);
+                    }
+                }
+
+                this.stepIndex++;
+            }
+
+            synthNote(freq, duration, type = 'square', vol = 0.1, vibrato = false) {
+                if (!this.ctx || this.musicMuted) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, now);
+
+                    if (vibrato) {
+                        osc.frequency.setValueAtTime(freq * 1.006, now + duration * 0.5);
+                    }
+
+                    gain.gain.setValueAtTime(0.001, now);
+                    gain.gain.linearRampToValueAtTime(vol, now + 0.012);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+                    osc.connect(gain);
+                    gain.connect(this.bgmGain);
+                    osc.start(now);
+                    osc.stop(now + duration + 0.01);
+                } catch (e) {}
+            }
+
+            sleighBellShimmer(vol = 0.04) {
+                if (!this.ctx || this.musicMuted) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    // Metallic high-frequency chime cluster + noise burst for authentic sleigh bell
+                    [2637, 3135, 3951].forEach(f => {
+                        const osc = this.ctx.createOscillator();
+                        const g = this.ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(f, now);
+                        g.gain.setValueAtTime(vol * 0.45, now);
+                        g.gain.exponentialRampToValueAtTime(0.0008, now + 0.065);
+                        osc.connect(g);
+                        g.connect(this.bgmGain);
+                        osc.start(now);
+                        osc.stop(now + 0.07);
+                    });
+                } catch (e) {}
+            }
+
+            // =========================================================================
+            // RICH MULTI-LAYERED SOUND EFFECTS
+            // =========================================================================
+            tone(freq, endFreq, duration, type = 'square', gainVal = 0.12, delayMs = 0) {
+                if (this.muted) return;
+                this.init();
+                try {
+                    const startAt = this.ctx.currentTime + delayMs / 1000;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, startAt);
+                    if (endFreq) {
+                        osc.frequency.exponentialRampToValueAtTime(Math.max(20, endFreq), startAt + duration);
+                    }
+                    gain.gain.setValueAtTime(gainVal, startAt);
+                    gain.gain.exponentialRampToValueAtTime(0.002, startAt + duration);
+                    osc.connect(gain);
+                    gain.connect(this.sfxGain);
+                    osc.start(startAt);
+                    osc.stop(startAt + duration + 0.01);
+                } catch (e) {}
+            }
+
+            noiseBurst(duration = 0.15, filterFreq = 900, gainVal = 0.14) {
+                if (this.muted) return;
+                this.init();
+                try {
+                    const bufferSize = Math.floor(this.ctx.sampleRate * duration);
+                    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+                    const noise = this.ctx.createBufferSource();
+                    noise.buffer = buffer;
+
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(filterFreq, this.ctx.currentTime);
+
+                    const gain = this.ctx.createGain();
+                    gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.005, this.ctx.currentTime + duration);
+
+                    noise.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(this.sfxGain);
+                    noise.start();
+                } catch (e) {}
+            }
+
+            chomp(alt) {
+                // Crisp dual-harmonic ornament crunch
+                const base = alt ? 440 : 349.23;
+                this.tone(base, base * 1.45, 0.055, 'triangle', 0.12, 0);
+                this.tone(base * 1.5, base * 0.8, 0.045, 'sine', 0.07, 15);
+            }
+
+            bell() {
+                // Sparkling Holiday Coin / Bell Chime
+                this.tone(987.77, 987.77, 0.07, 'sine', 0.14, 0);
+                this.tone(1318.51, 1318.51, 0.22, 'sine', 0.14, 65);
+                this.tone(2637.02, 2637.02, 0.15, 'triangle', 0.06, 65);
+            }
+
+            powerup() {
+                // Festive Sleigh-Bell Power-Up Arpeggio
+                const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+                notes.forEach((f, i) => {
+                    this.tone(f, f * 1.03, 0.09, 'square', 0.11, i * 48);
+                    this.tone(f * 0.5, f * 0.5, 0.09, 'triangle', 0.09, i * 48);
+                });
+            }
+
+            jump() {
+                // Classic Arcade Rising Pitch Bend with Warm Sub
+                this.tone(185, 620, 0.15, 'square', 0.11, 0);
+                this.tone(92, 310, 0.15, 'triangle', 0.12, 0);
+            }
+
+            stomp() {
+                // Punchy Grinch Squash + Crunch Burst
+                this.tone(520, 95, 0.14, 'sawtooth', 0.15, 0);
+                this.tone(140, 55, 0.16, 'triangle', 0.18, 20);
+                this.noiseBurst(0.11, 1100, 0.14);
+            }
+
+            shoot() {
+                // Peppermint Laser Blaster Pew + Harmonic Tail
+                this.tone(880, 170, 0.085, 'sawtooth', 0.11, 0);
+                this.tone(1320, 260, 0.065, 'square', 0.07, 10);
+                this.noiseBurst(0.04, 2400, 0.06);
+            }
+
+            freeze() {
+                // Crystalline Ice Shimmer
+                [1046.5, 1396.9, 1760.0].forEach((f, i) => {
+                    this.tone(f, f * 1.12, 0.08, 'sine', 0.11, i * 28);
+                });
+            }
+
+            kick() {
+                // Heavy Snowball Launch Thump + Whoosh
+                this.tone(130, 480, 0.16, 'triangle', 0.19, 0);
+                this.tone(260, 680, 0.13, 'square', 0.09, 25);
+                this.noiseBurst(0.14, 1500, 0.12);
+            }
+
+            pipe() {
+                // Classic 3-Step Subterranean Candy Warp Pipe
+                [0, 110, 220].forEach(delay => {
+                    this.tone(420, 160, 0.085, 'sawtooth', 0.13, delay);
+                    this.tone(210, 80, 0.085, 'square', 0.09, delay);
+                });
+            }
+
+            grinchLaugh() {
+                // Sinister Grinch Chromatic Laugh Descent
+                const notes = [246.94, 233.08, 220.00, 207.65, 196.00, 146.83];
+                notes.forEach((f, i) => {
+                    this.tone(f, f * 0.82, 0.11, 'sawtooth', 0.14, i * 75);
+                    this.tone(f * 0.5, f * 0.45, 0.11, 'triangle', 0.12, i * 75);
+                });
+            }
+
+            fanfare() {
+                // Grand Holiday Victory Fanfare
+                const melody = [
+                    { f: 523.25, d: 0.12, t: 0 },
+                    { f: 659.25, d: 0.12, t: 120 },
+                    { f: 783.99, d: 0.12, t: 240 },
+                    { f: 1046.50, d: 0.24, t: 360 },
+                    { f: 783.99, d: 0.12, t: 620 },
+                    { f: 1046.50, d: 0.42, t: 750 }
+                ];
+                melody.forEach(n => {
+                    this.tone(n.f, n.f, n.d, 'square', 0.13, n.t);
+                    this.tone(n.f * 0.5, n.f * 0.5, n.d, 'triangle', 0.12, n.t);
+                });
+            }
+        }
+        const sound = new SoundSystem();
+
+        /* ============================================================================
+         * UNIFIED INPUT MANAGER
+         * ============================================================================ */
+        class InputManager {
+            constructor() {
+                this.keys = {};
+                this.justPressed = {};
+                window.addEventListener('keydown', e => {
+                    const k = e.key.toLowerCase();
+                    if (!this.keys[k]) this.justPressed[k] = true;
+                    this.keys[k] = true;
+                    if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k) && app && app.activeGame) {
+                        e.preventDefault();
+                    }
+                });
+                window.addEventListener('keyup', e => {
+                    const k = e.key.toLowerCase();
+                    this.keys[k] = false;
+                });
+            }
+            setKey(k, state) {
+                if (state && !this.keys[k]) this.justPressed[k] = true;
+                this.keys[k] = state;
+            }
+            consumePressed(k) {
+                if (this.justPressed[k]) {
+                    this.justPressed[k] = false;
+                    return true;
+                }
+                return false;
+            }
+            clearFrame() {
+                this.justPressed = {};
+            }
+        }
+        const input = new InputManager();
+
+        /* ============================================================================
+         * SHARED VECTOR DRAWING HELPERS (Grinch & Holiday Chestnut Sprites)
+         * ============================================================================ */
+        function drawChestnutHero(ctx, x, y, r, facing, hatColor = '#dc2626', isPowered = false, label = '') {
+            ctx.save();
+            ctx.translate(x, y);
+            if (isPowered) {
+                ctx.shadowColor = '#fde047';
+                ctx.shadowBlur = 14;
+            }
+            // Chestnut Glossy Shell
+            ctx.fillStyle = isPowered ? '#f59e0b' : '#92400e';
+            ctx.beginPath();
+            ctx.arc(0, 2, r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = isPowered ? '#fef08a' : '#fbbf24';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Lower Roasted Cream Belly
+            ctx.fillStyle = '#fde68a';
+            ctx.beginPath();
+            ctx.arc(0, 4, r * 0.7, 0.15 * Math.PI, 0.85 * Math.PI);
+            ctx.fill();
+
+            // Festive Hat / Bandana
+            ctx.fillStyle = hatColor;
+            ctx.beginPath();
+            ctx.arc(0, -1, r, Math.PI, 0);
+            ctx.fill();
+            // White Fur Trim & Pom
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(-r, -4, r * 2, 4);
+            ctx.beginPath();
+            ctx.arc(-facing * (r * 0.7), -r * 0.85, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hero Eyes
+            ctx.fillStyle = '#ffffff';
+            const ex = facing * 3.5;
+            ctx.fillRect(ex - 4, -1, 3.5, 4.5);
+            ctx.fillRect(ex + 2, -1, 3.5, 4.5);
+
+            if (label) {
+                ctx.fillStyle = '#fde047';
+                ctx.font = '8px "Press Start 2P"';
+                ctx.textAlign = 'center';
+                ctx.fillText(label, 0, -r - 7);
+            }
+            ctx.restore();
+        }
+
+        function drawGrinchMinion(ctx, x, y, r, variantColor = '#84cc16', isScared = false, isFrozen = 0) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            if (isFrozen > 0) {
+                // Encased in Snowball (Game 4 mechanic)
+                ctx.fillStyle = isFrozen >= 2 ? '#f8fafc' : 'rgba(224, 242, 254, 0.75)';
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.arc(0, 0, r + 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                if (isFrozen >= 2) {
+                    ctx.restore();
+                    return;
+                }
+            }
+
+            // Grinch Shaggy Head
+            ctx.fillStyle = isScared ? '#3b82f6' : variantColor;
+            ctx.beginPath();
+            ctx.arc(0, 1, r, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Stolen Santa Hat tuft
+            ctx.fillStyle = isScared ? '#93c5fd' : '#dc2626';
+            ctx.beginPath();
+            ctx.moveTo(-r * 0.7, -r * 0.5);
+            ctx.lineTo(0, -r * 1.35);
+            ctx.lineTo(r * 0.7, -r * 0.5);
+            ctx.closePath();
+            ctx.fill();
+
+            // Yellow Grinch Eyes & Scowl
+            ctx.fillStyle = isScared ? '#ffffff' : '#fef08a';
+            ctx.beginPath();
+            ctx.arc(-4, -1, 3, 0, Math.PI * 2);
+            ctx.arc(4, -1, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            if (isScared) {
+                ctx.moveTo(-5, 6);
+                ctx.lineTo(5, 6);
+            } else {
+                // Mean Grinch Brow & Smirk
+                ctx.moveTo(-7, -5); ctx.lineTo(-1, -2);
+                ctx.moveTo(7, -5);  ctx.lineTo(1, -2);
+                ctx.moveTo(-5, 6);  ctx.quadraticCurveTo(0, 9, 6, 4);
+            }
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        /* ============================================================================
+         * GAME 1: CHEST-PAC: GRINCH MAZE HEIST
+         * (Strict Tile-Center Node Interpolation Engine - Never clips or gets stuck)
+         * ============================================================================ */
+        class ChestPacGrinchGame {
+            constructor(canvas, ctx) {
+                this.canvas = canvas;
+                this.ctx = ctx;
+                this.COLS = 28;
+                this.ROWS = 25;
+                this.TILE = 20;
+                this.offsetX = (canvas.width - this.COLS * this.TILE) / 2;
+                this.offsetY = 10;
+
+                // 1 = Candy Wall, 2 = Holiday Ornament, 3 = Roasted Star Power-Up, 0 = Path, 4 = Grinch Lair Gate
+                this.TEMPLATE = [
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,3,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,3,1],
+                    [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+                    [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+                    [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+                    [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
+                    [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
+                    [1,1,1,1,1,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,1,1],
+                    [0,0,0,0,0,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,0,0,0,0,0],
+                    [1,1,1,1,1,1,2,1,1,0,1,1,1,4,4,1,1,1,0,1,1,2,1,1,1,1,1,1],
+                    [0,0,0,0,0,0,2,0,0,0,1,0,0,0,0,0,0,1,0,0,0,2,0,0,0,0,0,0],
+                    [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
+                    [0,0,0,0,0,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,0,0,0,0,0],
+                    [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
+                    [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
+                    [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+                    [1,3,2,2,1,1,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,1,1,2,2,3,1],
+                    [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
+                    [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
+                    [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
+                    [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+                    [1,2,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,2,1],
+                    [1,2,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,2,1],
+                    [1,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1],
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+                ];
+
+                this.DIRS = {
+                    UP:    { dx: 0, dy: -1, opp: 'DOWN' },
+                    DOWN:  { dx: 0, dy:  1, opp: 'UP' },
+                    LEFT:  { dx: -1, dy: 0, opp: 'RIGHT' },
+                    RIGHT: { dx: 1, dy:  0, opp: 'LEFT' }
+                };
+            }
+
+            init(numPlayers) {
+                this.numPlayers = numPlayers;
+                this.score1 = 0;
+                this.score2 = 0;
+                this.lives = 3;
+                this.level = 1;
+                this.powerTimer = 0;
+                this.maxPowerTime = 420;
+                this.particles = [];
+                this.floatTexts = [];
+                this.loadLevel();
+            }
+
+            loadLevel() {
+                this.map = this.TEMPLATE.map(r => [...r]);
+                this.pelletsRemaining = 0;
+                for (let r = 0; r < this.ROWS; r++) {
+                    for (let c = 0; c < this.COLS; c++) {
+                        if (this.map[r][c] === 2 || this.map[r][c] === 3) this.pelletsRemaining++;
+                    }
+                }
+                this.resetEntities();
+            }
+
+            resetEntities() {
+                // Player 1 starts stationary at exact center of tile (13, 16)
+                this.player = {
+                    gridX: 13, gridY: 16,
+                    targetX: 13, targetY: 16,
+                    progress: 0,
+                    dir: null, nextDir: null,
+                    baseSpeed: 0.11 + Math.min(0.03, (this.level - 1) * 0.01),
+                    mouthPhase: 0
+                };
+
+                // 4 Grinch Minions positioned on open corridor tiles
+                const grinchConfigs = [
+                    { name: 'Chief Grinch', color: '#84cc16', gx: 13, gy: 8,  dir: 'LEFT',  isP2: this.numPlayers === 2 },
+                    { name: 'Robo-Grinch',  color: '#10b981', gx: 14, gy: 8,  dir: 'RIGHT', isP2: false },
+                    { name: 'Frost-Grinch', color: '#38bdf8', gx: 12, gy: 10, dir: 'UP',    isP2: false },
+                    { name: 'Pyro-Grinch',  color: '#f43f5e', gx: 15, gy: 10, dir: 'UP',    isP2: false }
+                ];
+
+                this.ghosts = grinchConfigs.map((cfg, idx) => {
+                    const g = {
+                        id: idx,
+                        name: cfg.name,
+                        color: cfg.color,
+                        gridX: cfg.gx, gridY: cfg.gy,
+                        targetX: cfg.gx, targetY: cfg.gy,
+                        progress: 0,
+                        dir: cfg.dir, nextDir: null,
+                        isP2: cfg.isP2,
+                        baseSpeed: 0.084 + Math.min(0.035, (this.level - 1) * 0.008)
+                    };
+                    this.assignNextGrinchTile(g);
+                    return g;
+                });
+            }
+
+            wrapX(x) {
+                if (x < 0) return this.COLS - 1;
+                if (x >= this.COLS) return 0;
+                return x;
+            }
+
+            isTileWalkable(gx, gy, isGhost = false) {
+                const wx = this.wrapX(gx);
+                if (gy < 0 || gy >= this.ROWS) return false;
+                const cell = this.map[gy][wx];
+                if (cell === 1) return false;
+                if (cell === 4 && !isGhost) return false;
+                return true;
+            }
+
+            canStep(gx, gy, dirName, isGhost = false) {
+                if (!dirName || !this.DIRS[dirName]) return false;
+                const d = this.DIRS[dirName];
+                return this.isTileWalkable(gx + d.dx, gy + d.dy, isGhost);
+            }
+
+            assignNextGrinchTile(g) {
+                if (g.isP2) {
+                    if (g.nextDir && this.canStep(g.gridX, g.gridY, g.nextDir, true)) {
+                        g.dir = g.nextDir;
+                    }
+                    if (g.dir && this.canStep(g.gridX, g.gridY, g.dir, true)) {
+                        const d = this.DIRS[g.dir];
+                        g.targetX = this.wrapX(g.gridX + d.dx);
+                        g.targetY = g.gridY + d.dy;
+                    } else {
+                        g.targetX = g.gridX;
+                        g.targetY = g.gridY;
+                    }
+                    return;
+                }
+
+                // Independent Graph-Node AI Decision at each tile center
+                const allDirs = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
+                const validDirs = allDirs.filter(d => this.canStep(g.gridX, g.gridY, d, true));
+                if (validDirs.length === 0) {
+                    g.targetX = g.gridX; g.targetY = g.gridY;
+                    return;
+                }
+
+                const oppDir = g.dir ? this.DIRS[g.dir].opp : null;
+                let candidates = validDirs.filter(d => d !== oppDir);
+                if (candidates.length === 0) candidates = validDirs;
+
+                let chosen = candidates[Math.floor(Math.random() * candidates.length)];
+                if (candidates.length > 1 && Math.random() < 0.35 && this.player) {
+                    const px = this.player.gridX, py = this.player.gridY;
+                    candidates.sort((a, b) => {
+                        const da = this.DIRS[a], db = this.DIRS[b];
+                        const distA = Math.hypot((g.gridX + da.dx) - px, (g.gridY + da.dy) - py);
+                        const distB = Math.hypot((g.gridX + db.dx) - px, (g.gridY + db.dy) - py);
+                        return this.powerTimer > 0 ? (distB - distA) : (distA - distB);
+                    });
+                    chosen = candidates[0];
+                }
+
+                g.dir = chosen;
+                const delta = this.DIRS[chosen];
+                g.targetX = this.wrapX(g.gridX + delta.dx);
+                g.targetY = g.gridY + delta.dy;
+            }
+
+            getRenderCoords(entity) {
+                let startX = entity.gridX;
+                let endX = entity.targetX;
+                if (startX === this.COLS - 1 && endX === 0) endX = this.COLS;
+                else if (startX === 0 && endX === this.COLS - 1) endX = -1;
+
+                const rx = (startX + (endX - startX) * entity.progress + 0.5) * this.TILE + this.offsetX;
+                const ry = (entity.gridY + (entity.targetY - entity.gridY) * entity.progress + 0.5) * this.TILE + this.offsetY;
+                return { x: rx, y: ry };
+            }
+
+            update() {
+                // 1. P1 Input
+                let p1Input = null;
+                if (input.keys['arrowup']    || (this.numPlayers === 1 && input.keys['w'])) p1Input = 'UP';
+                if (input.keys['arrowdown']  || (this.numPlayers === 1 && input.keys['s'])) p1Input = 'DOWN';
+                if (input.keys['arrowleft']  || (this.numPlayers === 1 && input.keys['a'])) p1Input = 'LEFT';
+                if (input.keys['arrowright'] || (this.numPlayers === 1 && input.keys['d'])) p1Input = 'RIGHT';
+
+                if (p1Input) {
+                    this.player.nextDir = p1Input;
+                    if (this.player.dir && this.DIRS[this.player.dir].opp === p1Input && this.player.progress > 0) {
+                        const tx = this.player.gridX, ty = this.player.gridY;
+                        this.player.gridX = this.player.targetX;
+                        this.player.gridY = this.player.targetY;
+                        this.player.targetX = tx;
+                        this.player.targetY = ty;
+                        this.player.progress = 1.0 - this.player.progress;
+                        this.player.dir = p1Input;
+                    }
+                }
+
+                // 2. P2 Chief Grinch Input (WASD)
+                if (this.numPlayers === 2) {
+                    const p2G = this.ghosts[0];
+                    let p2Input = null;
+                    if (input.keys['w']) p2Input = 'UP';
+                    if (input.keys['s']) p2Input = 'DOWN';
+                    if (input.keys['a']) p2Input = 'LEFT';
+                    if (input.keys['d']) p2Input = 'RIGHT';
+                    if (p2Input) {
+                        p2G.nextDir = p2Input;
+                        if (p2G.dir && this.DIRS[p2G.dir].opp === p2Input && p2G.progress > 0) {
+                            const tx = p2G.gridX, ty = p2G.gridY;
+                            p2G.gridX = p2G.targetX;
+                            p2G.gridY = p2G.targetY;
+                            p2G.targetX = tx;
+                            p2G.targetY = ty;
+                            p2G.progress = 1.0 - p2G.progress;
+                            p2G.dir = p2Input;
+                        }
+                    }
+                }
+
+                if (this.powerTimer > 0) this.powerTimer--;
+
+                // 3. Player Tile-Center Interpolation
+                const p = this.player;
+                const currentSpeed = p.baseSpeed * (this.powerTimer > 0 ? 1.22 : 1.0);
+
+                if (p.targetX === p.gridX && p.targetY === p.gridY) {
+                    if (p.nextDir && this.canStep(p.gridX, p.gridY, p.nextDir, false)) p.dir = p.nextDir;
+                    if (p.dir && this.canStep(p.gridX, p.gridY, p.dir, false)) {
+                        const d = this.DIRS[p.dir];
+                        p.targetX = this.wrapX(p.gridX + d.dx);
+                        p.targetY = p.gridY + d.dy;
+                        p.progress = 0;
+                    }
+                }
+
+                if (p.targetX !== p.gridX || p.targetY !== p.gridY) {
+                    p.progress += currentSpeed;
+                    p.mouthPhase += 0.28;
+                    if (Math.floor(p.mouthPhase) !== Math.floor(p.mouthPhase - 0.28)) {
+                        sound.chomp(Math.floor(p.mouthPhase) % 2 === 0);
+                    }
+                    if (p.progress >= 1.0) {
+                        p.gridX = p.targetX;
+                        p.gridY = p.targetY;
+                        p.progress = 0;
+
+                        const cell = this.map[p.gridY][p.gridX];
+                        const coords = this.getRenderCoords(p);
+                        if (cell === 2) {
+                            this.map[p.gridY][p.gridX] = 0;
+                            this.score1 += 10;
+                            this.pelletsRemaining--;
+                            this.spawnParticles(coords.x, coords.y, '#facc15', 4);
+                        } else if (cell === 3) {
+                            this.map[p.gridY][p.gridX] = 0;
+                            this.score1 += 50;
+                            this.pelletsRemaining--;
+                            this.powerTimer = this.maxPowerTime;
+                            sound.powerup();
+                            this.spawnParticles(coords.x, coords.y, '#84cc16', 16);
+                            this.floatTexts.push({ x: coords.x, y: coords.y, text: 'ROASTING MODE!', color: '#bef264', life: 45 });
+                        }
+
+                        if (p.nextDir && this.canStep(p.gridX, p.gridY, p.nextDir, false)) p.dir = p.nextDir;
+                        if (p.dir && this.canStep(p.gridX, p.gridY, p.dir, false)) {
+                            const d = this.DIRS[p.dir];
+                            p.targetX = this.wrapX(p.gridX + d.dx);
+                            p.targetY = p.gridY + d.dy;
+                        } else {
+                            p.targetX = p.gridX;
+                            p.targetY = p.gridY;
+                        }
+                    }
+                }
+
+                // 4. Grinch Minions Tile-Center Interpolation
+                const pCoords = this.getRenderCoords(p);
+                this.ghosts.forEach(g => {
+                    const gSpeed = g.baseSpeed * (this.powerTimer > 0 ? 0.62 : 1.0);
+                    if (g.targetX === g.gridX && g.targetY === g.gridY) {
+                        this.assignNextGrinchTile(g);
+                    }
+                    if (g.targetX !== g.gridX || g.targetY !== g.gridY) {
+                        g.progress += gSpeed;
+                        if (g.progress >= 1.0) {
+                            g.gridX = g.targetX;
+                            g.gridY = g.targetY;
+                            g.progress = 0;
+                            this.assignNextGrinchTile(g);
+                        }
+                    }
+
+                    const gCoords = this.getRenderCoords(g);
+                    if (Math.hypot(pCoords.x - gCoords.x, pCoords.y - gCoords.y) < this.TILE * 0.72) {
+                        if (this.powerTimer > 0) {
+                            sound.stomp();
+                            this.score1 += 250;
+                            this.spawnParticles(gCoords.x, gCoords.y, '#84cc16', 18);
+                            this.floatTexts.push({ x: gCoords.x, y: gCoords.y, text: 'UNBLOCKED +250', color: '#fde047', life: 40 });
+                            g.gridX = 13; g.gridY = 10;
+                            g.targetX = 13; g.targetY = 8;
+                            g.progress = 0;
+                        } else {
+                            sound.grinchLaugh();
+                            this.lives--;
+                            if (this.numPlayers === 2) this.score2 += 300;
+                            this.spawnParticles(pCoords.x, pCoords.y, '#ef4444', 24);
+                            if (this.lives <= 0) {
+                                app.triggerEndScreen(false, 'DAILY STAND-UP BLOCKED!', 'The Grinch Impediments derailed Chestnuts Daily!', this.score1, this.score2);
+                            } else {
+                                this.resetEntities();
+                            }
+                        }
+                    }
+                });
+
+                if (this.pelletsRemaining <= 0) {
+                    this.level++;
+                    sound.fanfare();
+                    this.floatTexts.push({ x: this.canvas.width / 2, y: this.canvas.height / 2, text: `DAILY SPRINT ${this.level}!`, color: '#bef264', life: 60 });
+                    this.loadLevel();
+                }
+
+                this.particles.forEach(pt => { pt.x += pt.vx; pt.y += pt.vy; pt.life--; });
+                this.particles = this.particles.filter(pt => pt.life > 0);
+                this.floatTexts.forEach(ft => { ft.y -= 0.6; ft.life--; });
+                this.floatTexts = this.floatTexts.filter(ft => ft.life > 0);
+
+                const statusMsg = this.powerTimer > 0
+                    ? `IMPEDIMENT ROAST MODE! (${Math.ceil(this.powerTimer / 60)}s)`
+                    : (this.player.dir ? 'CHESTNUTS DAILY IN PROGRESS' : 'PRESS ARROWS / WASD TO START DAILY');
+                app.updateHUD(this.score1, this.score2, `DAILY ${this.level}`, this.lives, statusMsg);
+            }
+
+            spawnParticles(x, y, color, count) {
+                for (let i = 0; i < count; i++) {
+                    const a = Math.random() * Math.PI * 2;
+                    const s = Math.random() * 2.5 + 0.8;
+                    this.particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, color, life: 25 });
+                }
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                ctx.fillStyle = '#020617';
+                ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                for (let r = 0; r < this.ROWS; r++) {
+                    for (let c = 0; c < this.COLS; c++) {
+                        const cell = this.map[r][c];
+                        const x = this.offsetX + c * this.TILE;
+                        const y = this.offsetY + r * this.TILE;
+
+                        if (cell === 1) {
+                            ctx.fillStyle = '#064e3b';
+                            ctx.fillRect(x + 1, y + 1, this.TILE - 2, this.TILE - 2);
+                            ctx.strokeStyle = (r + c) % 2 === 0 ? '#dc2626' : '#22c55e';
+                            ctx.lineWidth = 1.5;
+                            ctx.strokeRect(x + 2, y + 2, this.TILE - 4, this.TILE - 4);
+                        } else if (cell === 2) {
+                            ctx.fillStyle = (r * c) % 3 === 0 ? '#ef4444' : '#fbbf24';
+                            ctx.beginPath();
+                            ctx.arc(x + this.TILE / 2, y + this.TILE / 2, 3.2, 0, Math.PI * 2);
+                            ctx.fill();
+                        } else if (cell === 3) {
+                            const pulse = 5.5 + Math.sin(Date.now() * 0.01) * 1.8;
+                            ctx.save();
+                            ctx.fillStyle = '#fde047';
+                            ctx.shadowColor = '#84cc16';
+                            ctx.shadowBlur = 12;
+                            ctx.beginPath();
+                            ctx.arc(x + this.TILE / 2, y + this.TILE / 2, pulse, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.restore();
+                        } else if (cell === 4) {
+                            ctx.fillStyle = '#84cc16';
+                            ctx.fillRect(x, y + 8, this.TILE, 4);
+                        }
+                    }
+                }
+
+                // Draw Player 1 (Chest-Pac with Flashing Catching Mode Battery Bar)
+                const pPos = this.getRenderCoords(this.player);
+                ctx.save();
+                ctx.translate(pPos.x, pPos.y);
+
+                const isPower = this.powerTimer > 0;
+                const blinkFast = isPower && (Math.floor(Date.now() / 85) % 2 === 0);
+
+                if (isPower) {
+                    ctx.strokeStyle = blinkFast ? '#84cc16' : '#fde047';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.TILE * 0.72 + Math.sin(Date.now() * 0.02) * 2, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Overhead Battery Charge Meter
+                    const ratio = this.powerTimer / this.maxPowerTime;
+                    ctx.fillStyle = '#0f172a';
+                    ctx.fillRect(-12, -17, 24, 5);
+                    ctx.fillStyle = ratio > 0.3 ? '#84cc16' : '#ef4444';
+                    ctx.fillRect(-11, -16, 22 * ratio, 3);
+                }
+
+                let angle = 0;
+                if (this.player.dir === 'DOWN') angle = Math.PI / 2;
+                if (this.player.dir === 'LEFT') angle = Math.PI;
+                if (this.player.dir === 'UP') angle = -Math.PI / 2;
+                ctx.rotate(angle);
+
+                const mouthOpen = this.player.dir ? (Math.abs(Math.sin(this.player.mouthPhase)) * 0.38) : 0.12;
+                ctx.fillStyle = isPower ? (blinkFast ? '#fde047' : '#84cc16') : '#d97706';
+                ctx.shadowColor = ctx.fillStyle;
+                ctx.shadowBlur = isPower ? 14 : 6;
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.TILE * 0.46, mouthOpen * Math.PI, (2 - mouthOpen) * Math.PI);
+                ctx.lineTo(0, 0);
+                ctx.closePath();
+                ctx.fill();
+
+                // Santa Hat Cap on Chest-Pac
+                ctx.fillStyle = '#dc2626';
+                ctx.beginPath();
+                ctx.arc(-2, 0, this.TILE * 0.44, Math.PI * 0.65, Math.PI * 1.35);
+                ctx.fill();
+                ctx.restore();
+
+                // Draw Grinch Minions
+                this.ghosts.forEach(g => {
+                    const gPos = this.getRenderCoords(g);
+                    const scared = this.powerTimer > 0;
+                    drawGrinchMinion(ctx, gPos.x, gPos.y, this.TILE * 0.44, g.color, scared, 0);
+                    if (g.isP2) {
+                        ctx.fillStyle = '#fde047';
+                        ctx.font = '8px "Press Start 2P"';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('P2 GRINCH', gPos.x, gPos.y - 14);
+                    }
+                });
+
+                this.particles.forEach(pt => {
+                    ctx.fillStyle = pt.color;
+                    ctx.fillRect(pt.x, pt.y, 3, 3);
+                });
+                this.floatTexts.forEach(ft => {
+                    ctx.fillStyle = ft.color;
+                    ctx.font = '10px "Press Start 2P"';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(ft.text, ft.x, ft.y);
+                });
+            }
+        }
+
+        /* ============================================================================
+         * GAME 2: SUPER CHESTNUT: MOUNT CRUMPIT RESCUE
+         * (3 Worlds, Holiday Warp Pipes, Mecha-Grinch Dragon Boss & Princess Rescue)
+         * ============================================================================ */
+        class SuperChestnutCrumpitGame {
+            constructor(canvas, ctx) {
+                this.canvas = canvas;
+                this.ctx = ctx;
+                this.GRAVITY = 0.52;
+            }
+
+            init(numPlayers) {
+                this.numPlayers = numPlayers;
+                this.world = 1;
+                this.lives = 4;
+                this.score1 = 0;
+                this.score2 = 0;
+                this.cameraX = 0;
+                this.particles = [];
+                this.projectiles = [];
+                this.floatTexts = [];
+                this.loadWorld(1);
+            }
+
+            createPlayer(id, x, y) {
+                return {
+                    id, x, y, vx: 0, vy: 0,
+                    w: 28, h: 28,
+                    facing: 1, grounded: false,
+                    powerState: 1, invuln: 0
+                };
+            }
+
+            loadWorld(w) {
+                this.world = w;
+                this.cameraX = 0;
+                this.projectiles = [];
+                this.particles = [];
+                this.floatTexts = [];
+
+                const p1P = this.players && this.players[0] ? this.players[0].powerState : 1;
+                const p2P = this.players && this.players[1] ? this.players[1].powerState : 1;
+
+                this.players = [this.createPlayer(1, 80, 360)];
+                this.players[0].powerState = p1P;
+                if (this.numPlayers === 2) {
+                    const p2 = this.createPlayer(2, 125, 360);
+                    p2.powerState = p2P;
+                    this.players.push(p2);
+                }
+
+                this.platforms = [];
+                this.qBlocks = [];
+                this.pipes = [];
+                this.coins = [];
+                this.powerups = [];
+                this.enemies = [];
+                this.slimeVats = [];
+                this.goalFlag = null;
+                this.boss = null;
+                this.axeSwitch = null;
+                this.princess = null;
+
+                if (w === 1) this.buildWorld1();
+                else if (w === 2) this.buildWorld2();
+                else if (w === 3) this.buildWorld3();
+            }
+
+            buildWorld1() {
+                this.levelWidth = 2900;
+                this.skyColor = ['#022c22', '#0f172a'];
+
+                this.platforms.push({ x: 0, y: 450, w: 920, h: 70, type: 'snow' });
+                this.platforms.push({ x: 1020, y: 450, w: 880, h: 70, type: 'snow' });
+                this.platforms.push({ x: 2000, y: 450, w: 900, h: 70, type: 'snow' });
+
+                this.platforms.push({ x: 260, y: 330, w: 130, h: 26, type: 'candy' });
+                this.qBlocks.push({ x: 305, y: 225, w: 34, h: 34, hit: false, content: 'roast' });
+                this.qBlocks.push({ x: 640, y: 320, w: 34, h: 34, hit: false, content: 'coin' });
+
+                this.platforms.push({ x: 1180, y: 340, w: 180, h: 26, type: 'candy' });
+                this.platforms.push({ x: 1460, y: 255, w: 160, h: 26, type: 'candy' });
+                this.qBlocks.push({ x: 1520, y: 155, w: 34, h: 34, hit: false, content: 'roast' });
+
+                // Holiday Warp Pipe Shortcut
+                this.pipes.push({ x: 470, y: 370, w: 56, h: 80, warpToX: 1620, warpToY: 340, label: 'WARP PIPE' });
+                this.pipes.push({ x: 1620, y: 370, w: 56, h: 80, warpToX: null });
+
+                for (let i = 0; i < 12; i++) {
+                    this.coins.push({ x: 740 + i * 36, y: 265 - Math.sin(i * 0.5) * 40, collected: false });
+                }
+
+                this.enemies.push({ type: 'grinchling', x: 560, y: 422, vx: -1.4, w: 28, h: 28, minX: 400, maxX: 880 });
+                this.enemies.push({ type: 'grinchling', x: 1300, y: 422, vx: 1.5, w: 28, h: 28, minX: 1050, maxX: 1580 });
+                this.enemies.push({ type: 'spikybot',   x: 1780, y: 422, vx: -1.5, w: 28, h: 28, minX: 1690, maxX: 1880 });
+                this.enemies.push({ type: 'grinchling', x: 2300, y: 422, vx: -1.6, w: 28, h: 28, minX: 2050, maxX: 2600 });
+
+                this.goalFlag = { x: 2720, y: 170, h: 280 };
+            }
+
+            buildWorld2() {
+                this.levelWidth = 3000;
+                this.skyColor = ['#090d16', '#064e3b'];
+
+                this.platforms.push({ x: 0, y: 450, w: 760, h: 70, type: 'ice' });
+                this.platforms.push({ x: 900, y: 450, w: 840, h: 70, type: 'ice' });
+                this.platforms.push({ x: 1880, y: 450, w: 1120, h: 70, type: 'ice' });
+
+                this.platforms.push({ x: 280, y: 330, w: 160, h: 26, type: 'candy' });
+                this.qBlocks.push({ x: 340, y: 220, w: 34, h: 34, hit: false, content: 'roast' });
+
+                this.pipes.push({ x: 560, y: 365, w: 58, h: 85, warpToX: 2080, warpToY: 150, label: 'SECRET VAULT' });
+                this.platforms.push({ x: 2040, y: 215, w: 460, h: 24, type: 'gold' });
+                for (let i = 0; i < 10; i++) {
+                    this.coins.push({ x: 2070 + i * 40, y: 170, collected: false });
+                }
+
+                this.platforms.push({ x: 790, y: 355, w: 85, h: 22, type: 'ice' });
+                this.platforms.push({ x: 1770, y: 350, w: 85, h: 22, type: 'ice' });
+
+                this.enemies.push({ type: 'grinchling', x: 440, y: 422, vx: 1.5, w: 28, h: 28, minX: 180, maxX: 530 });
+                this.enemies.push({ type: 'spikybot',   x: 1250, y: 422, vx: -1.7, w: 28, h: 28, minX: 930, maxX: 1650 });
+                this.enemies.push({ type: 'grinchling', x: 2200, y: 422, vx: 1.8, w: 28, h: 28, minX: 1920, maxX: 2600 });
+
+                this.goalFlag = { x: 2820, y: 170, h: 280 };
+            }
+
+            buildWorld3() {
+                this.levelWidth = 3150;
+                this.skyColor = ['#1a050d', '#064e3b'];
+
+                this.platforms.push({ x: 0, y: 450, w: 680, h: 70, type: 'fortress' });
+                this.slimeVats.push({ x: 680, y: 475, w: 180, h: 45 });
+                this.platforms.push({ x: 860, y: 450, w: 720, h: 70, type: 'fortress' });
+                this.slimeVats.push({ x: 1580, y: 475, w: 190, h: 45 });
+                this.platforms.push({ x: 1770, y: 450, w: 430, h: 70, type: 'fortress' });
+
+                // Boss Bridge over Sour Grinch Slime
+                this.bridgePlatform = { x: 2200, y: 430, w: 500, h: 22, type: 'bridge', active: true };
+                this.platforms.push(this.bridgePlatform);
+                this.slimeVats.push({ x: 2200, y: 480, w: 500, h: 40 });
+
+                this.platforms.push({ x: 2700, y: 430, w: 450, h: 90, type: 'fortress' });
+
+                this.qBlocks.push({ x: 320, y: 320, w: 34, h: 34, hit: false, content: 'roast' });
+                this.qBlocks.push({ x: 1120, y: 320, w: 34, h: 34, hit: false, content: 'roast' });
+                this.platforms.push({ x: 720, y: 360, w: 100, h: 22, type: 'fortress' });
+                this.platforms.push({ x: 1620, y: 350, w: 100, h: 22, type: 'fortress' });
+                this.platforms.push({ x: 2320, y: 290, w: 140, h: 20, type: 'fortress' });
+
+                this.enemies.push({ type: 'spikybot',   x: 1150, y: 422, vx: -1.7, w: 28, h: 28, minX: 900, maxX: 1500 });
+                this.enemies.push({ type: 'grinchling', x: 1920, y: 422, vx: 1.6, w: 28, h: 28, minX: 1800, maxX: 2140 });
+
+                // Giant Grinch-Dragon Boss
+                this.boss = {
+                    x: 2460, y: 340,
+                    vx: -1.7, vy: 0,
+                    w: 74, h: 86,
+                    hp: 8, maxHp: 8,
+                    minX: 2230, maxX: 2600,
+                    fireCooldown: 85,
+                    jumpCooldown: 105,
+                    alive: true
+                };
+
+                this.axeSwitch = { x: 2665, y: 380, w: 32, h: 48, triggered: false };
+                this.princess = { x: 2840, y: 382, rescued: false };
+            }
+
+            update() {
+                this.players.forEach(p => {
+                    if (p.invuln > 0) p.invuln--;
+                    p.h = p.powerState >= 2 ? 36 : 28;
+
+                    const isP1 = p.id === 1;
+                    const left  = isP1 ? (input.keys['arrowleft']  || (this.numPlayers === 1 && input.keys['a'])) : input.keys['a'];
+                    const right = isP1 ? (input.keys['arrowright'] || (this.numPlayers === 1 && input.keys['d'])) : input.keys['d'];
+                    const jump  = isP1 ? (input.keys['arrowup'] || input.keys[' '] || (this.numPlayers === 1 && input.keys['w'])) : input.keys['w'];
+                    const down  = isP1 ? (input.keys['arrowdown']  || (this.numPlayers === 1 && input.keys['s'])) : input.keys['s'];
+                    const fire  = isP1 ? (input.consumePressed('z') || input.consumePressed('shift')) : (input.consumePressed('f') || input.consumePressed('e'));
+
+                    if (left)  { p.vx = -4.3; p.facing = -1; }
+                    else if (right) { p.vx = 4.3; p.facing = 1; }
+                    else { p.vx *= 0.78; if (Math.abs(p.vx) < 0.1) p.vx = 0; }
+
+                    if (jump && p.grounded) {
+                        p.vy = -11.6;
+                        p.grounded = false;
+                        sound.jump();
+                    }
+
+                    if (fire) {
+                        sound.shoot();
+                        this.projectiles.push({
+                            x: p.x + (p.facing > 0 ? p.w : -8),
+                            y: p.y + p.h * 0.4,
+                            vx: p.facing * 8.5,
+                            vy: -1.2,
+                            fromPlayer: p.id,
+                            life: 85
+                        });
+                    }
+
+                    p.vy += this.GRAVITY;
+                    if (p.vy > 12) p.vy = 12;
+
+                    p.x += p.vx;
+                    if (p.x < this.cameraX) p.x = this.cameraX;
+
+                    const solids = [
+                        ...this.platforms.filter(pl => pl.active !== false),
+                        ...this.qBlocks,
+                        ...this.pipes
+                    ];
+
+                    solids.forEach(s => {
+                        if (this.overlap(p, s)) {
+                            if (p.vx > 0) p.x = s.x - p.w;
+                            else if (p.vx < 0) p.x = s.x + s.w;
+                        }
+                    });
+
+                    p.y += p.vy;
+                    p.grounded = false;
+
+                    solids.forEach(s => {
+                        if (this.overlap(p, s)) {
+                            if (p.vy > 0) {
+                                p.y = s.y - p.h;
+                                p.vy = 0;
+                                p.grounded = true;
+                                if (down && s.warpToX) {
+                                    sound.pipe();
+                                    this.players.forEach(pl => {
+                                        pl.x = s.warpToX;
+                                        pl.y = s.warpToY;
+                                        pl.vy = 0;
+                                    });
+                                    this.floatTexts.push({ x: s.warpToX, y: s.warpToY - 20, text: 'CANDY PIPE WARP!', color: '#84cc16', life: 50 });
+                                }
+                            } else if (p.vy < 0) {
+                                p.y = s.y + s.h;
+                                p.vy = 0;
+                                if (s.content && !s.hit) {
+                                    s.hit = true;
+                                    sound.bell();
+                                    if (s.content === 'coin') {
+                                        this.addScore(p.id, 100);
+                                    } else {
+                                        this.powerups.push({ x: s.x + 4, y: s.y - 26, w: 24, h: 24, vx: 1.5, vy: -3 });
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    if (p.y > this.canvas.height + 40) this.damagePlayer(p, true);
+                });
+
+                const leadX = Math.max(...this.players.map(pl => pl.x));
+                const targetCam = Math.max(0, Math.min(this.levelWidth - this.canvas.width, leadX - 260));
+                this.cameraX += (targetCam - this.cameraX) * 0.12;
+
+                this.coins.forEach(c => {
+                    if (c.collected) return;
+                    this.players.forEach(p => {
+                        if (Math.hypot((p.x + p.w / 2) - c.x, (p.y + p.h / 2) - c.y) < 24) {
+                            c.collected = true;
+                            sound.bell();
+                            this.addScore(p.id, 50);
+                        }
+                    });
+                });
+
+                this.powerups.forEach(pw => {
+                    pw.vy += this.GRAVITY * 0.7;
+                    pw.x += pw.vx;
+                    pw.y += pw.vy;
+                    this.platforms.forEach(pl => {
+                        if (pl.active !== false && this.overlap(pw, pl)) {
+                            pw.y = pl.y - pw.h;
+                            pw.vy = 0;
+                        }
+                    });
+                    this.players.forEach(p => {
+                        if (!pw.collected && this.overlap(p, pw)) {
+                            pw.collected = true;
+                            sound.powerup();
+                            p.powerState = 2;
+                            this.addScore(p.id, 250);
+                            this.floatTexts.push({ x: p.x, y: p.y - 12, text: 'ROAST FIRE POWER!', color: '#fde047', life: 45 });
+                        }
+                    });
+                });
+                this.powerups = this.powerups.filter(pw => !pw.collected);
+
+                this.projectiles.forEach(pr => {
+                    pr.x += pr.vx;
+                    pr.y += pr.vy;
+                    pr.life--;
+
+                    if (!pr.enemyFire) {
+                        this.platforms.forEach(pl => {
+                            if (pl.active !== false && pr.x > pl.x && pr.x < pl.x + pl.w && pr.y > pl.y - 6 && pr.y < pl.y + 12) {
+                                pr.y = pl.y - 6;
+                                pr.vy = -4;
+                            }
+                        });
+                        pr.vy += 0.25;
+
+                        this.enemies.forEach(en => {
+                            if (!en.dead && pr.x > en.x && pr.x < en.x + en.w && pr.y > en.y && pr.y < en.y + en.h) {
+                                en.dead = true;
+                                pr.life = 0;
+                                sound.stomp();
+                                this.addScore(pr.fromPlayer, 150);
+                            }
+                        });
+
+                        if (this.boss && this.boss.alive) {
+                            const b = this.boss;
+                            if (pr.x > b.x && pr.x < b.x + b.w && pr.y > b.y && pr.y < b.y + b.h) {
+                                b.hp--;
+                                pr.life = 0;
+                                sound.stomp();
+                                if (b.hp <= 0) {
+                                    b.alive = false;
+                                    sound.fanfare();
+                                    this.addScore(pr.fromPlayer, 2000);
+                                }
+                            }
+                        }
+                    } else {
+                        this.players.forEach(p => {
+                            if (pr.x > p.x && pr.x < p.x + p.w && pr.y > p.y && pr.y < p.y + p.h) {
+                                pr.life = 0;
+                                this.damagePlayer(p, false);
+                            }
+                        });
+                    }
+                });
+                this.projectiles = this.projectiles.filter(pr => pr.life > 0);
+
+                this.enemies.forEach(en => {
+                    if (en.dead) return;
+                    en.x += en.vx;
+                    if (en.x < en.minX || en.x > en.maxX) en.vx *= -1;
+                    this.players.forEach(p => {
+                        if (this.overlap(p, en)) {
+                            if (p.vy > 0 && p.y + p.h - p.vy <= en.y + 12 && en.type !== 'spikybot') {
+                                en.dead = true;
+                                p.vy = -8.5;
+                                sound.stomp();
+                                this.addScore(p.id, 150);
+                            } else {
+                                this.damagePlayer(p, false);
+                            }
+                        }
+                    });
+                });
+                this.enemies = this.enemies.filter(en => !en.dead);
+
+                if (this.boss && this.boss.alive) {
+                    const b = this.boss;
+                    b.x += b.vx;
+                    if (b.x < b.minX || b.x > b.maxX) b.vx *= -1;
+                    b.jumpCooldown--;
+                    if (b.jumpCooldown <= 0 && b.y >= 340) {
+                        b.vy = -9.5;
+                        b.jumpCooldown = 105;
+                    }
+                    b.vy += 0.38;
+                    b.y += b.vy;
+
+                    if (this.bridgePlatform && this.bridgePlatform.active) {
+                        if (b.y + b.h > this.bridgePlatform.y) {
+                            b.y = this.bridgePlatform.y - b.h;
+                            b.vy = 0;
+                        }
+                    } else if (b.y > 540) {
+                        b.alive = false;
+                        sound.fanfare();
+                        this.addScore(1, 2000);
+                    }
+
+                    b.fireCooldown--;
+                    if (b.fireCooldown <= 0) {
+                        b.fireCooldown = 90;
+                        sound.shoot();
+                        this.projectiles.push({ x: b.x - 10, y: b.y + 32, vx: -5.4, vy: 0, enemyFire: true, life: 110 });
+                    }
+
+                    this.players.forEach(p => {
+                        if (this.overlap(p, b)) this.damagePlayer(p, false);
+                    });
+                }
+
+                if (this.axeSwitch && !this.axeSwitch.triggered) {
+                    this.players.forEach(p => {
+                        if (this.overlap(p, this.axeSwitch)) {
+                            this.axeSwitch.triggered = true;
+                            if (this.bridgePlatform) this.bridgePlatform.active = false;
+                            sound.powerup();
+                            this.floatTexts.push({ x: this.axeSwitch.x, y: this.axeSwitch.y - 20, text: 'SLIME BRIDGE DROPPED!', color: '#84cc16', life: 55 });
+                        }
+                    });
+                }
+
+                if (this.princess && !this.princess.rescued && (!this.boss || !this.boss.alive)) {
+                    this.players.forEach(p => {
+                        if (Math.abs(p.x - this.princess.x) < 48) {
+                            this.princess.rescued = true;
+                            sound.fanfare();
+                            this.addScore(p.id, 3000);
+                            setTimeout(() => {
+                                app.triggerEndScreen(true, 'RETROSPECTIVE COMPLETE!', 'You completed Chestnuts Retrospective, dropped the Grinch-Dragon, and rescued the Chestnut Princess!', this.score1, this.score2);
+                            }, 800);
+                        }
+                    });
+                }
+
+                if (this.goalFlag) {
+                    this.players.forEach(p => {
+                        if (p.x + p.w >= this.goalFlag.x) {
+                            sound.fanfare();
+                            this.addScore(p.id, 500);
+                            this.loadWorld(this.world + 1);
+                        }
+                    });
+                }
+
+                this.floatTexts.forEach(ft => { ft.y -= 0.6; ft.life--; });
+                this.floatTexts = this.floatTexts.filter(ft => ft.life > 0);
+
+                const wNames = { 1: 'RETRO 1: WENT WELL', 2: 'RETRO 2: ACTION ITEMS', 3: 'RETRO 3: CRUMPIT KEEP' };
+                app.updateHUD(this.score1, this.score2, `RETRO 1-${this.world}`, this.lives, wNames[this.world]);
+            }
+
+            addScore(id, pts) {
+                if (id === 2) this.score2 += pts;
+                else this.score1 += pts;
+            }
+
+            damagePlayer(p, instant) {
+                if (p.invuln > 0 && !instant) return;
+                if (!instant && p.powerState > 1) {
+                    p.powerState = 1;
+                    p.invuln = 90;
+                    sound.grinchLaugh();
+                    return;
+                }
+                sound.grinchLaugh();
+                this.lives--;
+                if (this.lives <= 0) {
+                    app.triggerEndScreen(false, 'RETROSPECTIVE FAILED', 'Unresolved Grinch action items stopped the Sprint Retrospective!', this.score1, this.score2);
+                } else {
+                    p.x = Math.max(60, this.cameraX + 60);
+                    p.y = 220;
+                    p.vx = 0; p.vy = 0; p.invuln = 90;
+                }
+            }
+
+            overlap(a, b) {
+                return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                const grad = ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+                grad.addColorStop(0, this.skyColor[0]);
+                grad.addColorStop(1, this.skyColor[1]);
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                ctx.save();
+                ctx.translate(-Math.floor(this.cameraX), 0);
+
+                this.platforms.forEach(pl => {
+                    if (pl.active === false) return;
+                    if (pl.type === 'snow') {
+                        ctx.fillStyle = '#451a03';
+                        ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
+                        ctx.fillStyle = '#f8fafc';
+                        ctx.fillRect(pl.x, pl.y, pl.w, 10);
+                    } else if (pl.type === 'candy') {
+                        ctx.fillStyle = '#991b1b';
+                        ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
+                        ctx.strokeStyle = '#fecaca';
+                        ctx.strokeRect(pl.x + 1, pl.y + 1, pl.w - 2, pl.h - 2);
+                    } else if (pl.type === 'gold') {
+                        ctx.fillStyle = '#eab308';
+                        ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
+                    } else if (pl.type === 'bridge') {
+                        ctx.fillStyle = '#dc2626';
+                        for (let bx = pl.x; bx < pl.x + pl.w; bx += 26) {
+                            ctx.fillRect(bx, pl.y, 22, pl.h);
+                        }
+                    } else {
+                        ctx.fillStyle = '#1e293b';
+                        ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
+                        ctx.strokeStyle = '#38bdf8';
+                        ctx.strokeRect(pl.x, pl.y, pl.w, pl.h);
+                    }
+                });
+
+                // Sour Grinch Slime Vats
+                this.slimeVats.forEach(sv => {
+                    ctx.fillStyle = '#65a30d';
+                    ctx.fillRect(sv.x, sv.y, sv.w, sv.h);
+                    ctx.fillStyle = '#bef264';
+                    ctx.fillRect(sv.x, sv.y, sv.w, 6);
+                });
+
+                this.qBlocks.forEach(qb => {
+                    ctx.fillStyle = qb.hit ? '#475569' : '#dc2626';
+                    ctx.fillRect(qb.x, qb.y, qb.w, qb.h);
+                    ctx.strokeStyle = '#fde047';
+                    ctx.strokeRect(qb.x + 2, qb.y + 2, qb.w - 4, qb.h - 4);
+                    if (!qb.hit) {
+                        ctx.fillStyle = '#fde047';
+                        ctx.font = '14px "Press Start 2P"';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('?', qb.x + qb.w / 2, qb.y + 24);
+                    }
+                });
+
+                this.pipes.forEach(pp => {
+                    ctx.fillStyle = pp.warpToX ? '#16a34a' : '#15803d';
+                    ctx.fillRect(pp.x + 4, pp.y + 16, pp.w - 8, pp.h - 16);
+                    ctx.fillStyle = '#22c55e';
+                    ctx.fillRect(pp.x, pp.y, pp.w, 16);
+                    if (pp.label) {
+                        ctx.fillStyle = '#bef264';
+                        ctx.font = '8px "Press Start 2P"';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('DOWN: WARP', pp.x + pp.w / 2, pp.y - 8);
+                    }
+                });
+
+                this.coins.forEach(c => {
+                    if (c.collected) return;
+                    ctx.fillStyle = '#facc15';
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, 7, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                this.powerups.forEach(pw => {
+                    ctx.fillStyle = '#fde047';
+                    ctx.beginPath();
+                    ctx.arc(pw.x + 12, pw.y + 12, 11, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                this.enemies.forEach(en => {
+                    drawGrinchMinion(ctx, en.x + 14, en.y + 14, 14, en.type === 'spikybot' ? '#ef4444' : '#84cc16', false, 0);
+                });
+
+                if (this.goalFlag) {
+                    ctx.fillStyle = '#f8fafc';
+                    ctx.fillRect(this.goalFlag.x, this.goalFlag.y, 6, this.goalFlag.h);
+                    ctx.fillStyle = '#84cc16';
+                    ctx.beginPath();
+                    ctx.moveTo(this.goalFlag.x + 6, this.goalFlag.y);
+                    ctx.lineTo(this.goalFlag.x + 56, this.goalFlag.y + 24);
+                    ctx.lineTo(this.goalFlag.x + 6, this.goalFlag.y + 48);
+                    ctx.fill();
+                }
+
+                if (this.axeSwitch && !this.axeSwitch.triggered) {
+                    ctx.fillStyle = '#facc15';
+                    ctx.fillRect(this.axeSwitch.x, this.axeSwitch.y, 8, 48);
+                    ctx.beginPath();
+                    ctx.arc(this.axeSwitch.x + 14, this.axeSwitch.y + 14, 14, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#fde047';
+                    ctx.font = '8px "Press Start 2P"';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('CANDY AXE', this.axeSwitch.x + 12, this.axeSwitch.y - 8);
+                }
+
+                if (this.boss && this.boss.alive) {
+                    const b = this.boss;
+                    ctx.fillStyle = '#65a30d';
+                    ctx.fillRect(b.x, b.y, b.w, b.h);
+                    ctx.fillStyle = '#dc2626';
+                    ctx.fillRect(b.x + 6, b.y - 12, b.w - 12, 14);
+                    ctx.fillStyle = '#fef08a';
+                    ctx.fillRect(b.x + 14, b.y + 18, 12, 12);
+                    ctx.fillRect(b.x + 42, b.y + 18, 12, 12);
+                    // Boss HP
+                    ctx.fillStyle = '#0f172a';
+                    ctx.fillRect(b.x, b.y - 26, b.w, 8);
+                    ctx.fillStyle = '#84cc16';
+                    ctx.fillRect(b.x + 1, b.y - 25, (b.w - 2) * (b.hp / b.maxHp), 6);
+                }
+
+                if (this.princess) {
+                    const pr = this.princess;
+                    drawChestnutHero(ctx, pr.x + 16, pr.y + 24, 15, -1, '#ec4899', true, 'PRINCESS');
+                    if (this.boss && this.boss.alive) {
+                        ctx.strokeStyle = '#94a3b8';
+                        ctx.lineWidth = 3;
+                        ctx.strokeRect(pr.x - 6, pr.y - 8, 44, 54);
+                    }
+                }
+
+                this.players.forEach(p => {
+                    if (p.invuln > 0 && Math.floor(p.invuln / 4) % 2 === 0) return;
+                    drawChestnutHero(ctx, p.x + p.w / 2, p.y + p.h / 2, p.w / 2, p.facing, p.id === 1 ? '#dc2626' : '#0284c7', p.powerState >= 2, `P${p.id}`);
+                });
+
+                this.projectiles.forEach(pr => {
+                    ctx.fillStyle = pr.enemyFire ? '#84cc16' : '#fde047';
+                    ctx.beginPath();
+                    ctx.arc(pr.x, pr.y, pr.enemyFire ? 7 : 5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                this.floatTexts.forEach(ft => {
+                    ctx.fillStyle = ft.color;
+                    ctx.font = '10px "Press Start 2P"';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(ft.text, ft.x, ft.y);
+                });
+
+                ctx.restore();
+            }
+        }
+
+        /* ============================================================================
+         * GAME 3: SLEIGH BELL COMMANDOS: GRINCH FACTORY ASSAULT
+         * (Run-and-Gun Action Platformer with Spread-Shots, Conveyor Belts & Tank Boss)
+         * ============================================================================ */
+        class SleighBellCommandosGame {
+            constructor(canvas, ctx) {
+                this.canvas = canvas;
+                this.ctx = ctx;
+                this.GRAVITY = 0.48;
+            }
+
+            init(numPlayers) {
+                this.numPlayers = numPlayers;
+                this.stage = 1;
+                this.lives = 5;
+                this.score1 = 0;
+                this.score2 = 0;
+                this.loadStage(1);
+            }
+
+            loadStage(st) {
+                this.stage = st;
+                this.cameraX = 0;
+                this.levelWidth = 2600;
+                this.bullets = [];
+                this.particles = [];
+                this.floatTexts = [];
+                this.weaponCrates = [];
+                this.enemies = [];
+
+                this.players = [
+                    { id: 1, x: 70, y: 340, vx: 0, vy: 0, w: 28, h: 30, facing: 1, grounded: false, weapon: 'RAPID', invuln: 0, cooldown: 0 }
+                ];
+                if (this.numPlayers === 2) {
+                    this.players.push({ id: 2, x: 115, y: 340, vx: 0, vy: 0, w: 28, h: 30, facing: 1, grounded: false, weapon: 'RAPID', invuln: 0, cooldown: 0 });
+                }
+
+                // Multi-tiered Factory Floors & Conveyor Belts
+                this.platforms = [
+                    { x: 0, y: 455, w: 2600, h: 65, conveyor: 0 },
+                    { x: 240, y: 345, w: 280, h: 20, conveyor: 1.2 },
+                    { x: 600, y: 265, w: 280, h: 20, conveyor: -1.2 },
+                    { x: 960, y: 345, w: 320, h: 20, conveyor: 1.4 },
+                    { x: 1380, y: 260, w: 290, h: 20, conveyor: -1.4 },
+                    { x: 1750, y: 345, w: 260, h: 20, conveyor: 0 },
+                    { x: 2100, y: 320, w: 180, h: 20, conveyor: 0 }
+                ];
+
+                // Weapon Gift Crates (Unlock Peppermint 3-Way Spread or Heavy Roaster!)
+                this.weaponCrates = [
+                    { x: 350, y: 310, w: 28, h: 28, type: 'SPREAD', collected: false },
+                    { x: 1080, y: 310, w: 28, h: 28, type: 'ROASTER', collected: false },
+                    { x: 1820, y: 310, w: 28, h: 28, type: 'SPREAD', collected: false }
+                ];
+
+                // Grinch Elf-Bots & Hovering Present-Drones
+                for (let i = 0; i < 11 + st * 2; i++) {
+                    const ex = 380 + i * 165;
+                    const isDrone = i % 2 === 1;
+                    this.enemies.push({
+                        x: ex,
+                        y: isDrone ? 190 + (i % 3) * 35 : 425,
+                        baseY: isDrone ? 190 + (i % 3) * 35 : 425,
+                        w: 30, h: 30,
+                        vx: -1.4,
+                        hp: 2 + Math.floor(st / 2),
+                        isDrone,
+                        shootTimer: 70 + (i * 19) % 60
+                    });
+                }
+
+                // End-of-Stage Giant Grinch Vacuum Tank Boss
+                const bossHp = 28 + st * 10;
+                this.boss = {
+                    x: 2350, y: 315,
+                    w: 110, h: 140,
+                    hp: bossHp, maxHp: bossHp,
+                    vx: -1.1,
+                    minX: 2180, maxX: 2450,
+                    shootTimer: 55,
+                    alive: true
+                };
+            }
+
+            update() {
+                this.players.forEach(p => {
+                    if (p.invuln > 0) p.invuln--;
+                    if (p.cooldown > 0) p.cooldown--;
+
+                    const isP1 = p.id === 1;
+                    const left  = isP1 ? (input.keys['arrowleft']  || (this.numPlayers === 1 && input.keys['a'])) : input.keys['a'];
+                    const right = isP1 ? (input.keys['arrowright'] || (this.numPlayers === 1 && input.keys['d'])) : input.keys['d'];
+                    const upAim = isP1 ? (input.keys['arrowup'] && !input.keys[' ']) : false;
+                    const jump  = isP1 ? (input.consumePressed(' ') || input.consumePressed('arrowup') || (this.numPlayers === 1 && input.consumePressed('w'))) : input.consumePressed('w');
+                    const fire  = isP1 ? (input.keys['z'] || input.keys['shift']) : (input.keys['f'] || input.keys['e']);
+
+                    if (left)  { p.vx = -4.4; p.facing = -1; }
+                    else if (right) { p.vx = 4.4; p.facing = 1; }
+                    else { p.vx *= 0.75; }
+
+                    if (jump && p.grounded) {
+                        p.vy = -11.4;
+                        p.grounded = false;
+                        sound.jump();
+                    }
+
+                    // Commando Rapid / Spread / Roaster Firing
+                    if (fire && p.cooldown <= 0) {
+                        sound.shoot();
+                        const bx = p.x + (p.facing > 0 ? p.w + 4 : -6);
+                        const by = p.y + 14;
+                        if (p.weapon === 'SPREAD') {
+                            [-2.2, 0, 2.2].forEach(vyVal => {
+                                this.bullets.push({ x: bx, y: by, vx: p.facing * 9.5, vy: vyVal, dmg: 1, r: 5, color: '#f43f5e', fromPlayer: p.id, life: 65 });
+                            });
+                            p.cooldown = 14;
+                        } else if (p.weapon === 'ROASTER') {
+                            this.bullets.push({ x: bx, y: by, vx: p.facing * 8.5, vy: upAim ? -3 : 0, dmg: 3, r: 9, color: '#fde047', fromPlayer: p.id, life: 70 });
+                            p.cooldown = 18;
+                        } else {
+                            this.bullets.push({ x: bx, y: by, vx: p.facing * 10, vy: 0, dmg: 1, r: 5, color: '#bef264', fromPlayer: p.id, life: 65 });
+                            p.cooldown = 10;
+                        }
+                    }
+
+                    p.vy += this.GRAVITY;
+                    p.x += p.vx;
+                    if (p.x < this.cameraX) p.x = this.cameraX;
+                    if (p.x > this.levelWidth - p.w) p.x = this.levelWidth - p.w;
+
+                    p.y += p.vy;
+                    p.grounded = false;
+
+                    this.platforms.forEach(pl => {
+                        if (p.vy >= 0 && p.x + p.w > pl.x && p.x < pl.x + pl.w && p.y + p.h >= pl.y && p.y + p.h - p.vy <= pl.y + 14) {
+                            p.y = pl.y - p.h;
+                            p.vy = 0;
+                            p.grounded = true;
+                            if (pl.conveyor) p.x += pl.conveyor;
+                        }
+                    });
+                });
+
+                // Camera scroll
+                const leadX = Math.max(...this.players.map(pl => pl.x));
+                const targetCam = Math.max(0, Math.min(this.levelWidth - this.canvas.width, leadX - 240));
+                this.cameraX += (targetCam - this.cameraX) * 0.12;
+
+                // Weapon Crates pickup
+                this.weaponCrates.forEach(wc => {
+                    if (wc.collected) return;
+                    this.players.forEach(p => {
+                        if (Math.hypot((p.x + 14) - (wc.x + 14), (p.y + 15) - (wc.y + 14)) < 28) {
+                            wc.collected = true;
+                            p.weapon = wc.type;
+                            sound.powerup();
+                            this.floatTexts.push({ x: wc.x, y: wc.y - 10, text: `${wc.type} BLASTER!`, color: '#fde047', life: 45 });
+                        }
+                    });
+                });
+
+                // Update Bullets
+                this.bullets.forEach(b => {
+                    b.x += b.vx;
+                    b.y += b.vy;
+                    b.life--;
+
+                    if (!b.enemy) {
+                        this.enemies.forEach(en => {
+                            if (en.hp > 0 && b.x > en.x && b.x < en.x + en.w && b.y > en.y && b.y < en.y + en.h) {
+                                en.hp -= b.dmg;
+                                b.life = 0;
+                                if (en.hp <= 0) {
+                                    sound.stomp();
+                                    this.addScore(b.fromPlayer, 200);
+                                    this.spawnParticles(en.x + 15, en.y + 15, '#84cc16', 12);
+                                }
+                            }
+                        });
+
+                        if (this.boss && this.boss.alive) {
+                            const bs = this.boss;
+                            if (b.x > bs.x && b.x < bs.x + bs.w && b.y > bs.y && b.y < bs.y + bs.h) {
+                                bs.hp -= b.dmg;
+                                b.life = 0;
+                                this.spawnParticles(b.x, b.y, '#fde047', 5);
+                                if (bs.hp <= 0) {
+                                    bs.alive = false;
+                                    sound.fanfare();
+                                    this.addScore(b.fromPlayer, 2500);
+                                    this.spawnParticles(bs.x + 55, bs.y + 70, '#f43f5e', 40);
+                                    setTimeout(() => {
+                                        if (this.stage < 3) {
+                                            this.loadStage(this.stage + 1);
+                                        } else {
+                                            app.triggerEndScreen(true, 'DEPENDENCIES RESOLVED!', 'Sleigh Bell Commandos resolved all Chestnut Dependencies and crushed the Monolith Grinch Tank!', this.score1, this.score2);
+                                        }
+                                    }, 900);
+                                }
+                            }
+                        }
+                    } else {
+                        this.players.forEach(p => {
+                            if (b.x > p.x && b.x < p.x + p.w && b.y > p.y && b.y < p.y + p.h) {
+                                b.life = 0;
+                                this.hitPlayer(p);
+                            }
+                        });
+                    }
+                });
+                this.bullets = this.bullets.filter(b => b.life > 0);
+
+                // Update Enemies
+                this.enemies.forEach(en => {
+                    if (en.hp <= 0) return;
+                    if (en.isDrone) {
+                        en.y = en.baseY + Math.sin(Date.now() * 0.005 + en.x) * 28;
+                    } else {
+                        en.x += en.vx;
+                        if (Math.random() < 0.015) en.vx *= -1;
+                    }
+
+                    en.shootTimer--;
+                    if (en.shootTimer <= 0 && Math.abs(en.x - leadX) < 500) {
+                        en.shootTimer = 95;
+                        this.bullets.push({ x: en.x, y: en.y + 15, vx: -5, vy: en.isDrone ? 1.5 : 0, enemy: true, r: 5, color: '#a3e635', life: 90 });
+                    }
+
+                    this.players.forEach(p => {
+                        if (Math.hypot((p.x + 14) - (en.x + 15), (p.y + 15) - (en.y + 15)) < 26) {
+                            this.hitPlayer(p);
+                        }
+                    });
+                });
+                this.enemies = this.enemies.filter(en => en.hp > 0);
+
+                // Update Tank Boss
+                if (this.boss && this.boss.alive) {
+                    const bs = this.boss;
+                    bs.x += bs.vx;
+                    if (bs.x < bs.minX || bs.x > bs.maxX) bs.vx *= -1;
+
+                    bs.shootTimer--;
+                    if (bs.shootTimer <= 0 && Math.abs(bs.x - leadX) < 650) {
+                        bs.shootTimer = 60;
+                        sound.shoot();
+                        [-2, 0, 2].forEach(vyVal => {
+                            this.bullets.push({ x: bs.x, y: bs.y + 55, vx: -6.2, vy: vyVal, enemy: true, r: 7, color: '#84cc16', life: 100 });
+                        });
+                    }
+                }
+
+                this.particles.forEach(pt => { pt.x += pt.vx; pt.y += pt.vy; pt.life--; });
+                this.particles = this.particles.filter(pt => pt.life > 0);
+                this.floatTexts.forEach(ft => { ft.y -= 0.6; ft.life--; });
+                this.floatTexts = this.floatTexts.filter(ft => ft.life > 0);
+
+                const bossStatus = this.boss && this.boss.alive
+                    ? `BLOCKER TANK HP: ${Math.max(0, this.boss.hp)}/${this.boss.maxHp}`
+                    : 'DEPENDENCIES RESOLVED!';
+                app.updateHUD(this.score1, this.score2, `DEP ${this.stage}/3`, this.lives, bossStatus);
+            }
+
+            addScore(id, pts) {
+                if (id === 2) this.score2 += pts;
+                else this.score1 += pts;
+            }
+
+            hitPlayer(p) {
+                if (p.invuln > 0) return;
+                p.invuln = 85;
+                p.weapon = 'RAPID';
+                sound.grinchLaugh();
+                this.lives--;
+                if (this.lives <= 0) {
+                    app.triggerEndScreen(false, 'BLOCKED BY DEPENDENCIES!', 'Circular Grinch dependencies overwhelmed the Sleigh Bell Commandos!', this.score1, this.score2);
+                }
+            }
+
+            spawnParticles(x, y, color, count) {
+                for (let i = 0; i < count; i++) {
+                    const a = Math.random() * Math.PI * 2;
+                    const s = Math.random() * 3.5 + 1;
+                    this.particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, color, life: 25 });
+                }
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                ctx.fillStyle = '#090d16';
+                ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                ctx.save();
+                ctx.translate(-Math.floor(this.cameraX), 0);
+
+                // Factory Background Pillars
+                for (let gx = 100; gx < this.levelWidth; gx += 260) {
+                    ctx.fillStyle = '#1e293b';
+                    ctx.fillRect(gx, 0, 36, this.canvas.height);
+                }
+
+                // Platforms & Conveyor Belts
+                this.platforms.forEach(pl => {
+                    ctx.fillStyle = pl.conveyor ? '#334155' : '#1e293b';
+                    ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
+                    ctx.strokeStyle = pl.conveyor ? '#f59e0b' : '#dc2626';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(pl.x, pl.y, pl.w, pl.h);
+                });
+
+                // Weapon Gift Crates
+                this.weaponCrates.forEach(wc => {
+                    if (wc.collected) return;
+                    ctx.fillStyle = '#dc2626';
+                    ctx.fillRect(wc.x, wc.y, wc.w, wc.h);
+                    ctx.fillStyle = '#fde047';
+                    ctx.fillRect(wc.x + 11, wc.y, 6, wc.h);
+                    ctx.fillRect(wc.x, wc.y + 11, wc.w, 6);
+                });
+
+                // Enemies
+                this.enemies.forEach(en => {
+                    drawGrinchMinion(ctx, en.x + 15, en.y + 15, 14, en.isDrone ? '#38bdf8' : '#84cc16', false, 0);
+                });
+
+                // Mecha-Grinch Vacuum Tank Boss
+                if (this.boss && this.boss.alive) {
+                    const bs = this.boss;
+                    ctx.fillStyle = '#3f6212';
+                    ctx.fillRect(bs.x, bs.y + 30, bs.w, bs.h - 30);
+                    ctx.strokeStyle = '#bef264';
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(bs.x, bs.y + 30, bs.w, bs.h - 30);
+                    // Grinch Pilot Dome
+                    drawGrinchMinion(ctx, bs.x + 55, bs.y + 20, 22, '#84cc16', false, 0);
+                    // Cannon Barrel
+                    ctx.fillStyle = '#dc2626';
+                    ctx.fillRect(bs.x - 28, bs.y + 52, 34, 16);
+                    // Boss HP Bar
+                    ctx.fillStyle = '#0f172a';
+                    ctx.fillRect(bs.x, bs.y - 22, bs.w, 10);
+                    ctx.fillStyle = '#f43f5e';
+                    ctx.fillRect(bs.x + 1, bs.y - 21, (bs.w - 2) * (bs.hp / bs.maxHp), 8);
+                }
+
+                // Commando Chestnut Players
+                this.players.forEach(p => {
+                    if (p.invuln > 0 && Math.floor(p.invuln / 4) % 2 === 0) return;
+                    drawChestnutHero(ctx, p.x + 14, p.y + 15, 14, p.facing, p.id === 1 ? '#e11d48' : '#0284c7', p.weapon !== 'RAPID', `P${p.id} ${p.weapon}`);
+                    // Blaster Barrel
+                    ctx.fillStyle = '#facc15';
+                    ctx.fillRect(p.x + (p.facing > 0 ? 18 : -10), p.y + 13, 16, 6);
+                });
+
+                // Bullets & Particles
+                this.bullets.forEach(b => {
+                    ctx.fillStyle = b.color;
+                    ctx.beginPath();
+                    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                this.particles.forEach(pt => {
+                    ctx.fillStyle = pt.color;
+                    ctx.fillRect(pt.x, pt.y, 4, 4);
+                });
+
+                this.floatTexts.forEach(ft => {
+                    ctx.fillStyle = ft.color;
+                    ctx.font = '10px "Press Start 2P"';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(ft.text, ft.x, ft.y);
+                });
+
+                ctx.restore();
+            }
+        }
+
+        /* ============================================================================
+         * GAME 4: FROSTY PEAK CLIMBERS: GRINCH AVALANCHE
+         * (Ice Climber + Snow Bros Arena Platformer: Freeze Grinches into Snowballs & Kick!)
+         * ============================================================================ */
+        class FrostyPeakClimbersGame {
+            constructor(canvas, ctx) {
+                this.canvas = canvas;
+                this.ctx = ctx;
+                this.GRAVITY = 0.46;
+            }
+
+            init(numPlayers) {
+                this.numPlayers = numPlayers;
+                this.peak = 1;
+                this.lives = 4;
+                this.score1 = 0;
+                this.score2 = 0;
+                this.loadPeak(1);
+            }
+
+            loadPeak(pk) {
+                this.peak = pk;
+                this.shots = [];
+                this.particles = [];
+                this.floatTexts = [];
+                this.hazards = [];
+
+                this.players = [
+                    { id: 1, x: 220, y: 440, vx: 0, vy: 0, w: 28, h: 28, facing: 1, grounded: false, invuln: 0 }
+                ];
+                if (this.numPlayers === 2) {
+                    this.players.push({ id: 2, x: 540, y: 440, vx: 0, vy: 0, w: 28, h: 28, facing: -1, grounded: false, invuln: 0 });
+                }
+
+                // 5-Tiered Icy Mountain Arena Floors + Moving Cloud Platforms
+                this.platforms = [
+                    { x: 20,  y: 485, w: 760, h: 35, vx: 0 },
+                    { x: 70,  y: 395, w: 260, h: 18, vx: 0 },
+                    { x: 470, y: 395, w: 260, h: 18, vx: 0 },
+                    { x: 180, y: 305, w: 440, h: 18, vx: 1.2, minX: 120, maxX: 340 },
+                    { x: 60,  y: 215, w: 250, h: 18, vx: 0 },
+                    { x: 490, y: 215, w: 250, h: 18, vx: 0 },
+                    { x: 230, y: 125, w: 340, h: 18, vx: 0 }
+                ];
+
+                // Grinch Minions on the icy tiers (Can be frozen into snowballs & kicked!)
+                this.minions = [
+                    { x: 140, y: 365, vx: 1.4, vy: 0, w: 28, h: 28, freeze: 0, rolling: false, rollVx: 0 },
+                    { x: 580, y: 365, vx: -1.4, vy: 0, w: 28, h: 28, freeze: 0, rolling: false, rollVx: 0 },
+                    { x: 360, y: 275, vx: 1.6, vy: 0, w: 28, h: 28, freeze: 0, rolling: false, rollVx: 0 },
+                    { x: 150, y: 185, vx: 1.5, vy: 0, w: 28, h: 28, freeze: 0, rolling: false, rollVx: 0 },
+                    { x: 590, y: 185, vx: -1.5, vy: 0, w: 28, h: 28, freeze: 0, rolling: false, rollVx: 0 }
+                ];
+
+                // The Grinch in his Garbage-Dumpster Sleigh at the Summit!
+                const maxHp = 14 + pk * 4;
+                this.sleighBoss = {
+                    x: 350, y: 38,
+                    w: 96, h: 52,
+                    vx: 2.2 + pk * 0.4,
+                    hp: maxHp, maxHp: maxHp,
+                    dropTimer: 85
+                };
+            }
+
+            update() {
+                // Move cloud platforms
+                this.platforms.forEach(pl => {
+                    if (pl.vx) {
+                        pl.x += pl.vx;
+                        if (pl.x < pl.minX || pl.x > pl.maxX) pl.vx *= -1;
+                    }
+                });
+
+                // Players update
+                this.players.forEach(p => {
+                    if (p.invuln > 0) p.invuln--;
+
+                    const isP1 = p.id === 1;
+                    const left  = isP1 ? (input.keys['arrowleft']  || (this.numPlayers === 1 && input.keys['a'])) : input.keys['a'];
+                    const right = isP1 ? (input.keys['arrowright'] || (this.numPlayers === 1 && input.keys['d'])) : input.keys['d'];
+                    const jump  = isP1 ? (input.consumePressed(' ') || input.consumePressed('arrowup') || (this.numPlayers === 1 && input.consumePressed('w'))) : input.consumePressed('w');
+                    const fire  = isP1 ? (input.consumePressed('z') || input.consumePressed('shift')) : (input.consumePressed('f') || input.consumePressed('e'));
+
+                    if (left)  { p.vx = -4.2; p.facing = -1; }
+                    else if (right) { p.vx = 4.2; p.facing = 1; }
+                    else { p.vx *= 0.8; }
+
+                    if (jump && p.grounded) {
+                        p.vy = -11.5;
+                        p.grounded = false;
+                        sound.jump();
+                    }
+
+                    // Shoot Frost-Roast Shot (Freezes minions OR damages Summit Sleigh!)
+                    if (fire) {
+                        sound.freeze();
+                        this.shots.push({
+                            x: p.x + 14,
+                            y: p.y + 12,
+                            vx: p.facing * 8.5,
+                            vy: p.y < 230 ? -4.5 : -0.5, // Angle upward when near summit to pelt the Sleigh!
+                            fromPlayer: p.id,
+                            life: 60
+                        });
+                    }
+
+                    p.vy += this.GRAVITY;
+                    p.x += p.vx;
+                    if (p.x < 20) p.x = 20;
+                    if (p.x > this.canvas.width - 48) p.x = this.canvas.width - 48;
+
+                    p.y += p.vy;
+                    p.grounded = false;
+
+                    this.platforms.forEach(pl => {
+                        if (p.vy >= 0 && p.x + p.w > pl.x && p.x < pl.x + pl.w && p.y + p.h >= pl.y && p.y + p.h - p.vy <= pl.y + 14) {
+                            p.y = pl.y - p.h;
+                            p.vy = 0;
+                            p.grounded = true;
+                            if (pl.vx) p.x += pl.vx;
+                        }
+                    });
+                });
+
+                // Frost Shots update
+                this.shots.forEach(sh => {
+                    sh.x += sh.vx;
+                    sh.y += sh.vy;
+                    sh.life--;
+
+                    // Freeze Minions into Giant Snowballs!
+                    this.minions.forEach(m => {
+                        if (sh.x > m.x && sh.x < m.x + m.w && sh.y > m.y && sh.y < m.y + m.h) {
+                            sh.life = 0;
+                            m.freeze = Math.min(2, m.freeze + 1);
+                            sound.freeze();
+                            if (m.freeze === 2) {
+                                this.floatTexts.push({ x: m.x + 14, y: m.y - 8, text: 'KICK SNOWBALL!', color: '#38bdf8', life: 40 });
+                            }
+                        }
+                    });
+
+                    // Hit Summit Grinch Sleigh Boss
+                    const sb = this.sleighBoss;
+                    if (sb && sh.x > sb.x && sh.x < sb.x + sb.w && sh.y > sb.y && sh.y < sb.y + sb.h) {
+                        sh.life = 0;
+                        sb.hp--;
+                        sound.stomp();
+                        this.addScore(sh.fromPlayer, 150);
+                        this.spawnParticles(sh.x, sh.y, '#fde047', 8);
+                        this.checkPeakVictory();
+                    }
+                });
+                this.shots = this.shots.filter(sh => sh.life > 0);
+
+                // Minions & Rolling Snowball Avalanche Logic
+                this.minions.forEach(m => {
+                    if (m.rolling) {
+                        m.x += m.rollVx;
+                        m.vy += this.GRAVITY;
+                        m.y += m.vy;
+
+                        // Bounce off arena walls
+                        if (m.x < 20 || m.x > this.canvas.width - 48) {
+                            m.rollVx *= -1;
+                            sound.kick();
+                        }
+
+                        // Bowl over other minions!
+                        this.minions.forEach(other => {
+                            if (other !== m && Math.hypot(m.x - other.x, m.y - other.y) < 30) {
+                                other.dead = true;
+                                sound.stomp();
+                                this.addScore(1, 300);
+                                this.spawnParticles(other.x + 14, other.y + 14, '#38bdf8', 15);
+                                this.floatTexts.push({ x: other.x, y: other.y, text: 'AVALANCHE +300!', color: '#fde047', life: 45 });
+                            }
+                        });
+
+                        if (m.y > 500) m.dead = true;
+                    } else {
+                        if (m.freeze === 0) {
+                            m.x += m.vx;
+                            if (m.x < 50 || m.x > this.canvas.width - 78) m.vx *= -1;
+                        } else {
+                            // Slowly thaw if not kicked
+                            if (Math.random() < 0.004) m.freeze = Math.max(0, m.freeze - 1);
+                        }
+
+                        m.vy += this.GRAVITY;
+                        m.y += m.vy;
+                    }
+
+                    this.platforms.forEach(pl => {
+                        if (m.vy >= 0 && m.x + m.w > pl.x && m.x < pl.x + pl.w && m.y + m.h >= pl.y && m.y + m.h - m.vy <= pl.y + 14) {
+                            m.y = pl.y - m.h;
+                            m.vy = 0;
+                        }
+                    });
+
+                    // Player interaction: Kick Frozen Snowball or take damage if unfrozen
+                    this.players.forEach(p => {
+                        if (Math.hypot((p.x + 14) - (m.x + 14), (p.y + 14) - (m.y + 14)) < 26) {
+                            if (m.freeze >= 2 && !m.rolling) {
+                                m.rolling = true;
+                                m.rollVx = p.facing * 9.5;
+                                sound.kick();
+                                this.addScore(p.id, 200);
+                                this.sleighBoss.hp = Math.max(0, this.sleighBoss.hp - 2);
+                                this.checkPeakVictory();
+                            } else if (m.freeze === 0 && !m.rolling) {
+                                this.hurtClimber(p);
+                            }
+                        }
+                    });
+                });
+                this.minions = this.minions.filter(m => !m.dead);
+
+                // Respawn minions if arena gets empty while Sleigh Boss still active
+                if (this.minions.length < 2 && this.sleighBoss.hp > 0) {
+                    this.minions.push({ x: 140, y: 180, vx: 1.6, vy: 0, w: 28, h: 28, freeze: 0, rolling: false, rollVx: 0 });
+                    this.minions.push({ x: 600, y: 180, vx: -1.6, vy: 0, w: 28, h: 28, freeze: 0, rolling: false, rollVx: 0 });
+                }
+
+                // Update Summit Grinch Sleigh Boss
+                const sb = this.sleighBoss;
+                sb.x += sb.vx;
+                if (sb.x < 70 || sb.x > this.canvas.width - 166) sb.vx *= -1;
+                sb.dropTimer--;
+                if (sb.dropTimer <= 0) {
+                    sb.dropTimer = Math.max(45, 85 - this.peak * 12);
+                    this.hazards.push({ x: sb.x + 48, y: sb.y + 45, vy: 3.4, r: 9 });
+                }
+
+                // Falling Snow-Boulders from Grinch Sleigh
+                this.hazards.forEach(hz => {
+                    hz.y += hz.vy;
+                    this.players.forEach(p => {
+                        if (Math.hypot((p.x + 14) - hz.x, (p.y + 14) - hz.y) < 20) {
+                            hz.y = 999;
+                            this.hurtClimber(p);
+                        }
+                    });
+                });
+                this.hazards = this.hazards.filter(hz => hz.y < 540);
+
+                this.particles.forEach(pt => { pt.x += pt.vx; pt.y += pt.vy; pt.life--; });
+                this.particles = this.particles.filter(pt => pt.life > 0);
+                this.floatTexts.forEach(ft => { ft.y -= 0.6; ft.life--; });
+                this.floatTexts = this.floatTexts.filter(ft => ft.life > 0);
+
+                const envNames = { 1: 'DEV ENV', 2: 'STAGING ENV', 3: 'PROD SUMMIT' };
+                app.updateHUD(this.score1, this.score2, `${envNames[this.peak]}`, this.lives, `PROD SLEIGH HP: ${sb.hp}/${sb.maxHp}`);
+            }
+
+            checkPeakVictory() {
+                if (this.sleighBoss.hp <= 0) {
+                    sound.fanfare();
+                    this.addScore(1, 1500);
+                    if (this.peak < 3) {
+                        this.loadPeak(this.peak + 1);
+                    } else {
+                        app.triggerEndScreen(true, 'PROMOTED TO PRODUCTION!', 'Chestnuts Promotion succeeded! You deployed to the Mount Crumpit Summit and defeated the Grinch!', this.score1, this.score2);
+                    }
+                }
+            }
+
+            addScore(id, pts) {
+                if (id === 2) this.score2 += pts;
+                else this.score1 += pts;
+            }
+
+            hurtClimber(p) {
+                if (p.invuln > 0) return;
+                p.invuln = 85;
+                sound.grinchLaugh();
+                this.lives--;
+                if (this.lives <= 0) {
+                    app.triggerEndScreen(false, 'PROMOTION ROLLBACK!', 'Grinch regressions forced a rollback during Chestnuts Promotion!', this.score1, this.score2);
+                }
+            }
+
+            addScore(id, pts) {
+                if (id === 2) this.score2 += pts;
+                else this.score1 += pts;
+            }
+
+            hurtClimber(p) {
+                if (p.invuln > 0) return;
+                p.invuln = 85;
+                sound.grinchLaugh();
+                this.lives--;
+                if (this.lives <= 0) {
+                    app.triggerEndScreen(false, 'AVALANCHE DEFEAT!', 'The Grinch defending the icy summit stopped your climb!', this.score1, this.score2);
+                }
+            }
+
+            spawnParticles(x, y, color, count) {
+                for (let i = 0; i < count; i++) {
+                    const a = Math.random() * Math.PI * 2;
+                    const s = Math.random() * 3 + 1;
+                    this.particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, color, life: 25 });
+                }
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                const grad = ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+                grad.addColorStop(0, '#082f49');
+                grad.addColorStop(1, '#020617');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Background Mountain Peak Silhouette
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+                ctx.beginPath();
+                ctx.moveTo(400, 20);
+                ctx.lineTo(780, 520);
+                ctx.lineTo(20, 520);
+                ctx.closePath();
+                ctx.fill();
+
+                // Icy Platforms
+                this.platforms.forEach(pl => {
+                    ctx.fillStyle = pl.vx ? '#e0f2fe' : '#0284c7';
+                    ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
+                    ctx.fillStyle = '#f8fafc';
+                    ctx.fillRect(pl.x, pl.y, pl.w, 6);
+                });
+
+                // Summit Grinch Sleigh Boss
+                const sb = this.sleighBoss;
+                ctx.fillStyle = '#dc2626';
+                ctx.fillRect(sb.x, sb.y + 16, sb.w, 32);
+                ctx.strokeStyle = '#fde047';
+                ctx.lineWidth = 2.5;
+                ctx.strokeRect(sb.x, sb.y + 16, sb.w, 32);
+                drawGrinchMinion(ctx, sb.x + 48, sb.y + 10, 16, '#84cc16', false, 0);
+                // Sleigh HP Bar
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(sb.x, sb.y - 16, sb.w, 8);
+                ctx.fillStyle = '#84cc16';
+                ctx.fillRect(sb.x + 1, sb.y - 15, (sb.w - 2) * (sb.hp / sb.maxHp), 6);
+
+                // Minions & Frozen Snowballs
+                this.minions.forEach(m => {
+                    drawGrinchMinion(ctx, m.x + 14, m.y + 14, 14, '#84cc16', false, m.freeze);
+                });
+
+                // Players
+                this.players.forEach(p => {
+                    if (p.invuln > 0 && Math.floor(p.invuln / 4) % 2 === 0) return;
+                    drawChestnutHero(ctx, p.x + 14, p.y + 14, 14, p.facing, p.id === 1 ? '#0284c7' : '#10b981', true, `P${p.id}`);
+                });
+
+                // Frost Shots & Falling Snow Boulders
+                this.shots.forEach(sh => {
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.beginPath();
+                    ctx.arc(sh.x, sh.y, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                this.hazards.forEach(hz => {
+                    ctx.fillStyle = '#f43f5e';
+                    ctx.beginPath();
+                    ctx.arc(hz.x, hz.y, hz.r, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                this.particles.forEach(pt => {
+                    ctx.fillStyle = pt.color;
+                    ctx.fillRect(pt.x, pt.y, 4, 4);
+                });
+
+                this.floatTexts.forEach(ft => {
+                    ctx.fillStyle = ft.color;
+                    ctx.font = '10px "Press Start 2P"';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(ft.text, ft.x, ft.y);
+                });
+            }
+        }
+
+        /* ============================================================================
+         * MASTER HUB CONTROLLER ("GRINCH CHEST CONQUEST")
+         * ============================================================================ */
+        class GrinchConquestApp {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.numPlayers = 1;
+                this.activeGame = null;
+                this.activeGameKey = null;
+                this.paused = false;
+                this.running = false;
+
+                this.games = {
+                    chestpac:      new ChestPacGrinchGame(this.canvas, this.ctx),
+                    superchestnut: new SuperChestnutCrumpitGame(this.canvas, this.ctx),
+                    commandos:     new SleighBellCommandosGame(this.canvas, this.ctx),
+                    climbers:      new FrostyPeakClimbersGame(this.canvas, this.ctx)
+                };
+
+                requestAnimationFrame(() => this.loop());
+            }
+
+            setPlayers(n) {
+                this.numPlayers = n;
+                // Sync both Hub and Top Bar 1P/2P buttons
+                const activeHub = 'px-4 py-2.5 rounded-xl bg-amber-500 text-slate-950 font-black text-xs arcade-font shadow-lg transition';
+                const idleHub   = 'px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-black text-xs arcade-font border border-slate-600 transition';
+                document.getElementById('hub-1p').className = n === 1 ? activeHub : idleHub;
+                document.getElementById('hub-2p').className = n === 2 ? activeHub : idleHub;
+
+                const activeTop = 'px-2.5 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-black text-[10px] arcade-font transition';
+                const idleTop   = 'px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white font-black text-[10px] arcade-font transition';
+                document.getElementById('top-1p').className = n === 1 ? activeTop : idleTop;
+                document.getElementById('top-2p').className = n === 2 ? activeTop : idleTop;
+
+                // If currently in a game, restart with new player count seamlessly
+                if (this.activeGameKey && this.running) {
+                    this.launchGame(this.activeGameKey);
+                }
+            }
+
+            launchGame(gameKey) {
+                sound.unlockAndStart();
+                sound.setMusicMode(gameKey);
+                this.activeGameKey = gameKey;
+                this.paused = false;
+                this.running = true;
+
+                document.getElementById('hub-view').classList.add('hidden');
+                document.getElementById('game-view').classList.remove('hidden');
+                document.getElementById('overlay-pause').classList.add('hidden');
+                document.getElementById('overlay-end').classList.add('hidden');
+
+                ['btn-hub', 'btn-pause', 'btn-restart', 'btn-end'].forEach(id => {
+                    document.getElementById(id).classList.remove('hidden');
+                });
+                document.getElementById('pause-label').innerText = 'Pause';
+
+                const p2Box = document.getElementById('hud-p2-box');
+                if (this.numPlayers === 2) p2Box.classList.remove('hidden');
+                else p2Box.classList.add('hidden');
+
+                const titles = {
+                    chestpac:      'CHEST-PAC: CHESTNUTS DAILY',
+                    superchestnut: 'SUPER CHESTNUT: CHESTNUTS RETROSPECTIVE',
+                    commandos:     'SLEIGH BELL COMMANDOS: CHESTNUT DEPENDENCIES',
+                    climbers:      'FROSTY PEAK CLIMBERS: CHESTNUTS PROMOTION'
+                };
+                const legends = {
+                    chestpac:      'CHESTNUTS DAILY — P1: Arrows (or WASD in 1P) | P2: Chief Grinch Blocker (WASD)',
+                    superchestnut: 'CHESTNUTS RETROSPECTIVE — P1: Arrows + Space (Jump) + Z (Roast) + Down (Pipe) | P2: WASD + F',
+                    commandos:     'CHESTNUT DEPENDENCIES — P1: Arrows + Space (Jump) + Z (Blaster) | P2: A/D + W (Jump) + F',
+                    climbers:      'CHESTNUTS PROMOTION — P1: Arrows + Space (Jump) + Z (Frost Freeze & Kick!) | P2: WASD + F'
+                };
+
+                document.getElementById('header-subtitle').innerText = `${titles[gameKey]} • ${this.numPlayers}P MODE`;
+                document.getElementById('controls-footer').innerText = legends[gameKey];
+
+                this.activeGame = this.games[gameKey];
+                this.activeGame.init(this.numPlayers);
+            }
+
+            togglePause() {
+                if (!this.activeGame || !this.running) return;
+                this.paused = !this.paused;
+                document.getElementById('overlay-pause').classList.toggle('hidden', !this.paused);
+                document.getElementById('pause-label').innerText = this.paused ? 'Resume' : 'Pause';
+            }
+
+            restartCurrentGame() {
+                if (!this.activeGameKey) return;
+                this.launchGame(this.activeGameKey);
+            }
+
+            endCurrentGame() {
+                if (!this.activeGame) return;
+                this.triggerEndScreen(false, 'MISSION ENDED', 'You ended the current holiday conquest.', this.activeGame.score1, this.activeGame.score2);
+            }
+
+            returnToHub() {
+                this.running = false;
+                this.paused = false;
+                this.activeGame = null;
+                this.activeGameKey = null;
+                sound.setMusicMode('hub');
+                document.getElementById('game-view').classList.add('hidden');
+                document.getElementById('hub-view').classList.remove('hidden');
+                ['btn-hub', 'btn-pause', 'btn-restart', 'btn-end'].forEach(id => {
+                    document.getElementById(id).classList.add('hidden');
+                });
+                document.getElementById('header-subtitle').innerText = 'AGILE ROASTED CHESTNUTS VS. MOUNT CRUMPIT GRINCH BLOCKERS';
+            }
+
+            updateHUD(s1, s2, lvlText, lives, statusText) {
+                document.getElementById('hud-score1').innerText = String(s1).padStart(5, '0');
+                document.getElementById('hud-score2').innerText = String(s2).padStart(5, '0');
+                document.getElementById('hud-level').innerText = lvlText;
+                document.getElementById('hud-status').innerText = statusText;
+
+                const livesEl = document.getElementById('hud-lives');
+                const count = Math.max(0, lives);
+                if (livesEl.dataset.count !== String(count)) {
+                    livesEl.dataset.count = String(count);
+                    livesEl.innerHTML = Array.from({ length: count }).map(() => `
+                        <svg class="w-4 h-4" viewBox="0 0 32 32">
+                            <circle cx="16" cy="18" r="11" fill="#B45309" stroke="#FDE047" stroke-width="2"/>
+                            <path d="M6 14L18 4L26 14Z" fill="#DC2626"/>
+                        </svg>
+                    `).join('');
+                }
+            }
+
+            triggerEndScreen(victory, title, subtitle, s1, s2) {
+                this.running = false;
+                document.getElementById('overlay-end').classList.remove('hidden');
+                const titleEl = document.getElementById('end-title');
+                titleEl.innerText = title;
+                titleEl.className = victory
+                    ? 'text-2xl sm:text-4xl font-black text-lime-400 arcade-font mb-2 neon-grinch'
+                    : 'text-2xl sm:text-4xl font-black text-rose-500 arcade-font mb-2 neon-crimson';
+                document.getElementById('end-subtitle').innerText = subtitle;
+                document.getElementById('end-score1').innerText = s1;
+                const p2Row = document.getElementById('end-p2-row');
+                if (this.numPlayers === 2) {
+                    p2Row.classList.remove('hidden');
+                    document.getElementById('end-score2').innerText = s2;
+                } else {
+                    p2Row.classList.add('hidden');
+                }
+            }
+
+            loop() {
+                if (this.activeGame && this.running && !this.paused) {
+                    this.activeGame.update();
+                    this.activeGame.draw();
+                }
+                input.clearFrame();
+                requestAnimationFrame(() => this.loop());
+            }
+        }
+
+        const app = new GrinchConquestApp();
+    </script>
+</body>
+</html>

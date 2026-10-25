@@ -1,8 +1,25 @@
-# Repozytorium zawiera hobbistyczny zestaw gier: Chestnut Arcade Game Hub (Snake, space impact, bomberman and tanks) oraz Cienie Korony (Shadows of the Crown) w wersji webowej.
+# Repozytorium zawiera hobbistyczny zestaw gier i hubów: retro arcade, nowe 2-playerowe centra gier, świąteczne arcady oraz edukacyjne gry logopedyczne, a także Cienie Korony (Shadows of the Crown) w wersji webowej.
+
+## Nowe gry i huby dodane do repozytorium
+
+W repozytorium pojawiły się dodatkowe projekty, które rozszerzają katalog gier o nowe tryby, motywy i doświadczenia:
+
+* [chestnut\_arcade\_game\_hub.html](./chestnut_arcade_game_hub.html) — klasyczny hub arcade z 4 mini-grami: Snake, Space Impact, Tanks i Bomberman.
+* [chestnut\_arcade\_game\_hub\_v2.html](./chestnut_arcade_game_hub_v2.html) — zaktualizowana wersja hubu z poprawionym interfejsem i ulepszonymi elementami gry.
+* [autumn\_neon\_chestnut\_2p\_arcade\_hub.html](./autumn_neon_chestnut_2p_arcade_hub.html) — neonowy hub arcade dla dwóch graczy z lokalnym trybem współpracy/rywalizacji.
+* [grinch\_chest\_conquest.html](./grinch_chest_conquest.html) — świąteczny hub arcade z motywem Grincha, zwierząt i świątecznych wyzwań.
+* [logopedia.html](./logopedia.html) — gra logopedyczna skupiająca się na rozpoznawaniu głosek i wyrazów.
+* [kraina\_wyraznej\_mowy.html](./kraina_wyraznej_mowy.html) — edukacyjny hub z serii gier logopedycznych i ćwiczeń oddechowych i fonetycznych.
+* [ShadowsOfCrown.html](./ShadowsOfCrown.html) — strategiczno-narracyjna gra w stylu dworskiego intryganta.
 
 ## Pliki gry
 
 * [chestnut\_arcade\_game\_hub.html](./chestnut_arcade_game_hub.html) — centrum gier arcade z 4 mini-grami: Snake, Space Impact, Tanks i Bomberman.
+* [chestnut\_arcade\_game\_hub\_v2.html](./chestnut_arcade_game_hub_v2.html) — ulepszona wersja hubu 4-in-1 z nowym stylem i dodatkowymi funkcjami.
+* [autumn\_neon\_chestnut\_2p\_arcade\_hub.html](./autumn_neon_chestnut_2p_arcade_hub.html) — neonowy hub 2-player z lokalnym trybem rozgrywki.
+* [grinch\_chest\_conquest.html](./grinch_chest_conquest.html) — świąteczna arcada typu holiday challenge.
+* [logopedia.html](./logopedia.html) — interaktywna gra logopedyczna dla ćwiczenia dźwięków i słów.
+* [kraina\_wyraznej\_mowy.html](./kraina_wyraznej_mowy.html) — edukacyjny portal z grami logopedycznymi.
 * [ShadowsOfCrown.html](./ShadowsOfCrown.html) — strategiczno-narracyjna gra w stylu dworskiego intryganta.
 
 # Chestnut Arcade Game Hub 🌰🚀
@@ -94,12 +111,17 @@ Features
 
 ## 🛠️ Wymagania i uruchomienie
 
-Obie gry są samodzielnymi plikami HTML, które zawierają interfejs i kod gry. Nie wymagają silnika, instalacji ani zewnętrznych bibliotek.
+Gry są samodzielnymi plikami HTML, które zawierają interfejs i kod gry. Nie wymagają silnika, instalacji ani zewnętrznych bibliotek.
 
 1. Pobierz lub sklonuj repozytorium.
 2. Otwórz odpowiedni plik w nowoczesnej przeglądarce:
 
-   * [chestnut\_arcade\_game\_hub.html](./chestnut_arcade_game_hub.html) — hub z arcade mini-grami,
+   * [chestnut\_arcade\_game\_hub.html](./chestnut_arcade_game_hub.html) — klasyczny hub z mini-grami arcade,
+   * [chestnut\_arcade\_game\_hub\_v2.html](./chestnut_arcade_game_hub_v2.html) — ulepszona wersja hubu 4-in-1,
+   * [autumn\_neon\_chestnut\_2p\_arcade\_hub.html](./autumn_neon\_chestnut\_2p\_arcade\_hub.html) — neonowy hub 2-player,
+   * [grinch\_chest\_conquest.html](./grinch\_chest\_conquest.html) — świąteczna arcada,
+   * [logopedia.html](./logopedia.html) — gra logopedyczna,
+   * [kraina\_wyraznej\_mowy.html](./kraina\_wyraznej\_mowy.html) — edukacyjny hub logopedyczny,
    * [ShadowsOfCrown.html](./ShadowsOfCrown.html) — gra strategiczna.
 3. Gra działa na komputerach i urządzeniach mobilnych. Postęp jest zapisywany lokalnie w pamięci przeglądarki; przycisk nowej gry rozpoczyna rozgrywkę od początku.
 

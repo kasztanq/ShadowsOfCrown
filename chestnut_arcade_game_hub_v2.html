@@ -1297,8 +1297,8 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       const subtitle = theme.waveTitles[subWave] || 'ELITE FLEET INCOMING';
 
       if (subWave <= 3) {
-        // 12 to 18 enemies per standard wave
-        waveEnemiesTotal = Math.min(20, 10 + sector * 2 + subWave * 2);
+        // 14 to 22 enemies per standard wave for higher challenge
+        waveEnemiesTotal = Math.min(24, 12 + sector * 2 + subWave * 2);
         waveEnemiesSpawned = 0;
         waveEnemiesCleared = 0;
 
@@ -1315,6 +1315,18 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       }
 
       updateHUD();
+    }
+
+    // Returns true for enemies that look like chestnuts/burrs
+    function isChestnutLookalikeEnemy(en) {
+      return (
+        en.type === 'burr' ||
+        en.type === 'cluster_burr' ||
+        en.type === 'mini_burr' ||
+        en.type === 'burr_mine' ||
+        en.type === 'bark_cruiser' ||
+        en.type === 'sniper_pod'
+      );
     }
 
     function toggleAutoFire() {
@@ -1579,31 +1591,32 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
 
     function spawnStandardWaveEnemy() {
       const yPos = 48 + Math.random() * (canvas.height - 96);
-      const speedScale = 1 + (spaceSector - 1) * 0.14;
+      const speedScale = 1.12 + (spaceSector - 1) * 0.16;
       const roll = Math.random();
 
       // Determine enemy type based on Sector (1..4+) and Sub-Wave (1..3)
+      // Include chestnut-like burr enemies from the very first wave
       let chosenType = 'bug';
 
       if (spaceSector === 1) {
         if (spaceSubWave === 1) {
-          chosenType = 'bug';
-        } else if (spaceSubWave === 2) {
           chosenType = roll < 0.55 ? 'bug' : 'burr';
+        } else if (spaceSubWave === 2) {
+          chosenType = roll < 0.4 ? 'bug' : (roll < 0.8 ? 'burr' : 'cluster_burr');
         } else {
-          chosenType = roll < 0.5 ? 'squirrel' : 'acorn_fighter';
+          chosenType = roll < 0.4 ? 'squirrel' : (roll < 0.75 ? 'acorn_fighter' : 'burr');
         }
       } else if (spaceSector === 2) {
         if (spaceSubWave === 1) {
-          chosenType = roll < 0.55 ? 'leaf_viper' : 'acorn_fighter';
+          chosenType = roll < 0.45 ? 'leaf_viper' : (roll < 0.75 ? 'burr' : 'acorn_fighter');
         } else if (spaceSubWave === 2) {
-          chosenType = roll < 0.55 ? 'cluster_burr' : 'leaf_viper';
+          chosenType = roll < 0.6 ? 'cluster_burr' : 'leaf_viper';
         } else {
-          chosenType = roll < 0.5 ? 'bark_cruiser' : 'squirrel';
+          chosenType = roll < 0.55 ? 'bark_cruiser' : 'cluster_burr';
         }
       } else if (spaceSector === 3) {
         if (spaceSubWave === 1) {
-          chosenType = roll < 0.55 ? 'stealth_wasp' : 'leaf_viper';
+          chosenType = roll < 0.5 ? 'stealth_wasp' : 'cluster_burr';
         } else if (spaceSubWave === 2) {
           chosenType = roll < 0.5 ? 'sniper_pod' : 'cluster_burr';
         } else {
@@ -1611,7 +1624,7 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         }
       } else {
         // Sector 4+: Omega Void Elite Mix
-        const elitePool = ['leaf_viper', 'cluster_burr', 'bark_cruiser', 'stealth_wasp', 'sniper_pod', 'acorn_fighter'];
+        const elitePool = ['leaf_viper', 'cluster_burr', 'bark_cruiser', 'stealth_wasp', 'sniper_pod', 'burr'];
         chosenType = elitePool[Math.floor(Math.random() * elitePool.length)];
       }
 
@@ -1963,7 +1976,7 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
             spaceSpawnTimer--;
             if (spaceSpawnTimer <= 0) {
               spawnStandardWaveEnemy();
-              spaceSpawnTimer = Math.max(24, 58 - spaceSector * 4 - spaceSubWave * 3);
+              spaceSpawnTimer = Math.max(20, 50 - spaceSector * 4 - spaceSubWave * 3);
             }
           } else if (spaceEnemies.length === 0) {
             // All enemies in this sub-wave have been cleared!
@@ -2363,11 +2376,26 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
           continue;
         }
 
-        // 11. Remove Off-Screen Standard Enemies (Count toward wave completion so wave never stalls)
-        if (!en.isBoss && en.x + en.radius < -45) {
+        // 11. Check Left Border Breach: Chestnut-like enemies remove 1 life if they pass the left edge!
+        if (!en.isBoss && en.x + en.radius < 0) {
+          const breachedChestnut = isChestnutLookalikeEnemy(en);
+          const breachY = en.y;
           spaceEnemies.splice(i, 1);
           if (!en.isMinion) waveEnemiesCleared++;
-          updateHUD();
+
+          if (breachedChestnut) {
+            playSound('boom');
+            createSpaceExplosion(14, breachY, '#ef4444', 22);
+            spacePlayer.lives--;
+            showLevelBanner('⚠️ CHESTNUT BREACHED BORDER!', '-1 Hull Life! Stop Chestnut Foes!', 55);
+            updateHUD();
+            if (spacePlayer.lives <= 0) {
+              triggerGameOver('Too many Chestnut enemies breached your left perimeter!');
+              return;
+            }
+          } else {
+            updateHUD();
+          }
         }
       }
 
@@ -3456,6 +3484,9 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       }
 
       // 5. Update Chestnut Shells & Check Wall / Base / Tank Collisions
+      const baseCenterX = tankTileCenterX(TANK_BASE_COL);
+      const baseCenterY = tankTileCenterY(TANK_BASE_ROW);
+
       for (let i = tankBullets.length - 1; i >= 0; i--) {
         const b = tankBullets[i];
         b.x += b.vx;
@@ -3465,6 +3496,16 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
           tankBullets.splice(i, 1);
           continue;
+        }
+
+        // Direct hitbox check against the Golden Chestnut Base
+        if (Math.hypot(b.x - baseCenterX, b.y - baseCenterY) < b.radius + 16) {
+          tankMap[TANK_BASE_ROW][TANK_BASE_COL] = 0;
+          tankBullets.splice(i, 1);
+          playSound('boom');
+          createSpaceExplosion(baseCenterX, baseCenterY, '#facc15', 40);
+          triggerGameOver('The Golden Chestnut Base was destroyed!');
+          return;
         }
 
         // Check Tile Hit
@@ -3486,10 +3527,11 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
             tankBullets.splice(i, 1);
             continue;
           } else if (tile === 9) {
-          } else if ( tile === 9) {
             // Golden Chestnut Base Hit!
+            tankMap[row][col] = 0;
             tankBullets.splice(i, 1);
-            createSpaceExplosion(tankTileCenterX(TANK_BASE_COL), tankTileCenterY(TANK_BASE_ROW), '#facc15', 35);
+            playSound('boom');
+            createSpaceExplosion(baseCenterX, baseCenterY, '#facc15', 40);
             triggerGameOver('The Golden Chestnut Base was destroyed!');
             return;
           }
@@ -4095,7 +4137,9 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
               speed: isChaser ? (1.45 + lvl * 0.1) : (1.1 + lvl * 0.08),
               hp: 1,
               maxHp: 1,
-              invulnTimer: 0
+              invulnTimer: 0,
+              lastCenterCol: -1,
+              lastCenterRow: -1
             });
             spawned++;
           }
@@ -4121,7 +4165,9 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
         hp: maxHp,
         maxHp: maxHp,
         invulnTimer: 0,
-        throwTimer: 90
+        throwTimer: 90,
+        lastCenterCol: -1,
+        lastCenterRow: -1
       };
       bomberEnemies.push(activeBomberBoss);
     }
@@ -4353,20 +4399,105 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       return false;
     }
 
-    function canBomberEnemyMoveTo(nx, ny, radius) {
-      const left = Math.floor((nx - radius + 3) / BOMBER_TILE);
-      const right = Math.floor((nx + radius - 3) / BOMBER_TILE);
-      const top = Math.floor((ny - radius + 3) / BOMBER_TILE);
-      const bottom = Math.floor((ny + radius - 3) / BOMBER_TILE);
-
-      for (let r = top; r <= bottom; r++) {
-        for (let c = left; c <= right; c++) {
-          if (r < 0 || r >= BOMBER_ROWS || c < 0 || c >= BOMBER_COLS) return false;
-          if (bomberGrid[r][c] === 1 || bomberGrid[r][c] === 2) return false;
-          if (plantedBombs.some(b => b.c === c && b.r === r)) return false;
-        }
-      }
+    function isBomberTileOpenForEnemy(c, r) {
+      if (r < 0 || r >= BOMBER_ROWS || c < 0 || c >= BOMBER_COLS) return false;
+      if (bomberGrid[r][c] === 1 || bomberGrid[r][c] === 2) return false;
+      if (plantedBombs.some(b => b.c === c && b.r === r)) return false;
       return true;
+    }
+
+    function chooseBomberEnemyDir(en, curCol, curRow) {
+      const cardinalDirs = [
+        { x: 1, y: 0 },
+        { x: -1, y: 0 },
+        { x: 0, y: 1 },
+        { x: 0, y: -1 }
+      ];
+      const openDirs = cardinalDirs.filter(d =>
+        isBomberTileOpenForEnemy(curCol + d.x, curRow + d.y)
+      );
+
+      if (openDirs.length === 0) {
+        return { x: 0, y: 0 };
+      }
+
+      const forwardOpen = openDirs.some(d => d.x === en.dir.x && d.y === en.dir.y);
+      const nonReverseDirs = openDirs.filter(d => !(d.x === -en.dir.x && d.y === -en.dir.y));
+      const candidates = nonReverseDirs.length > 0 ? nonReverseDirs : openDirs;
+
+      if (en.type === 'chaser' || en.isBoss) {
+        if (!forwardOpen || (candidates.length > 1 && Math.random() < 0.75)) {
+          const sorted = [...candidates].sort((a, b) => {
+            const ax = (curCol + a.x) * BOMBER_TILE + BOMBER_TILE / 2;
+            const ay = (curRow + a.y) * BOMBER_TILE + BOMBER_TILE / 2;
+            const bx = (curCol + b.x) * BOMBER_TILE + BOMBER_TILE / 2;
+            const by = (curRow + b.y) * BOMBER_TILE + BOMBER_TILE / 2;
+            return (
+              Math.hypot(bomberPlayer.x - ax, bomberPlayer.y - ay) -
+              Math.hypot(bomberPlayer.x - bx, bomberPlayer.y - by)
+            );
+          });
+          return sorted[0];
+        }
+        return en.dir;
+      }
+
+      if (forwardOpen && (candidates.length === 1 || Math.random() < 0.65)) {
+        return en.dir;
+      }
+      return candidates[Math.floor(Math.random() * candidates.length)];
+    }
+
+    function moveBomberEnemyOnRail(en) {
+      const curCol = Math.floor(en.x / BOMBER_TILE);
+      const curRow = Math.floor(en.y / BOMBER_TILE);
+      const centerX = curCol * BOMBER_TILE + BOMBER_TILE / 2;
+      const centerY = curRow * BOMBER_TILE + BOMBER_TILE / 2;
+
+      // Lock orthogonal coordinate strictly to the center of the tunnel
+      if (en.dir.x !== 0) {
+        en.y = centerY;
+      } else if (en.dir.y !== 0) {
+        en.x = centerX;
+      } else {
+        en.x = centerX;
+        en.y = centerY;
+        en.dir = chooseBomberEnemyDir(en, curCol, curRow);
+        en.lastCenterCol = curCol;
+        en.lastCenterRow = curRow;
+        if (en.dir.x === 0 && en.dir.y === 0) return;
+      }
+
+      const distToCenter = (en.dir.x !== 0)
+        ? (centerX - en.x) * en.dir.x
+        : (centerY - en.y) * en.dir.y;
+
+      const atNewCenter = (en.lastCenterCol !== curCol || en.lastCenterRow !== curRow);
+      const forwardBlocked = !isBomberTileOpenForEnemy(curCol + en.dir.x, curRow + en.dir.y);
+
+      if (distToCenter >= 0 && distToCenter <= en.speed && (atNewCenter || forwardBlocked)) {
+        en.x = centerX;
+        en.y = centerY;
+        en.lastCenterCol = curCol;
+        en.lastCenterRow = curRow;
+
+        const remStep = en.speed - distToCenter;
+        en.dir = chooseBomberEnemyDir(en, curCol, curRow);
+        if (en.dir.x !== 0 || en.dir.y !== 0) {
+          en.x += en.dir.x * remStep;
+          en.y += en.dir.y * remStep;
+        }
+        return;
+      }
+
+      if (distToCenter < 0 && forwardBlocked) {
+        en.dir = { x: -en.dir.x, y: -en.dir.y };
+        en.lastCenterCol = -1;
+        en.lastCenterRow = -1;
+      }
+
+      en.x += en.dir.x * en.speed;
+      en.y += en.dir.y * en.speed;
     }
 
     function updateBomberGame() {
@@ -4482,42 +4613,7 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
       bomberEnemies.forEach(en => {
         if (en.invulnTimer > 0) en.invulnTimer--;
 
-        const nx = en.x + en.dir.x * en.speed;
-        const ny = en.y + en.dir.y * en.speed;
-
-        if (canBomberEnemyMoveTo(nx, ny, en.radius - 2)) {
-          en.x = nx;
-          en.y = ny;
-
-          // Chaser Beetles & Boss periodically align toward Player at intersections
-          if (en.type === 'chaser' || en.isBoss) {
-            const centerX = Math.floor(en.x / BOMBER_TILE) * BOMBER_TILE + BOMBER_TILE / 2;
-            const centerY = Math.floor(en.y / BOMBER_TILE) * BOMBER_TILE + BOMBER_TILE / 2;
-            if (Math.hypot(en.x - centerX, en.y - centerY) < 2.2 && Math.random() < 0.25) {
-              const diffX = bomberPlayer.x - en.x;
-              const diffY = bomberPlayer.y - en.y;
-              if (Math.abs(diffX) > Math.abs(diffY)) {
-                en.dir = { x: Math.sign(diffX), y: 0 };
-              } else {
-                en.dir = { x: 0, y: Math.sign(diffY) };
-              }
-            }
-          }
-        } else {
-          // Pick a valid open direction
-          const possibleDirs = [
-            { x: 1, y: 0 },
-            { x: -1, y: 0 },
-            { x: 0, y: 1 },
-            { x: 0, y: -1 }
-          ].filter(d => canBomberEnemyMoveTo(en.x + d.x * 4, en.y + d.y * 4, en.radius - 2));
-
-          if (possibleDirs.length > 0) {
-            en.dir = possibleDirs[Math.floor(Math.random() * possibleDirs.length)];
-          } else {
-            en.dir = { x: -en.dir.x, y: -en.dir.y };
-          }
-        }
+        moveBomberEnemyOnRail(en);
 
         // King Burr-Golem hurls Spiky Mini-Burrs toward the Player!
         if (en.isBoss) {
@@ -5038,6 +5134,19 @@ else if (currentMode === 'BOMBER') { updateBomberGame(); drawBomberGame(); }</co
      * 9. KEYBOARD & TOUCH INPUT LISTENERS
      **************************************************************/
     window.addEventListener('keydown', (e) => {
+      // If Game Over overlay is active, handle restart or menu shortcuts
+      if (isGameOver) {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          restartCurrentGame();
+          return;
+        } else if (e.code === 'Enter') {
+          e.preventDefault();
+          returnToMenu();
+          return;
+        }
+      }
+
       if (currentMode === 'MENU') return;
 
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {

@@ -1,0 +1,2543 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogoHub – Kraina Wyraźnej Mowy | Gry Logopedyczne</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --font-heading: 'Fredoka', sans-serif;
+            --font-body: 'Nunito', sans-serif;
+        }
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #fef3c7 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+        h1, h2, h3, h4, .font-heading {
+            font-family: var(--font-heading);
+        }
+        /* Custom animations */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.6); }
+            50% { box-shadow: 0 0 0 12px rgba(251, 191, 36, 0); }
+        }
+        @keyframes throatVibrate {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-3px) rotate(-1deg); }
+            40% { transform: translateX(3px) rotate(1deg); }
+            60% { transform: translateX(-3px) rotate(-1deg); }
+            80% { transform: translateX(3px) rotate(1deg); }
+        }
+        @keyframes bubbleRise {
+            0% { transform: translateY(0) scale(0.5); opacity: 0.9; }
+            100% { transform: translateY(-220px) scale(1.25); opacity: 0; }
+        }
+        .animate-float {
+            animation: floatSlow 3.5s ease-in-out infinite;
+        }
+        .animate-glow {
+            animation: pulseGlow 2s infinite;
+        }
+        .animate-vibrate {
+            animation: throatVibrate 0.25s linear infinite;
+        }
+        .game-btn {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 6px 0 rgba(0,0,0,0.15);
+        }
+        .game-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 9px 0 rgba(0,0,0,0.18);
+        }
+        .game-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+        }
+        .card-3d {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-3d:hover {
+            transform: translateY(-5px);
+        }
+        /* Highlighted phoneme in syllables */
+        .phoneme-hl {
+            color: #dc2626;
+            font-weight: 800;
+            text-decoration: underline;
+            text-decoration-thickness: 3px;
+            text-underline-offset: 4px;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col min-h-screen">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b-4 border-sky-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <!-- Brand Logo & Home Button -->
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="navigateTo('dashboard')">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white text-2xl shadow-md group-hover:scale-105 transition">
+                    🦜
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-sky-600 via-indigo-600 to-amber-500 bg-clip-text text-transparent">
+                            LogoHub
+                        </h1>
+                        <span class="text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full border border-amber-300">PL</span>
+                    </div>
+                    <p class="text-xs text-slate-500 font-medium hidden sm:block">Kraina Wyraźnej Mowy • Interaktywne Gry Logopedyczne</p>
+                </div>
+            </div>
+
+            <!-- Navigation & Status Pill Bar -->
+            <div class="flex items-center flex-wrap gap-2 sm:gap-3">
+                <!-- Back to Dashboard button (visible inside games) -->
+                <button id="navHomeBtn" onclick="navigateTo('dashboard')" class="hidden game-btn bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold px-3.5 py-2 rounded-xl text-sm flex items-center gap-2 border border-sky-300">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Powrót do Huba</span>
+                </button>
+
+                <!-- Warmup Quick Button -->
+                <button onclick="openWarmupModal()" class="game-btn bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold px-3.5 py-2 rounded-xl text-sm flex items-center gap-2">
+                    <span class="text-base">👅</span>
+                    <span class="hidden md:inline">Rozgrzewka Buzi</span>
+                </button>
+
+                <!-- Therapist Tips Toggle -->
+                <button id="therapistToggleBtn" onclick="toggleTherapistMode()" class="game-btn bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300 font-bold px-3.5 py-2 rounded-xl text-sm flex items-center gap-2" title="Wskazówki artykulacyjne dla Logopedy i Rodzica">
+                    <i class="fa-solid fa-user-doctor"></i>
+                    <span class="hidden lg:inline">Wskazówki Logopedy</span>
+                    <span id="therapistBadge" class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                </button>
+
+                <!-- Stars Counter -->
+                <div class="bg-amber-50 border-2 border-amber-300 px-3.5 py-1.5 rounded-2xl flex items-center gap-2 shadow-inner">
+                    <span class="text-xl animate-bounce">⭐</span>
+                    <div>
+                        <div class="text-[10px] uppercase font-extrabold text-amber-700 leading-none">Gwiazdki</div>
+                        <div id="headerStarCount" class="text-base font-extrabold text-amber-900 leading-tight">0</div>
+                    </div>
+                </div>
+
+                <!-- Child Avatar Selector Button -->
+                <button onclick="openAvatarModal()" class="flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 px-3 py-1.5 rounded-2xl transition" title="Zmień awatar i imię">
+                    <span id="headerAvatarEmoji" class="text-2xl">🦊</span>
+                    <div class="text-left hidden sm:block">
+                        <div class="text-[10px] uppercase font-bold text-indigo-500 leading-none">Gracz</div>
+                        <div id="headerChildName" class="text-xs font-extrabold text-indigo-950">Mały Mówca</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Global Therapist / Parent Guidance Banner (Collapsible) -->
+        <div id="therapistGlobalBanner" class="hidden bg-emerald-900 text-emerald-50 border-t border-emerald-700 transition-all">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs sm:text-sm">
+                <div class="flex items-start gap-3">
+                    <div class="bg-emerald-700 p-2 rounded-xl text-lg shrink-0">🩺</div>
+                    <div>
+                        <span class="font-bold text-emerald-300 uppercase tracking-wide block">Tryb Wskazówek Logopedycznych Aktywny:</span>
+                        <span id="therapistDynamicTip">W każdej grze zobaczysz dokładny opis ułożenia języka, warg oraz pracy wiązadeł głosowych. Pamiętaj, aby dziecko siedziało prosto i widziało Twoją twarz lub lusterko!</span>
+                    </div>
+                </div>
+                <button onclick="openFullTherapistGuide()" class="shrink-0 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-xl border border-emerald-400 text-xs">
+                    📖 Pełny Atlas Głosek
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+
+        <!-- ==========================================
+             VIEW 0: DASHBOARD (STRONA GŁÓWNA HUBA)
+             ========================================== -->
+        <section id="view-dashboard" class="space-y-8">
+            <!-- Hero Banner -->
+            <div class="relative rounded-3xl bg-gradient-to-r from-indigo-600 via-sky-500 to-teal-400 p-6 sm:p-8 text-white shadow-xl overflow-hidden">
+                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <div class="lg:col-span-8 space-y-4">
+                        <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3.5 py-1 rounded-full text-xs sm:text-sm font-bold">
+                            <span>✨ Witaj w Krainie Wyraźnej Mowy!</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-4xl font-bold leading-tight">
+                            Cześć, <span id="heroChildName" class="text-amber-300 underline decoration-wavy">Mały Mówco</span>! Gotowy na dzisiejszą przygodę z głoskami?
+                        </h2>
+                        <p class="text-sky-50 text-sm sm:text-base max-w-2xl font-medium">
+                            Zacznij od wesołej rozgrzewki buzi i języka przed lusterkiem, a potem wybierz jedną z 4 magicznych krain i zbieraj złote gwiazdki za wyraźną wymowę!
+                        </p>
+                        <div class="flex flex-wrap gap-3 pt-1">
+                            <button onclick="openWarmupModal()" class="game-btn bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold px-5 py-3 rounded-2xl text-sm sm:text-base flex items-center gap-2">
+                                <span class="text-xl">🦁</span>
+                                <span>Rozgrzewka Buzi i Języka (Start!)</span>
+                            </button>
+                            <button onclick="speakText('Witaj w Krainie Wyraźnej Mowy! Wybierz grę lub zacznij od rozgrzewki buzi i języka.')" class="game-btn bg-white/20 hover:bg-white/30 text-white font-bold px-4 py-3 rounded-2xl text-sm sm:text-base flex items-center gap-2 backdrop-blur-sm border border-white/30">
+                                <i class="fa-solid fa-volume-high"></i>
+                                <span>Posłuchaj powitania</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Progress & Badges Card in Hero -->
+                    <div class="lg:col-span-4 bg-white/15 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-white/25 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-base flex items-center gap-2">
+                                <span>🏆 Twoje Odznaki i Postępy</span>
+                            </h3>
+                            <button onclick="resetProgressPrompt()" class="text-[11px] text-sky-100 hover:text-white underline" title="Wyzeruj postępy">Resetuj</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-center">
+                            <div class="bg-white/20 rounded-xl p-2.5">
+                                <div class="text-2xl font-extrabold text-amber-300" id="dashStarsTotal">0</div>
+                                <div class="text-xs text-sky-100">Zdobyte Gwiazdki</div>
+                            </div>
+                            <div class="bg-white/20 rounded-xl p-2.5">
+                                <div class="text-2xl font-extrabold text-emerald-300" id="dashWordsCount">0</div>
+                                <div class="text-xs text-sky-100">Wypowiedziane Słowa</div>
+                            </div>
+                        </div>
+                        <!-- 5 Mini Badges -->
+                        <div class="pt-1">
+                            <div class="text-xs font-bold text-sky-100 mb-1.5">Kolekcja Odznak Mistrza Mowy:</div>
+                            <div class="grid grid-cols-5 gap-1.5" id="badgesContainer">
+                                <!-- Rendered dynamically by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 MAIN SPEECH THERAPY GAMES GRID -->
+            <div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                            <span>🎮 Wybierz Krainę Ćwiczeń Logopedycznych</span>
+                        </h3>
+                        <p class="text-sm text-slate-600">Każda gra rozwija inną grupę głosek i wspiera terapię najczęstszych wad wymowy</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-microphone text-rose-500"></i>
+                        <span>Działa z <strong>mikrofonem</strong> lub <strong>przyciskiem ekranowym</strong>!</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- GAME 1 CARD: SYGMATYZM -->
+                    <div class="card-3d bg-white rounded-3xl border-4 border-emerald-200 shadow-lg overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <div class="bg-gradient-to-r from-emerald-500 to-teal-600 p-5 text-white relative">
+                                <div class="flex justify-between items-start">
+                                    <span class="bg-white/25 backdrop-blur-sm text-xs font-extrabold uppercase px-3 py-1 rounded-full">
+                                        Gra 1 • Sygmatyzm (Seplenienie)
+                                    </span>
+                                    <span class="text-4xl animate-float">🌲🐿️</span>
+                                </div>
+                                <h4 class="text-2xl font-bold mt-2">Szumiący Las</h4>
+                                <p class="text-emerald-50 text-xs sm:text-sm mt-1">
+                                    Szereg szumiący (<strong>SZ, Ż, CZ, DŻ</strong>) vs syczący (<strong>S, Z, C, DZ</strong>) vs ciszący (<strong>Ś, Ź, Ć, DŹ</strong>)
+                                </p>
+                            </div>
+                            <div class="p-5 space-y-3">
+                                <p class="text-sm text-slate-600 leading-relaxed">
+                                    Pomóż leśnym zwierzakom (Misiowi Szumkowi, Wężowi Syczkowi i Ptaszkowi Świergotkowi) posortować obrazki do właściwych koszyków! Ćwicz głoski w <strong>nagłosie, śródgłosie i wygłosie</strong>.
+                                </p>
+                                <!-- Therapist mini box -->
+                                <div class="therapist-card-note hidden bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-900">
+                                    <strong>💡 Wskazówka Logopedy:</strong> Przy głoskach <em>SZ, Ż, CZ, DŻ</em> czubek języka unosi się za górne wałki dziąsłowe (tzw. „kieliszek”), a usta tworzą lekki ryjek. Przy <em>S, Z, C, DZ</em> język leży za dolnymi zębami, a usta się uśmiechają!
+                                </div>
+                                <div class="flex flex-wrap gap-1.5 pt-1">
+                                    <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-lg">Nagłos / Śródgłos / Wygłos</span>
+                                    <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-lg">Syntezator Mowy PL</span>
+                                    <span class="text-xs bg-sky-100 text-sky-800 font-bold px-2.5 py-1 rounded-lg" id="g1StatBadge">Ukończono: 0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-5 pt-0">
+                            <button onclick="navigateTo('game1')" class="w-full game-btn bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold py-3.5 rounded-2xl text-base flex items-center justify-center gap-2">
+                                <span>Wejdź do Szumiącego Lasu</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- GAME 2 CARD: ROTACYZM -->
+                    <div class="card-3d bg-white rounded-3xl border-4 border-indigo-200 shadow-lg overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-white relative">
+                                <div class="flex justify-between items-start">
+                                    <span class="bg-white/25 backdrop-blur-sm text-xs font-extrabold uppercase px-3 py-1 rounded-full">
+                                        Gra 2 • Rotacyzm (Reranie)
+                                    </span>
+                                    <span class="text-4xl animate-float">🚀🪐</span>
+                                </div>
+                                <h4 class="text-2xl font-bold mt-2">Rakieta Głoski R</h4>
+                                <p class="text-indigo-100 text-xs sm:text-sm mt-1">
+                                    Głoska <strong>R</strong>, grupy <strong>TR, DR, PR, BR</strong> oraz różnicowanie <strong>R vs L</strong>
+                                </p>
+                            </div>
+                            <div class="p-5 space-y-3">
+                                <p class="text-sm text-slate-600 leading-relaxed">
+                                    Wyrusz w kosmiczny lot przez Stacje Sylabowe (<em>LA-LO ➔ TLA ➔ TRA-DRO ➔ RA-RO-RU</em>), rozwiązuj zagadki <strong>Rak czy Lok?</strong> i uruchom <strong>Trener Wibracji Języka</strong> z falą dźwiękową!
+                                </p>
+                                <!-- Therapist mini box -->
+                                <div class="therapist-card-note hidden bg-indigo-50 border border-indigo-200 rounded-xl p-3 text-xs text-indigo-900">
+                                    <strong>💡 Wskazówka Logopedy:</strong> Nie wywołujemy „R” gardłowego! Zaczynamy od szybkiego powtarzania dziąsłowego <em>td-td-td</em> lub <em>tr-tr-tr</em> przy szeroko otwartej buzi, aż czubek języka (apeks) zacznie drgać za górnymi zębami.
+                                </div>
+                                <div class="flex flex-wrap gap-1.5 pt-1">
+                                    <span class="text-xs bg-indigo-100 text-indigo-800 font-bold px-2.5 py-1 rounded-lg">Stacje Sylabowe</span>
+                                    <span class="text-xs bg-purple-100 text-purple-800 font-bold px-2.5 py-1 rounded-lg">Trener Wibracji TD/TR</span>
+                                    <span class="text-xs bg-sky-100 text-sky-800 font-bold px-2.5 py-1 rounded-lg" id="g2StatBadge">Ukończono: 0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-5 pt-0">
+                            <button onclick="navigateTo('game2')" class="w-full game-btn bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-3.5 rounded-2xl text-base flex items-center justify-center gap-2">
+                                <span>Wystrzel Rakietę Głoski R</span>
+                                <i class="fa-solid fa-shuttle-space"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- GAME 3 CARD: KAPPACYZM & GAMMACYZM -->
+                    <div class="card-3d bg-white rounded-3xl border-4 border-amber-200 shadow-lg overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-5 text-white relative">
+                                <div class="flex justify-between items-start">
+                                    <span class="bg-white/25 backdrop-blur-sm text-xs font-extrabold uppercase px-3 py-1 rounded-full">
+                                        Gra 3 • Kappacyzm i Gammacyzm
+                                    </span>
+                                    <span class="text-4xl animate-float">👑💎</span>
+                                </div>
+                                <h4 class="text-2xl font-bold mt-2">Skarby Króla Kruka i Gąski</h4>
+                                <p class="text-amber-50 text-xs sm:text-sm mt-1">
+                                    Głoski tylnojęzykowe <strong>K</strong> i <strong>G</strong> (zamiast przedniojęzykowych T i D)
+                                </p>
+                            </div>
+                            <div class="p-5 space-y-3">
+                                <p class="text-sm text-slate-600 leading-relaxed">
+                                    Odkrywaj królewskie karty Memory ze skarbami (<em>Kot, Korona, Klucz, Gitara, Grzyb</em>) oraz naprawiaj zepsute słowa: <strong>„Tura czy Kura?”</strong>, <strong>„Duzik czy Guzik?”</strong>.
+                                </p>
+                                <!-- Therapist mini box -->
+                                <div class="therapist-card-note hidden bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900">
+                                    <strong>💡 Wskazówka Logopedy:</strong> Przy głoskach <em>K</em> i <em>G</em> czubek języka leży na dole za dolnymi siekaczami, a grzbiet (tył) języka unosi się i zwiera z podniebieniem miękkim („koci grzbiet”).
+                                </div>
+                                <div class="flex flex-wrap gap-1.5 pt-1">
+                                    <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-lg">Napraw Słowo (K/T, G/D)</span>
+                                    <span class="text-xs bg-orange-100 text-orange-800 font-bold px-2.5 py-1 rounded-lg">Memory Skarbów 3x</span>
+                                    <span class="text-xs bg-sky-100 text-sky-800 font-bold px-2.5 py-1 rounded-lg" id="g3StatBadge">Ukończono: 0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-5 pt-0">
+                            <button onclick="navigateTo('game3')" class="w-full game-btn bg-amber-500 hover:bg-amber-600 text-white font-extrabold py-3.5 rounded-2xl text-base flex items-center justify-center gap-2">
+                                <span>Otwórz Skarbiec K i G</span>
+                                <i class="fa-solid fa-crown"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- GAME 4 CARD: MOWA BEZDŹWIĘCZNA + ODDECH -->
+                    <div class="card-3d bg-white rounded-3xl border-4 border-sky-200 shadow-lg overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <div class="bg-gradient-to-r from-sky-500 to-cyan-500 p-5 text-white relative">
+                                <div class="flex justify-between items-start">
+                                    <span class="bg-white/25 backdrop-blur-sm text-xs font-extrabold uppercase px-3 py-1 rounded-full">
+                                        Gra 4 • Mowa Bezdźwięczna i Oddech
+                                    </span>
+                                    <span class="text-4xl animate-float">🫧🎈</span>
+                                </div>
+                                <h4 class="text-2xl font-bold mt-2">Dźwięczna Dmuchawka i Bąbelki</h4>
+                                <p class="text-sky-50 text-xs sm:text-sm mt-1">
+                                    Pary opozycyjne (<strong>B-P, D-T, W-F, Z-S, Ż-SZ, G-K</strong>) + Miernik Oddechu
+                                </p>
+                            </div>
+                            <div class="p-5 space-y-3">
+                                <p class="text-sm text-slate-600 leading-relaxed">
+                                    Dotknij szyi (krtani) i poczuj wibracje pszczółki 🐝 w quizie par minimalnych (<em>Bąk–Pąk, Koza–Kosa, Góra–Kura</em>), a potem dmuchaj w mikrofon lub przycisk, by kręcić wiatraczkiem i puszczać bańki!
+                                </p>
+                                <!-- Therapist mini box -->
+                                <div class="therapist-card-note hidden bg-sky-50 border border-sky-200 rounded-xl p-3 text-xs text-sky-900">
+                                    <strong>💡 Wskazówka Logopedy:</strong> Przykładamy dłoń dziecka do krtani: przy głoskach dźwięcznych (<em>B, D, W, Z, Ż, G</em>) czuć wyraźne drżenie („silniczek pracuje”), a przy bezdźwięcznych (<em>P, T, F, S, SZ, K</em>) krtań nie drży.
+                                </div>
+                                <div class="flex flex-wrap gap-1.5 pt-1">
+                                    <span class="text-xs bg-sky-100 text-sky-800 font-bold px-2.5 py-1 rounded-lg">Pary Minimalne (B-P, Z-S...)</span>
+                                    <span class="text-xs bg-cyan-100 text-cyan-800 font-bold px-2.5 py-1 rounded-lg">Miernik Oddechu (Mikrofon)</span>
+                                    <span class="text-xs bg-sky-100 text-sky-800 font-bold px-2.5 py-1 rounded-lg" id="g4StatBadge">Ukończono: 0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-5 pt-0">
+                            <button onclick="navigateTo('game4')" class="w-full game-btn bg-sky-500 hover:bg-sky-600 text-white font-extrabold py-3.5 rounded-2xl text-base flex items-center justify-center gap-2">
+                                <span>Uruchom Dmuchawkę i Pary</span>
+                                <i class="fa-solid fa-wind"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 1: GRA 1 - "SZUMIĄCY LAS" (SYGMATYZM)
+             ========================================== -->
+        <section id="view-game1" class="hidden space-y-6">
+            <!-- Game Header Bar -->
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl p-5 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="text-4xl bg-white/20 p-3 rounded-2xl">🌲</div>
+                    <div>
+                        <span class="text-xs uppercase font-extrabold bg-emerald-800/60 px-2.5 py-0.5 rounded-full">Gra 1 • Terapia Sygmatyzmu</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold">Szumiący Las – Sortowanie Głosek</h2>
+                        <p class="text-xs sm:text-sm text-emerald-100">Posłuchaj słowa, powtórz wyraźnie i wybierz koszyk odpowiedniego zwierzaka!</p>
+                    </div>
+                </div>
+
+                <!-- Position Filter (Nagłos, Śródgłos, Wygłos) -->
+                <div class="bg-white/15 backdrop-blur-sm p-2 rounded-2xl flex flex-wrap gap-1.5 border border-white/20">
+                    <span class="text-xs font-bold self-center px-2">Pozycja głoski:</span>
+                    <button onclick="setGame1Position('all')" id="g1Pos-all" class="g1-pos-btn bg-white text-emerald-900 font-extrabold px-3 py-1.5 rounded-xl text-xs transition">Wszystkie</button>
+                    <button onclick="setGame1Position('naglos')" id="g1Pos-naglos" class="g1-pos-btn bg-white/20 hover:bg-white/30 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Nagłos (Początek)</button>
+                    <button onclick="setGame1Position('srodglos')" id="g1Pos-srodglos" class="g1-pos-btn bg-white/20 hover:bg-white/30 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Śródgłos (Środek)</button>
+                    <button onclick="setGame1Position('wyglos')" id="g1Pos-wyglos" class="g1-pos-btn bg-white/20 hover:bg-white/30 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Wygłos (Koniec)</button>
+                </div>
+            </div>
+
+            <!-- Therapist Tip for Game 1 -->
+            <div class="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-emerald-950">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">👄</span>
+                    <div>
+                        <strong>Jak ułożyć buzię?</strong>
+                        <span class="block sm:inline">
+                            • <strong>Szumiące (SZ, Ż, CZ, DŻ):</strong> język u góry za zębami, usta w „ryjek”.
+                            • <strong>Syczące (S, Z, C, DZ):</strong> język na dole za zębami, usta w uśmiechu.
+                            • <strong>Ciszące (Ś, Ź, Ć, DŹ):</strong> środek języka uniesiony do podniebienia.
+                        </span>
+                    </div>
+                </div>
+                <span class="shrink-0 bg-emerald-200 text-emerald-900 font-extrabold px-3 py-1 rounded-xl" id="g1ScoreCounter">Wynik w lesie: 0 pkt</span>
+            </div>
+
+            <!-- Active Word Card & Controls -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                <!-- Left/Center: Current Word Card -->
+                <div class="lg:col-span-5 bg-white rounded-3xl border-4 border-emerald-200 p-6 shadow-md flex flex-col items-center justify-between text-center relative">
+                    <div class="w-full flex justify-between items-center text-xs font-bold text-slate-400">
+                        <span id="g1PosLabel" class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full">Pozycja: Nagłos</span>
+                        <button onclick="nextGame1Word()" class="text-emerald-600 hover:underline flex items-center gap-1">
+                            <span>Inne słowo</span> <i class="fa-solid fa-rotate"></i>
+                        </button>
+                    </div>
+
+                    <div class="my-4">
+                        <div id="g1WordEmoji" class="text-7xl sm:text-8xl mb-3 transition-transform duration-300 hover:scale-110 cursor-pointer" onclick="speakGame1Current()">
+                             pinecones
+                        </div>
+                        <div id="g1WordSyllables" class="text-3xl sm:text-4xl font-extrabold tracking-wider text-slate-800 mb-1 font-heading">
+                            SZY-SZKA
+                        </div>
+                        <div id="g1WordPlain" class="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                            (szyszka)
+                        </div>
+                    </div>
+
+                    <!-- Listen & Repeat Buttons -->
+                    <div class="w-full space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="speakGame1Current()" class="game-btn bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-sm sm:text-base">
+                                <i class="fa-solid fa-volume-high"></i>
+                                <span>Posłuchaj</span>
+                            </button>
+                            <button onclick="practiceGame1Pronunciation()" id="g1RepeatBtn" class="game-btn bg-amber-400 hover:bg-amber-500 text-slate-900 font-extrabold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-sm sm:text-base">
+                                <i class="fa-solid fa-microphone-lines"></i>
+                                <span id="g1RepeatBtnText">Powtórz głośno!</span>
+                            </button>
+                        </div>
+                        <div id="g1PronounceFeedback" class="text-xs font-bold text-emerald-700 bg-emerald-50 py-2 px-3 rounded-xl border border-emerald-200">
+                            Krok 1: Kliknij „Posłuchaj”, powtórz słowo, a potem wrzuć je do właściwego koszyka!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: 3 Forest Animal Baskets -->
+                <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- Basket 1: Szumiące -->
+                    <button onclick="checkGame1Basket('szumiace')" class="card-3d bg-gradient-to-b from-amber-50 to-orange-100 hover:from-amber-100 hover:to-orange-200 border-4 border-amber-300 rounded-3xl p-5 flex flex-col items-center justify-between text-center shadow-md group">
+                        <div class="w-full">
+                            <span class="bg-amber-300 text-amber-950 text-xs font-extrabold px-3 py-1 rounded-full uppercase">Szereg Szumiący</span>
+                            <div class="text-6xl my-3 group-hover:scale-110 transition">🐻</div>
+                            <h3 class="text-xl font-bold text-amber-950">Miś Szumek</h3>
+                            <p class="text-xs text-amber-800 mt-1">Czubek języka u góry („kieliszek”)</p>
+                        </div>
+                        <div class="my-4 bg-white/80 w-full py-3 rounded-2xl border-2 border-amber-300">
+                            <div class="text-2xl font-extrabold text-amber-900 font-heading">SZ • Ż • CZ • DŻ</div>
+                            <div class="text-[11px] font-bold text-amber-700">Szyszka, Żaba, Czapka</div>
+                        </div>
+                        <div class="w-full bg-amber-500 group-hover:bg-amber-600 text-white font-extrabold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                            <span>Wrzuć do koszyka</span>
+                        </div>
+                    </button>
+
+                    <!-- Basket 2: Syczące -->
+                    <button onclick="checkGame1Basket('syczace')" class="card-3d bg-gradient-to-b from-emerald-50 to-teal-100 hover:from-emerald-100 hover:to-teal-200 border-4 border-emerald-300 rounded-3xl p-5 flex flex-col items-center justify-between text-center shadow-md group">
+                        <div class="w-full">
+                            <span class="bg-emerald-300 text-emerald-950 text-xs font-extrabold px-3 py-1 rounded-full uppercase">Szereg Syczący</span>
+                            <div class="text-6xl my-3 group-hover:scale-110 transition">🐍</div>
+                            <h3 class="text-xl font-bold text-emerald-950">Wąż Syczek</h3>
+                            <p class="text-xs text-emerald-800 mt-1">Język za dolnymi zębami, uśmiech</p>
+                        </div>
+                        <div class="my-4 bg-white/80 w-full py-3 rounded-2xl border-2 border-emerald-300">
+                            <div class="text-2xl font-extrabold text-emerald-900 font-heading">S • Z • C • DZ</div>
+                            <div class="text-[11px] font-bold text-emerald-700">Sowa, Zamek, Cytryna</div>
+                        </div>
+                        <div class="w-full bg-emerald-600 group-hover:bg-emerald-700 text-white font-extrabold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                            <span>Wrzuć do koszyka</span>
+                        </div>
+                    </button>
+
+                    <!-- Basket 3: Ciszące -->
+                    <button onclick="checkGame1Basket('ciszace')" class="card-3d bg-gradient-to-b from-sky-50 to-indigo-100 hover:from-sky-100 hover:to-indigo-200 border-4 border-sky-300 rounded-3xl p-5 flex flex-col items-center justify-between text-center shadow-md group">
+                        <div class="w-full">
+                            <span class="bg-sky-300 text-sky-950 text-xs font-extrabold px-3 py-1 rounded-full uppercase">Szereg Ciszący</span>
+                            <div class="text-6xl my-3 group-hover:scale-110 transition">🐦</div>
+                            <h3 class="text-xl font-bold text-sky-950">Ptak Świergotek</h3>
+                            <p class="text-xs text-sky-800 mt-1">Środek języka miękko u góry</p>
+                        </div>
+                        <div class="my-4 bg-white/80 w-full py-3 rounded-2xl border-2 border-sky-300">
+                            <div class="text-2xl font-extrabold text-sky-900 font-heading">Ś • Ź • Ć • DŹ</div>
+                            <div class="text-[11px] font-bold text-sky-700">Ślimak, Źrebak, Ćma</div>
+                        </div>
+                        <div class="w-full bg-sky-600 group-hover:bg-sky-700 text-white font-extrabold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                            <span>Wrzuć do koszyka</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 2: GRA 2 - "RAKIETA GŁOSKI R" (ROTACYZM)
+             ========================================== -->
+        <section id="view-game2" class="hidden space-y-6">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-indigo-700 via-purple-700 to-slate-900 rounded-3xl p-5 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="text-4xl bg-white/15 p-3 rounded-2xl">🚀</div>
+                    <div>
+                        <span class="text-xs uppercase font-extrabold bg-indigo-500/60 px-2.5 py-0.5 rounded-full">Gra 2 • Terapia Rotacyzmu (Głoska R)</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold">Rakieta Głoski R – Kosmiczna Misja</h2>
+                        <p class="text-xs sm:text-sm text-indigo-200">Stacje sylabowe, zagadki R vs L oraz Trener Wibracji Języka!</p>
+                    </div>
+                </div>
+                <!-- Sub-mode Tabs -->
+                <div class="flex flex-wrap gap-2 bg-white/10 p-1.5 rounded-2xl border border-white/20">
+                    <button onclick="switchGame2Tab('stations')" id="g2Tab-stations" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-amber-400 text-slate-900 transition">
+                        🪐 1. Stacje i Lot Rakiety
+                    </button>
+                    <button onclick="switchGame2Tab('riddles')" id="g2Tab-riddles" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white hover:bg-white/15 transition">
+                        🦀 2. Zagadki R vs L
+                    </button>
+                    <button onclick="switchGame2Tab('vibrator')" id="g2Tab-vibrator" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white hover:bg-white/15 transition">
+                        〰️ 3. Trener Wibracji (TD/TR)
+                    </button>
+                </div>
+            </div>
+
+            <!-- SUB-MODE 2A: STACJE SYLABOWE & KOSMICZNY LOT -->
+            <div id="g2Panel-stations" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left: 5 Cosmic Syllable Stations -->
+                <div class="lg:col-span-7 bg-white rounded-3xl border-4 border-indigo-200 p-5 sm:p-6 shadow-md space-y-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-indigo-950">Etapy Kosmicznej Podróży (Od L i TD do R!)</h3>
+                            <p class="text-xs text-slate-500">Kliknij stację, posłuchaj i wypowiedz sylaby, aby zatankować paliwo do rakiety!</p>
+                        </div>
+                        <span class="bg-indigo-100 text-indigo-800 font-extrabold px-3 py-1 rounded-xl text-xs" id="g2FuelLabel">Paliwo: 100%</span>
+                    </div>
+
+                    <!-- Station Progression Stepper -->
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2" id="g2StationsGrid">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Current Station Practice Box -->
+                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-5 border-2 border-indigo-200 text-center space-y-4">
+                        <div class="text-xs font-extrabold uppercase tracking-wider text-indigo-600" id="g2ActiveStationTitle">
+                            Stacja 1: Rozgrzewka Czubka Języka (Głoska L)
+                        </div>
+                        <div class="flex flex-wrap justify-center gap-3" id="g2SyllableButtons">
+                            <!-- Syllable buttons injected by JS -->
+                        </div>
+                        <p class="text-xs text-slate-600" id="g2ActiveStationHint">
+                            Unieś szeroki czubek języka do górnych wałków dziąsłowych za zębami i wypowiedz sprężyście każdą sylabę!
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-3 pt-1">
+                            <button onclick="speakCurrentStationAll()" class="game-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-volume-high"></i>
+                                <span>Odczytaj całą stację</span>
+                            </button>
+                            <button onclick="boostRocketFromStation()" class="game-btn bg-amber-400 hover:bg-amber-500 text-slate-900 font-extrabold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-rocket"></i>
+                                <span>Wymówione! Leć Rakietą (+1⭐)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Interactive Space Flight Mini-Game -->
+                <div class="lg:col-span-5 bg-slate-900 rounded-3xl border-4 border-indigo-400 p-5 text-white shadow-xl flex flex-col justify-between relative overflow-hidden">
+                    <div class="flex items-center justify-between z-10">
+                        <div>
+                            <h4 class="font-bold text-lg text-amber-300 flex items-center gap-2">
+                                <span>🌌 Kosmiczny Tor Głoski R</span>
+                            </h4>
+                            <p class="text-xs text-slate-300">Omijaj asteroidy i łap planety ze słowami z głoską R!</p>
+                        </div>
+                        <div class="bg-indigo-950 border border-indigo-500 px-3 py-1 rounded-xl text-xs font-extrabold">
+                            Wysokość: <span id="g2AltitudeText" class="text-amber-300">0 km</span>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Flight Track -->
+                    <div id="g2SpaceStage" class="my-4 h-64 rounded-2xl bg-gradient-to-b from-slate-950 via-indigo-950 to-purple-950 border-2 border-indigo-500/40 relative overflow-hidden flex flex-col justify-between p-4">
+                        <!-- Stars background -->
+                        <div class="text-center z-10 bg-white/10 backdrop-blur-sm rounded-xl p-2.5 border border-white/15">
+                            <div class="text-[11px] text-indigo-200 uppercase font-bold">Zbliżająca się planeta ze słowem:</div>
+                            <div class="flex items-center justify-center gap-3 mt-1">
+                                <span id="g2PlanetEmoji" class="text-4xl">🚜</span>
+                                <div class="text-left">
+                                    <div id="g2PlanetWord" class="text-xl font-extrabold text-amber-300 tracking-wide">TRA-KTOR</div>
+                                    <button onclick="speakGame2PlanetWord()" class="text-xs text-sky-300 underline flex items-center gap-1">
+                                        <i class="fa-solid fa-volume-high"></i> Posłuchaj i powtórz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rocket visual -->
+                        <div class="relative h-24 flex items-center justify-center">
+                            <div id="g2RocketSprite" class="text-6xl transition-all duration-300 transform">
+                                🚀
+                            </div>
+                        </div>
+
+                        <!-- Controls for Rocket -->
+                        <div class="grid grid-cols-3 gap-2 z-10">
+                            <button onclick="moveRocketLane(-1)" class="game-btn bg-indigo-700 hover:bg-indigo-600 py-2 rounded-xl text-xs font-bold">
+                                ⬅️ Lewo
+                            </button>
+                            <button onclick="collectPlanetReward()" class="game-btn bg-emerald-500 hover:bg-emerald-400 text-slate-950 py-2 rounded-xl text-xs font-extrabold">
+                                🎯 Złap i Powtórz!
+                            </button>
+                            <button onclick="moveRocketLane(1)" class="game-btn bg-indigo-700 hover:bg-indigo-600 py-2 rounded-xl text-xs font-bold">
+                                Prawo ➡️
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="g2SpaceStatus" class="text-xs text-center text-indigo-200 font-bold">
+                        Wypowiedz głośno słowo z planety i kliknij „Złap i Powtórz!”, aby rakieta wzbiła się wyżej!
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-MODE 2B: ZAGADKI R vs L (RÓŻNICOWANIE) -->
+            <div id="g2Panel-riddles" class="hidden bg-white rounded-3xl border-4 border-indigo-200 p-6 shadow-md space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-indigo-950">Zagadki Kosmicznego Kapitana: R czy L?</h3>
+                        <p class="text-sm text-slate-600">Posłuchaj uważnie zagadki i wskaż poprawne słowo (różnicowanie słuchowe i artykulacyjne R vs L)</p>
+                    </div>
+                    <span id="g2RiddleProgress" class="bg-indigo-100 text-indigo-900 font-extrabold px-4 py-2 rounded-xl text-sm">
+                        Zagadka 1 / 6
+                    </span>
+                </div>
+
+                <div class="max-w-2xl mx-auto text-center space-y-6 py-2">
+                    <div id="g2RiddleEmoji" class="text-8xl animate-float">🦀</div>
+                    <p id="g2RiddleQuestion" class="text-lg sm:text-xl font-bold text-slate-800">
+                        Ma szczypce i chodzi wspak po dnie morza. Czy to LOK czy RAK?
+                    </p>
+                    <button onclick="speakGame2Riddle()" class="game-btn bg-sky-500 hover:bg-sky-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm inline-flex items-center gap-2">
+                        <i class="fa-solid fa-volume-high"></i>
+                        <span>Posłuchaj pytania</span>
+                    </button>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2" id="g2RiddleOptions">
+                        <!-- Injected by JS -->
+                    </div>
+
+                    <div id="g2RiddleFeedback" class="text-sm font-bold text-indigo-800 bg-indigo-50 p-3 rounded-xl border border-indigo-200">
+                        Wybierz poprawną odpowiedź i powtórz ją wyraźnie!
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-MODE 2C: TRENER WIBRACJI JĘZYKA -->
+            <div id="g2Panel-vibrator" class="hidden bg-white rounded-3xl border-4 border-purple-200 p-6 shadow-md space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-purple-950">〰️ Trener Wibracji Czubka Języka (TD-TD ➔ TR-TR ➔ RRR)</h3>
+                        <p class="text-sm text-slate-600">
+                            Uderzaj rytmicznie czubkiem języka o wałek dziąsłowy za górnymi zębami i obserwuj falę dźwiękową!
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="setVibrationPattern('TD - TD - TD')" class="vib-pat-btn bg-purple-600 text-white font-extrabold px-3.5 py-2 rounded-xl text-xs">1. TD-TD-TD</button>
+                        <button onclick="setVibrationPattern('TDA - TDO - TDU')" class="vib-pat-btn bg-purple-100 text-purple-900 font-bold px-3.5 py-2 rounded-xl text-xs">2. TDA-TDO-TDU</button>
+                        <button onclick="setVibrationPattern('TR - TR - TR')" class="vib-pat-btn bg-purple-100 text-purple-900 font-bold px-3.5 py-2 rounded-xl text-xs">3. TR-TR-TR</button>
+                        <button onclick="setVibrationPattern('DR - DR - DR')" class="vib-pat-btn bg-purple-100 text-purple-900 font-bold px-3.5 py-2 rounded-xl text-xs">4. DR-DR-DR</button>
+                        <button onclick="setVibrationPattern('RRR - RAKIETA!')" class="vib-pat-btn bg-purple-100 text-purple-900 font-bold px-3.5 py-2 rounded-xl text-xs">5. RRR!</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <div class="lg:col-span-7 space-y-4">
+                        <div class="bg-slate-900 rounded-2xl p-4 text-center relative overflow-hidden border-2 border-purple-400">
+                            <div class="text-xs uppercase font-bold text-purple-300 mb-1">Aktualny rytm ćwiczenia:</div>
+                            <div id="g2VibPatternText" class="text-3xl sm:text-4xl font-extrabold text-amber-300 tracking-widest mb-3 font-heading">
+                                TD - TD - TD
+                            </div>
+                            <canvas id="g2VibCanvas" class="w-full h-36 rounded-xl bg-slate-950"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-5 space-y-4 text-center">
+                        <div class="bg-purple-50 border-2 border-purple-200 rounded-2xl p-5 space-y-3">
+                            <div class="text-5xl">👅⚡</div>
+                            <h4 class="font-bold text-lg text-purple-950">Jak ćwiczyć z falą?</h4>
+                            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                Otwórz szeroko buzię (uśmiechnij się), unieś czubek języka za górne zęby i wymawiaj rytmicznie <strong>„td-td-td”</strong> (jak kopytka konika albo mały motorek).
+                            </p>
+                            <div class="pt-2 space-y-2">
+                                <button onclick="triggerVibrationPulse()" class="w-full game-btn bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-extrabold py-3.5 rounded-2xl text-base flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-wave-square"></i>
+                                    <span>Impuls Rytmiczny + Posłuchaj</span>
+                                </button>
+                                <button onclick="toggleMicForVibrator()" id="g2MicBtn" class="w-full game-btn bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-microphone"></i>
+                                    <span>Włącz Mikrofon dla Fali Dźwiękowej</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 3: GRA 3 - "SKARBY KRÓLA KRUKA I GĄSKI" (KAPPACYZM I GAMMACYZM)
+             ========================================== -->
+        <section id="view-game3" class="hidden space-y-6">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-600 rounded-3xl p-5 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="text-4xl bg-white/20 p-3 rounded-2xl">👑</div>
+                    <div>
+                        <span class="text-xs uppercase font-extrabold bg-amber-900/50 px-2.5 py-0.5 rounded-full">Gra 3 • Kappacyzm i Gammacyzm (Głoski K oraz G)</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold">Skarby Króla Kruka i Gąski</h2>
+                        <p class="text-xs sm:text-sm text-amber-100">Naprawiaj zepsute słowa (K zamiast T, G zamiast D) i odkrywaj karty Memory!</p>
+                    </div>
+                </div>
+
+                <!-- Sub-mode switcher -->
+                <div class="flex gap-2 bg-white/15 p-1.5 rounded-2xl border border-white/25">
+                    <button onclick="switchGame3Tab('repair')" id="g3Tab-repair" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-white text-amber-950 transition">
+                        🛠️ 1. Napraw Zepsute Słowo
+                    </button>
+                    <button onclick="switchGame3Tab('memory')" id="g3Tab-memory" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition">
+                        🃏 2. Królewskie Memory (K i G)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Royal Chest Coin Counter Bar -->
+            <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-3 text-xs sm:text-sm text-amber-950">
+                    <span class="text-2xl">🐈‍⬛</span>
+                    <div>
+                        <strong>Wskazówka „Koci Grzbiet”:</strong> При głoskach <strong>K</strong> i <strong>G</strong> czubek języka schowaj na dole za dolnymi zębami, a tył języka unieś wysoko do podniebienia!
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 bg-amber-200/80 border border-amber-400 px-4 py-1.5 rounded-xl shrink-0">
+                    <span class="text-xl">🪙</span>
+                    <span class="text-sm font-extrabold text-amber-950">Złote Monety w Skrzyni: <span id="g3CoinsCount">0</span></span>
+                </div>
+            </div>
+
+            <!-- SUB-MODE 3A: NAPRAW ZEPSUTE SŁOWO (Tura czy Kura? Duzik czy Guzik?) -->
+            <div id="g3Panel-repair" class="bg-white rounded-3xl border-4 border-amber-200 p-6 shadow-md">
+                <div class="max-w-3xl mx-auto text-center space-y-6">
+                    <div class="inline-flex items-center gap-2 bg-amber-100 text-amber-900 px-4 py-1.5 rounded-full text-xs font-extrabold">
+                        <span>Chochlik zamienił głoski K i G na T i D! Pomóż Królowi Krukowi!</span>
+                    </div>
+
+                    <div id="g3RepairEmoji" class="text-8xl animate-float">🐔</div>
+
+                    <h3 id="g3RepairQuestion" class="text-2xl sm:text-3xl font-extrabold text-slate-800">
+                        Jak mówimy poprawnie: <span class="text-rose-500 line-through">TURA</span> czy <span class="text-emerald-600">KURA</span>?
+                    </h3>
+
+                    <button onclick="speakGame3RepairPrompt()" class="game-btn bg-sky-500 hover:bg-sky-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm inline-flex items-center gap-2">
+                        <i class="fa-solid fa-volume-high"></i>
+                        <span>Posłuchaj pytania Króla</span>
+                    </button>
+
+                    <!-- Two choice buttons -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2" id="g3RepairChoices">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <!-- 3x Repetition Box after choosing correct word -->
+                    <div id="g3Repeat3Box" class="hidden bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-5 space-y-3">
+                        <div class="text-sm font-extrabold text-emerald-900">
+                            🎉 Brawo! Teraz wypowiedz to słowo wyraźnie 3 razy i klikaj złotą monetę:
+                        </div>
+                        <div id="g3TargetSyllables" class="text-3xl font-extrabold text-emerald-700 font-heading">
+                            KU-RA
+                        </div>
+                        <div class="flex justify-center items-center gap-4">
+                            <button onclick="clickGame3Repetition()" id="g3RepBtn" class="game-btn bg-amber-400 hover:bg-amber-500 text-slate-900 font-extrabold px-6 py-3 rounded-2xl text-base flex items-center gap-2">
+                                <span>🗣️ Powiedziałem!</span>
+                                <span id="g3RepCounterBadge" class="bg-white px-2.5 py-0.5 rounded-lg text-sm">0 / 3</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-MODE 3B: KRÓLEWSKIE MEMORY SKARBÓW (K i G) -->
+            <div id="g3Panel-memory" class="hidden bg-white rounded-3xl border-4 border-amber-200 p-6 shadow-md space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-xl font-bold text-amber-950">Królewskie Memory Skarbów (Kot, Korona, Klucz, Gitara, Grzyb, Gwiazda)</h3>
+                        <p class="text-xs text-slate-600">Odkrywaj karty! Po każdym znalezieniu pary powtórz nazwę skarbu 3 razy, by zdobyć monety!</p>
+                    </div>
+                    <button onclick="initGame3Memory()" class="game-btn bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 self-start">
+                        <i class="fa-solid fa-shuffle"></i>
+                        <span>Nowe rozdanie kart</span>
+                    </button>
+                </div>
+
+                <!-- Memory Grid (12 cards = 6 pairs) -->
+                <div id="g3MemoryGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Memory Match 3x Practice Banner -->
+                <div id="g3MemoryMatchModal" class="hidden bg-gradient-to-r from-amber-100 to-yellow-100 border-4 border-amber-400 rounded-2xl p-5 text-center space-y-3 max-w-xl mx-auto">
+                    <div class="text-4xl" id="g3MemMatchEmoji">👑</div>
+                    <h4 class="text-xl font-extrabold text-amber-950">
+                        Znaleziono parę: <span id="g3MemMatchWord" class="text-rose-600">KO-RO-NA</span>!
+                    </h4>
+                    <p class="text-xs text-amber-900">Powtórz słowo głośno 3 razy (pamiętaj o uniesieniu tyłu języka przy K/G):</p>
+                    <button onclick="stepGame3MemoryPractice()" class="game-btn bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold px-6 py-2.5 rounded-xl text-sm inline-flex items-center gap-2">
+                        <span>🗣️ Powtórzono!</span>
+                        <span id="g3MemRepCount" class="bg-white text-emerald-900 px-2 py-0.5 rounded-md">0 / 3</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 4: GRA 4 - "DŹWIĘCZNA DMUCHAWKA I BĄBELKI" (MOWA BEZDŹWIĘCZNA + ODDECH)
+             ========================================== -->
+        <section id="view-game4" class="hidden space-y-6">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-sky-500 via-cyan-500 to-blue-600 rounded-3xl p-5 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="text-4xl bg-white/20 p-3 rounded-2xl">🫧</div>
+                    <div>
+                        <span class="text-xs uppercase font-extrabold bg-sky-900/50 px-2.5 py-0.5 rounded-full">Gra 4 • Mowa Bezdźwięczna i Ćwiczenia Oddechowe</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold">Dźwięczna Dmuchawka i Bąbelki</h2>
+                        <p class="text-xs sm:text-sm text-sky-100">Różnicowanie par (B-P, D-T, W-F, Z-S, Ż-SZ, G-K) oraz Miernik Oddechu i Fonacji</p>
+                    </div>
+                </div>
+
+                <!-- Sub-mode Tabs -->
+                <div class="flex gap-2 bg-white/15 p-1.5 rounded-2xl border border-white/25">
+                    <button onclick="switchGame4Tab('pairs')" id="g4Tab-pairs" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-white text-sky-950 transition">
+                        🐝 1. Dźwięczna czy Bezdźwięczna? (Pary)
+                    </button>
+                    <button onclick="switchGame4Tab('breath')" id="g4Tab-breath" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition">
+                        🌬️ 2. Miernik Oddechu i Fonacji
+                    </button>
+                </div>
+            </div>
+
+            <!-- SUB-MODE 4A: RÓŻNICOWANIE PAR MINIMALNYCH (DOTKNIJ KRTANI) -->
+            <div id="g4Panel-pairs" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left: Tactile Throat Vibration Guide -->
+                <div class="lg:col-span-5 bg-white rounded-3xl border-4 border-sky-200 p-6 shadow-md flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <span class="bg-sky-100 text-sky-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase">Eksperyment z rączką</span>
+                        <h3 class="text-2xl font-bold text-slate-800">🖐️ Dotknij swojej szyi (krtani)!</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Przyłóż delikatnie dłoń do przodu szyi i sprawdź różnicę między głoską <strong>dźwięczną</strong> a <strong>bezdźwięczną</strong>:
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div onclick="speakText('Bbbb, Dddd, Zzzz, Żżżż, Gggg. Czujesz jak szyja drży jak pszczółka?')" class="cursor-pointer bg-amber-50 hover:bg-amber-100 border-2 border-amber-300 rounded-2xl p-4 text-center space-y-1 transition">
+                            <div class="text-4xl animate-vibrate inline-block">🐝</div>
+                            <div class="font-extrabold text-amber-950 text-base">DŹWIĘCZNA</div>
+                            <div class="text-xs font-extrabold text-amber-700">B • D • W • Z • Ż • G</div>
+                            <p class="text-[11px] text-slate-600">Krtań wibruje! Czujemy „bzyczenie” pod palcami.</p>
+                        </div>
+
+                        <div onclick="speakText('Pppp, Tttt, Ffff, Ssss, Szszsz, Kkkk. Tutaj szyja odpoczywa w ciszy!')" class="cursor-pointer bg-sky-50 hover:bg-sky-100 border-2 border-sky-300 rounded-2xl p-4 text-center space-y-1 transition">
+                            <div class="text-4xl">💨</div>
+                            <div class="font-extrabold text-sky-950 text-base">BEZDŹWIĘCZNA</div>
+                            <div class="text-xs font-extrabold text-sky-700">P • T • F • S • SZ • K</div>
+                            <p class="text-[11px] text-slate-600">Krtań jest cicho (brak wibracji), leci samo powietrze.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+                        <span>Kliknij kafelki powyżej, aby posłuchać demonstracji!</span>
+                        <span class="font-extrabold text-sky-700" id="g4PairsScore">Punkty: 0</span>
+                    </div>
+                </div>
+
+                <!-- Right: Minimal Pairs Interactive Quiz -->
+                <div class="lg:col-span-7 bg-white rounded-3xl border-4 border-sky-200 p-6 shadow-md flex flex-col justify-between space-y-5">
+                    <div class="flex items-center justify-between border-b pb-3">
+                        <div>
+                            <span class="text-xs font-extrabold uppercase text-sky-600" id="g4PairCategoryLabel">Para opozycyjna: B vs P</span>
+                            <h4 class="text-xl font-bold text-slate-800">Które słowo słyszysz i widzisz w zagadce?</h4>
+                        </div>
+                        <button onclick="nextGame4Pair()" class="text-xs font-bold text-sky-600 hover:underline flex items-center gap-1">
+                            <span>Następna para</span> <i class="fa-solid fa-forward"></i>
+                        </button>
+                    </div>
+
+                    <!-- Prompt Box -->
+                    <div class="bg-gradient-to-r from-sky-50 to-indigo-50 rounded-2xl p-5 border-2 border-sky-200 text-center space-y-3">
+                        <div id="g4TargetTypeBadge" class="inline-flex items-center gap-1.5 bg-amber-300 text-amber-950 text-xs font-extrabold px-3 py-1 rounded-full">
+                            🐝 Szukamy głoski DŹWIĘCZNEJ (krtań drży!)
+                        </div>
+                        <p id="g4PairPromptText" class="text-base sm:text-lg font-bold text-slate-800">
+                            Wskaż słowo z dźwięczną głoską B: „Huczy na łące duży, puszysty...”
+                        </p>
+                        <button onclick="speakGame4Target()" class="game-btn bg-sky-500 hover:bg-sky-600 text-white font-bold px-4 py-2 rounded-xl text-xs sm:text-sm inline-flex items-center gap-2">
+                            <i class="fa-solid fa-volume-high"></i>
+                            <span>Posłuchaj obu słów i zagadki</span>
+                        </button>
+                    </div>
+
+                    <!-- Minimal Pair 2 Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="g4PairCardsContainer">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <div id="g4PairFeedback" class="text-xs sm:text-sm font-bold text-center text-sky-900 bg-sky-50 p-3 rounded-xl border border-sky-200">
+                        Dotknij szyi, wypowiedz oba słowa i wybierz właściwy obrazek!
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-MODE 4B: MIERNIK ODDECHU I FONACJI (MIKROFON + PRZYCISK AWARYJNY) -->
+            <div id="g4Panel-breath" class="hidden bg-white rounded-3xl border-4 border-cyan-200 p-6 shadow-md space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-cyan-950">🌬️ Miernik Oddechu i Długiej Fonacji</h3>
+                        <p class="text-sm text-slate-600">
+                            Dmuchaj jednostajnie do mikrofonu (lub przytrzymaj przycisk / klawisz <strong>SPACJA</strong>), aby kręcić wiatraczkiem, unieść balon i puszczać bańki!
+                        </p>
+                    </div>
+
+                    <!-- Exercise Phonation Selector -->
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="setBreathExercise('wind', '💨 Dmuchanie (Fffff...)')" class="breath-ex-btn bg-cyan-600 text-white font-extrabold px-3 py-2 rounded-xl text-xs">1. Wiatraczek (Ffff...)</button>
+                        <button onclick="setBreathExercise('vowel', '🎵 Samogłoska (Aaaaa...)')" class="breath-ex-btn bg-cyan-100 text-cyan-900 font-bold px-3 py-2 rounded-xl text-xs">2. Balon (Aaaaa...)</button>
+                        <button onclick="setBreathExercise('buzz', '🐝 Bzyczenie (Zzzzz...)')" class="breath-ex-btn bg-cyan-100 text-cyan-900 font-bold px-3 py-2 rounded-xl text-xs">3. Bańki (Zzzzz...)</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <!-- Left: Interactive Visual Stage (Pinwheel, Balloon, Bubbles) -->
+                    <div class="lg:col-span-7 bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-100 rounded-3xl border-4 border-sky-300 h-80 relative overflow-hidden flex flex-col justify-between p-5">
+                        <div class="flex justify-between items-center z-10">
+                            <span id="g4BreathTaskBadge" class="bg-white/90 text-sky-900 font-extrabold px-3.5 py-1 rounded-full text-xs shadow-sm">
+                                Zadanie: Dmuchaj przez 4 sekundy (Fffff...)
+                            </span>
+                            <span id="g4BreathTimerText" class="bg-sky-900 text-amber-300 font-extrabold px-3.5 py-1 rounded-full text-xs">
+                                Czas wydechu: 0.0 s / 4.0 s
+                            </span>
+                        </div>
+
+                        <!-- Center Animated Object -->
+                        <div class="flex-1 flex items-center justify-center relative" id="g4BreathVisualArea">
+                            <!-- Pinwheel SVG -->
+                            <div id="g4PinwheelWrap" class="flex flex-col items-center">
+                                <svg id="g4PinwheelSvg" class="w-36 h-36 transition-transform" viewBox="0 0 100 100">
+                                    <path d="M50 50 L50 10 A20 20 0 0 1 70 30 Z" fill="#ef4444"/>
+                                    <path d="M50 50 L90 50 A20 20 0 0 1 70 70 Z" fill="#f59e0b"/>
+                                    <path d="M50 50 L50 90 A20 20 0 0 1 30 70 Z" fill="#10b981"/>
+                                    <path d="M50 50 L10 50 A20 20 0 0 1 30 30 Z" fill="#3b82f6"/>
+                                    <circle cx="50" cy="50" r="7" fill="#ffffff" stroke="#1e293b" stroke-width="3"/>
+                                </svg>
+                                <div class="w-2.5 h-16 bg-amber-700 rounded-full -mt-2"></div>
+                            </div>
+
+                            <!-- Hot Air Balloon -->
+                            <div id="g4BalloonWrap" class="hidden text-7xl transition-all duration-150" style="transform: translateY(40px);">
+                                🎈
+                            </div>
+
+                            <!-- Bubble Container -->
+                            <div id="g4BubbleStream" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+                        </div>
+
+                        <!-- Progress Bar for 4-second target -->
+                        <div class="w-full bg-white/70 h-5 rounded-full overflow-hidden border border-sky-400 p-0.5 z-10">
+                            <div id="g4BreathProgressBar" class="bg-gradient-to-r from-emerald-400 to-sky-500 h-full rounded-full transition-all duration-100" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Microphone Meter & Hold Button Controls -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-bold text-slate-700">Siła wydechu / głosu:</span>
+                                <span id="g4MicStatusBadge" class="text-xs bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded-lg">
+                                    Tryb: Przycisk / Spacja
+                                </span>
+                            </div>
+
+                            <!-- Live Volume Meter -->
+                            <div class="w-full bg-slate-200 h-7 rounded-xl overflow-hidden p-1">
+                                <div id="g4VolumeBar" class="bg-gradient-to-r from-sky-400 via-emerald-400 to-amber-400 h-full rounded-lg transition-all duration-75" style="width: 5%"></div>
+                            </div>
+
+                            <!-- Hold Button (Touch + Mouse + Spacebar) -->
+                            <button id="g4HoldBlowBtn"
+                                onmousedown="startManualBlow()"
+                                onmouseup="stopManualBlow()"
+                                onmouseleave="stopManualBlow()"
+                                ontouchstart="startManualBlow(event)"
+                                ontouchend="stopManualBlow(event)"
+                                class="w-full game-btn bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-extrabold py-5 rounded-2xl text-base sm:text-lg flex flex-col items-center justify-center gap-1 shadow-lg select-none">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-wind text-xl"></i>
+                                    <span>PRZYTRZYMAJ I DMUCHAJ!</span>
+                                </div>
+                                <span class="text-xs text-sky-100 font-normal">(Lub przytrzymaj klawisz SPACJA na klawiaturze)</span>
+                            </button>
+
+                            <!-- Microphone Enable Toggle -->
+                            <button onclick="toggleGame4Microphone()" id="g4EnableMicBtn" class="w-full game-btn bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-microphone"></i>
+                                <span>Aktywuj Prawdziwy Mikrofon (Dmuchaj w ekran)</span>
+                            </button>
+
+                            <p class="text-xs text-slate-500 text-center">
+                                💡 Nabierz powietrze nosem (nie unoś ramion!) i wypuszczaj je powoli ustami przez 4 sekundy.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================
+         MODAL 1: ROZGRZEWKA BUZI I JĘZYKA (GIMNASTYKA BUZI)
+         ========================================== -->
+    <div id="warmupModal" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl border-4 border-pink-300 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 space-y-5">
+            <div class="flex items-center justify-between border-b pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl bg-pink-100 p-2.5 rounded-2xl">👅</span>
+                    <div>
+                        <h3 class="text-2xl font-bold text-pink-950">Rozgrzewka Buzi i Języka</h3>
+                        <p class="text-xs sm:text-sm text-slate-600">Gimnastyka narządów mowy przed grami – ćwicz razem z animowanym zegarem!</p>
+                    </div>
+                </div>
+                <button onclick="closeWarmupModal()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-lg">✕</button>
+            </div>
+
+            <!-- Exercise Selector Tabs -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2" id="warmupTabsContainer">
+                <!-- Populated by JS: Konik, Malarz, Chomik, Rybka, Ziewający Lew -->
+            </div>
+
+            <!-- Active Exercise Display Card -->
+            <div class="bg-gradient-to-br from-pink-50 via-rose-50 to-amber-50 rounded-3xl border-2 border-pink-200 p-6 text-center space-y-4">
+                <div id="warmupEmoji" class="text-8xl animate-bounce inline-block">🐴</div>
+                <h4 id="warmupTitle" class="text-2xl font-bold text-slate-800">1. Konik (Kląskanie językiem)</h4>
+                <p id="warmupDesc" class="text-sm sm:text-base text-slate-700 max-w-xl mx-auto leading-relaxed">
+                    Przyklej szeroki język do podniebienia i energicznie go odklejaj, naśladując stukot kopytek konika: <strong>kląsk-kląsk-kląsk!</strong> Utrzymuj brodę nieruchomo.
+                </p>
+                <div id="warmupTherapistGoal" class="text-xs font-bold text-rose-800 bg-rose-100/80 inline-block px-3.5 py-1.5 rounded-full">
+                    🎯 Cel logopedyczny: Pionizacja języka i rozciąganie wędzidełka podjęzykowego.
+                </div>
+
+                <!-- Interactive 10s Timer & Controls -->
+                <div class="pt-2 flex flex-col items-center gap-3">
+                    <div class="w-full max-w-md bg-white h-6 rounded-full border-2 border-pink-300 overflow-hidden p-0.5">
+                        <div id="warmupTimerBar" class="bg-gradient-to-r from-pink-500 to-amber-400 h-full rounded-full transition-all duration-200" style="width: 0%"></div>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <button onclick="startWarmupTimer()" id="warmupStartBtn" class="game-btn bg-pink-500 hover:bg-pink-600 text-white font-extrabold px-6 py-3 rounded-2xl text-sm sm:text-base flex items-center gap-2">
+                            <i class="fa-solid fa-play"></i>
+                            <span id="warmupStartBtnText">Start Ćwiczenia (8 sekund)</span>
+                        </button>
+                        <button onclick="speakCurrentWarmup()" class="game-btn bg-sky-500 hover:bg-sky-600 text-white font-bold px-4 py-3 rounded-2xl text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-volume-high"></i>
+                            <span>Posłuchaj instrukcji</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL 2: WYBÓR AWATARA I IMIENIA DZIECKA
+         ========================================== -->
+    <div id="avatarModal" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl border-4 border-indigo-300 max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h3 class="text-xl font-bold text-indigo-950">🦊 Wybierz Awatar i Imię</h3>
+                <button onclick="closeAvatarModal()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold">✕</button>
+            </div>
+            <div class="space-y-3">
+                <label class="block text-xs font-extrabold uppercase text-slate-600">Twoje Imię lub Pseudonim:</label>
+                <input id="childNameInput" type="text" maxlength="18" placeholder="np. Zosia, Kubuś, Mały Mówca" class="w-full border-2 border-indigo-200 rounded-xl px-4 py-2.5 font-bold text-slate-800 focus:outline-none focus:border-indigo-500">
+            </div>
+            <div class="space-y-2">
+                <label class="block text-xs font-extrabold uppercase text-slate-600">Wybierz zwierzątko – pomocnika:</label>
+                <div class="grid grid-cols-4 gap-2.5" id="avatarPickerGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+            <button onclick="saveAvatarProfile()" class="w-full game-btn bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-3 rounded-2xl text-base">
+                Zapisz Profil Gracza
+            </button>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL 3: ATLAS WSKAZÓWEK DLA LOGOPEDY I RODZICA
+         ========================================== -->
+    <div id="therapistGuideModal" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl border-4 border-emerald-300 max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl">
+            <div class="flex items-center justify-between border-b pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🩺</span>
+                    <div>
+                        <h3 class="text-xl sm:text-2xl font-bold text-emerald-950">Poradnik Artykulacyjny dla Logopedy i Rodzica</h3>
+                        <p class="text-xs text-slate-500">Jak prawidłowo układać narządy mowy podczas zabawy w LogoHub?</p>
+                    </div>
+                </div>
+                <button onclick="closeFullTherapistGuide()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold">✕</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+                <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-1.5">
+                    <h4 class="font-bold text-emerald-900 text-base">1. Sygmatyzm (Szumiące, Syczące, Ciszące)</h4>
+                    <p><strong>Szereg szumiący (SZ, Ż, CZ, DŻ):</strong> Czubek języka uniesiony do wałka dziąsłowego za górnymi zębami, boki języka przylegają do górnych zębów trzonowych, wargi lekko wysunięte do przodu („ryjek”). Zęby zbliżone.</p>
+                    <p><strong>Szereg syczący (S, Z, C, DZ):</strong> Czubek języka opiera się o dolne siekacze, wargi rozciągnięte jak przy uśmiechu. Pilnujemy, by język nie wsuwał się między zęby (seplenienie międzyzębowe)!</p>
+                </div>
+                <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 space-y-1.5">
+                    <h4 class="font-bold text-indigo-900 text-base">2. Rotacyzm (Głoska R i grupy TR/DR)</h4>
+                    <p><strong>Wibracja przedniojęzykowo-dziąsłowa:</strong> Szeroki i elastyczny czubek języka (apeks) uderza o wałek dziąsłowy za górnymi zębami pod wpływem silnego prądu wydychanego powietrza.</p>
+                    <p><strong>Kolejność w grze:</strong> Najpierw pionizacja przy głosce <em>L</em>, następnie szybkie dziąsłowe <em>td-td-td</em>, grupy <em>TR, DR, PR, BR</em> i pełne <em>R</em>.</p>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-1.5">
+                    <h4 class="font-bold text-amber-900 text-base">3. Kappacyzm i Gammacyzm (Głoski K i G)</h4>
+                    <p><strong>Zwarcie tylnojęzykowe:</strong> Czubek języka spoczywa na dnie jamy ustnej za dolnymi zębami, natomiast tył (grzbiet) języka wygina się wysoko w „koci grzbiet” i zwiera z podniebieniem miękkim.</p>
+                    <p>Pomocne bywa delikatne odchylenie głowy dziecka lekko w tył lub przytrzymanie czubka języka za dolnymi zębami szpatułką/palcem.</p>
+                </div>
+                <div class="bg-sky-50 border border-sky-200 rounded-2xl p-4 space-y-1.5">
+                    <h4 class="font-bold text-sky-900 text-base">4. Mowa Bezdźwięczna i Oddech</h4>
+                    <p><strong>Kontrola dotykowa krtani:</strong> Dziecko kładzie dłoń na szyi. Przy głoskach dźwięcznych (<em>B, D, W, Z, Ż, G</em>) wiązadła głosowe drgają. Przy bezdźwięcznych (<em>P, T, F, S, SZ, K</em>) są rozsunięte (brak wibracji).</p>
+                    <p><strong>Tor oddechowy:</strong> Wdech nosem, długi i równomierny wydech ustami bez unoszenia barków.</p>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <button onclick="closeFullTherapistGuide()" class="game-btn bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm">Rozumiem, wracamy do zabawy!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST REWARD NOTIFICATION -->
+    <div id="rewardToast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl border-2 border-amber-400 flex items-center gap-3 transition-all">
+        <span id="rewardToastEmoji" class="text-3xl">⭐</span>
+        <div>
+            <div id="rewardToastTitle" class="font-extrabold text-amber-300 text-sm">Zdobyto Gwiazdkę!</div>
+            <div id="rewardToastSub" class="text-xs text-slate-200">Świetna wymowa! Tak trzymaj!</div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         APPLICATION LOGIC (JAVASCRIPT)
+         ========================================== -->
+    <script>
+        /* ==========================================
+           1. STATE & LOCAL STORAGE PERSISTENCE
+           ========================================== */
+        const STORAGE_KEY = 'logohub_state_v1';
+
+        const defaultState = {
+            childName: 'Mały Mówca',
+            avatar: '🦊',
+            stars: 0,
+            wordsSpoken: 0,
+            therapistMode: false,
+            warmupDone: 0,
+            gameStats: {
+                game1: 0,
+                game2: 0,
+                game3: 0,
+                game4: 0
+            }
+        };
+
+        let appState = loadState();
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return JSON.parse(JSON.stringify(defaultState));
+                const parsed = JSON.parse(raw);
+                return {
+                    ...defaultState,
+                    ...parsed,
+                    gameStats: { ...defaultState.gameStats, ...(parsed.gameStats || {}) }
+                };
+            } catch (e) {
+                return JSON.parse(JSON.stringify(defaultState));
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+            } catch (e) {
+                console.warn('localStorage niedostępny:', e);
+            }
+            updateDashboardUI();
+        }
+
+        function addStarReward(amount = 1, message = 'Brawo za wyraźną wymowę!', gameKey = null) {
+            appState.stars += amount;
+            appState.wordsSpoken += 1;
+            if (gameKey && appState.gameStats[gameKey] !== undefined) {
+                appState.gameStats[gameKey] += 1;
+            }
+            saveState();
+            playSoundEffect('fanfare');
+            showToast(`+${amount} Gwiazdka! ⭐`, message, '🌟');
+        }
+
+        function showToast(title, subtitle, emoji = '⭐') {
+            const toast = document.getElementById('rewardToast');
+            document.getElementById('rewardToastEmoji').textContent = emoji;
+            document.getElementById('rewardToastTitle').textContent = title;
+            document.getElementById('rewardToastSub').textContent = subtitle;
+            toast.classList.remove('hidden');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3200);
+        }
+
+        /* ==========================================
+           2. WEB AUDIO API SOUND EFFECTS & SPEECH SYNTHESIS (pl-PL)
+           ========================================== */
+        let sharedAudioCtx = null;
+
+        function getAudioCtx() {
+            if (!sharedAudioCtx) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                sharedAudioCtx = new AudioCtx();
+            }
+            if (sharedAudioCtx.state === 'suspended') {
+                sharedAudioCtx.resume();
+            }
+            return sharedAudioCtx;
+        }
+
+        function playSoundEffect(type) {
+            try {
+                const ctx = getAudioCtx();
+                const now = ctx.currentTime;
+
+                if (type === 'click') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(520, now);
+                    osc.frequency.exponentialRampToValueAtTime(680, now + 0.08);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.09);
+                } else if (type === 'success') {
+                    [523.25, 659.25, 783.99].forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+                        gain.gain.setValueAtTime(0.15, now + idx * 0.09);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.22);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(now + idx * 0.09);
+                        osc.stop(now + idx * 0.09 + 0.24);
+                    });
+                } else if (type === 'fanfare') {
+                    [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+                        gain.gain.setValueAtTime(0.18, now + idx * 0.1);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.28);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(now + idx * 0.1);
+                        osc.stop(now + idx * 0.1 + 0.3);
+                    });
+                } else if (type === 'oops') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(240, now);
+                    osc.frequency.linearRampToValueAtTime(160, now + 0.25);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.27);
+                } else if (type === 'beat') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(360, now);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                }
+            } catch (e) {
+                // Ignore audio errors if blocked
+            }
+        }
+
+        function speakText(text, rate = 0.88) {
+            if (!('speechSynthesis' in window)) {
+                showToast('Syntezator Mowy', text, '🗣️');
+                return;
+            }
+            try {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.lang = 'pl-PL';
+                utter.rate = rate;
+                utter.pitch = 1.05;
+                const voices = window.speechSynthesis.getVoices();
+                const plVoice = voices.find(v => v.lang && v.lang.toLowerCase().includes('pl'));
+                if (plVoice) utter.voice = plVoice;
+                window.speechSynthesis.speak(utter);
+            } catch (e) {
+                console.warn('SpeechSynthesis error:', e);
+            }
+        }
+
+        /* ==========================================
+           3. NAVIGATION & DASHBOARD UI
+           ========================================== */
+        const views = ['dashboard', 'game1', 'game2', 'game3', 'game4'];
+
+        function navigateTo(viewName) {
+            playSoundEffect('click');
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.toggle('hidden', v !== viewName);
+            });
+            const homeBtn = document.getElementById('navHomeBtn');
+            if (homeBtn) homeBtn.classList.toggle('hidden', viewName === 'dashboard');
+
+            // Update dynamic therapist banner tip depending on active view
+            const tipEl = document.getElementById('therapistDynamicTip');
+            if (tipEl) {
+                const tips = {
+                    dashboard: 'Wybierz grę dopasowaną do ćwiczonej głoski. Zawsze zaczynaj sesję od 2-minutowej Rozgrzewki Buzi i Języka!',
+                    game1: 'Sygmatyzm: Pilnuj, aby język nie wsuwał się między zęby! Przy SZ, Ż, CZ, DŻ język u góry (za górnymi dziąsłami), przy S, Z, C, DZ za dolnymi zębami.',
+                    game2: 'Rotacyzm: Zaczynaj od pionizacji języka (L oraz TD-TD) przy otwartych ustach. Unikaj pobudzania podniebienia miękkiego (R tylnojęzykowego).',
+                    game3: 'Kappacyzm / Gammacyzm: Czubek języka leży za dolnymi zębami, a grzbiet języka unosi się wysoko do podniebienia miękkiego (K, G).',
+                    game4: 'Mowa bezdźwięczna: Dziecko trzyma dłoń na krtani – przy głoskach dźwięcznych (B, D, W, Z, Ż, G) czuć wyraźną wibrację wiązadeł głosowych.'
+                };
+                tipEl.textContent = tips[viewName] || tips.dashboard;
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateDashboardUI() {
+            document.getElementById('headerStarCount').textContent = appState.stars;
+            document.getElementById('headerAvatarEmoji').textContent = appState.avatar;
+            document.getElementById('headerChildName').textContent = appState.childName;
+            document.getElementById('heroChildName').textContent = appState.childName;
+            document.getElementById('dashStarsTotal').textContent = appState.stars;
+            document.getElementById('dashWordsCount').textContent = appState.wordsSpoken;
+
+            document.getElementById('g1StatBadge').textContent = `Ukończono: ${appState.gameStats.game1}`;
+            document.getElementById('g2StatBadge').textContent = `Ukończono: ${appState.gameStats.game2}`;
+            document.getElementById('g3StatBadge').textContent = `Ukończono: ${appState.gameStats.game3}`;
+            document.getElementById('g4StatBadge').textContent = `Ukończono: ${appState.gameStats.game4}`;
+
+            // Therapist toggle visuals
+            const banner = document.getElementById('therapistGlobalBanner');
+            const badge = document.getElementById('therapistBadge');
+            const cardNotes = document.querySelectorAll('.therapist-card-note');
+            if (appState.therapistMode) {
+                banner.classList.remove('hidden');
+                badge.classList.remove('bg-slate-400');
+                badge.classList.add('bg-emerald-500');
+                cardNotes.forEach(n => n.classList.remove('hidden'));
+            } else {
+                banner.classList.add('hidden');
+                badge.classList.add('bg-slate-400');
+                badge.classList.remove('bg-emerald-500');
+                cardNotes.forEach(n => n.classList.add('hidden'));
+            }
+
+            // Render 5 Badges
+            const badgesData = [
+                { icon: '👅', name: 'Gimnastyk', unlocked: appState.warmupDone >= 1 },
+                { icon: '🌲', name: 'Strażnik Lasu', unlocked: appState.gameStats.game1 >= 3 },
+                { icon: '🚀', name: 'Pilot R', unlocked: appState.gameStats.game2 >= 3 },
+                { icon: '👑', name: 'Król K i G', unlocked: appState.gameStats.game3 >= 3 },
+                { icon: '🫧', name: 'Mistrz Oddechu', unlocked: appState.gameStats.game4 >= 3 }
+            ];
+            const container = document.getElementById('badgesContainer');
+            container.innerHTML = badgesData.map(b => `
+                <div class="rounded-xl p-1.5 text-center border ${b.unlocked ? 'bg-amber-400/30 border-amber-300 text-white' : 'bg-white/10 border-white/15 opacity-50'}" title="${b.name}">
+                    <div class="text-lg">${b.icon}</div>
+                    <div class="text-[9px] font-bold truncate">${b.name}</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleTherapistMode() {
+            playSoundEffect('click');
+            appState.therapistMode = !appState.therapistMode;
+            saveState();
+        }
+
+        function openFullTherapistGuide() {
+            playSoundEffect('click');
+            document.getElementById('therapistGuideModal').classList.remove('hidden');
+        }
+        function closeFullTherapistGuide() {
+            document.getElementById('therapistGuideModal').classList.add('hidden');
+        }
+
+        function resetProgressPrompt() {
+            appState.stars = 0;
+            appState.wordsSpoken = 0;
+            appState.warmupDone = 0;
+            appState.gameStats = { game1: 0, game2: 0, game3: 0, game4: 0 };
+            saveState();
+            showToast('Postępy wyzerowane', 'Zaczynamy nową przygodę!', '🔄');
+        }
+
+        /* ==========================================
+           4. AVATAR & PROFILE MODAL
+           ========================================== */
+        const avatarOptions = ['🦊', '🦁', '🐼', '🐸', '🦄', '🦉', '🐯', '🐨'];
+        let selectedTempAvatar = appState.avatar;
+
+        function openAvatarModal() {
+            playSoundEffect('click');
+            selectedTempAvatar = appState.avatar;
+            document.getElementById('childNameInput').value = appState.childName;
+            renderAvatarPicker();
+            document.getElementById('avatarModal').classList.remove('hidden');
+        }
+
+        function closeAvatarModal() {
+            document.getElementById('avatarModal').classList.add('hidden');
+        }
+
+        function renderAvatarPicker() {
+            const grid = document.getElementById('avatarPickerGrid');
+            grid.innerHTML = avatarOptions.map(av => `
+                <button onclick="selectTempAvatar('${av}')" class="text-3xl p-2.5 rounded-2xl border-2 transition ${selectedTempAvatar === av ? 'bg-indigo-100 border-indigo-600 scale-105' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}">
+                    ${av}
+                </button>
+            `).join('');
+        }
+
+        function selectTempAvatar(av) {
+            playSoundEffect('click');
+            selectedTempAvatar = av;
+            renderAvatarPicker();
+        }
+
+        function saveAvatarProfile() {
+            const val = document.getElementById('childNameInput').value.trim();
+            appState.childName = val || 'Mały Mówca';
+            appState.avatar = selectedTempAvatar;
+            saveState();
+            closeAvatarModal();
+            showToast('Profil zapisany!', `Cześć, ${appState.childName}!`, appState.avatar);
+        }
+
+        /* ==========================================
+           5. ROZGRZEWKA BUZI I JĘZYKA (ORAL MOTOR EXERCISES)
+           ========================================== */
+        const warmupExercises = [
+            {
+                id: 'konik',
+                emoji: '🐴',
+                shortTitle: 'Konik',
+                title: '1. Konik (Kląskanie językiem)',
+                desc: 'Przyklej szeroki język do podniebienia i energicznie go odklejaj, naśladując stukot kopytek konika: kląsk-kląsk-kląsk! Staraj się, aby broda się nie ruszała.',
+                speech: 'Ćwiczenie Konik. Przyklej szeroki język u góry do podniebienia i kląskaj jak kopytka konika!',
+                goal: '🎯 Cel logopedyczny: Pionizacja języka i rozciąganie wędzidełka podjęzykowego (do głosek SZ, Ż, CZ, DŻ, L, R).'
+            },
+            {
+                id: 'malarz',
+                emoji: '🎨',
+                shortTitle: 'Malarz',
+                title: '2. Malarz (Malowanie podniebienia)',
+                desc: 'Twój język to pędzelek, a podniebienie to sufit! Otwórz szeroko buzię i przesuwaj czubek języka od górnych zębów w głąb gardła i z powrotem.',
+                speech: 'Ćwiczenie Malarz. Otwórz buzię i maluj czubkiem języka sufit w buzi, od górnych zębów do tyłu!',
+                goal: '🎯 Cel logopedyczny: Usprawnianie czubka języka (apeksu) i orientacji w jamie ustnej.'
+            },
+            {
+                id: 'chomik',
+                emoji: '🐹',
+                shortTitle: 'Chomik',
+                title: '3. Chomik (Wypychanie policzków)',
+                desc: 'Nadymaj oba policzki powietrzem jak chomiczek, a potem przesuwaj „kulkę powietrza” z lewego policzka do prawego bez wypuszczania powietrza!',
+                speech: 'Ćwiczenie Chomik. Nadymaj policzki i przerzucaj powietrze z jednej strony na drugą!',
+                goal: '🎯 Cel logopedyczny: Wzmacnianie mięśnia okrężnego warg i napięcia mięśni policzków.'
+            },
+            {
+                id: 'rybka',
+                emoji: '🐠',
+                shortTitle: 'Rybka',
+                title: '4. Rybka i Całuski (Ruch warg)',
+                desc: 'Wysuń mocno zaokrąglone usta do przodu jak rybka (lub „ryjek”) i rozciągnij je w szerokim uśmiechu (pokazując ząbki) na zmianę!',
+                speech: 'Ćwiczenie Rybka. Zrób ustami ryjek do przodu, a potem szeroki uśmiech!',
+                goal: '🎯 Cel logopedyczny: Różnicowanie pracy warg między szeregiem szumiącym (ryjek) a syczącym (uśmiech).'
+            },
+            {
+                id: 'lew',
+                emoji: '🦁',
+                shortTitle: 'Ziewający Lew',
+                title: '5. Ziewający Lew (Otwieranie buzi i podniebienie)',
+                desc: 'Otwórz bardzo szeroko buzię jak śpiący lew i powiedz cicho „Aaaaa”, a potem zakaszl z wystawionym językiem, aby unieść podniebienie miękkie!',
+                speech: 'Ćwiczenie Ziewający Lew. Otwórz szeroko buzię i ziewnij przeciągle: Aaaaa!',
+                goal: '🎯 Cel logopedyczny: Rozluźnienie stawu skroniowo-żuchwowego i aktywizacja podniebienia miękkiego (do K i G).'
+            }
+        ];
+
+        let activeWarmupIdx = 0;
+        let warmupInterval = null;
+
+        function openWarmupModal() {
+            playSoundEffect('click');
+            selectWarmupExercise(0);
+            document.getElementById('warmupModal').classList.remove('hidden');
+        }
+
+        function closeWarmupModal() {
+            clearInterval(warmupInterval);
+            document.getElementById('warmupModal').classList.add('hidden');
+        }
+
+        function selectWarmupExercise(idx) {
+            clearInterval(warmupInterval);
+            activeWarmupIdx = idx;
+            const ex = warmupExercises[idx];
+
+            // Render tabs
+            const tabsEl = document.getElementById('warmupTabsContainer');
+            tabsEl.innerHTML = warmupExercises.map((item, i) => `
+                <button onclick="selectWarmupExercise(${i})" class="p-2.5 rounded-2xl border-2 text-xs font-extrabold flex flex-col items-center gap-1 transition ${i === idx ? 'bg-pink-500 text-white border-pink-600 shadow-md' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-pink-50'}">
+                    <span class="text-2xl">${item.emoji}</span>
+                    <span>${item.shortTitle}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('warmupEmoji').textContent = ex.emoji;
+            document.getElementById('warmupTitle').textContent = ex.title;
+            document.getElementById('warmupDesc').textContent = ex.desc;
+            document.getElementById('warmupTherapistGoal').textContent = ex.goal;
+            document.getElementById('warmupTimerBar').style.width = '0%';
+            document.getElementById('warmupStartBtnText').textContent = 'Start Ćwiczenia (8 sekund)';
+        }
+
+        function speakCurrentWarmup() {
+            speakText(warmupExercises[activeWarmupIdx].speech);
+        }
+
+        function startWarmupTimer() {
+            clearInterval(warmupInterval);
+            let elapsed = 0;
+            const duration = 8000;
+            const step = 100;
+            const bar = document.getElementById('warmupTimerBar');
+            const btnText = document.getElementById('warmupStartBtnText');
+
+            playSoundEffect('click');
+            warmupInterval = setInterval(() => {
+                elapsed += step;
+                const pct = Math.min(100, (elapsed / duration) * 100);
+                bar.style.width = `${pct}%`;
+                const secLeft = Math.ceil((duration - elapsed) / 1000);
+                btnText.textContent = `Ćwiczymy... (${secLeft} s)`;
+                if (elapsed % 1000 === 0) playSoundEffect('beat');
+
+                if (elapsed >= duration) {
+                    clearInterval(warmupInterval);
+                    btnText.textContent = 'Ukończono! Ćwicz jeszcze raz';
+                    appState.warmupDone += 1;
+                    addStarReward(1, `Ukończono ćwiczenie: ${warmupExercises[activeWarmupIdx].shortTitle}!`);
+                }
+            }, step);
+        }
+
+        /* ==========================================
+           6. GRA 1: "SZUMIĄCY LAS" (SYGMATYZM)
+           ========================================== */
+        const game1WordBank = [
+            // SZUMIĄCE (SZ, Ż, CZ, DŻ)
+            { word: 'Szyszka', syllablesHtml: '<span class="phoneme-hl">SZ</span>Y-<span class="phoneme-hl">SZ</span>KA', emoji: '🌲', group: 'szumiace', pos: 'naglos', hint: 'Słyszysz szumiące SZ na początku? Czubek języka w górę!' },
+            { word: 'Żaba', syllablesHtml: '<span class="phoneme-hl">Ż</span>A-BA', emoji: '🐸', group: 'szumiace', pos: 'naglos', hint: 'Żaba zaczyna się na szumiącą głoskę Ż!' },
+            { word: 'Czapka', syllablesHtml: '<span class="phoneme-hl">CZ</span>A-PKA', emoji: '🧢', group: 'szumiace', pos: 'naglos', hint: 'Czapka ma na początku głoskę CZ – język za górnymi ząbkami!' },
+            { word: 'Szafa', syllablesHtml: '<span class="phoneme-hl">SZ</span>A-FA', emoji: '🚪', group: 'szumiace', pos: 'naglos', hint: 'Szafa szumi głoską SZ na początku słowa!' },
+            { word: 'Koszyk', syllablesHtml: 'KO-<span class="phoneme-hl">SZ</span>YK', emoji: '🧺', group: 'szumiace', pos: 'srodglos', hint: 'Koszyk ma głoskę SZ w środku słowa (śródgłos)!' },
+            { word: 'Kaczka', syllablesHtml: 'KA-<span class="phoneme-hl">CZ</span>KA', emoji: '🦆', group: 'szumiace', pos: 'srodglos', hint: 'Kaczka ma szumiącą głoskę CZ w środku słowa!' },
+            { word: 'Jeżyk', syllablesHtml: 'JE-<span class="phoneme-hl">Ż</span>YK', emoji: '🦔', group: 'szumiace', pos: 'srodglos', hint: 'Jeżyk ma szumiące Ż w środku słowa!' },
+            { word: 'Mysz', syllablesHtml: 'MY-<span class="phoneme-hl">SZ</span>', emoji: '🐭', group: 'szumiace', pos: 'wyglos', hint: 'Mysz kończy się szumiącą głoską SZ (wygłos)!' },
+            { word: 'Klucz', syllablesHtml: 'KLU-<span class="phoneme-hl">CZ</span>', emoji: '🔑', group: 'szumiace', pos: 'wyglos', hint: 'Klucz ma na końcu wyraźną głoskę CZ!' },
+
+            // SYCZĄCE (S, Z, C, DZ)
+            { word: 'Sowa', syllablesHtml: '<span class="phoneme-hl">S</span>O-WA', emoji: '🦉', group: 'syczace', pos: 'naglos', hint: 'Sowa syczy głoską S – język na dole za ząbkami!' },
+            { word: 'Zamek', syllablesHtml: '<span class="phoneme-hl">Z</span>A-MEK', emoji: '🏰', group: 'syczace', pos: 'naglos', hint: 'Zamek zaczyna się na głoskę Z – uśmiechnij usta!' },
+            { word: 'Cytryna', syllablesHtml: '<span class="phoneme-hl">C</span>Y-TRY-NA', emoji: '🍋', group: 'syczace', pos: 'naglos', hint: 'Cytryna zaczyna się na syczącą głoskę C!' },
+            { word: 'Samolot', syllablesHtml: '<span class="phoneme-hl">S</span>A-MO-LOT', emoji: '✈️', group: 'syczace', pos: 'naglos', hint: 'Samolot syczy głoską S na początku!' },
+            { word: 'Koza', syllablesHtml: 'KO-<span class="phoneme-hl">Z</span>A', emoji: '🐐', group: 'syczace', pos: 'srodglos', hint: 'Koza ma głoskę Z w środku słowa!' },
+            { word: 'Widelce', syllablesHtml: 'WI-DEL-<span class="phoneme-hl">C</span>E', emoji: '🍴', group: 'syczace', pos: 'srodglos', hint: 'Widelce mają syczącą głoskę C w środku!' },
+            { word: 'Pies', syllablesHtml: 'PIE-<span class="phoneme-hl">S</span>', emoji: '🐶', group: 'syczace', pos: 'wyglos', hint: 'Pies ma na końcu syczącą głoskę S!' },
+            { word: 'Nos', syllablesHtml: 'NO-<span class="phoneme-hl">S</span>', emoji: '👃', group: 'syczace', pos: 'wyglos', hint: 'Nos kończy się syczącym S!' },
+
+            // CISZĄCE (Ś, Ź, Ć, DŹ)
+            { word: 'Ślimak', syllablesHtml: '<span class="phoneme-hl">Ś</span>LI-MAK', emoji: '🐌', group: 'ciszace', pos: 'naglos', hint: 'Ślimak zaczyna się miękką, ciszącą głoską Ś!' },
+            { word: 'Źrebak', syllablesHtml: '<span class="phoneme-hl">Ź</span>RE-BAK', emoji: '🐴', group: 'ciszace', pos: 'naglos', hint: 'Źrebak ma na początku miękką głoskę Ź!' },
+            { word: 'Ćma', syllablesHtml: '<span class="phoneme-hl">Ć</span>MA', emoji: '🦋', group: 'ciszace', pos: 'naglos', hint: 'Ćma zaczyna się ciszącą głoską Ć!' },
+            { word: 'Huśtawka', syllablesHtml: 'HU-<span class="phoneme-hl">Ś</span>TA-WKA', emoji: '🎠', group: 'ciszace', pos: 'srodglos', hint: 'Huśtawka ma miękkie Ś w środku słowa!' },
+            { word: 'Budzik', syllablesHtml: 'BU-<span class="phoneme-hl">DŹ</span>IK', emoji: '⏰', group: 'ciszace', pos: 'srodglos', hint: 'Budzik ma w środku miękką głoskę DŹ!' },
+            { word: 'Miś', syllablesHtml: 'MI-<span class="phoneme-hl">Ś</span>', emoji: '🧸', group: 'ciszace', pos: 'wyglos', hint: 'Miś kończy się miękką głoską Ś!' },
+            { word: 'Liść', syllablesHtml: 'LI-<span class="phoneme-hl">ŚĆ</span>', emoji: '🍃', group: 'ciszace', pos: 'wyglos', hint: 'Liść kończy się ciszącymi głoskami Ś oraz Ć!' }
+        ];
+
+        let g1PositionFilter = 'all';
+        let g1CurrentWord = game1WordBank[0];
+        let g1Score = 0;
+
+        function setGame1Position(pos) {
+            playSoundEffect('click');
+            g1PositionFilter = pos;
+            document.querySelectorAll('.g1-pos-btn').forEach(btn => {
+                btn.className = 'g1-pos-btn bg-white/20 hover:bg-white/30 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition';
+            });
+            const activeBtn = document.getElementById(`g1Pos-${pos}`);
+            if (activeBtn) {
+                activeBtn.className = 'g1-pos-btn bg-white text-emerald-900 font-extrabold px-3 py-1.5 rounded-xl text-xs transition';
+            }
+            nextGame1Word();
+        }
+
+        function nextGame1Word() {
+            const pool = g1PositionFilter === 'all'
+                ? game1WordBank
+                : game1WordBank.filter(w => w.pos === g1PositionFilter);
+
+            const candidates = pool.filter(w => w.word !== g1CurrentWord.word);
+            const list = candidates.length > 0 ? candidates : pool;
+            g1CurrentWord = list[Math.floor(Math.random() * list.length)];
+            renderGame1Word();
+        }
+
+        function renderGame1Word() {
+            const posNames = { naglos: 'Nagłos (Początek)', srodglos: 'Śródgłos (Środek)', wyglos: 'Wygłos (Koniec)' };
+            document.getElementById('g1PosLabel').textContent = `Pozycja: ${posNames[g1CurrentWord.pos]}`;
+            document.getElementById('g1WordEmoji').textContent = g1CurrentWord.emoji;
+            document.getElementById('g1WordSyllables').innerHTML = g1CurrentWord.syllablesHtml;
+            document.getElementById('g1WordPlain').textContent = `(${g1CurrentWord.word.toLowerCase()})`;
+            document.getElementById('g1PronounceFeedback').textContent = g1CurrentWord.hint;
+            document.getElementById('g1RepeatBtnText').textContent = 'Powtórz głośno!';
+        }
+
+        function speakGame1Current() {
+            speakText(`${g1CurrentWord.word}. ${g1CurrentWord.hint}`);
+        }
+
+        function practiceGame1Pronunciation() {
+            playSoundEffect('success');
+            document.getElementById('g1RepeatBtnText').textContent = 'Świetnie! ✅';
+            document.getElementById('g1PronounceFeedback').innerHTML = `🌟 Super wymowa słowa <strong>${g1CurrentWord.word}</strong>! Teraz kliknij koszyk zwierzaka po prawej stronie!`;
+        }
+
+        function checkGame1Basket(chosenGroup) {
+            if (chosenGroup === g1CurrentWord.group) {
+                g1Score += 10;
+                document.getElementById('g1ScoreCounter').textContent = `Wynik w lesie: ${g1Score} pkt`;
+                addStarReward(1, `Słowo „${g1CurrentWord.word}” trafiło do dobrego koszyka!`, 'game1');
+                speakText(`Brawo! ${g1CurrentWord.word} pasuje idealnie!`);
+                setTimeout(() => nextGame1Word(), 900);
+            } else {
+                playSoundEffect('oops');
+                const groupLabel = {
+                    szumiace: 'szumiąca (SZ, Ż, CZ, DŻ – Miś Szumek)',
+                    syczace: 'sycząca (S, Z, C, DZ – Wąż Syczek)',
+                    ciszace: 'cisząca (Ś, Ź, Ć, DŹ – Ptak Świergotek)'
+                }[g1CurrentWord.group];
+                document.getElementById('g1PronounceFeedback').innerHTML = `🤔 Posłuchaj jeszcze raz! W słowie <strong>${g1CurrentWord.word}</strong> jest głoska <strong>${groupLabel}</strong>.`;
+                speakText(`Spróbuj jeszcze raz! Posłuchaj uważnie słowa ${g1CurrentWord.word}`);
+            }
+        }
+
+        /* ==========================================
+           7. GRA 2: "RAKIETA GŁOSKI R" (ROTACYZM)
+           ========================================== */
+        const g2StationsData = [
+            {
+                step: 1,
+                short: '1. LA-LO-LU',
+                title: 'Stacja 1: Pionizacja Czubka Języka (Głoska L)',
+                syllables: ['LA', 'LO', 'LU', 'LE', 'LA-LA', 'LO-LO'],
+                hint: 'Otwórz szeroko buzię i dotykaj czubkiem języka do wałka dziąsłowego za górnymi zębami.'
+            },
+            {
+                step: 2,
+                short: '2. TLA-DLA',
+                title: 'Stacja 2: Zbitki Dziąsłowe (TLA, TLO, DLA, DLO)',
+                syllables: ['TLA', 'TLO', 'TLU', 'DLA', 'DLO', 'DLU'],
+                hint: 'Głoski T, D oraz L wymawiamy w tym samym miejscu – wysoko na dziąsłach za górnymi zębami!'
+            },
+            {
+                step: 3,
+                short: '3. TD-TD-TD',
+                title: 'Stacja 3: Szybki Motorek Dziąsłowy (TD, TDA, TDO)',
+                syllables: ['TD-TD', 'TDA', 'TDO', 'TDU', 'TDE', 'TDY'],
+                hint: 'Wypowiedz bardzo szybko T i D przy otwartej buzi, tak aby czubek języka zadrżał jak motorek!'
+            },
+            {
+                step: 4,
+                short: '4. TRA-DRA-PRA',
+                title: 'Stacja 4: Grupy Spółgłoskowe (TR, DR, PR, BR)',
+                syllables: ['TRA', 'TRO', 'DRA', 'DRO', 'PRA', 'BRA'],
+                hint: 'Mocne dmuchnięcie powietrza po głoskach T, D, P, B wprawia czubek języka w wibrację!'
+            },
+            {
+                step: 5,
+                short: '5. RA-RO-RU',
+                title: 'Stacja 5: Kosmiczny Szczyt – Czysta Głoska R!',
+                syllables: ['RA', 'RO', 'RU', 'RE', 'RY', 'RA-KIE-TA'],
+                hint: 'Brawo! Czubek języka drży swobodnie za górnymi zębami!'
+            }
+        ];
+
+        const g2PlanetsBank = [
+            { word: 'TRA-KTOR', plain: 'Traktor', emoji: '🚜' },
+            { word: 'RA-KIE-TA', plain: 'Rakieta', emoji: '🚀' },
+            { word: 'RO-WER', plain: 'Rower', emoji: '🚲' },
+            { word: 'DRA-BI-NA', plain: 'Drabina', emoji: '🪜' },
+            { word: 'KO-RO-NA', plain: 'Korona', emoji: '👑' },
+            { word: 'TRU-SKA-WKA', plain: 'Truskawka', emoji: '🍓' },
+            { word: 'KRO-WA', plain: 'Krowa', emoji: '🐄' },
+            { word: 'RY-BA', plain: 'Ryba', emoji: '🐟' }
+        ];
+
+        const g2RiddlesBank = [
+            {
+                emoji: '🦀',
+                question: 'Ma czerwone szczypce i chodzi po dnie morza. Czy to LOK czy RAK?',
+                correct: 'RAK',
+                wrong: 'LOK',
+                correctSyl: '<span class="phoneme-hl">R</span>AK'
+            },
+            {
+                emoji: '📿',
+                question: 'Mama nosi je na szyi – czerwone i błyszczące. Czy to KOLALE czy KORALE?',
+                correct: 'KORALE',
+                wrong: 'KOLALE',
+                correctSyl: 'KO-<span class="phoneme-hl">R</span>A-LE'
+            },
+            {
+                emoji: '🖼️',
+                question: 'Otacza piękny obraz wiszący na ścianie. Czy to LAMA czy RAMA?',
+                correct: 'RAMA',
+                wrong: 'LAMA',
+                correctSyl: '<span class="phoneme-hl">R</span>A-MA'
+            },
+            {
+                emoji: '🚜',
+                question: 'Jeździ po polu i ma wielkie koła. Czy to TLAKTOL czy TRAKTOR?',
+                correct: 'TRAKTOR',
+                wrong: 'TLAKTOL',
+                correctSyl: 'T<span class="phoneme-hl">R</span>A-KTO<span class="phoneme-hl">R</span>'
+            },
+            {
+                emoji: '🪜',
+                question: 'Wchodzimy po jej szczeblach wysoko na dach. Czy to DLABINA czy DRABINA?',
+                correct: 'DRABINA',
+                wrong: 'DLABINA',
+                correctSyl: 'D<span class="phoneme-hl">R</span>A-BI-NA'
+            },
+            {
+                emoji: '🚲',
+                question: 'Ma dwa koła, kierownicę i pedały. Czy to LOWEL czy ROWER?',
+                correct: 'ROWER',
+                wrong: 'LOWEL',
+                correctSyl: '<span class="phoneme-hl">R</span>O-WE<span class="phoneme-hl">R</span>'
+            }
+        ];
+
+        let g2ActiveStationIdx = 0;
+        let g2Altitude = 0;
+        let g2RocketLane = 0; // -1, 0, 1
+        let g2CurrentPlanetIdx = 0;
+        let g2RiddleIdx = 0;
+
+        function switchGame2Tab(tab) {
+            playSoundEffect('click');
+            ['stations', 'riddles', 'vibrator'].forEach(t => {
+                document.getElementById(`g2Panel-${t}`).classList.toggle('hidden', t !== tab);
+                const btn = document.getElementById(`g2Tab-${t}`);
+                if (t === tab) {
+                    btn.className = 'px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-amber-400 text-slate-900 transition';
+                } else {
+                    btn.className = 'px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white hover:bg-white/15 transition';
+                }
+            });
+            if (tab === 'vibrator') {
+                startVibrationVisualizerLoop();
+            }
+        }
+
+        function renderGame2Stations() {
+            const grid = document.getElementById('g2StationsGrid');
+            grid.innerHTML = g2StationsData.map((st, idx) => `
+                <button onclick="selectGame2Station(${idx})" class="p-3 rounded-2xl border-2 text-center transition ${idx === g2ActiveStationIdx ? 'bg-indigo-600 text-white border-indigo-700 shadow-md scale-105' : 'bg-indigo-50 text-indigo-900 border-indigo-200 hover:bg-indigo-100'}">
+                    <div class="text-xs font-extrabold">${st.short}</div>
+                </button>
+            `).join('');
+
+            const active = g2StationsData[g2ActiveStationIdx];
+            document.getElementById('g2ActiveStationTitle').textContent = active.title;
+            document.getElementById('g2ActiveStationHint').textContent = active.hint;
+
+            const sylContainer = document.getElementById('g2SyllableButtons');
+            sylContainer.innerHTML = active.syllables.map(s => `
+                <button onclick="speakSyllableItem('${s}')" class="game-btn bg-white hover:bg-amber-50 text-indigo-950 border-2 border-indigo-300 font-extrabold px-4 py-3 rounded-2xl text-lg font-heading shadow-sm">
+                    ${s} 🔊
+                </button>
+            `).join('');
+        }
+
+        function selectGame2Station(idx) {
+            playSoundEffect('click');
+            g2ActiveStationIdx = idx;
+            renderGame2Stations();
+        }
+
+        function speakSyllableItem(syl) {
+            playSoundEffect('click');
+            speakText(syl, 0.85);
+        }
+
+        function speakCurrentStationAll() {
+            const active = g2StationsData[g2ActiveStationIdx];
+            speakText(active.syllables.join(', '), 0.82);
+        }
+
+        function boostRocketFromStation() {
+            g2Altitude += 150;
+            document.getElementById('g2AltitudeText').textContent = `${g2Altitude} km`;
+            addStarReward(1, `Zatankowano paliwo na stacji ${g2StationsData[g2ActiveStationIdx].short}!`, 'game2');
+            if (g2ActiveStationIdx < g2StationsData.length - 1) {
+                g2ActiveStationIdx++;
+                renderGame2Stations();
+            }
+        }
+
+        function moveRocketLane(dir) {
+            playSoundEffect('click');
+            g2RocketLane = Math.max(-1, Math.min(1, g2RocketLane + dir));
+            const rocket = document.getElementById('g2RocketSprite');
+            rocket.style.transform = `translateX(${g2RocketLane * 75}px) rotate(${g2RocketLane * 15}deg)`;
+        }
+
+        function renderGame2Planet() {
+            const p = g2PlanetsBank[g2CurrentPlanetIdx];
+            document.getElementById('g2PlanetEmoji').textContent = p.emoji;
+            document.getElementById('g2PlanetWord').textContent = p.word;
+        }
+
+        function speakGame2PlanetWord() {
+            const p = g2PlanetsBank[g2CurrentPlanetIdx];
+            speakText(p.plain);
+        }
+
+        function collectPlanetReward() {
+            const p = g2PlanetsBank[g2CurrentPlanetIdx];
+            g2Altitude += 250;
+            document.getElementById('g2AltitudeText').textContent = `${g2Altitude} km`;
+            document.getElementById('g2SpaceStatus').innerHTML = `🌟 Złapano planetę <strong>${p.word}</strong>! Rakieta leci na wysokość ${g2Altitude} km!`;
+            addStarReward(1, `Zdobyto planetę ze słowem ${p.plain}!`, 'game2');
+            g2CurrentPlanetIdx = (g2CurrentPlanetIdx + 1) % g2PlanetsBank.length;
+            renderGame2Planet();
+        }
+
+        // Sub-mode 2B: Riddles R vs L
+        function renderGame2Riddle() {
+            const r = g2RiddlesBank[g2RiddleIdx];
+            document.getElementById('g2RiddleProgress').textContent = `Zagadka ${g2RiddleIdx + 1} / ${g2RiddlesBank.length}`;
+            document.getElementById('g2RiddleEmoji').textContent = r.emoji;
+            document.getElementById('g2RiddleQuestion').textContent = r.question;
+
+            const isFirstCorrect = Math.random() > 0.5;
+            const opt1 = isFirstCorrect ? r.correct : r.wrong;
+            const opt2 = isFirstCorrect ? r.wrong : r.correct;
+
+            document.getElementById('g2RiddleOptions').innerHTML = [opt1, opt2].map(opt => `
+                <button onclick="answerGame2Riddle('${opt}')" class="game-btn bg-indigo-50 hover:bg-indigo-100 border-4 border-indigo-300 text-indigo-950 font-extrabold py-4 px-6 rounded-2xl text-2xl font-heading">
+                    ${opt}
+                </button>
+            `).join('');
+        }
+
+        function speakGame2Riddle() {
+            speakText(g2RiddlesBank[g2RiddleIdx].question);
+        }
+
+        function answerGame2Riddle(chosen) {
+            const r = g2RiddlesBank[g2RiddleIdx];
+            if (chosen === r.correct) {
+                document.getElementById('g2RiddleFeedback').innerHTML = `🎉 Brawo! Mówimy wyraźnie: <strong>${r.correctSyl}</strong>!`;
+                speakText(`Doskonale! To jest ${r.correct}!`);
+                addStarReward(1, `Rozwiązano zagadkę: ${r.correct}!`, 'game2');
+                setTimeout(() => {
+                    g2RiddleIdx = (g2RiddleIdx + 1) % g2RiddlesBank.length;
+                    renderGame2Riddle();
+                }, 1200);
+            } else {
+                playSoundEffect('oops');
+                document.getElementById('g2RiddleFeedback').innerHTML = `🤔 Uważaj! Słowo <strong>${r.wrong}</strong> ma głoskę L zamiast R. Spróbuj wybrać słowo z drżącym <strong>R</strong>!`;
+                speakText(`Posłuchaj jeszcze raz! Czy mówimy ${r.wrong} czy ${r.correct}?`);
+            }
+        }
+
+        // Sub-mode 2C: Vibration Trainer Canvas
+        let vibPulseEnergy = 0.2;
+        let vibAnimId = null;
+
+        function setVibrationPattern(pat) {
+            playSoundEffect('click');
+            document.getElementById('g2VibPatternText').textContent = pat;
+            triggerVibrationPulse();
+        }
+
+        function triggerVibrationPulse() {
+            vibPulseEnergy = 1.0;
+            const pat = document.getElementById('g2VibPatternText').textContent;
+            playSoundEffect('beat');
+            speakText(pat.replace(/-/g, ', '), 0.9);
+        }
+
+        function startVibrationVisualizerLoop() {
+            if (vibAnimId) cancelAnimationFrame(vibAnimId);
+            const canvas = document.getElementById('g2VibCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let phase = 0;
+
+            function draw() {
+                if (document.getElementById('g2Panel-vibrator').classList.contains('hidden')) return;
+                canvas.width = canvas.clientWidth || 500;
+                canvas.height = canvas.clientHeight || 140;
+
+                const w = canvas.width;
+                const h = canvas.height;
+                ctx.clearRect(0, 0, w, h);
+
+                // Check microphone volume if active
+                const micVol = getLiveMicVolume();
+                const amp = Math.max(vibPulseEnergy, micVol * 1.4);
+                vibPulseEnergy = Math.max(0.15, vibPulseEnergy * 0.96);
+
+                ctx.beginPath();
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#fbbf24';
+                for (let x = 0; x < w; x++) {
+                    const y = h / 2 + Math.sin(x * 0.06 + phase) * (amp * 42) * Math.sin(x * 0.015);
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                phase += 0.28;
+                vibAnimId = requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        function toggleMicForVibrator() {
+            initSharedMicrophone().then(ok => {
+                if (ok) {
+                    document.getElementById('g2MicBtn').innerHTML = `<i class="fa-solid fa-microphone-lines"></i> <span>Mikrofon Aktywny! Mów TD-TD / TR-TR!</span>`;
+                    document.getElementById('g2MicBtn').className = 'w-full game-btn bg-emerald-600 text-white font-extrabold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2';
+                }
+            });
+        }
+
+        /* ==========================================
+           8. GRA 3: "SKARBY KRÓLA KRUKA I GĄSKI" (KAPPACYZM I GAMMACYZM)
+           ========================================== */
+        const g3RepairBank = [
+            { emoji: '🐔', wrong: 'TURA', correct: 'KURA', syl: '<span class="phoneme-hl">K</span>U-RA', question: 'Jak mówimy poprawnie: TURA czy KURA?' },
+            { emoji: '🔘', wrong: 'DUZIK', correct: 'GUZIK', syl: '<span class="phoneme-hl">G</span>U-ZIK', question: 'Zapinamy go przy koszuli: DUZIK czy GUZIK?' },
+            { emoji: '🐱', wrong: 'TOT', correct: 'KOT', syl: '<span class="phoneme-hl">K</span>OT', question: 'Mruczy i pije mleko: TOT czy KOT?' },
+            { emoji: '🛣️', wrong: 'ulica DŁUDA', correct: 'ulica DŁUGA', syl: 'DŁU-<span class="phoneme-hl">G</span>A', question: 'Czy jedziemy ulicą DŁUDĄ czy ulicą DŁUGĄ?' },
+            { emoji: '🔑', wrong: 'TLUCZ', correct: 'KLUCZ', syl: '<span class="phoneme-hl">K</span>LUCZ', question: 'Otwiera zamek w drzwiach: TLUCZ czy KLUCZ?' },
+            { emoji: '🎸', wrong: 'DITARA', correct: 'GITARA', syl: '<span class="phoneme-hl">G</span>I-TA-RA', question: 'Gramy na jej strunach: DITARA czy GITARA?' },
+            { emoji: '👑', wrong: 'TORONA', correct: 'KORONA', syl: '<span class="phoneme-hl">K</span>O-RO-NA', question: 'Błyszczy na głowie króla: TORONA czy KORONA?' },
+            { emoji: '🍄', wrong: 'DRZYB', correct: 'GRZYB', syl: '<span class="phoneme-hl">G</span>RZYB', question: 'Rośnie w lesie pod sosną: DRZYB czy GRZYB?' }
+        ];
+
+        const g3MemoryTreasures = [
+            { id: 'kot', word: 'KOT', syl: 'KOT', emoji: '🐱' },
+            { id: 'korona', word: 'KORONA', syl: 'KO-RO-NA', emoji: '👑' },
+            { id: 'klucz', word: 'KLUCZ', syl: 'KLUCZ', emoji: '🔑' },
+            { id: 'gitara', word: 'GITARA', syl: 'GI-TA-RA', emoji: '🎸' },
+            { id: 'grzyb', word: 'GRZYB', syl: 'GRZYB', emoji: '🍄' },
+            { id: 'gwiazda', word: 'GWIAZDA', syl: 'GWIA-ZDA', emoji: '🌟' }
+        ];
+
+        let g3RepairIdx = 0;
+        let g3RepCount = 0;
+        let g3Coins = 0;
+
+        // Memory state
+        let g3Cards = [];
+        let g3FlippedIndices = [];
+        let g3MemPracticeCount = 0;
+        let g3MemLocked = false;
+
+        function switchGame3Tab(tab) {
+            playSoundEffect('click');
+            document.getElementById('g3Panel-repair').classList.toggle('hidden', tab !== 'repair');
+            document.getElementById('g3Panel-memory').classList.toggle('hidden', tab !== 'memory');
+
+            document.getElementById('g3Tab-repair').className = tab === 'repair'
+                ? 'px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-white text-amber-950 transition'
+                : 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition';
+            document.getElementById('g3Tab-memory').className = tab === 'memory'
+                ? 'px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-white text-amber-950 transition'
+                : 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition';
+        }
+
+        function renderGame3Repair() {
+            const item = g3RepairBank[g3RepairIdx];
+            g3RepCount = 0;
+            document.getElementById('g3Repeat3Box').classList.add('hidden');
+            document.getElementById('g3RepairEmoji').textContent = item.emoji;
+            document.getElementById('g3RepairQuestion').innerHTML = `Jak mówimy poprawnie: <span class="text-rose-600">${item.wrong}</span> czy <span class="text-emerald-700">${item.correct}</span>?`;
+
+            const firstCorrect = Math.random() > 0.5;
+            const choices = firstCorrect ? [item.correct, item.wrong] : [item.wrong, item.correct];
+
+            document.getElementById('g3RepairChoices').innerHTML = choices.map(ch => `
+                <button onclick="selectGame3RepairChoice('${ch}')" class="game-btn bg-amber-50 hover:bg-amber-100 border-4 border-amber-300 text-amber-950 font-extrabold py-4 px-6 rounded-2xl text-xl sm:text-2xl font-heading">
+                    ${ch}
+                </button>
+            `).join('');
+        }
+
+        function speakGame3RepairPrompt() {
+            const item = g3RepairBank[g3RepairIdx];
+            speakText(item.question);
+        }
+
+        function selectGame3RepairChoice(choice) {
+            const item = g3RepairBank[g3RepairIdx];
+            if (choice === item.correct) {
+                playSoundEffect('success');
+                speakText(`Brawo! Mówimy ${item.correct}! Powtórz teraz trzy razy.`);
+                document.getElementById('g3TargetSyllables').innerHTML = item.syl;
+                document.getElementById('g3RepCounterBadge').textContent = '0 / 3';
+                document.getElementById('g3Repeat3Box').classList.remove('hidden');
+            } else {
+                playSoundEffect('oops');
+                speakText(`Oj, ${item.wrong} brzmi jak psota chochlika! Wybierz słowo z głoską tylnojęzykową: ${item.correct}.`);
+            }
+        }
+
+        function clickGame3Repetition() {
+            const item = g3RepairBank[g3RepairIdx];
+            g3RepCount++;
+            playSoundEffect('click');
+            speakText(item.correct, 0.9);
+            document.getElementById('g3RepCounterBadge').textContent = `${g3RepCount} / 3`;
+
+            if (g3RepCount >= 3) {
+                g3Coins += 3;
+                document.getElementById('g3CoinsCount').textContent = g3Coins;
+                addStarReward(1, `Naprawiono słowo ${item.correct} i zdobyto 3 złote monety!`, 'game3');
+                setTimeout(() => {
+                    g3RepairIdx = (g3RepairIdx + 1) % g3RepairBank.length;
+                    renderGame3Repair();
+                }, 700);
+            }
+        }
+
+        // Sub-mode 3B: Royal Memory Game
+        function initGame3Memory() {
+            const deck = [...g3MemoryTreasures, ...g3MemoryTreasures]
+                .map((item, idx) => ({ ...item, uid: idx, flipped: false, matched: false }))
+                .sort(() => Math.random() - 0.5);
+            g3Cards = deck;
+            g3FlippedIndices = [];
+            g3MemLocked = false;
+            document.getElementById('g3MemoryMatchModal').classList.add('hidden');
+            renderGame3MemoryGrid();
+        }
+
+        function renderGame3MemoryGrid() {
+            const grid = document.getElementById('g3MemoryGrid');
+            grid.innerHTML = g3Cards.map((card, idx) => {
+                const isRevealed = card.flipped || card.matched;
+                return `
+                    <button onclick="flipGame3Card(${idx})" class="h-28 sm:h-32 rounded-2xl border-4 transition-all flex flex-col items-center justify-center p-2 shadow-sm ${
+                        card.matched
+                            ? 'bg-emerald-100 border-emerald-400 text-emerald-950'
+                            : isRevealed
+                                ? 'bg-amber-50 border-amber-400 text-amber-950 scale-105'
+                                : 'bg-gradient-to-br from-amber-500 to-orange-500 border-amber-300 text-white hover:scale-105'
+                    }">
+                        ${isRevealed ? `
+                            <div class="text-4xl mb-1">${card.emoji}</div>
+                            <div class="text-xs sm:text-sm font-extrabold font-heading">${card.syl}</div>
+                        ` : `
+                            <div class="text-3xl">👑</div>
+                            <div class="text-[11px] font-bold uppercase tracking-wider mt-1">Skarb K/G</div>
+                        `}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function flipGame3Card(idx) {
+            if (g3MemLocked) return;
+            const card = g3Cards[idx];
+            if (card.flipped || card.matched) return;
+
+            playSoundEffect('click');
+            card.flipped = true;
+            g3FlippedIndices.push(idx);
+            renderGame3MemoryGrid();
+            speakText(card.word, 0.92);
+
+            if (g3FlippedIndices.length === 2) {
+                g3MemLocked = true;
+                const [i1, i2] = g3FlippedIndices;
+                if (g3Cards[i1].id === g3Cards[i2].id) {
+                    g3Cards[i1].matched = true;
+                    g3Cards[i2].matched = true;
+                    g3FlippedIndices = [];
+                    playSoundEffect('success');
+                    openMemoryPracticeModal(g3Cards[i1]);
+                } else {
+                    setTimeout(() => {
+                        g3Cards[i1].flipped = false;
+                        g3Cards[i2].flipped = false;
+                        g3FlippedIndices = [];
+                        g3MemLocked = false;
+                        renderGame3MemoryGrid();
+                    }, 950);
+                }
+            }
+        }
+
+        function openMemoryPracticeModal(card) {
+            g3MemPracticeCount = 0;
+            document.getElementById('g3MemMatchEmoji').textContent = card.emoji;
+            document.getElementById('g3MemMatchWord').textContent = card.syl;
+            document.getElementById('g3MemRepCount').textContent = '0 / 3';
+            document.getElementById('g3MemoryMatchModal').classList.remove('hidden');
+        }
+
+        function stepGame3MemoryPractice() {
+            g3MemPracticeCount++;
+            playSoundEffect('click');
+            document.getElementById('g3MemRepCount').textContent = `${g3MemPracticeCount} / 3`;
+            if (g3MemPracticeCount >= 3) {
+                g3Coins += 5;
+                document.getElementById('g3CoinsCount').textContent = g3Coins;
+                document.getElementById('g3MemoryMatchModal').classList.add('hidden');
+                g3MemLocked = false;
+                renderGame3MemoryGrid();
+                addStarReward(1, 'Odkryto parę skarbów i powtórzono słowo 3 razy!', 'game3');
+            }
+        }
+
+        /* ==========================================
+           9. GRA 4: "DŹWIĘCZNA DMUCHAWKA I BĄBELKI" (MOWA BEZDŹWIĘCZNA + ODDECH)
+           ========================================== */
+        const g4MinimalPairs = [
+            {
+                pairLabel: 'Para opozycyjna: B (dźwięczna) vs P (bezdźwięczna)',
+                targetType: 'voiced',
+                prompt: 'Wskaż słowo z DŹWIĘCZNĄ głoską B (krtań drży 🐝): „Lata nad łąką i głośno bzyczy...”',
+                voiced: { word: 'BĄK', syl: '<span class="phoneme-hl">B</span>ĄK', emoji: '🐝', desc: 'Dźwięczna B (krtań wibruje)' },
+                voiceless: { word: 'PĄK', syl: '<span class="phoneme-hl">P</span>ĄK', emoji: '🌷', desc: 'Bezdźwięczna P (krtań cicho)' }
+            },
+            {
+                pairLabel: 'Para opozycyjna: D (dźwięczna) vs T (bezdźwięczna)',
+                targetType: 'voiced',
+                prompt: 'Wskaż słowo z DŹWIĘCZNĄ głoską D (krtań drży 🐝): „Ma czerwony dach, okna i komin...”',
+                voiced: { word: 'DOMEK', syl: '<span class="phoneme-hl">D</span>O-MEK', emoji: '🏠', desc: 'Dźwięczna D (krtań wibruje)' },
+                voiceless: { word: 'TOMEK', syl: '<span class="phoneme-hl">T</span>O-MEK', emoji: '👦', desc: 'Bezdźwięczna T (krtań cicho)' }
+            },
+            {
+                pairLabel: 'Para opozycyjna: Z (dźwięczna) vs S (bezdźwięczna)',
+                targetType: 'voiced',
+                prompt: 'Wskaż słowo z DŹWIĘCZNĄ głoską Z (krtań drży 🐝): „Białe zwierzątko z różkami, które lubi trawę...”',
+                voiced: { word: 'KOZA', syl: 'KO-<span class="phoneme-hl">Z</span>A', emoji: '🐐', desc: 'Dźwięczna Z (krtań wibruje)' },
+                voiceless: { word: 'KOSA', syl: 'KO-<span class="phoneme-hl">S</span>A', emoji: '🌾', desc: 'Bezdźwięczna S (krtań cicho)' }
+            },
+            {
+                pairLabel: 'Para opozycyjna: W (dźwięczna) vs F (bezdźwięczna)',
+                targetType: 'voiceless',
+                prompt: 'Teraz znajdź słowo z BEZDŹWIĘCZNĄ głoską T/W vs miękka puszysta: „Miękka jak chmurka w apteczce to...”',
+                voiced: { word: 'WADA', syl: 'WA-<span class="phoneme-hl">D</span>A', emoji: '🔍', desc: 'Dźwięczna D (krtań wibruje)' },
+                voiceless: { word: 'WATA', syl: 'WA-<span class="phoneme-hl">T</span>A', emoji: '☁️', desc: 'Bezdźwięczna T (krtań cicho)' }
+            },
+            {
+                pairLabel: 'Para opozycyjna: G (dźwięczna) vs K (bezdźwięczna)',
+                targetType: 'voiced',
+                prompt: 'Wskaż słowo z DŹWIĘCZNĄ głoską G (krtań drży 🐝): „Wysoki szczyt w Tatrach to...”',
+                voiced: { word: 'GÓRA', syl: '<span class="phoneme-hl">G</span>Ó-RA', emoji: '⛰️', desc: 'Dźwięczna G (krtań wibruje)' },
+                voiceless: { word: 'KURA', syl: '<span class="phoneme-hl">K</span>U-RA', emoji: '🐔', desc: 'Bezdźwięczna K (krtań cicho)' }
+            },
+            {
+                pairLabel: 'Para opozycyjna: B (dźwięczna) vs P (bezdźwięczna)',
+                targetType: 'voiced',
+                prompt: 'Wskaż słowo z DŹWIĘCZNĄ głoską B (krtań drży 🐝): „Uderzamy w niego pałeczkami: bum-bum!”',
+                voiced: { word: 'BĘBEN', syl: '<span class="phoneme-hl">B</span>Ę-<span class="phoneme-hl">B</span>EN', emoji: '🥁', desc: 'Dźwięczna B (krtań wibruje)' },
+                voiceless: { word: 'PIŁKA', syl: '<span class="phoneme-hl">P</span>IŁ-KA', emoji: '⚽', desc: 'Bezdźwięczna P (krtań cicho)' }
+            }
+        ];
+
+        let g4PairIdx = 0;
+        let g4PairsPoints = 0;
+
+        function switchGame4Tab(tab) {
+            playSoundEffect('click');
+            document.getElementById('g4Panel-pairs').classList.toggle('hidden', tab !== 'pairs');
+            document.getElementById('g4Panel-breath').classList.toggle('hidden', tab !== 'breath');
+
+            document.getElementById('g4Tab-pairs').className = tab === 'pairs'
+                ? 'px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-white text-sky-950 transition'
+                : 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition';
+            document.getElementById('g4Tab-breath').className = tab === 'breath'
+                ? 'px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-white text-sky-950 transition'
+                : 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition';
+
+            if (tab === 'breath') {
+                startBreathLoop();
+            }
+        }
+
+        function renderGame4Pair() {
+            const p = g4MinimalPairs[g4PairIdx];
+            document.getElementById('g4PairCategoryLabel').textContent = p.pairLabel;
+            document.getElementById('g4PairPromptText').textContent = p.prompt;
+
+            const badge = document.getElementById('g4TargetTypeBadge');
+            if (p.targetType === 'voiced') {
+                badge.className = 'inline-flex items-center gap-1.5 bg-amber-300 text-amber-950 text-xs font-extrabold px-3 py-1 rounded-full';
+                badge.textContent = '🐝 Szukamy głoski DŹWIĘCZNEJ (krtań wibruje!)';
+            } else {
+                badge.className = 'inline-flex items-center gap-1.5 bg-sky-200 text-sky-950 text-xs font-extrabold px-3 py-1 rounded-full';
+                badge.textContent = '💨 Szukamy głoski BEZDŹWIĘCZNEJ (krtań cicho!)';
+            }
+
+            const cards = [
+                { ...p.voiced, type: 'voiced' },
+                { ...p.voiceless, type: 'voiceless' }
+            ];
+
+            document.getElementById('g4PairCardsContainer').innerHTML = cards.map(c => `
+                <div class="bg-slate-50 hover:bg-sky-50 border-4 border-sky-200 rounded-3xl p-5 text-center flex flex-col justify-between gap-3 transition">
+                    <div>
+                        <span class="text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full ${c.type === 'voiced' ? 'bg-amber-200 text-amber-950' : 'bg-sky-200 text-sky-950'}">
+                            ${c.type === 'voiced' ? '🐝 ' + c.desc : '💨 ' + c.desc}
+                        </span>
+                        <div class="text-6xl my-3">${c.emoji}</div>
+                        <div class="text-2xl font-extrabold font-heading text-slate-800">${c.syl}</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="speakText('${c.word}')" class="game-btn bg-white border border-slate-300 text-slate-700 font-bold py-2 rounded-xl text-xs">
+                            🔊 Posłuchaj
+                        </button>
+                        <button onclick="checkGame4PairAnswer('${c.type}')" class="game-btn bg-sky-500 hover:bg-sky-600 text-white font-extrabold py-2 rounded-xl text-xs">
+                            Wybierz ✅
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function speakGame4Target() {
+            const p = g4MinimalPairs[g4PairIdx];
+            speakText(`Porównaj słowa: ${p.voiced.word} oraz ${p.voiceless.word}. ${p.prompt}`);
+        }
+
+        function nextGame4Pair() {
+            playSoundEffect('click');
+            g4PairIdx = (g4PairIdx + 1) % g4MinimalPairs.length;
+            renderGame4Pair();
+        }
+
+        function checkGame4PairAnswer(chosenType) {
+            const p = g4MinimalPairs[g4PairIdx];
+            const correctItem = p.targetType === 'voiced' ? p.voiced : p.voiceless;
+            if (chosenType === p.targetType) {
+                g4PairsPoints += 10;
+                document.getElementById('g4PairsScore').textContent = `Punkty: ${g4PairsPoints}`;
+                document.getElementById('g4PairFeedback').innerHTML = `🎉 Brawo! Poprawne słowo to <strong>${correctItem.word}</strong>!`;
+                addStarReward(1, `Rozróżniono parę minimalną: ${p.voiced.word} – ${p.voiceless.word}!`, 'game4');
+                speakText(`Świetnie! To jest ${correctItem.word}!`);
+                setTimeout(() => nextGame4Pair(), 1100);
+            } else {
+                playSoundEffect('oops');
+                document.getElementById('g4PairFeedback').innerHTML = `🤔 Przyłóż dłoń do szyi i wymów jeszcze raz: <strong>${p.voiced.word}</strong> (drży 🐝) oraz <strong>${p.voiceless.word}</strong> (cisza 💨).`;
+                speakText(`Spróbuj jeszcze raz! Dotknij szyi i sprawdź, kiedy czujesz bzyczenie pszczółki.`);
+            }
+        }
+
+        /* ==========================================
+           10. MIERNIK ODDECHU I FONACJI (MICROPHONE + FALLBACK)
+           ========================================== */
+        let micAnalyser = null;
+        let micDataArray = null;
+        let micActive = false;
+        let manualBlowActive = false;
+        let breathDurationSec = 0;
+        let pinwheelAngle = 0;
+        let breathLoopId = null;
+        let currentBreathMode = 'wind';
+
+        async function initSharedMicrophone() {
+            if (micActive && micAnalyser) return true;
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showToast('Tryb Przycisku', 'Przeglądarka nie udostępnia mikrofonu – użyj przycisku ekranowego lub Spacji!', '🌬️');
+                return false;
+            }
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                const ctx = getAudioCtx();
+                const source = ctx.createMediaStreamSource(stream);
+                micAnalyser = ctx.createAnalyser();
+                micAnalyser.fftSize = 256;
+                source.connect(micAnalyser);
+                micDataArray = new Uint8Array(micAnalyser.frequencyBinCount);
+                micActive = true;
+                showToast('Mikrofon Włączony! 🎙️', 'Możesz dmuchać lub wymawiać głoski prosto do mikrofonu!', '🎙️');
+                return true;
+            } catch (err) {
+                showToast('Użyj Przycisku lub Spacji', 'Brak dostępu do mikrofonu – przytrzymaj przycisk na ekranie!', '🖐️');
+                return false;
+            }
+        }
+
+        function getLiveMicVolume() {
+            if (!micActive || !micAnalyser || !micDataArray) return 0;
+            micAnalyser.getByteFrequencyData(micDataArray);
+            let sum = 0;
+            for (let i = 0; i < micDataArray.length; i++) {
+                sum += micDataArray[i];
+            }
+            const avg = sum / micDataArray.length;
+            return Math.min(1, avg / 55);
+        }
+
+        function toggleGame4Microphone() {
+            initSharedMicrophone().then(ok => {
+                if (ok) {
+                    document.getElementById('g4MicStatusBadge').textContent = 'Tryb: Mikrofon + Przycisk 🎙️';
+                    document.getElementById('g4MicStatusBadge').className = 'text-xs bg-emerald-100 text-emerald-800 font-extrabold px-2.5 py-1 rounded-lg';
+                    document.getElementById('g4EnableMicBtn').innerHTML = `<i class="fa-solid fa-check"></i> <span>Mikrofon Aktywny – Dmuchaj lub Mów!</span>`;
+                    document.getElementById('g4EnableMicBtn').className = 'w-full game-btn bg-emerald-600 text-white font-extrabold py-3 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2';
+                }
+            });
+        }
+
+        function setBreathExercise(mode, label) {
+            playSoundEffect('click');
+            currentBreathMode = mode;
+            breathDurationSec = 0;
+            document.getElementById('g4BreathTaskBadge').textContent = `Zadanie: ${label} przez 4 sekundy`;
+
+            document.getElementById('g4PinwheelWrap').classList.toggle('hidden', mode !== 'wind');
+            document.getElementById('g4BalloonWrap').classList.toggle('hidden', mode !== 'vowel');
+        }
+
+        function startManualBlow(e) {
+            if (e && e.cancelable) e.preventDefault();
+            manualBlowActive = true;
+        }
+
+        function stopManualBlow() {
+            manualBlowActive = false;
+        }
+
+        // Keyboard Spacebar support for blowing
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !document.getElementById('view-game4').classList.contains('hidden')) {
+                if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+                e.preventDefault();
+                manualBlowActive = true;
+            }
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'Space') {
+                manualBlowActive = false;
+            }
+        });
+
+        function spawnSoapBubble() {
+            const container = document.getElementById('g4BubbleStream');
+            if (!container) return;
+            const b = document.createElement('div');
+            const size = 22 + Math.floor(Math.random() * 26);
+            const left = 15 + Math.floor(Math.random() * 70);
+            b.textContent = '🫧';
+            b.style.position = 'absolute';
+            b.style.bottom = '10px';
+            b.style.left = `${left}%`;
+            b.style.fontSize = `${size}px`;
+            b.style.animation = 'bubbleRise 2.2s ease-out forwards';
+            container.appendChild(b);
+            setTimeout(() => b.remove(), 2200);
+        }
+
+        function startBreathLoop() {
+            if (breathLoopId) cancelAnimationFrame(breathLoopId);
+            let lastTime = performance.now();
+
+            function step(now) {
+                if (document.getElementById('g4Panel-breath').classList.contains('hidden')) return;
+                const dt = (now - lastTime) / 1000;
+                lastTime = now;
+
+                const micLevel = getLiveMicVolume();
+                const intensity = manualBlowActive ? 0.85 : micLevel;
+
+                // Volume Bar update
+                const volPct = Math.min(100, Math.max(5, Math.round(intensity * 100)));
+                document.getElementById('g4VolumeBar').style.width = `${volPct}%`;
+
+                if (intensity > 0.22) {
+                    breathDurationSec += dt;
+                    pinwheelAngle += intensity * 14;
+                    const svg = document.getElementById('g4PinwheelSvg');
+                    if (svg) svg.style.transform = `rotate(${pinwheelAngle}deg)`;
+
+                    // Move balloon up
+                    const balloon = document.getElementById('g4BalloonWrap');
+                    if (balloon) {
+                        const offset = 40 - Math.min(95, (breathDurationSec / 4) * 95);
+                        balloon.style.transform = `translateY(${offset}px) scale(${1 + Math.min(0.3, breathDurationSec * 0.06)})`;
+                    }
+
+                    // Spawn soap bubbles occasionally
+                    if (Math.random() < 0.28) spawnSoapBubble();
+
+                    if (breathDurationSec >= 4.0) {
+                        breathDurationSec = 0;
+                        manualBlowActive = false;
+                        addStarReward(1, 'Wspaniały, długi wydech przez 4 sekundy!', 'game4');
+                        speakText('Brawo! Piękny, długi oddech!');
+                    }
+                } else {
+                    breathDurationSec = Math.max(0, breathDurationSec - dt * 0.6);
+                }
+
+                const pct = Math.min(100, (breathDurationSec / 4.0) * 100);
+                document.getElementById('g4BreathProgressBar').style.width = `${pct}%`;
+                document.getElementById('g4BreathTimerText').textContent = `Czas wydechu: ${breathDurationSec.toFixed(1)} s / 4.0 s`;
+
+                breathLoopId = requestAnimationFrame(step);
+            }
+            breathLoopId = requestAnimationFrame(step);
+        }
+
+        /* ==========================================
+           11. INITIALIZATION ON WINDOW LOAD
+           ========================================== */
+        window.onload = function () {
+            updateDashboardUI();
+            renderGame1Word();
+            renderGame2Stations();
+            renderGame2Planet();
+            renderGame2Riddle();
+            renderGame3Repair();
+            initGame3Memory();
+            renderGame4Pair();
+
+            // Preload speech synthesis voices in Polish
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.getVoices();
+            }
+        };
+    </script>
+</body>
+</html>
