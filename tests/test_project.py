@@ -18,6 +18,7 @@ MODULE_CONTRACTS = {
     "chestnut_arcade_game_hub_v2.html": ("id=\"mainMenuView\"", "returnToMenu"),
     "autumn_neon_chestnut_2p_arcade_hub.html": ("id=\"hub-view\"", "startGame(gameId)"),
     "grinch_chest_conquest.html": ("id=\"hub-view\"", "class GrinchConquestApp"),
+    "smerfastyczny_labirynt.html": ('id="gameCanvas"', "function generateMazeLevel", "function triggerVictoryModal"),
     "chess_nuts.html": ("id=\"chessboard\"", "Chess-Nuts"),
     "logopedia.html": ("id=\"interaction-area\"", "function switchMode", "function resetTask"),
     "kraina_wyraznej_mowy.html": ("id=\"view-dashboard\"", "function navigateTo"),

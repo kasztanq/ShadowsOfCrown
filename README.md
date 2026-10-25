@@ -8,6 +8,7 @@ W repozytorium pojawiły się dodatkowe projekty, które rozszerzają katalog gi
 * [chestnut\_arcade\_game\_hub\_v2.html](./chestnut_arcade_game_hub_v2.html) — zaktualizowana wersja hubu z poprawionym interfejsem i ulepszonymi elementami gry.
 * [autumn\_neon\_chestnut\_2p\_arcade\_hub.html](./autumn_neon_chestnut_2p_arcade_hub.html) — neonowy hub arcade dla dwóch graczy z lokalnym trybem współpracy/rywalizacji.
 * [grinch\_chest\_conquest.html](./grinch_chest_conquest.html) — świąteczny hub arcade z motywem Grincha, zwierząt i świątecznych wyzwań.
+* [smerfastyczny\_labirynt.html](./smerfastyczny_labirynt.html) — szybki labirynt o ucieczce Smerfów z kluczami, skrótami i 50 poziomami.
 * [logopedia.html](./logopedia.html) — gra logopedyczna skupiająca się na rozpoznawaniu głosek i wyrazów.
 * [kraina\_wyraznej\_mowy.html](./kraina_wyraznej_mowy.html) — edukacyjny hub z serii gier logopedycznych i ćwiczeń oddechowych i fonetycznych.
 * [ShadowsOfCrown.html](./ShadowsOfCrown.html) — strategiczno-narracyjna gra w stylu dworskiego intryganta.
@@ -18,6 +19,7 @@ W repozytorium pojawiły się dodatkowe projekty, które rozszerzają katalog gi
 * [chestnut\_arcade\_game\_hub\_v2.html](./chestnut_arcade_game_hub_v2.html) — ulepszona wersja hubu 4-in-1 z nowym stylem i dodatkowymi funkcjami.
 * [autumn\_neon\_chestnut\_2p\_arcade\_hub.html](./autumn_neon_chestnut_2p_arcade_hub.html) — neonowy hub 2-player z lokalnym trybem rozgrywki.
 * [grinch\_chest\_conquest.html](./grinch_chest_conquest.html) — świąteczna arcada typu holiday challenge.
+* [smerfastyczny\_labirynt.html](./smerfastyczny_labirynt.html) — labirynt z kluczami, ukrytymi przejściami i wyzwaniami dla 50 poziomów.
 * [logopedia.html](./logopedia.html) — interaktywna gra logopedyczna dla ćwiczenia dźwięków i słów.
 * [kraina\_wyraznej\_mowy.html](./kraina_wyraznej_mowy.html) — edukacyjny portal z grami logopedycznymi.
 * [ShadowsOfCrown.html](./ShadowsOfCrown.html) — strategiczno-narracyjna gra w stylu dworskiego intryganta.
@@ -119,6 +121,7 @@ Gry są samodzielnymi plikami HTML, które zawierają interfejs i kod gry. Nie w
    * [chestnut\_arcade\_game\_hub\_v2.html](./chestnut_arcade_game_hub_v2.html) — ulepszona wersja hubu 4-in-1,
    * [autumn\_neon\_chestnut\_2p\_arcade\_hub.html](./autumn_neon\_chestnut\_2p\_arcade\_hub.html) — neonowy hub 2-player,
    * [grinch\_chest\_conquest.html](./grinch\_chest\_conquest.html) — świąteczna arcada,
+   * [smerfastyczny\_labirynt.html](./smerfastyczny_labirynt.html) — labiryntowa gra o ucieczce Smerfów,
    * [logopedia.html](./logopedia.html) — gra logopedyczna,
    * [kraina\_wyraznej\_mowy.html](./kraina\_wyraznej\_mowy.html) — edukacyjny hub logopedyczny,
    * [ShadowsOfCrown.html](./ShadowsOfCrown.html) — gra strategiczna.
