@@ -120,7 +120,7 @@
                     Nazywasz się <strong class="text-amber-300">Jack „Viper” Kowalski</strong>. Jesteś byłym żołnierzem sił specjalnych, który po powrocie do skąpanego w słońcu i neonach Miami zaciągnął się jako cyngiel do rodziny <strong class="text-amber-400">Chestnuts</strong>.
                 </p>
                 <p>
-                    Miasto podzielone jest między <strong class="text-teal-300">4 bezwzględne syndykaty</strong>: <span class="text-amber-400">Chestnuts</span>, <span class="text-indigo-400">Rhavens</span>, <span class="text-emerald-400">Magicians (Magic Froggy's)</span> oraz <span class="text-red-400">Wild-Weasels</span>. Twoim bezpośrednim przełożonym w dokach Chestnuts jest kapitan <strong class="text-pink-400">„Grinch”</strong>.
+                    Miasto podzielone jest między <strong class="text-teal-300">4 bezwzględne syndykaty</strong>: <span class="text-amber-400">Chestnuts</span>, <span class="text-indigo-400">Rhavens</span>, <span class="text-emerald-400">Magicians (Magic Froggy's)</span> oraz <span class="text-red-400">Wild-Weasels</span>. Każdy ma własny sposób prowadzenia odpraw i własną definicję słowa „pilne”. Twoim bezpośrednim przełożonym w dokach Chestnuts jest kapitan <strong class="text-pink-400">„Grinch”</strong>.
                 </p>
                 <p class="bg-black/40 border-l-4 border-pink-500 p-3 rounded text-xs md:text-sm text-pink-200">
                     <strong>AKT ŚLEDZTWA:</strong> Twoje wojskowe instynkty mówią Ci jedno — kapitan <strong>Grinch</strong> wystawia ludzi Chestnutsów na rzeź. Wszystko wskazuje na to, że jest głęboko zakonspirowanym kretem pracującym dla mrocznych <strong>Rhavensów</strong>. Zdobądź respekt wszystkich 4 mafii, odbieraj dzwoniące budki telefoniczne i zbierz <strong>4 twarde dowody zdrady Grincha</strong>!
@@ -668,6 +668,7 @@ const gameState = {
     phoneBooths: [],
     cars: [],
     peds: [],
+    froggyShops: [],
     skidMarks: [],
     particles: [],
     bullets: []
@@ -676,6 +677,7 @@ const gameState = {
 function generateWorld() {
     gameState.buildings = [];
     gameState.palmTrees = [];
+    gameState.froggyShops = [];
 
     const numBlocks = Math.floor(WORLD_SIZE / BLOCK_SIZE);
 
@@ -720,6 +722,22 @@ function generateWorld() {
         }
     }
 
+    for (const district of ['chestnuts', 'rhavens', 'magicians', 'weasels']) {
+        const shops = gameState.buildings.filter(b =>
+            !b.label && getDistrictAt(b.x + b.w / 2, b.y + b.h / 2).id === district
+        );
+        if (!shops.length) continue;
+        const shop = shops[Math.floor(Math.random() * shops.length)];
+        shop.label = 'FROGGY SHOP';
+        const x = shop.x + shop.w / 2;
+        const y = shop.y + shop.h / 2;
+        shop.marker = Math.abs(y - Math.round(y / BLOCK_SIZE) * BLOCK_SIZE) <
+            Math.abs(x - Math.round(x / BLOCK_SIZE) * BLOCK_SIZE)
+            ? { x, y: Math.round(y / BLOCK_SIZE) * BLOCK_SIZE }
+            : { x: Math.round(x / BLOCK_SIZE) * BLOCK_SIZE, y };
+        gameState.froggyShops.push(shop);
+    }
+
     gameState.phoneBooths = [
         {
             id: 'grinch_hq',
@@ -730,7 +748,7 @@ function generateWorld() {
             emoji: '🕶️',
             tag: 'CHESTNUTS HQ',
             color: '#f7c548',
-            dialogue: '„Witaj w szeregach Chestnuts, żołnierzu! Nazywają mnie Grinch, ale w papierach figuruję jako Grinch. Mam dla Ciebie pierwsze zadanie: podjedź pod północny dok (żółty znacznik) i odbierz walizkę z utargiem. Tylko nie zaglądaj do środka i nie pytaj, czemu czekają tam ludzie z Rhaven Bay...”',
+            dialogue: '„Witaj w szeregach Chestnuts, żołnierzu! Nazywają mnie Grinch, ale w papierach figuruję jako Grinch. Krótka odprawa: odbierz walizkę z północnego doku. Termin był wczoraj, a zakres właśnie urósł, więc pytań nie przewidziano. I nie pytaj, czemu czekają tam ludzie z Rhaven Bay...”',
             clueId: 'clue_1',
             clueText: 'POSZLAKA 1/4: Podczas rozmowy z Grinchem zauważyłeś w jego kaburze pistolet z wygrawerowanym czarnym krukiem — symbolem elity wrogiego gangu Rhavens!',
             missionTarget: { x: 1125, y: 450 },
@@ -747,7 +765,7 @@ function generateWorld() {
             emoji: '📞',
             tag: 'CHESTNUTS',
             color: '#f59e0b',
-            dialogue: '„Tu Don Vito! Ktoś sypie nasze transporty w dokach! Ostatniej nocy straciliśmy dwa magazyny, a jedynym oficerem, który znał kody wejściowe, był kapitan Grinch. Sprawdź aleję przy granicy z Rhavensami!”',
+            dialogue: '„Tu Don Vito! Na porannej odprawie wszyscy zgłosili, że nie mają blokad. Potem straciliśmy dwa magazyny, a kody znał tylko Grinch. Sprawdź aleję przy granicy z Rhavensami — może tamtejszy plan na cały kwartał wyjaśni, kto wiedział pierwszy.”',
             clueId: 'clue_2',
             clueText: 'POSZLAKA 2/4: Don Vito potwierdził, że tylko kapitan Grinch miał kody do magazynów Chestnuts, które bez jednego wystrzału przejęli Rhavensi.',
             missionTarget: { x: 1575, y: 900 },
@@ -764,7 +782,7 @@ function generateWorld() {
             emoji: '🐦‍⬛',
             tag: 'RHAVENS',
             color: '#6366f1',
-            dialogue: '„Słyszeliśmy, że jesteś nowym żołnierzem u Kasztanów... Nie zabijaj posłańca. Nasz najlepszy tajny agent o kryptonimie Grinch płaci dobrze tym, którzy potrafią przymknąć oko. Przewieź nasz pakunek przez Krucze Wybrzeże.”',
+            dialogue: '„Słyszeliśmy, że jesteś nowym żołnierzem u Kasztanów... U nas plan obejmuje całe wybrzeże, a każdy transport ma własny harmonogram. Dziwnym trafem Grinch zawsze zna go przed odprawą. Nie zabijaj posłańca — przewieź nasz pakunek przez Krucze Wybrzeże.”',
             clueId: 'clue_3',
             clueText: 'POSZLAKA 3/4: Łącznik z Rhaven Bay wprost przyznał przez zaszyfrowaną budkę, że Grinch to ich najwyżej postawiony wtyczka w strukturach Chestnuts!',
             missionTarget: { x: 2925, y: 1125 },
@@ -781,7 +799,7 @@ function generateWorld() {
             emoji: '🐸',
             tag: 'MAGIC FROGGY\'S',
             color: '#10b981',
-            dialogue: '„Rechot w eterze, bracie! Witaj na Szmaragdowych Bagnach! Nasi barmani widzieli wczoraj Twojego szefa — tego całego Grincha — jak w tylnej loży naszego klubu pił szampana z bossami Rhavensów! Zrób dla nas szybki objazd pod klubem, a podzielimy się nagraniem!”',
+            dialogue: '„Rechot w eterze, bracie! Po naszej nocnej retrospekcji wszyscy zgodnie uznali, że problemów nie ma. A potem barmani zobaczyli Grincha przy szampanie z bossami Rhavensów. Zrób objazd pod klubem, to pokażemy Ci nagranie — jedyny protokół, którego nie da się zagadać.”',
             clueId: 'clue_4',
             clueText: 'POSZLAKA 4/4: Ludzie Magic Froggy\'ego przekazali Ci zdjęcie z klubu: kapitan Grinch przyjmuje walizkę pełną dolarów od szefa wywiadu Rhavensów!',
             missionTarget: { x: 1125, y: 2925 },
@@ -798,7 +816,7 @@ function generateWorld() {
             emoji: '🔧',
             tag: 'WILD-WEASELS',
             color: '#ef4444',
-            dialogue: '„Słuchaj no, wojak! My w Wild-Weasels kochamy zapach palonej gumy i silniki V8! Ten Twój kapitan Grinch zamawiał u nas ostatnio opancerzoną limuzynę na fałszywych blachach z Rhaven Bay. Pokaż nam jak wchodzisz w zakręt i podjedź pod nasz warsztat na południowym wschodzie!”',
+            dialogue: '„Słuchaj no, wojak! My w Wild-Weasels kochamy zapach palonej gumy i silniki V8. Każdy warsztat ma własną listę priorytetów, ale limuzyna Grincha zawsze wskakuje na samą górę — nawet gdy reszta czeka od miesięcy. Pokaż, jak wchodzisz w zakręt, i podjedź do nas na południowym wschodzie!”',
             clueId: null,
             clueText: '',
             missionTarget: { x: 2925, y: 2475 },
@@ -1287,7 +1305,7 @@ function isPointInBuilding(x, y, margin = 0) {
     return null;
 }
 
-function resolveCircleBuildingCollision(entity, radius) {
+function resolveCircleBuildingCollision(entity, radius, dampenVelocity = true) {
     let hitBuilding = false;
     for (const b of gameState.buildings) {
         const closestX = Math.max(b.x, Math.min(entity.x, b.x + b.w));
@@ -1314,14 +1332,23 @@ function resolveCircleBuildingCollision(entity, radius) {
                 else if (minPen === topPen) entity.y = b.y - radius - 2;
                 else entity.y = b.y + b.h + radius + 2;
             }
-            if (entity.vx !== undefined) entity.vx *= 0.5;
-            if (entity.vy !== undefined) entity.vy *= 0.5;
-            if (entity.speed !== undefined) entity.speed *= 0.55;
+            if (dampenVelocity) {
+                if (entity.vx !== undefined) entity.vx *= 0.5;
+                if (entity.vy !== undefined) entity.vy *= 0.5;
+                if (entity.speed !== undefined) entity.speed *= 0.55;
+            }
         }
     }
     entity.x = Math.max(40, Math.min(WORLD_SIZE - 40, entity.x));
     entity.y = Math.max(40, Math.min(WORLD_SIZE - 40, entity.y));
     return hitBuilding;
+}
+
+function moveCircleWithBuildingCollision(entity, dx, dy, radius) {
+    entity.x += dx;
+    resolveCircleBuildingCollision(entity, radius, false);
+    entity.y += dy;
+    resolveCircleBuildingCollision(entity, radius, false);
 }
 
 function updateGame(dt) {
@@ -1341,8 +1368,7 @@ function updateGame(dt) {
         if (len > 0) {
             player.vx = (moveX / len) * player.speed * sprint;
             player.vy = (moveY / len) * player.speed * sprint;
-            player.x += player.vx * dt;
-            player.y += player.vy * dt;
+            moveCircleWithBuildingCollision(player, player.vx * dt, player.vy * dt, player.radius);
             player.walkCycle += dt * 10 * sprint;
         } else {
             player.vx = 0;
@@ -1355,8 +1381,6 @@ function updateGame(dt) {
         mouse.worldY = mouse.y + camY;
         player.angle = Math.atan2(mouse.worldY - player.y, mouse.worldX - player.x);
 
-        resolveCircleBuildingCollision(player, player.radius);
-
         for (const car of gameState.cars) {
             const dx = player.x - car.x;
             const dy = player.y - car.y;
@@ -1368,7 +1392,7 @@ function updateGame(dt) {
                 player.y += (dy / dist) * overlap;
             }
         }
-        resolveCircleBuildingCollision(player, player.radius);
+        resolveCircleBuildingCollision(player, player.radius, false);
 
         document.getElementById('speedometerDisplay').textContent = '0 MPH';
     } else {
@@ -1732,6 +1756,16 @@ function renderGame() {
         }
     }
 
+    for (const shop of gameState.froggyShops) {
+        ctx.fillStyle = '#052e2b';
+        ctx.beginPath();
+        ctx.arc(shop.marker.x, shop.marker.y, 15, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.font = '22px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🐸', shop.marker.x, shop.marker.y + 8);
+    }
+
     if (gameState.activeMission) {
         const m = gameState.activeMission;
         const pulse = 28 + Math.sin(performance.now() * 0.006) * 10;
@@ -1965,6 +1999,13 @@ function renderMinimap() {
         minimapCtx.beginPath();
         minimapCtx.arc(booth.x * scale, booth.y * scale, 3.5, 0, Math.PI * 2);
         minimapCtx.fill();
+    }
+
+    for (const shop of gameState.froggyShops) {
+        minimapCtx.fillStyle = '#34d399';
+        minimapCtx.font = '10px sans-serif';
+        minimapCtx.textAlign = 'center';
+        minimapCtx.fillText('🐸', shop.marker.x * scale, shop.marker.y * scale);
     }
 
     if (gameState.activeMission) {
