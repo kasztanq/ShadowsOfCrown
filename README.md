@@ -131,9 +131,16 @@ Interfejs zawiera również syntetyzowane efekty dźwiękowe, które można wyci
 
 ## Testy projektu
 
-Testy sprawdzają wszystkie samodzielne strony gry: poprawność struktury HTML, unikalność identyfikatorów, działanie lokalnych odnośników i zasobów, ikonę powrotu do strony głównej oraz kluczowe elementy portalu i pierwszego cabinetu.
+Testy sprawdzają wszystkie samodzielne strony gry: strukturę HTML, unikalność identyfikatorów, lokalne odnośniki i zasoby oraz kluczowe elementy portalu. Testy modułów uruchamiają każdą grę w Chromium i wykonują reprezentatywną akcję, weryfikując zmianę stanu i brak błędów JavaScript. Sprawdzają również, czy ukryty odnośnik z portalu otwiera Miami '77.
 
-Python 3.10 lub nowszy jest wymagany. Testy korzystają wyłącznie ze standardowej biblioteki Pythona:
+Wymagany jest Python 3.10 lub nowszy. Zainstaluj zależności testowe i przeglądarkę Playwright:
+
+```powershell
+python -m pip install -r requirements-test.txt
+python -m playwright install chromium
+```
+
+Uruchom cały zestaw testów:
 
 ```powershell
 python -m unittest discover -s tests -v
