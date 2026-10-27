@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIAMI '77: Cienie Podziemia (Etap 1)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Share+Tech+Mono&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --miami-orange: #ff6b35;
+            --miami-teal: #00d2b8;
+            --miami-pink: #ff2a85;
+            --miami-gold: #f7c548;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #120d16;
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+        }
+        .font-retro {
+            font-family: 'Righteous', cursive;
+        }
+        .font-mono-tech {
+            font-family: 'Share Tech Mono', monospace;
+        }
+        #gameCanvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            cursor: crosshair;
+            outline: none;
+        }
+        .crt-overlay {
+            pointer-events: none;
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(circle at center, transparent 55%, rgba(20, 8, 28, 0.55) 100%),
+                linear-gradient(rgba(255, 140, 80, 0.05), rgba(0, 210, 184, 0.04));
+            z-index: 15;
+        }
+        .scanlines {
+            pointer-events: none;
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0, 0, 0, 0.14) 50%,
+                rgba(0, 0, 0, 0.14)
+            );
+            background-size: 100% 4px;
+            z-index: 16;
+            opacity: 0.45;
+        }
+        .respect-bar-bg {
+            background: repeating-linear-gradient(
+                90deg,
+                rgba(0,0,0,0.65) 0px,
+                rgba(0,0,0,0.65) 8px,
+                rgba(255,255,255,0.08) 8px,
+                rgba(255,255,255,0.08) 10px
+            );
+        }
+        @keyframes pulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 107, 53, 0.8)); }
+            50% { filter: drop-shadow(0 0 16px rgba(0, 210, 184, 0.95)); }
+        }
+        .retro-title-glow {
+            animation: pulseGlow 3s infinite;
+        }
+        .hud-panel {
+            background: rgba(20, 14, 28, 0.86);
+            backdrop-filter: blur(6px);
+            border: 2px solid rgba(247, 197, 72, 0.45);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.65), inset 0 0 12px rgba(255, 107, 53, 0.12);
+        }
+    </style>
+</head>
+<body class="relative text-amber-50">
+
+    <!-- Główny Canvas Gry z tabindex dla pewnego przechwytywania klawiatury -->
+    <canvas id="gameCanvas" tabindex="0"></canvas>
+    <a href="./index.htm" aria-label="Back to home" title="Back to home" class="fixed bottom-3 left-3 z-20 flex h-10 w-10 items-center justify-center rounded-xl border border-amber-400/70 bg-black/70 text-xl text-amber-200 shadow-lg transition hover:bg-black/90">🏠</a>
+
+    <!-- Filtry wizualne lat 70. -->
+    <div class="crt-overlay"></div>
+    <div class="scanlines"></div>
+
+    <!-- EKRAN POWITALNY / PROLOG -->
+    <div id="startModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <div class="max-w-2xl w-full hud-panel rounded-2xl p-6 md:p-8 border-2 border-amber-400/70 shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-56 h-56 bg-orange-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-56 h-56 bg-teal-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-amber-500/30 pb-4 mb-5">
+                <div>
+                    <span class="text-xs font-mono-tech uppercase tracking-widest px-2.5 py-1 rounded bg-orange-500/20 text-orange-300 border border-orange-400/40">
+                        ETAP 1: OTWARTY ŚWIAT & KRET W SZEREGACH
+                    </span>
+                    <h1 class="font-retro text-4xl md:text-5xl tracking-wider mt-2 bg-gradient-to-r from-amber-300 via-orange-400 to-pink-500 bg-clip-text text-transparent retro-title-glow">
+                        MIAMI '77: CIENIE PODZIEMIA
+                    </h1>
+                </div>
+                <div class="text-right font-mono-tech text-xs text-teal-300">
+                    <div>PAŹDZIERNIK 1977</div>
+                    <div>PALM BEACH COUNTY</div>
+                </div>
+            </div>
+
+            <div class="space-y-3 text-sm md:text-base text-amber-100/90 leading-relaxed mb-6">
+                <p>
+                    Nazywasz się <strong class="text-amber-300">Jack „Viper” Kowalski</strong>. Jesteś byłym żołnierzem sił specjalnych, który po powrocie do skąpanego w słońcu i neonach Miami zaciągnął się jako cyngiel do rodziny <strong class="text-amber-400">Chestnuts</strong>.
+                </p>
+                <p>
+                    Miasto podzielone jest między <strong class="text-teal-300">4 bezwzględne syndykaty</strong>: <span class="text-amber-400">Chestnuts</span>, <span class="text-indigo-400">Rhavens</span>, <span class="text-emerald-400">Magicians (Magic Froggy's)</span> oraz <span class="text-red-400">Wild-Weasels</span>. Twoim bezpośrednim przełożonym w dokach Chestnuts jest kapitan <strong class="text-pink-400">„Grinch”</strong>.
+                </p>
+                <p class="bg-black/40 border-l-4 border-pink-500 p-3 rounded text-xs md:text-sm text-pink-200">
+                    <strong>AKT ŚLEDZTWA:</strong> Twoje wojskowe instynkty mówią Ci jedno — kapitan <strong>Grinch</strong> wystawia ludzi Chestnutsów na rzeź. Wszystko wskazuje na to, że jest głęboko zakonspirowanym kretem pracującym dla mrocznych <strong>Rhavensów</strong>. Zdobądź respekt wszystkich 4 mafii, odbieraj dzwoniące budki telefoniczne i zbierz <strong>4 twarde dowody zdrady Grincha</strong>!
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6 text-xs font-mono-tech">
+                <div class="bg-black/50 p-2.5 rounded-lg border border-amber-500/20">
+                    <div class="text-amber-400 font-bold mb-1">[W,A,S,D] / Strzałki</div>
+                    <div class="text-amber-100/70">Ruch / Gaz, Wsteczny, Skręt</div>
+                </div>
+                <div class="bg-black/50 p-2.5 rounded-lg border border-amber-500/20">
+                    <div class="text-teal-400 font-bold mb-1">[F] lub [E]</div>
+                    <div class="text-amber-100/70">Kradzież auta / Budka tel.</div>
+                </div>
+                <div class="bg-black/50 p-2.5 rounded-lg border border-amber-500/20">
+                    <div class="text-pink-400 font-bold mb-1">[SPACJA] + [H]</div>
+                    <div class="text-amber-100/70">Hamulec ręczny (Drift) / Klakson</div>
+                </div>
+                <div class="bg-black/50 p-2.5 rounded-lg border border-amber-500/20">
+                    <div class="text-emerald-400 font-bold mb-1">[LPM] / [R] / [M]</div>
+                    <div class="text-amber-100/70">Strzał / Radio 70s / Wycisz</div>
+                </div>
+            </div>
+
+            <button id="startGameBtn" class="w-full py-3.5 px-6 rounded-xl font-retro text-xl tracking-wider uppercase bg-gradient-to-r from-orange-500 via-amber-500 to-pink-600 hover:from-orange-400 hover:to-pink-500 text-slate-950 font-bold shadow-lg shadow-orange-500/30 transition transform hover:scale-[1.01] active:scale-[0.99] cursor-pointer">
+                WKROCZ DO MIAMI '77 (URUCHOM SILNIK & SYNTH-AUDIO)
+            </button>
+        </div>
+    </div>
+
+    <!-- LEWY GÓRNY RÓG: WSKAŹNIK RESPEKTU SYNDYKATÓW -->
+    <div class="fixed top-3 left-3 z-20 w-72 sm:w-80 hud-panel rounded-xl p-3 pointer-events-auto">
+        <div class="flex items-center justify-between mb-2 border-b border-amber-400/20 pb-1">
+            <span class="font-retro text-xs tracking-widest text-amber-300 uppercase flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span>
+                RESPEKT SYNDYKATÓW
+            </span>
+            <span id="InvestigationBadge" class="font-mono-tech text-[11px] px-2 py-0.5 rounded bg-pink-500/20 border border-pink-400/40 text-pink-300">
+                Dowody na Grincha: 0/4
+            </span>
+        </div>
+
+        <div class="space-y-2 text-xs font-mono-tech">
+            <div>
+                <div class="flex justify-between items-center mb-0.5">
+                    <span class="font-bold text-amber-400 flex items-center gap-1">
+                        🌰 CHESTNUTS <span class="text-[10px] text-amber-200/60">(Grinch)</span>
+                    </span>
+                    <span id="respVal-chestnuts" class="text-amber-300 font-bold">15%</span>
+                </div>
+                <div class="w-full h-3 rounded overflow-hidden respect-bar-bg border border-amber-500/40 p-0.5">
+                    <div id="respBar-chestnuts" class="h-full bg-gradient-to-r from-amber-600 to-yellow-400 transition-all duration-300 rounded-sm" style="width: 15%"></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between items-center mb-0.5">
+                    <span class="font-bold text-indigo-400 flex items-center gap-1">
+                        🐦‍⬛ RHAVENS <span class="text-[10px] text-indigo-200/60">(Kruczy Syndykat)</span>
+                    </span>
+                    <span id="respVal-rhavens" class="text-indigo-300 font-bold">0%</span>
+                </div>
+                <div class="w-full h-3 rounded overflow-hidden respect-bar-bg border border-indigo-500/40 p-0.5">
+                    <div id="respBar-rhavens" class="h-full bg-gradient-to-r from-indigo-600 to-cyan-400 transition-all duration-300 rounded-sm" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between items-center mb-0.5">
+                    <span class="font-bold text-emerald-400 flex items-center gap-1">
+                        🐸 MAGICIANS <span class="text-[10px] text-emerald-200/60">(Magic Froggy's)</span>
+                    </span>
+                    <span id="respVal-magicians" class="text-emerald-300 font-bold">0%</span>
+                </div>
+                <div class="w-full h-3 rounded overflow-hidden respect-bar-bg border border-emerald-500/40 p-0.5">
+                    <div id="respBar-magicians" class="h-full bg-gradient-to-r from-emerald-600 to-pink-400 transition-all duration-300 rounded-sm" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between items-center mb-0.5">
+                    <span class="font-bold text-red-400 flex items-center gap-1">
+                        🔧 WILD-WEASELS <span class="text-[10px] text-red-200/60">(Łasice V8)</span>
+                    </span>
+                    <span id="respVal-weasels" class="text-red-300 font-bold">0%</span>
+                </div>
+                <div class="w-full h-3 rounded overflow-hidden respect-bar-bg border border-red-500/40 p-0.5">
+                    <div id="respBar-weasels" class="h-full bg-gradient-to-r from-red-600 to-orange-400 transition-all duration-300 rounded-sm" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-2.5 pt-2 border-t border-amber-500/20 text-[11px] font-mono-tech flex items-start gap-2">
+            <span class="text-teal-400 font-bold shrink-0">CEL:</span>
+            <span id="activeObjectiveText" class="text-amber-100/90">
+                Jedź lub idź do dzwoniącej budki telefonicznej (zielony puls na radarze) lub porozmawiaj z kapitanem Grinchem w Chestnut Heights.
+            </span>
+        </div>
+    </div>
+
+    <!-- ŚRODKOWY GÓRNY BANER DZIELNICY -->
+    <div id="districtBanner" class="fixed top-6 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-all duration-500 opacity-0 transform -translate-y-4">
+        <div class="hud-panel px-6 py-2.5 rounded-full border-2 border-teal-400/70 text-center shadow-2xl">
+            <div class="text-[10px] font-mono-tech uppercase tracking-[0.25em] text-teal-300" id="districtSub">TERYTORIUM NEUTRALNE</div>
+            <div class="font-retro text-xl md:text-2xl tracking-wider text-amber-300" id="districtTitle">PALM BEACH DOWNTOWN</div>
+        </div>
+    </div>
+
+    <!-- PRAWY GÓRNY RÓG: MINIMAPA + STATYSTYKI + RADIO -->
+    <div class="fixed top-3 right-3 z-20 flex flex-col items-end gap-2 pointer-events-auto">
+        <div class="hud-panel rounded-xl p-2.5 flex flex-col items-center">
+            <div class="relative rounded-lg overflow-hidden border-2 border-amber-400/50 bg-slate-950">
+                <canvas id="minimapCanvas" width="168" height="168" class="block"></canvas>
+                <div class="absolute bottom-1 left-1.5 right-1.5 flex justify-between text-[9px] font-mono-tech text-amber-200/80 pointer-events-none">
+                    <span>NW:Chestnut</span>
+                    <span>NE:Rhaven</span>
+                </div>
+            </div>
+
+            <div class="w-full mt-2 space-y-1.5 font-mono-tech text-xs">
+                <div class="flex items-center justify-between">
+                    <span class="text-emerald-400 font-bold text-sm" id="moneyDisplay">$1,250</span>
+                    <span class="text-[11px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400/30" id="vehicleStatusDisplay">
+                        PIESZO (M65)
+                    </span>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-teal-300">
+                    <span>PRĘDKOŚĆ:</span>
+                    <span id="speedometerDisplay" class="font-bold">0 MPH</span>
+                </div>
+                <div class="w-full bg-black/60 h-2.5 rounded overflow-hidden border border-red-500/40 p-0.5">
+                    <div id="healthBar" class="h-full bg-gradient-to-r from-red-600 to-rose-400 rounded-sm transition-all" style="width: 100%"></div>
+                </div>
+                <div class="flex items-center justify-between pt-1 border-t border-amber-500/20 text-[11px]">
+                    <button id="radioBtn" class="px-2 py-1 rounded bg-teal-500/20 hover:bg-teal-500/30 border border-teal-400/40 text-teal-200 transition cursor-pointer">
+                        📻 <span id="radioStationName">Funk 77 FM</span> [R]
+                    </button>
+                    <button id="muteBtn" class="px-2 py-1 rounded bg-orange-500/20 hover:bg-orange-500/30 border border-orange-400/40 text-orange-200 transition cursor-pointer">
+                        🔊 [M]
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PODPOWIEDŹ INTERAKCJI -->
+    <div id="interactionPrompt" class="fixed bottom-28 left-1/2 -translate-x-1/2 z-20 hidden pointer-events-none">
+        <div class="hud-panel px-4 py-2 rounded-xl border border-teal-400 text-xs md:text-sm font-mono-tech text-teal-200 shadow-lg flex items-center gap-2 animate-bounce">
+            <span class="px-2 py-0.5 bg-teal-500 text-slate-950 font-bold rounded">[E] / [F]</span>
+            <span id="interactionPromptText">Odbierz telefon z budki</span>
+        </div>
+    </div>
+
+    <!-- DOLNY PANEL DIALOGOWY -->
+    <div id="dialogueModal" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 w-[95%] max-w-3xl hud-panel rounded-2xl p-4 md:p-5 border-2 border-amber-400 hidden">
+        <div class="flex flex-col sm:flex-row gap-4 items-start">
+            <div id="speakerAvatar" class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl shrink-0 flex flex-col items-center justify-center border-2 border-amber-300 bg-gradient-to-br from-amber-700 to-slate-900 text-center p-1 shadow-inner">
+                <div class="text-2xl" id="speakerEmoji">📞</div>
+                <div class="text-[9px] font-mono-tech uppercase tracking-tighter text-amber-200 mt-0.5" id="speakerFactionTag">CHESTNUTS</div>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2 border-b border-amber-400/30 pb-1 mb-2">
+                    <h3 id="speakerName" class="font-retro text-lg text-amber-300 tracking-wide">
+                        KAPITAN GRINCH - OFICER CHESTNUTS
+                    </h3>
+                    <span class="text-[11px] font-mono-tech text-pink-300 bg-pink-500/15 px-2 py-0.5 rounded border border-pink-400/30" id="clueCounterTag">
+                        AKTA KRETA
+                    </span>
+                </div>
+                <p id="dialogueText" class="text-xs sm:text-sm text-amber-50/95 leading-relaxed font-mono-tech mb-3">
+                    ...
+                </p>
+                <div id="clueBox" class="hidden mb-3 p-2.5 rounded-lg bg-pink-950/60 border border-pink-400/50 text-xs font-mono-tech text-pink-200">
+                    🔍 <strong>NOWY DOWÓD W ŚLEDZTWIE:</strong> <span id="clueText">...</span>
+                </div>
+                <div class="flex flex-wrap items-center justify-end gap-2">
+                    <button id="acceptMissionBtn" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-bold text-xs font-mono-tech uppercase tracking-wider transition cursor-pointer">
+                        PRZYJMIJ ZLECENIE (+RESPEKT)
+                    </button>
+                    <button id="closeDialogueBtn" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-200 border border-amber-400/30 text-xs font-mono-tech uppercase cursor-pointer">
+                        ZAMKNIJ [ESC]
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOTYKOWE PRZYCISKI DLA TELEFONÓW / TABLETÓW / MYSZY -->
+    <div class="fixed bottom-3 left-3 right-3 z-20 flex justify-between items-end pointer-events-none md:hidden">
+        <div class="grid grid-cols-3 gap-1.5 pointer-events-auto">
+            <div></div>
+            <button data-key="up" class="touch-btn w-12 h-12 rounded-xl hud-panel flex items-center justify-center font-bold text-amber-300 active:bg-amber-500/40">▲</button>
+            <div></div>
+            <button data-key="left" class="touch-btn w-12 h-12 rounded-xl hud-panel flex items-center justify-center font-bold text-amber-300 active:bg-amber-500/40">◀</button>
+            <button data-key="down" class="touch-btn w-12 h-12 rounded-xl hud-panel flex items-center justify-center font-bold text-amber-300 active:bg-amber-500/40">▼</button>
+            <button data-key="right" class="touch-btn w-12 h-12 rounded-xl hud-panel flex items-center justify-center font-bold text-amber-300 active:bg-amber-500/40">▶</button>
+        </div>
+        <div class="flex flex-col gap-1.5 pointer-events-auto">
+            <div class="flex gap-1.5">
+                <button id="touchActionBtn" class="px-3.5 py-3 rounded-xl hud-panel font-mono-tech text-xs font-bold text-teal-300 border-teal-400 active:bg-teal-500/40">
+                    AUTO / TEL [E]
+                </button>
+                <button data-key="handbrake" class="touch-btn px-3.5 py-3 rounded-xl hud-panel font-mono-tech text-xs font-bold text-pink-300 border-pink-400 active:bg-pink-500/40">
+                    DRIFT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STOPKA STEROWANIA NA DESKTOPIE -->
+    <div class="hidden md:flex fixed bottom-2.5 left-3 z-20 hud-panel px-3 py-1.5 rounded-lg text-[11px] font-mono-tech text-amber-200/80 gap-4 pointer-events-none">
+        <span><strong class="text-amber-400">W/S lub ▲/▼</strong> Gaz / Wsteczny</span>
+        <span><strong class="text-amber-400">A/D lub ◀/▶</strong> Kierownica</span>
+        <span><strong class="text-teal-400">F / E</strong> Wsiądź/Wysiądź / Budka tel.</span>
+        <span><strong class="text-pink-400">SPACJA</strong> Ręczny (Drift)</span>
+        <span><strong class="text-orange-400">LPM</strong> Strzał</span>
+        <span><strong class="text-emerald-400">H</strong> Klakson</span>
+    </div>
+
+<script>
+class Miami77Audio {
+    constructor() {
+        this.ctx = null;
+        this.isMuted = false;
+        this.isPlaying = false;
+        this.stationIndex = 0;
+        this.stations = [
+            { name: "Funk 77 FM", tempo: 112, bassNotes: [55, 55, 65.41, 73.42, 82.41, 73.42, 65.41, 61.74] },
+            { name: "Vice Groove", tempo: 120, bassNotes: [49, 49, 58.27, 65.41, 73.42, 65.41, 58.27, 55.00] },
+            { name: "Neon Nights", tempo: 98,  bassNotes: [41.2, 41.2, 49.0, 55.0, 61.74, 55.0, 49.0, 46.25] }
+        ];
+        this.step = 0;
+        this.timer = null;
+    }
+
+    init() {
+        if (this.ctx) return;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioCtx();
+        this.startMusicLoop();
+    }
+
+    startMusicLoop() {
+        if (this.timer) clearInterval(this.timer);
+        const st = this.stations[this.stationIndex];
+        const stepMs = (60 / st.tempo / 2) * 1000;
+        this.isPlaying = true;
+
+        this.timer = setInterval(() => {
+            if (!this.ctx || this.isMuted || this.ctx.state !== 'running') return;
+            const currentStation = this.stations[this.stationIndex];
+            const idx = this.step % 8;
+
+            this.playFunkBass(currentStation.bassNotes[idx], 0.19);
+
+            if (idx === 0 || idx === 4) this.playKick();
+            if (idx === 2 || idx === 6) this.playSnare();
+            this.playHiHat(idx % 2 === 1 ? 0.06 : 0.03);
+
+            if (idx === 0) {
+                this.playWarmChord(currentStation.bassNotes[0] * 4);
+            }
+
+            this.step++;
+        }, stepMs);
+    }
+
+    nextStation() {
+        this.stationIndex = (this.stationIndex + 1) % this.stations.length;
+        document.getElementById('radioStationName').textContent = this.stations[this.stationIndex].name;
+        this.startMusicLoop();
+        this.playSfx('radio');
+    }
+
+    toggleMute() {
+        this.isMuted = !this.isMuted;
+        document.getElementById('muteBtn').textContent = this.isMuted ? '🔇 [M]' : '🔊 [M]';
+    }
+
+    playFunkBass(freq, duration) {
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const filter = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now);
+
+        filter.type = 'lowpass';
+        filter.Q.value = 7;
+        filter.frequency.setValueAtTime(180, now);
+        filter.frequency.exponentialRampToValueAtTime(1250, now + 0.05);
+        filter.frequency.exponentialRampToValueAtTime(240, now + duration);
+
+        gain.gain.setValueAtTime(0.11, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + duration);
+    }
+
+    playWarmChord(rootFreq) {
+        const now = this.ctx.currentTime;
+        const ratios = [1, 1.2, 1.5, 1.78];
+        ratios.forEach(r => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(rootFreq * r, now);
+            gain.gain.setValueAtTime(0.025, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.9);
+        });
+    }
+
+    playKick() {
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.frequency.setValueAtTime(125, now);
+        osc.frequency.exponentialRampToValueAtTime(35, now + 0.12);
+        gain.gain.setValueAtTime(0.16, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.14);
+    }
+
+    playSnare() {
+        const now = this.ctx.currentTime;
+        const bufferSize = this.ctx.sampleRate * 0.1;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 600;
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(now);
+    }
+
+    playHiHat(vol) {
+        const now = this.ctx.currentTime;
+        const bufferSize = this.ctx.sampleRate * 0.04;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 5000;
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(vol, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(now);
+    }
+
+    playSfx(type) {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        if (type === 'carDoor') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(190, now);
+            osc.frequency.exponentialRampToValueAtTime(110, now + 0.18);
+            gain.gain.setValueAtTime(0.18, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.19);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.19);
+        } else if (type === 'engineRev') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(65, now);
+            osc.frequency.exponentialRampToValueAtTime(135, now + 0.22);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.008, now + 0.24);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.24);
+        } else if (type === 'horn') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(310, now);
+            const osc2 = this.ctx.createOscillator();
+            osc2.type = 'sawtooth';
+            osc2.frequency.setValueAtTime(390, now);
+            gain.gain.setValueAtTime(0.14, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+            osc.connect(gain);
+            osc2.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc2.start(now);
+            osc.stop(now + 0.35);
+            osc2.stop(now + 0.35);
+        } else if (type === 'phoneRing') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(880, now);
+            osc.frequency.setValueAtTime(1120, now + 0.06);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.005, now + 0.14);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.14);
+        } else if (type === 'shoot') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(420, now);
+            osc.frequency.exponentialRampToValueAtTime(55, now + 0.11);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.005, now + 0.12);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.12);
+        } else if (type === 'respectUp') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.setValueAtTime(554.37, now + 0.08);
+            osc.frequency.setValueAtTime(659.25, now + 0.16);
+            gain.gain.setValueAtTime(0.18, now);
+            gain.gain.exponentialRampToValueAtTime(0.005, now + 0.38);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.38);
+        } else if (type === 'radio') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(950, now);
+            gain.gain.setValueAtTime(0.09, now);
+            gain.gain.exponentialRampToValueAtTime(0.005, now + 0.08);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.08);
+        }
+    }
+}
+
+const audio = new Miami77Audio();
+
+const WORLD_SIZE = 3600;
+const BLOCK_SIZE = 450;
+const ROAD_WIDTH = 136;
+
+const DISTRICTS = {
+    neutral: {
+        id: 'neutral',
+        name: 'PALM BEACH DOWNTOWN',
+        sub: 'STREFA NEUTRALNA • CENTRUM MIAMI \'77',
+        groundColor: '#2b2438',
+        sidewalkColor: '#d9c5a0',
+        neonColor: '#00d2b8',
+        roofColors: ['#f4a261', '#2a9d8f', '#e9c46a', '#e76f51']
+    },
+    chestnuts: {
+        id: 'chestnuts',
+        name: 'CHESTNUT HEIGHTS & DOKI',
+        sub: 'TERYTORIUM MAFII CHESTNUTS (Kwatera Grincha)',
+        groundColor: '#2d1e17',
+        sidewalkColor: '#c9a679',
+        neonColor: '#f7c548',
+        roofColors: ['#8d4925', '#b5651d', '#d48c46', '#6b3e26']
+    },
+    rhavens: {
+        id: 'rhavens',
+        name: 'RHAVEN BAY (KRUCZE WYBRZEŻE)',
+        sub: 'TERYTORIUM MAFII RHAVENS',
+        groundColor: '#16192b',
+        sidewalkColor: '#8e9aaf',
+        neonColor: '#6366f1',
+        roofColors: ['#1e293b', '#312e81', '#3b0764', '#0f172a']
+    },
+    magicians: {
+        id: 'magicians',
+        name: 'MAGIC FROGGY\'S STRIP',
+        sub: 'TERYTORIUM MAFII MAGICIANS (Szmaragdowe Bagna)',
+        groundColor: '#112622',
+        sidewalkColor: '#7fb69e',
+        neonColor: '#ff2a85',
+        roofColors: ['#065f46', '#047857', '#9d174d', '#115e59']
+    },
+    weasels: {
+        id: 'weasels',
+        name: 'WEASEL FLATS (ZŁOMOWISKO V8)',
+        sub: 'TERYTORIUM MAFII WILD-WEASELS',
+        groundColor: '#2e1818',
+        sidewalkColor: '#b88b7d',
+        neonColor: '#ef4444',
+        roofColors: ['#7f1d1d', '#991b1b', '#b45309', '#57534e']
+    }
+};
+
+function getDistrictAt(x, y) {
+    const centerDist = Math.hypot(x - WORLD_SIZE / 2, y - WORLD_SIZE / 2);
+    if (centerDist < 720) return DISTRICTS.neutral;
+    if (x < WORLD_SIZE / 2 && y < WORLD_SIZE / 2) return DISTRICTS.chestnuts;
+    if (x >= WORLD_SIZE / 2 && y < WORLD_SIZE / 2) return DISTRICTS.rhavens;
+    if (x < WORLD_SIZE / 2 && y >= WORLD_SIZE / 2) return DISTRICTS.magicians;
+    return DISTRICTS.weasels;
+}
+
+const gameState = {
+    started: false,
+    money: 1250,
+    health: 100,
+    currentDistrictId: '',
+    respect: {
+        chestnuts: 15,
+        rhavens: 0,
+        magicians: 0,
+        weasels: 0
+    },
+    cluesFound: [],
+    activeMission: null,
+    buildings: [],
+    palmTrees: [],
+    phoneBooths: [],
+    cars: [],
+    peds: [],
+    skidMarks: [],
+    particles: [],
+    bullets: []
+};
+
+function generateWorld() {
+    gameState.buildings = [];
+    gameState.palmTrees = [];
+
+    const numBlocks = Math.floor(WORLD_SIZE / BLOCK_SIZE);
+
+    for (let bx = 0; bx < numBlocks; bx++) {
+        for (let by = 0; by < numBlocks; by++) {
+            const plotX = bx * BLOCK_SIZE + ROAD_WIDTH / 2 + 24;
+            const plotY = by * BLOCK_SIZE + ROAD_WIDTH / 2 + 24;
+            const plotW = BLOCK_SIZE - ROAD_WIDTH - 48;
+            const plotH = BLOCK_SIZE - ROAD_WIDTH - 48;
+
+            const centerX = plotX + plotW / 2;
+            const centerY = plotY + plotH / 2;
+            const dist = getDistrictAt(centerX, centerY);
+
+            if (bx === 3 && by === 3) {
+                for (let p = 0; p < 8; p++) {
+                    const angle = (p / 8) * Math.PI * 2;
+                    gameState.palmTrees.push({
+                        x: centerX + Math.cos(angle) * 110,
+                        y: centerY + Math.sin(angle) * 110,
+                        size: 22
+                    });
+                }
+                continue;
+            }
+
+            const splitVertical = (bx + by) % 2 === 0;
+            if (splitVertical) {
+                const w1 = plotW * 0.46;
+                const w2 = plotW * 0.46;
+                addBuilding(plotX, plotY, w1, plotH, dist, bx, by, 0);
+                addBuilding(plotX + plotW - w2, plotY, w2, plotH, dist, bx, by, 1);
+            } else {
+                const h1 = plotH * 0.46;
+                const h2 = plotH * 0.46;
+                addBuilding(plotX, plotY, plotW, h1, dist, bx, by, 0);
+                addBuilding(plotX, plotY + plotH - h2, plotW, h2, dist, bx, by, 1);
+            }
+
+            gameState.palmTrees.push({ x: plotX - 10, y: plotY - 10, size: 17 });
+            gameState.palmTrees.push({ x: plotX + plotW + 10, y: plotY + plotH + 10, size: 17 });
+        }
+    }
+
+    gameState.phoneBooths = [
+        {
+            id: 'grinch_hq',
+            x: 1 * BLOCK_SIZE + ROAD_WIDTH / 2 + 12,
+            y: 1 * BLOCK_SIZE + BLOCK_SIZE / 2,
+            faction: 'chestnuts',
+            speaker: 'KAPITAN „GRINCH” - OFICER CHESTNUTS',
+            emoji: '🕶️',
+            tag: 'CHESTNUTS HQ',
+            color: '#f7c548',
+            dialogue: '„Witaj w szeregach Chestnuts, żołnierzu! Nazywają mnie Grinch, ale w papierach figuruję jako Grinch. Mam dla Ciebie pierwsze zadanie: podjedź pod północny dok (żółty znacznik) i odbierz walizkę z utargiem. Tylko nie zaglądaj do środka i nie pytaj, czemu czekają tam ludzie z Rhaven Bay...”',
+            clueId: 'clue_1',
+            clueText: 'POSZLAKA 1/4: Podczas rozmowy z Grinchem zauważyłeś w jego kaburze pistolet z wygrawerowanym czarnym krukiem — symbolem elity wrogiego gangu Rhavens!',
+            missionTarget: { x: 1125, y: 450 },
+            missionDesc: 'Udaj się do punktu zrzutu Chestnuts (żółty znacznik na minimapie), by wykonać rozkaz Grincha.',
+            rewardRespect: 20,
+            rewardCash: 500
+        },
+        {
+            id: 'phone_chestnuts',
+            x: 2 * BLOCK_SIZE + ROAD_WIDTH / 2 + 12,
+            y: 1 * BLOCK_SIZE + BLOCK_SIZE / 2,
+            faction: 'chestnuts',
+            speaker: 'BUDKA TELEFONICZNA - DON VITO CHESTNUT',
+            emoji: '📞',
+            tag: 'CHESTNUTS',
+            color: '#f59e0b',
+            dialogue: '„Tu Don Vito! Ktoś sypie nasze transporty w dokach! Ostatniej nocy straciliśmy dwa magazyny, a jedynym oficerem, który znał kody wejściowe, był kapitan Grinch. Sprawdź aleję przy granicy z Rhavensami!”',
+            clueId: 'clue_2',
+            clueText: 'POSZLAKA 2/4: Don Vito potwierdził, że tylko kapitan Grinch miał kody do magazynów Chestnuts, które bez jednego wystrzału przejęli Rhavensi.',
+            missionTarget: { x: 1575, y: 900 },
+            missionDesc: 'Zbadaj granicę dzielnicy Chestnuts i Rhavens (żółty punkt na minimapie).',
+            rewardRespect: 25,
+            rewardCash: 650
+        },
+        {
+            id: 'phone_rhavens',
+            x: 6 * BLOCK_SIZE - ROAD_WIDTH / 2 - 12,
+            y: 1 * BLOCK_SIZE + BLOCK_SIZE / 2,
+            faction: 'rhavens',
+            speaker: 'BUDKA TELEFONICZNA - SZEPTACZ Z RHAVENS',
+            emoji: '🐦‍⬛',
+            tag: 'RHAVENS',
+            color: '#6366f1',
+            dialogue: '„Słyszeliśmy, że jesteś nowym żołnierzem u Kasztanów... Nie zabijaj posłańca. Nasz najlepszy tajny agent o kryptonimie Grinch płaci dobrze tym, którzy potrafią przymknąć oko. Przewieź nasz pakunek przez Krucze Wybrzeże.”',
+            clueId: 'clue_3',
+            clueText: 'POSZLAKA 3/4: Łącznik z Rhaven Bay wprost przyznał przez zaszyfrowaną budkę, że Grinch to ich najwyżej postawiony wtyczka w strukturach Chestnuts!',
+            missionTarget: { x: 2925, y: 1125 },
+            missionDesc: 'Dostarcz tajny pakunek na Kruczym Wybrzeżu (fioletowy cel na minimapie).',
+            rewardRespect: 30,
+            rewardCash: 800
+        },
+        {
+            id: 'phone_magicians',
+            x: 1 * BLOCK_SIZE + ROAD_WIDTH / 2 + 12,
+            y: 6 * BLOCK_SIZE + BLOCK_SIZE / 2,
+            faction: 'magicians',
+            speaker: 'BUDKA TELEFONICZNA - MAGIC FROGGY',
+            emoji: '🐸',
+            tag: 'MAGIC FROGGY\'S',
+            color: '#10b981',
+            dialogue: '„Rechot w eterze, bracie! Witaj na Szmaragdowych Bagnach! Nasi barmani widzieli wczoraj Twojego szefa — tego całego Grincha — jak w tylnej loży naszego klubu pił szampana z bossami Rhavensów! Zrób dla nas szybki objazd pod klubem, a podzielimy się nagraniem!”',
+            clueId: 'clue_4',
+            clueText: 'POSZLAKA 4/4: Ludzie Magic Froggy\'ego przekazali Ci zdjęcie z klubu: kapitan Grinch przyjmuje walizkę pełną dolarów od szefa wywiadu Rhavensów!',
+            missionTarget: { x: 1125, y: 2925 },
+            missionDesc: 'Zabezpiecz taśmy z klubu Magic Froggy\'s (szmaragdowy cel na minimapie).',
+            rewardRespect: 30,
+            rewardCash: 750
+        },
+        {
+            id: 'phone_weasels',
+            x: 6 * BLOCK_SIZE - ROAD_WIDTH / 2 - 12,
+            y: 6 * BLOCK_SIZE + BLOCK_SIZE / 2,
+            faction: 'weasels',
+            speaker: 'BUDKA TELEFONICZNA - „RDZAWY” JOE (WILD-WEASELS)',
+            emoji: '🔧',
+            tag: 'WILD-WEASELS',
+            color: '#ef4444',
+            dialogue: '„Słuchaj no, wojak! My w Wild-Weasels kochamy zapach palonej gumy i silniki V8! Ten Twój kapitan Grinch zamawiał u nas ostatnio opancerzoną limuzynę na fałszywych blachach z Rhaven Bay. Pokaż nam jak wchodzisz w zakręt i podjedź pod nasz warsztat na południowym wschodzie!”',
+            clueId: null,
+            clueText: '',
+            missionTarget: { x: 2925, y: 2475 },
+            missionDesc: 'Dojedź pod warsztat Wild-Weasels na Złomowisku Łasic (czerwony cel na minimapie).',
+            rewardRespect: 30,
+            rewardCash: 700
+        }
+    ];
+}
+
+function addBuilding(x, y, w, h, dist, bx, by, idx) {
+    const color = dist.roofColors[(bx + by + idx) % dist.roofColors.length];
+    let label = '';
+    if (bx === 1 && by === 1 && idx === 0) label = 'DOKI CHESTNUTS (GRINCH HQ)';
+    if (bx === 5 && by === 1 && idx === 0) label = 'SYNDYKAT RHAVENS';
+    if (bx === 1 && by === 6 && idx === 0) label = 'KLUB MAGIC FROGGY\'S';
+    if (bx === 5 && by === 6 && idx === 0) label = 'GARAŻ WILD-WEASELS V8';
+    if (bx === 3 && by === 2 && idx === 0) label = 'HOTEL FLAMINGO \'77';
+
+    gameState.buildings.push({
+        x, y, w, h,
+        color,
+        neonColor: dist.neonColor,
+        label
+    });
+}
+
+const player = {
+    x: 3 * BLOCK_SIZE + BLOCK_SIZE / 2,
+    y: 3 * BLOCK_SIZE + BLOCK_SIZE / 2,
+    vx: 0,
+    vy: 0,
+    angle: 0,
+    radius: 13,
+    speed: 225,
+    sprintMultiplier: 1.48,
+    inCar: null,
+    walkCycle: 0
+};
+
+const CAR_MODELS_70S = [
+    { name: 'Stallion V8 \'77 (Muscle)', width: 56, height: 28, maxSpeed: 540, accel: 420, grip: 0.91, colors: ['#ff6b35', '#f7c548', '#ef4444'], stripe: true },
+    { name: 'Eldorado Cabrio \'75', width: 58, height: 29, maxSpeed: 470, accel: 360, grip: 0.94, colors: ['#00d2b8', '#ff2a85', '#f4a261'], convertible: true },
+    { name: 'Chestnut Limo \'76', width: 66, height: 30, maxSpeed: 450, accel: 340, grip: 0.95, colors: ['#8d4925', '#1e293b', '#111827'], stripe: false },
+    { name: 'Froggy Funk Van \'74', width: 56, height: 31, maxSpeed: 400, accel: 310, grip: 0.93, colors: ['#10b981', '#06b6d4', '#a855f7'], stripe: true },
+    { name: 'Miami GT Turbo \'77', width: 54, height: 27, maxSpeed: 590, accel: 460, grip: 0.89, colors: ['#facc15', '#ec4899', '#38bdf8'], stripe: true }
+];
+
+function spawnTrafficAndParkedCars() {
+    gameState.cars = [];
+
+    const starterModel = CAR_MODELS_70S[0];
+    gameState.cars.push({
+        x: player.x + 80,
+        y: player.y - 40,
+        vx: 0,
+        vy: 0,
+        speed: 0,
+        angle: 0,
+        model: starterModel,
+        color: '#ff6b35',
+        hasDriver: false,
+        aiState: 'parked',
+        wheelAngle: 0
+    });
+
+    const cabrioModel = CAR_MODELS_70S[1];
+    gameState.cars.push({
+        x: player.x - 95,
+        y: player.y + 55,
+        vx: 0,
+        vy: 0,
+        speed: 0,
+        angle: Math.PI / 2,
+        model: cabrioModel,
+        color: '#00d2b8',
+        hasDriver: false,
+        aiState: 'parked',
+        wheelAngle: 0
+    });
+
+    const numBlocks = Math.floor(WORLD_SIZE / BLOCK_SIZE);
+    for (let i = 0; i < 34; i++) {
+        const model = CAR_MODELS_70S[i % CAR_MODELS_70S.length];
+        const color = model.colors[i % model.colors.length];
+        const horizontal = i % 2 === 0;
+        const roadIndex = (i % (numBlocks - 1)) + 1;
+
+        let x, y, angle;
+        if (horizontal) {
+            x = Math.random() * (WORLD_SIZE - 400) + 200;
+            y = roadIndex * BLOCK_SIZE + 26;
+            angle = 0;
+        } else {
+            x = roadIndex * BLOCK_SIZE - 26;
+            y = Math.random() * (WORLD_SIZE - 400) + 200;
+            angle = Math.PI / 2;
+        }
+
+        gameState.cars.push({
+            x, y,
+            vx: 0,
+            vy: 0,
+            speed: 0,
+            angle,
+            model,
+            color,
+            hasDriver: true,
+            aiState: 'driving',
+            aiTargetSpeed: 170 + (i % 4) * 25
+        });
+    }
+}
+
+function spawnPedestrians() {
+    gameState.peds = [];
+    for (let i = 0; i < 65; i++) {
+        const x = 180 + Math.random() * (WORLD_SIZE - 360);
+        const y = 180 + Math.random() * (WORLD_SIZE - 360);
+        if (isPointInBuilding(x, y, 16)) continue;
+
+        const dist = getDistrictAt(x, y);
+        let outfitColor = '#f4a261';
+        if (dist.id === 'chestnuts') outfitColor = '#f59e0b';
+        else if (dist.id === 'rhavens') outfitColor = '#6366f1';
+        else if (dist.id === 'magicians') outfitColor = '#10b981';
+        else if (dist.id === 'weasels') outfitColor = '#ef4444';
+        else outfitColor = ['#00d2b8', '#ff2a85', '#facc15', '#fb923c'][i % 4];
+
+        gameState.peds.push({
+            x, y,
+            angle: Math.random() * Math.PI * 2,
+            speed: 45 + Math.random() * 25,
+            panicTimer: 0,
+            outfitColor,
+            hairColor: ['#1c1917', '#78350f', '#d97706', '#44403c'][i % 4],
+            afro: i % 3 === 0,
+            districtId: dist.id,
+            shoutText: '',
+            shoutTimer: 0
+        });
+    }
+}
+
+const inputState = {
+    up: false,
+    down: false,
+    left: false,
+    right: false,
+    sprint: false,
+    handbrake: false
+};
+
+const mouse = { x: 0, y: 0, worldX: 0, worldY: 0 };
+
+function setKeyState(e, isDown) {
+    const code = e.code;
+    const key = (e.key || '').toLowerCase();
+
+    if (code === 'KeyW' || code === 'ArrowUp' || key === 'w' || key === 'arrowup') {
+        inputState.up = isDown;
+    }
+    if (code === 'KeyS' || code === 'ArrowDown' || key === 's' || key === 'arrowdown') {
+        inputState.down = isDown;
+    }
+    if (code === 'KeyA' || code === 'ArrowLeft' || key === 'a' || key === 'arrowleft') {
+        inputState.left = isDown;
+    }
+    if (code === 'KeyD' || code === 'ArrowRight' || key === 'd' || key === 'arrowright') {
+        inputState.right = isDown;
+    }
+    if (code === 'ShiftLeft' || code === 'ShiftRight' || key === 'shift') {
+        inputState.sprint = isDown;
+    }
+    if (code === 'Space' || key === ' ') {
+        inputState.handbrake = isDown;
+    }
+}
+
+window.addEventListener('keydown', (e) => {
+    setKeyState(e, true);
+
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+        e.preventDefault();
+    }
+
+    if (e.repeat) return;
+
+    const code = e.code;
+    const key = (e.key || '').toLowerCase();
+
+    if (code === 'KeyE' || code === 'KeyF' || key === 'e' || key === 'f') {
+        handleContextAction();
+    }
+    if (code === 'KeyR' || key === 'r') {
+        audio.nextStation();
+    }
+    if (code === 'KeyM' || key === 'm') {
+        audio.toggleMute();
+    }
+    if ((code === 'KeyH' || key === 'h') && player.inCar) {
+        audio.playSfx('horn');
+        triggerPanicAround(player.x, player.y, 260, 'Z drogi! Klakson!');
+    }
+    if (code === 'Escape') {
+        closeDialogue();
+    }
+});
+
+window.addEventListener('keyup', (e) => {
+    setKeyState(e, false);
+});
+
+window.addEventListener('blur', () => {
+    inputState.up = false;
+    inputState.down = false;
+    inputState.left = false;
+    inputState.right = false;
+    inputState.sprint = false;
+    inputState.handbrake = false;
+});
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const minimapCanvas = document.getElementById('minimapCanvas');
+const minimapCtx = minimapCanvas.getContext('2d');
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+canvas.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
+
+canvas.addEventListener('mousedown', (e) => {
+    if (e.button === 0 && gameState.started && document.getElementById('dialogueModal').classList.contains('hidden')) {
+        shootWeapon();
+    }
+});
+
+document.querySelectorAll('.touch-btn').forEach(btn => {
+    const keyName = btn.getAttribute('data-key');
+    btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (keyName === 'up') inputState.up = true;
+        if (keyName === 'down') inputState.down = true;
+        if (keyName === 'left') inputState.left = true;
+        if (keyName === 'right') inputState.right = true;
+        if (keyName === 'handbrake') inputState.handbrake = true;
+    });
+    btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        if (keyName === 'up') inputState.up = false;
+        if (keyName === 'down') inputState.down = false;
+        if (keyName === 'left') inputState.left = false;
+        if (keyName === 'right') inputState.right = false;
+        if (keyName === 'handbrake') inputState.handbrake = false;
+    });
+});
+
+document.getElementById('touchActionBtn').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    handleContextAction();
+});
+
+function handleContextAction() {
+    if (!gameState.started) return;
+
+    if (!player.inCar) {
+        const booth = getNearestPhoneBooth(player.x, player.y, 70);
+        if (booth) {
+            openDialogue(booth);
+            return;
+        }
+    }
+
+    if (player.inCar) {
+        const car = player.inCar;
+        car.speed = 0;
+        car.vx = 0;
+        car.vy = 0;
+        car.aiState = 'parked';
+
+        const candidateOffsets = [
+            { angleOffset: -Math.PI / 2, dist: 44 },
+            { angleOffset: Math.PI / 2,  dist: 44 },
+            { angleOffset: Math.PI,      dist: 52 },
+            { angleOffset: 0,            dist: 52 },
+            { angleOffset: -Math.PI * 0.75, dist: 54 },
+            { angleOffset: Math.PI * 0.75,  dist: 54 }
+        ];
+
+        let safeX = car.x;
+        let safeY = car.y;
+        let foundSafeSpot = false;
+
+        for (const cand of candidateOffsets) {
+            const testAngle = car.angle + cand.angleOffset;
+            const tx = car.x + Math.cos(testAngle) * cand.dist;
+            const ty = car.y + Math.sin(testAngle) * cand.dist;
+
+            if (!isPointInBuilding(tx, ty, player.radius + 6) &&
+                tx > 50 && tx < WORLD_SIZE - 50 &&
+                ty > 50 && ty < WORLD_SIZE - 50) {
+                safeX = tx;
+                safeY = ty;
+                foundSafeSpot = true;
+                break;
+            }
+        }
+
+        player.inCar = null;
+        player.x = safeX;
+        player.y = safeY;
+        player.vx = 0;
+        player.vy = 0;
+
+        if (!foundSafeSpot) {
+            resolveCircleBuildingCollision(player, player.radius + 2);
+        }
+
+        audio.playSfx('carDoor');
+        updateHUD();
+        canvas.focus();
+        return;
+    }
+
+    let nearestCar = null;
+    let minDist = 88;
+    for (const car of gameState.cars) {
+        const d = Math.hypot(car.x - player.x, car.y - player.y);
+        if (d < minDist) {
+            minDist = d;
+            nearestCar = car;
+        }
+    }
+
+    if (nearestCar) {
+        audio.playSfx('carDoor');
+        setTimeout(() => audio.playSfx('engineRev'), 90);
+
+        if (nearestCar.hasDriver) {
+            nearestCar.hasDriver = false;
+            nearestCar.aiState = 'stolen';
+            gameState.peds.push({
+                x: nearestCar.x - Math.sin(nearestCar.angle) * 38,
+                y: nearestCar.y + Math.cos(nearestCar.angle) * 38,
+                angle: nearestCar.angle + Math.PI,
+                speed: 135,
+                panicTimer: 6.0,
+                outfitColor: '#fb7185',
+                hairColor: '#1c1917',
+                afro: true,
+                districtId: 'neutral',
+                shoutText: 'Hej! Moja fura! Policja!',
+                shoutTimer: 3.5
+            });
+            triggerPanicAround(nearestCar.x, nearestCar.y, 280);
+        }
+
+        nearestCar.aiState = 'player_controlled';
+        if (typeof nearestCar.speed !== 'number') nearestCar.speed = 0;
+        player.inCar = nearestCar;
+        player.x = nearestCar.x;
+        player.y = nearestCar.y;
+        updateHUD();
+        canvas.focus();
+    }
+}
+
+function shootWeapon() {
+    audio.playSfx('shoot');
+    const originX = player.inCar ? player.inCar.x : player.x;
+    const originY = player.inCar ? player.inCar.y : player.y;
+
+    const camX = originX - canvas.width / 2;
+    const camY = originY - canvas.height / 2;
+    const aimAngle = Math.atan2((mouse.y + camY) - originY, (mouse.x + camX) - originX);
+
+    gameState.bullets.push({
+        x: originX + Math.cos(aimAngle) * 24,
+        y: originY + Math.sin(aimAngle) * 24,
+        vx: Math.cos(aimAngle) * 900,
+        vy: Math.sin(aimAngle) * 900,
+        life: 0.75
+    });
+
+    triggerPanicAround(originX, originY, 420, 'Strzelają! Uciekać!');
+}
+
+function triggerPanicAround(x, y, radius, customShout = '') {
+    for (const ped of gameState.peds) {
+        const d = Math.hypot(ped.x - x, ped.y - y);
+        if (d < radius) {
+            ped.panicTimer = 5.5;
+            ped.angle = Math.atan2(ped.y - y, ped.x - x);
+            if (customShout && Math.random() < 0.35) {
+                ped.shoutText = customShout;
+                ped.shoutTimer = 2.5;
+            }
+        }
+    }
+}
+
+function getNearestPhoneBooth(x, y, maxDist) {
+    let best = null;
+    let bestD = maxDist;
+    for (const b of gameState.phoneBooths) {
+        const d = Math.hypot(b.x - x, b.y - y);
+        if (d < bestD) {
+            bestD = d;
+            best = b;
+        }
+    }
+    return best;
+}
+
+let currentBoothDialogue = null;
+
+function openDialogue(booth) {
+    currentBoothDialogue = booth;
+    audio.playSfx('phoneRing');
+
+    document.getElementById('speakerEmoji').textContent = booth.emoji;
+    document.getElementById('speakerFactionTag').textContent = booth.tag;
+    document.getElementById('speakerName').textContent = booth.speaker;
+    document.getElementById('dialogueText').textContent = booth.dialogue;
+
+    const clueBox = document.getElementById('clueBox');
+    if (booth.clueId) {
+        clueBox.classList.remove('hidden');
+        document.getElementById('clueText').textContent = booth.clueText;
+        if (!gameState.cluesFound.includes(booth.clueId)) {
+            gameState.cluesFound.push(booth.clueId);
+        }
+    } else {
+        clueBox.classList.add('hidden');
+    }
+
+    document.getElementById('dialogueModal').classList.remove('hidden');
+    updateHUD();
+}
+
+function closeDialogue() {
+    document.getElementById('dialogueModal').classList.add('hidden');
+    currentBoothDialogue = null;
+    canvas.focus();
+}
+
+document.getElementById('closeDialogueBtn').addEventListener('click', closeDialogue);
+
+document.getElementById('acceptMissionBtn').addEventListener('click', () => {
+    if (!currentBoothDialogue) return;
+    const b = currentBoothDialogue;
+    gameState.activeMission = {
+        id: b.id,
+        faction: b.faction,
+        targetX: b.missionTarget.x,
+        targetY: b.missionTarget.y,
+        desc: b.missionDesc,
+        rewardRespect: b.rewardRespect,
+        rewardCash: b.rewardCash,
+        color: b.color
+    };
+    document.getElementById('activeObjectiveText').textContent = b.missionDesc;
+    audio.playSfx('respectUp');
+    closeDialogue();
+});
+
+function isPointInBuilding(x, y, margin = 0) {
+    for (const b of gameState.buildings) {
+        if (
+            x > b.x - margin &&
+            x < b.x + b.w + margin &&
+            y > b.y - margin &&
+            y < b.y + b.h + margin
+        ) {
+            return b;
+        }
+    }
+    return null;
+}
+
+function resolveCircleBuildingCollision(entity, radius) {
+    let hitBuilding = false;
+    for (const b of gameState.buildings) {
+        const closestX = Math.max(b.x, Math.min(entity.x, b.x + b.w));
+        const closestY = Math.max(b.y, Math.min(entity.y, b.y + b.h));
+        const dx = entity.x - closestX;
+        const dy = entity.y - closestY;
+        const distSq = dx * dx + dy * dy;
+
+        if (distSq < radius * radius) {
+            hitBuilding = true;
+            const dist = Math.sqrt(distSq);
+            if (dist > 0.0001) {
+                const overlap = radius - dist;
+                entity.x += (dx / dist) * overlap;
+                entity.y += (dy / dist) * overlap;
+            } else {
+                const leftPen = Math.abs(entity.x - b.x);
+                const rightPen = Math.abs((b.x + b.w) - entity.x);
+                const topPen = Math.abs(entity.y - b.y);
+                const bottomPen = Math.abs((b.y + b.h) - entity.y);
+                const minPen = Math.min(leftPen, rightPen, topPen, bottomPen);
+                if (minPen === leftPen) entity.x = b.x - radius - 2;
+                else if (minPen === rightPen) entity.x = b.x + b.w + radius + 2;
+                else if (minPen === topPen) entity.y = b.y - radius - 2;
+                else entity.y = b.y + b.h + radius + 2;
+            }
+            if (entity.vx !== undefined) entity.vx *= 0.5;
+            if (entity.vy !== undefined) entity.vy *= 0.5;
+            if (entity.speed !== undefined) entity.speed *= 0.55;
+        }
+    }
+    entity.x = Math.max(40, Math.min(WORLD_SIZE - 40, entity.x));
+    entity.y = Math.max(40, Math.min(WORLD_SIZE - 40, entity.y));
+    return hitBuilding;
+}
+
+function updateGame(dt) {
+    if (!gameState.started) return;
+
+    if (!player.inCar) {
+        let moveX = 0;
+        let moveY = 0;
+        if (inputState.up) moveY -= 1;
+        if (inputState.down) moveY += 1;
+        if (inputState.left) moveX -= 1;
+        if (inputState.right) moveX += 1;
+
+        const len = Math.hypot(moveX, moveY);
+        const sprint = inputState.sprint ? player.sprintMultiplier : 1;
+
+        if (len > 0) {
+            player.vx = (moveX / len) * player.speed * sprint;
+            player.vy = (moveY / len) * player.speed * sprint;
+            player.x += player.vx * dt;
+            player.y += player.vy * dt;
+            player.walkCycle += dt * 10 * sprint;
+        } else {
+            player.vx = 0;
+            player.vy = 0;
+        }
+
+        const camX = player.x - canvas.width / 2;
+        const camY = player.y - canvas.height / 2;
+        mouse.worldX = mouse.x + camX;
+        mouse.worldY = mouse.y + camY;
+        player.angle = Math.atan2(mouse.worldY - player.y, mouse.worldX - player.x);
+
+        resolveCircleBuildingCollision(player, player.radius);
+
+        for (const car of gameState.cars) {
+            const dx = player.x - car.x;
+            const dy = player.y - car.y;
+            const dist = Math.hypot(dx, dy);
+            const minDist = player.radius + 20;
+            if (dist < minDist && dist > 0.001) {
+                const overlap = minDist - dist;
+                player.x += (dx / dist) * overlap;
+                player.y += (dy / dist) * overlap;
+            }
+        }
+        resolveCircleBuildingCollision(player, player.radius);
+
+        document.getElementById('speedometerDisplay').textContent = '0 MPH';
+    } else {
+        const car = player.inCar;
+        const m = car.model;
+
+        let throttle = 0;
+        if (inputState.up) throttle += 1;
+        if (inputState.down) throttle -= 1;
+
+        let steer = 0;
+        if (inputState.left) steer -= 1;
+        if (inputState.right) steer += 1;
+
+        const isHandbrake = inputState.handbrake;
+
+        const forwardX = Math.cos(car.angle);
+        const forwardY = Math.sin(car.angle);
+        const rightX = -forwardY;
+        const rightY = forwardX;
+
+        let forwardSpeed = car.vx * forwardX + car.vy * forwardY;
+        let lateralSpeed = car.vx * rightX + car.vy * rightY;
+
+        if (throttle > 0) {
+            forwardSpeed += m.accel * dt;
+        } else if (throttle < 0) {
+            if (forwardSpeed > 20) {
+                forwardSpeed -= m.accel * 1.6 * dt;
+            } else {
+                forwardSpeed -= m.accel * 0.85 * dt;
+            }
+        } else {
+            forwardSpeed *= Math.pow(0.982, dt * 60);
+            if (Math.abs(forwardSpeed) < 3) forwardSpeed = 0;
+        }
+
+        if (isHandbrake) {
+            forwardSpeed *= Math.pow(0.955, dt * 60);
+        }
+
+        forwardSpeed = Math.max(-m.maxSpeed * 0.45, Math.min(m.maxSpeed, forwardSpeed));
+
+        if (steer !== 0) {
+            const speedFactor = Math.max(0.38, Math.min(1.0, Math.abs(forwardSpeed) / 110));
+            const dir = forwardSpeed < -10 ? -1 : 1;
+            const turnRate = isHandbrake ? 3.6 : 2.75;
+            car.angle += steer * turnRate * dir * speedFactor * dt;
+
+            if (Math.abs(forwardSpeed) > 90) {
+                lateralSpeed += steer * (isHandbrake ? 140 : 45) * dt;
+            }
+        }
+
+        const lateralGrip = isHandbrake ? 0.94 : 0.82;
+        lateralSpeed *= Math.pow(lateralGrip, dt * 60);
+
+        car.vx = forwardX * forwardSpeed + rightX * lateralSpeed;
+        car.vy = forwardY * forwardSpeed + rightY * lateralSpeed;
+        car.speed = Math.hypot(car.vx, car.vy);
+
+        car.x += car.vx * dt;
+        car.y += car.vy * dt;
+
+        resolveCircleBuildingCollision(car, 21);
+
+        for (const other of gameState.cars) {
+            if (other === car) continue;
+            const dx = car.x - other.x;
+            const dy = car.y - other.y;
+            const dist = Math.hypot(dx, dy);
+            const minCarDist = 42;
+            if (dist < minCarDist && dist > 0.001) {
+                const overlap = minCarDist - dist;
+                const nx = dx / dist;
+                const ny = dy / dist;
+                car.x += nx * overlap * 0.5;
+                car.y += ny * overlap * 0.5;
+                other.x -= nx * overlap * 0.5;
+                other.y -= ny * overlap * 0.5;
+                other.vx += car.vx * 0.35;
+                other.vy += car.vy * 0.35;
+            }
+        }
+
+        if ((Math.abs(lateralSpeed) > 45 || (isHandbrake && Math.abs(forwardSpeed) > 80))) {
+            gameState.skidMarks.push({
+                x: car.x - forwardX * 18 + rightX * 10,
+                y: car.y - forwardY * 18 + rightY * 10,
+                alpha: 0.55
+            });
+            gameState.skidMarks.push({
+                x: car.x - forwardX * 18 - rightX * 10,
+                y: car.y - forwardY * 18 - rightY * 10,
+                alpha: 0.55
+            });
+            if (gameState.skidMarks.length > 420) gameState.skidMarks.splice(0, 2);
+
+            gameState.particles.push({
+                x: car.x - forwardX * 22,
+                y: car.y - forwardY * 22,
+                vx: (Math.random() - 0.5) * 30,
+                vy: (Math.random() - 0.5) * 30,
+                size: 7 + Math.random() * 6,
+                alpha: 0.5,
+                color: '#e2e8f0'
+            });
+        }
+
+        player.x = car.x;
+        player.y = car.y;
+        player.angle = car.angle;
+
+        const mph = Math.round(Math.abs(forwardSpeed) * 0.18);
+        document.getElementById('speedometerDisplay').textContent = `${mph} MPH`;
+    }
+
+    for (const car of gameState.cars) {
+        if (car === player.inCar) continue;
+
+        if (car.hasDriver && car.aiState === 'driving') {
+            const fwdX = Math.cos(car.angle);
+            const fwdY = Math.sin(car.angle);
+
+            let obstacleAhead = false;
+            const probeX = car.x + fwdX * 72;
+            const probeY = car.y + fwdY * 72;
+
+            if (Math.hypot(probeX - player.x, probeY - player.y) < 48) {
+                obstacleAhead = true;
+            }
+            for (const other of gameState.cars) {
+                if (other !== car && Math.hypot(probeX - other.x, probeY - other.y) < 52) {
+                    obstacleAhead = true;
+                    break;
+                }
+            }
+
+            const speed = obstacleAhead ? 0 : car.aiTargetSpeed;
+            car.vx = fwdX * speed;
+            car.vy = fwdY * speed;
+            car.x += car.vx * dt;
+            car.y += car.vy * dt;
+
+            if (car.x < 140 || car.x > WORLD_SIZE - 140 || car.y < 140 || car.y > WORLD_SIZE - 140) {
+                car.angle += Math.PI / 2;
+                car.x = Math.max(150, Math.min(WORLD_SIZE - 150, car.x));
+                car.y = Math.max(150, Math.min(WORLD_SIZE - 150, car.y));
+            }
+        } else {
+            car.vx *= 0.9;
+            car.vy *= 0.9;
+            car.x += car.vx * dt;
+            car.y += car.vy * dt;
+        }
+        resolveCircleBuildingCollision(car, 21);
+    }
+
+    for (const ped of gameState.peds) {
+        if (ped.panicTimer > 0) {
+            ped.panicTimer -= dt;
+        } else if (Math.random() < 0.015) {
+            ped.angle += (Math.random() - 0.5) * 1.2;
+        }
+        if (ped.shoutTimer > 0) ped.shoutTimer -= dt;
+
+        const currentSpeed = ped.panicTimer > 0 ? ped.speed * 2.3 : ped.speed;
+        const nx = ped.x + Math.cos(ped.angle) * currentSpeed * dt;
+        const ny = ped.y + Math.sin(ped.angle) * currentSpeed * dt;
+
+        if (isPointInBuilding(nx, ny, 12) || nx < 60 || nx > WORLD_SIZE - 60 || ny < 60 || ny > WORLD_SIZE - 60) {
+            ped.angle += Math.PI * 0.75;
+        } else {
+            ped.x = nx;
+            ped.y = ny;
+        }
+    }
+
+    for (let i = gameState.bullets.length - 1; i >= 0; i--) {
+        const b = gameState.bullets[i];
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        b.life -= dt;
+        if (b.life <= 0 || isPointInBuilding(b.x, b.y, 2)) {
+            gameState.bullets.splice(i, 1);
+        }
+    }
+
+    for (let i = gameState.particles.length - 1; i >= 0; i--) {
+        const p = gameState.particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.size += dt * 12;
+        p.alpha -= dt * 0.9;
+        if (p.alpha <= 0) gameState.particles.splice(i, 1);
+    }
+
+    if (gameState.activeMission) {
+        const m = gameState.activeMission;
+        const distToGoal = Math.hypot(player.x - m.targetX, player.y - m.targetY);
+        if (distToGoal < 85) {
+            gameState.respect[m.faction] = Math.min(100, gameState.respect[m.faction] + m.rewardRespect);
+            gameState.money += m.rewardCash;
+            audio.playSfx('respectUp');
+
+            const completedFactionName = m.faction.toUpperCase();
+            gameState.activeMission = null;
+
+            if (gameState.cluesFound.length >= 4) {
+                document.getElementById('activeObjectiveText').textContent =
+                    `ZLECENIE WYKONANE! Zebrałeś wszystkie 4 DOWODY zdrady kapitana Grincha! Kontynuuj budowanie 100% respektu u 4 mafii!`;
+            } else {
+                document.getElementById('activeObjectiveText').textContent =
+                    `Zlecenie dla ${completedFactionName} ukończone! (+${m.rewardRespect}% Respektu, +$${m.rewardCash}). Odbierz kolejną budkę telefoniczną!`;
+            }
+            updateHUD();
+        }
+    }
+
+    const currentDist = getDistrictAt(player.x, player.y);
+    if (currentDist.id !== gameState.currentDistrictId) {
+        gameState.currentDistrictId = currentDist.id;
+        showDistrictBanner(currentDist);
+    }
+
+    updateInteractionPrompt();
+}
+
+let bannerTimeout = null;
+function showDistrictBanner(dist) {
+    const banner = document.getElementById('districtBanner');
+    document.getElementById('districtSub').textContent = dist.sub;
+    document.getElementById('districtTitle').textContent = dist.name;
+    banner.classList.remove('opacity-0', '-translate-y-4');
+    banner.classList.add('opacity-100', 'translate-y-0');
+
+    if (bannerTimeout) clearTimeout(bannerTimeout);
+    bannerTimeout = setTimeout(() => {
+        banner.classList.add('opacity-0', '-translate-y-4');
+        banner.classList.remove('opacity-100', 'translate-y-0');
+    }, 3400);
+}
+
+function updateInteractionPrompt() {
+    const promptEl = document.getElementById('interactionPrompt');
+    const promptText = document.getElementById('interactionPromptText');
+
+    if (!player.inCar) {
+        const booth = getNearestPhoneBooth(player.x, player.y, 70);
+        if (booth) {
+            promptEl.classList.remove('hidden');
+            promptText.textContent = `Porozmawiaj / Odbierz telefon: ${booth.tag}`;
+            return;
+        }
+
+        for (const car of gameState.cars) {
+            if (Math.hypot(car.x - player.x, car.y - player.y) < 85) {
+                promptEl.classList.remove('hidden');
+                promptText.textContent = `Ukradnij / Wsiądź do: ${car.model.name}`;
+                return;
+            }
+        }
+    }
+    promptEl.classList.add('hidden');
+}
+
+function updateHUD() {
+    ['chestnuts', 'rhavens', 'magicians', 'weasels'].forEach(f => {
+        const val = gameState.respect[f];
+        document.getElementById(`respVal-${f}`).textContent = `${val}%`;
+        document.getElementById(`respBar-${f}`).style.width = `${val}%`;
+    });
+
+    document.getElementById('moneyDisplay').textContent = `$${gameState.money.toLocaleString()}`;
+    document.getElementById('InvestigationBadge').textContent = `Dowody na Grincha: ${gameState.cluesFound.length}/4`;
+
+    const vehEl = document.getElementById('vehicleStatusDisplay');
+    if (player.inCar) {
+        vehEl.textContent = `🚗 ${player.inCar.model.name}`;
+    } else {
+        vehEl.textContent = `🥾 PIESZO (ŻOŁNIERZ M65)`;
+    }
+}
+
+function renderGame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const camX = player.x - canvas.width / 2;
+    const camY = player.y - canvas.height / 2;
+
+    ctx.save();
+    ctx.translate(-camX, -camY);
+
+    const half = WORLD_SIZE / 2;
+    ctx.fillStyle = DISTRICTS.chestnuts.groundColor;
+    ctx.fillRect(0, 0, half, half);
+    ctx.fillStyle = DISTRICTS.rhavens.groundColor;
+    ctx.fillRect(half, 0, half, half);
+    ctx.fillStyle = DISTRICTS.magicians.groundColor;
+    ctx.fillRect(0, half, half, half);
+    ctx.fillStyle = DISTRICTS.weasels.groundColor;
+    ctx.fillRect(half, half, half, half);
+
+    ctx.fillStyle = DISTRICTS.neutral.groundColor;
+    ctx.beginPath();
+    ctx.arc(half, half, 720, 0, Math.PI * 2);
+    ctx.fill();
+
+    const numBlocks = Math.floor(WORLD_SIZE / BLOCK_SIZE);
+    ctx.fillStyle = '#242228';
+    for (let i = 0; i <= numBlocks; i++) {
+        const pos = i * BLOCK_SIZE;
+        ctx.fillRect(0, pos - ROAD_WIDTH / 2, WORLD_SIZE, ROAD_WIDTH);
+        ctx.fillRect(pos - ROAD_WIDTH / 2, 0, ROAD_WIDTH, WORLD_SIZE);
+    }
+
+    ctx.strokeStyle = '#eab308';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([18, 14]);
+    for (let i = 0; i <= numBlocks; i++) {
+        const pos = i * BLOCK_SIZE;
+        ctx.beginPath();
+        ctx.moveTo(0, pos);
+        ctx.lineTo(WORLD_SIZE, pos);
+        ctx.moveTo(pos, 0);
+        ctx.lineTo(pos, WORLD_SIZE);
+        ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    for (const s of gameState.skidMarks) {
+        ctx.fillStyle = `rgba(12, 10, 14, ${s.alpha})`;
+        ctx.fillRect(s.x - 3, s.y - 3, 6, 6);
+    }
+
+    for (const b of gameState.buildings) {
+        if (b.x + b.w < camX - 100 || b.x > camX + canvas.width + 100 ||
+            b.y + b.h < camY - 100 || b.y > camY + canvas.height + 100) continue;
+
+        ctx.fillStyle = '#47424f';
+        ctx.fillRect(b.x - 14, b.y - 14, b.w + 28, b.h + 28);
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.fillRect(b.x + 10, b.y + 12, b.w, b.h);
+
+        ctx.fillStyle = b.color;
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+
+        ctx.strokeStyle = b.neonColor;
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(b.x + 2, b.y + 2, b.w - 4, b.h - 4);
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+        ctx.fillRect(b.x + 14, b.y + 14, b.w - 28, b.h - 28);
+
+        if (b.label) {
+            ctx.fillStyle = '#fef3c7';
+            ctx.font = 'bold 12px "Share Tech Mono", monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(b.label, b.x + b.w / 2, b.y + b.h / 2 + 4);
+        }
+    }
+
+    if (gameState.activeMission) {
+        const m = gameState.activeMission;
+        const pulse = 28 + Math.sin(performance.now() * 0.006) * 10;
+        ctx.strokeStyle = m.color || '#facc15';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(m.targetX, m.targetY, pulse, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(250, 204, 21, 0.22)';
+        ctx.beginPath();
+        ctx.arc(m.targetX, m.targetY, 45, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    const time = performance.now() * 0.005;
+    for (const booth of gameState.phoneBooths) {
+        const ringRadius = 22 + Math.sin(time * 2) * 6;
+        ctx.strokeStyle = booth.color;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(booth.x, booth.y, ringRadius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(booth.x - 11, booth.y - 11, 22, 22);
+        ctx.strokeStyle = booth.color;
+        ctx.strokeRect(booth.x - 11, booth.y - 11, 22, 22);
+
+        ctx.font = '15px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(booth.emoji, booth.x, booth.y + 5);
+
+        ctx.fillStyle = '#fef08a';
+        ctx.font = 'bold 10px "Share Tech Mono", monospace';
+        ctx.fillText(booth.tag, booth.x, booth.y - 18);
+    }
+
+    for (const ped of gameState.peds) {
+        if (ped.x < camX - 60 || ped.x > camX + canvas.width + 60 ||
+            ped.y < camY - 60 || ped.y > camY + canvas.height + 60) continue;
+
+        ctx.save();
+        ctx.translate(ped.x, ped.y);
+        ctx.rotate(ped.angle);
+
+        ctx.fillStyle = ped.outfitColor;
+        ctx.beginPath();
+        ctx.roundRect(-7, -10, 14, 20, 5);
+        ctx.fill();
+
+        ctx.fillStyle = ped.hairColor;
+        ctx.beginPath();
+        ctx.arc(0, 0, ped.afro ? 7.5 : 5.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+
+        if (ped.shoutTimer > 0 && ped.shoutText) {
+            ctx.fillStyle = 'rgba(0,0,0,0.75)';
+            ctx.fillRect(ped.x - 55, ped.y - 28, 110, 16);
+            ctx.fillStyle = '#fde047';
+            ctx.font = '10px "Share Tech Mono", monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(ped.shoutText, ped.x, ped.y - 17);
+        }
+    }
+
+    for (const car of gameState.cars) {
+        if (car.x < camX - 90 || car.x > camX + canvas.width + 90 ||
+            car.y < camY - 90 || car.y > camY + canvas.height + 90) continue;
+
+        ctx.save();
+        ctx.translate(car.x, car.y);
+        ctx.rotate(car.angle);
+
+        const w = car.model.width;
+        const h = car.model.height;
+
+        const grad = ctx.createLinearGradient(w / 2, 0, w / 2 + 125, 0);
+        grad.addColorStop(0, car === player.inCar ? 'rgba(254, 240, 138, 0.42)' : 'rgba(254, 240, 138, 0.25)');
+        grad.addColorStop(1, 'rgba(254, 240, 138, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(w / 2, -h / 2 + 3);
+        ctx.lineTo(w / 2 + 125, -h * 1.45);
+        ctx.lineTo(w / 2 + 125, h * 1.45);
+        ctx.lineTo(w / 2, h / 2 - 3);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(0,0,0,0.45)';
+        ctx.beginPath();
+        ctx.roundRect(-w / 2 + 4, -h / 2 + 5, w, h, 6);
+        ctx.fill();
+
+        ctx.fillStyle = car.color;
+        ctx.beginPath();
+        ctx.roundRect(-w / 2, -h / 2, w, h, 6);
+        ctx.fill();
+        ctx.strokeStyle = car === player.inCar ? '#fde047' : '#111827';
+        ctx.lineWidth = car === player.inCar ? 2.2 : 1.5;
+        ctx.stroke();
+
+        if (car.model.stripe) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
+            ctx.fillRect(-w / 2 + 2, -3, w - 4, 6);
+        }
+
+        ctx.fillStyle = car.model.convertible ? '#1e1b4b' : '#0f172a';
+        ctx.fillRect(-w * 0.22, -h / 2 + 4, w * 0.48, h - 8);
+
+        ctx.fillStyle = '#fef08a';
+        ctx.fillRect(w / 2 - 3, -h / 2 + 3, 3, 5);
+        ctx.fillRect(w / 2 - 3, h / 2 - 8, 3, 5);
+
+        ctx.restore();
+    }
+
+    if (!player.inCar) {
+        ctx.save();
+        ctx.translate(player.x, player.y);
+        ctx.rotate(player.angle);
+
+        ctx.fillStyle = 'rgba(0,0,0,0.45)';
+        ctx.beginPath();
+        ctx.arc(2, 3, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#4d7c0f';
+        ctx.beginPath();
+        ctx.roundRect(-8, -12, 16, 24, 6);
+        ctx.fill();
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.fillStyle = '#d97706';
+        ctx.fillRect(4, 4, 10, 4);
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(11, 4, 7, 3);
+
+        ctx.fillStyle = '#451a03';
+        ctx.beginPath();
+        ctx.arc(0, 0, 6.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, 6.5, 2.2, 4.1);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    ctx.fillStyle = '#fde047';
+    for (const b of gameState.bullets) {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    for (const p of gameState.particles) {
+        ctx.fillStyle = `rgba(226, 232, 240, ${p.alpha})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    for (const palm of gameState.palmTrees) {
+        if (palm.x < camX - 50 || palm.x > camX + canvas.width + 50 ||
+            palm.y < camY - 50 || palm.y > camY + canvas.height + 50) continue;
+
+        ctx.save();
+        ctx.translate(palm.x, palm.y);
+        for (let l = 0; l < 6; l++) {
+            ctx.rotate(Math.PI / 3);
+            ctx.fillStyle = l % 2 === 0 ? '#15803d' : '#16a34a';
+            ctx.beginPath();
+            ctx.ellipse(palm.size * 0.55, 0, palm.size * 0.6, 4.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.fillStyle = '#78350f';
+        ctx.beginPath();
+        ctx.arc(0, 0, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    ctx.restore();
+
+    renderMinimap();
+}
+
+function renderMinimap() {
+    const mw = minimapCanvas.width;
+    const mh = minimapCanvas.height;
+    const scale = mw / WORLD_SIZE;
+
+    minimapCtx.clearRect(0, 0, mw, mh);
+
+    minimapCtx.fillStyle = '#452716';
+    minimapCtx.fillRect(0, 0, mw / 2, mh / 2);
+    minimapCtx.fillStyle = '#1e1b4b';
+    minimapCtx.fillRect(mw / 2, 0, mw / 2, mh / 2);
+    minimapCtx.fillStyle = '#064e3b';
+    minimapCtx.fillRect(0, mh / 2, mw / 2, mh / 2);
+    minimapCtx.fillStyle = '#450a0a';
+    minimapCtx.fillRect(mw / 2, mh / 2, mw / 2, mh / 2);
+
+    minimapCtx.fillStyle = '#2b2438';
+    minimapCtx.beginPath();
+    minimapCtx.arc(mw / 2, mh / 2, 720 * scale, 0, Math.PI * 2);
+    minimapCtx.fill();
+
+    minimapCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+    minimapCtx.lineWidth = 1.5;
+    const numBlocks = Math.floor(WORLD_SIZE / BLOCK_SIZE);
+    for (let i = 1; i < numBlocks; i++) {
+        const p = i * BLOCK_SIZE * scale;
+        minimapCtx.beginPath();
+        minimapCtx.moveTo(0, p);
+        minimapCtx.lineTo(mw, p);
+        minimapCtx.moveTo(p, 0);
+        minimapCtx.lineTo(p, mh);
+        minimapCtx.stroke();
+    }
+
+    for (const booth of gameState.phoneBooths) {
+        minimapCtx.fillStyle = booth.color;
+        minimapCtx.beginPath();
+        minimapCtx.arc(booth.x * scale, booth.y * scale, 3.5, 0, Math.PI * 2);
+        minimapCtx.fill();
+    }
+
+    if (gameState.activeMission) {
+        minimapCtx.strokeStyle = '#fde047';
+        minimapCtx.lineWidth = 2;
+        minimapCtx.beginPath();
+        minimapCtx.arc(
+            gameState.activeMission.targetX * scale,
+            gameState.activeMission.targetY * scale,
+            6, 0, Math.PI * 2
+        );
+        minimapCtx.stroke();
+    }
+
+    minimapCtx.fillStyle = '#ffffff';
+    minimapCtx.beginPath();
+    minimapCtx.arc(player.x * scale, player.y * scale, 4, 0, Math.PI * 2);
+    minimapCtx.fill();
+}
+
+let lastTime = performance.now();
+function gameLoop(now) {
+    const dt = Math.min(0.05, (now - lastTime) / 1000);
+    lastTime = now;
+
+    updateGame(dt);
+    renderGame();
+
+    requestAnimationFrame(gameLoop);
+}
+
+document.getElementById('startGameBtn').addEventListener('click', () => {
+    audio.init();
+    gameState.started = true;
+    document.getElementById('startModal').classList.add('hidden');
+    updateHUD();
+    window.focus();
+    canvas.focus();
+});
+
+document.getElementById('radioBtn').addEventListener('click', () => {
+    audio.nextStation();
+    canvas.focus();
+});
+document.getElementById('muteBtn').addEventListener('click', () => {
+    audio.toggleMute();
+    canvas.focus();
+});
+
+window.addEventListener('load', () => {
+    generateWorld();
+    spawnTrafficAndParkedCars();
+    spawnPedestrians();
+    updateHUD();
+    requestAnimationFrame(gameLoop);
+});
+</script>
+</body>
+</html>

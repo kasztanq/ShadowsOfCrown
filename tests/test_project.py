@@ -18,6 +18,7 @@ MODULE_CONTRACTS = {
     "chestnut_arcade_game_hub_v2.html": ("id=\"mainMenuView\"", "returnToMenu"),
     "autumn_neon_chestnut_2p_arcade_hub.html": ("id=\"hub-view\"", "startGame(gameId)"),
     "grinch_chest_conquest.html": ("id=\"hub-view\"", "class GrinchConquestApp"),
+    "miami_77.html": ('id="gameCanvas"', "class Miami77Audio", "function gameLoop"),
     "smerfastyczny_labirynt.html": ('id="gameCanvas"', "function generateMazeLevel", "function triggerVictoryModal"),
     "chess_nuts.html": ("id=\"chessboard\"", "Chess-Nuts"),
     "logopedia.html": ("id=\"interaction-area\"", "function switchMode", "function resetTask"),
@@ -158,6 +159,31 @@ class ProjectPagesTests(unittest.TestCase):
         self.assertEqual(
             sum(reference == "./chess_nuts.html" for reference in parser.links),
             1,
+        )
+
+    def test_homepage_has_a_hidden_miami_77_pixel_easter_egg(self):
+        parser = parse_page(ROOT / "index.htm")
+        contents = (ROOT / "index.htm").read_text(encoding="utf-8")
+
+        self.assertIn(
+            '<a class="miami-egg" href="./miami_77.html" '
+            'aria-label="Play hidden Miami \'77"></a>',
+            contents,
+        )
+        self.assertEqual(
+            sum(reference == "./miami_77.html" for reference in parser.links),
+            1,
+        )
+        self.assertRegex(
+            contents,
+            r"\.miami-egg\s*\{[^}]*position:\s*absolute;[^}]*"
+            r"top:\s*18px;[^}]*right:\s*7px;[^}]*width:\s*8px;[^}]*"
+            r"height:\s*8px;[^}]*opacity:\s*0;",
+        )
+        self.assertRegex(contents, r"\.orbit-nut:nth-child\(3\)\s*\{")
+        self.assertRegex(
+            contents,
+            r"\.miami-egg:focus-visible\s*\{[^}]*opacity:\s*1;",
         )
 
     def test_arcade_cabinet_one_describes_the_current_hub(self):

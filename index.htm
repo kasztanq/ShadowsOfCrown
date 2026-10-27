@@ -725,6 +725,22 @@
       filter: drop-shadow(0 0 7px rgba(239, 189, 119, 0.55));
     }
 
+    .miami-egg {
+      position: absolute;
+      top: 18px;
+      right: 7px;
+      z-index: 3;
+      width: 8px;
+      height: 8px;
+      opacity: 0;
+    }
+
+    .miami-egg:focus-visible {
+      opacity: 1;
+      outline: 2px solid #ffe58a;
+      outline-offset: 2px;
+    }
+
     .chestnut-stage {
       position: relative;
       width: 34px;
@@ -931,6 +947,7 @@
               </svg>
             </span>
           </a>
+          <a class="miami-egg" href="./miami_77.html" aria-label="Play hidden Miami '77"></a>
         </div>
       </div>
     </section>
