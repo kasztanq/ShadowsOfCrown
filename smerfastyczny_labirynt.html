@@ -2,8 +2,8 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Labirynt Smerfów: Ucieczka przed Gargamelem</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Labirynt Smerfów: Ucieczka przed Gargamelem (150 Poziomów)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
     <style>
@@ -13,11 +13,18 @@
             --forest-green: #2e7d32;
             --gold: #ffca28;
         }
-        body {
-            font-family: 'Nunito', sans-serif;
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100dvh;
+            overflow: hidden;
             background-color: #0b1f13;
             color: #ffffff;
-            overflow: hidden;
+            font-family: 'Nunito', sans-serif;
             user-select: none;
             -webkit-user-select: none;
             touch-action: none;
@@ -26,31 +33,32 @@
             font-family: 'Fredoka', sans-serif;
         }
         .btn-cartoon {
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.3);
         }
         .btn-cartoon:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 0 rgba(0, 0, 0, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.4);
         }
-        .btn-cartoon:active:not(:disabled) {
-            transform: translateY(4px);
+        .btn-cartoon:active:not(:disabled), .btn-cartoon.active-dir {
+            transform: translateY(3px);
             box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         .wood-panel {
             background: linear-gradient(180deg, #5d4037 0%, #3e2723 100%);
-            border: 4px solid #8d6e63;
+            border: 3px solid #8d6e63;
             box-shadow: 0 12px 28px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,255,255,0.2);
         }
         .parchment-panel {
             background: linear-gradient(180deg, #fff8e1 0%, #ffecb3 100%);
             color: #3e2723;
-            border: 4px solid #ffb300;
+            border: 3px solid #ffb300;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-        /* Custom Scrollbar for Level Grid */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.2);
@@ -62,59 +70,60 @@
         }
         @keyframes pulse-fast {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
+            50% { transform: scale(1.06); }
         }
         .animate-pulse-fast {
             animation: pulse-fast 1s infinite ease-in-out;
         }
     </style>
 </head>
-<body class="w-screen h-screen flex flex-col justify-between relative bg-[#0c2214]">
+<body class="w-full h-[100dvh] flex flex-col justify-between relative bg-[#0c2214]">
 
-    <!-- TOP HUD BAR -->
-    <header class="w-full z-20 px-2 sm:px-4 py-2 bg-gradient-to-b from-[#1b3b22] to-[#112616] border-b-4 border-[#2e5c36] shadow-lg flex flex-wrap items-center justify-between gap-2">
-        <!-- Brand & Level -->
-        <div class="flex items-center gap-2 sm:gap-4">
-            <div class="flex items-center gap-2 bg-[#0d47a1] border-2 border-[#64b5f6] px-3 py-1 rounded-2xl shadow-md">
-                <span class="text-xl sm:text-2xl">🍄</span>
+    <!-- TOP HUD BAR (Compact on Mobile, Full on Desktop) -->
+    <header class="w-full z-20 px-2 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-b from-[#1b3b22] to-[#112616] border-b-2 sm:border-b-4 border-[#2e5c36] shadow-lg flex items-center justify-between gap-1 sm:gap-2 shrink-0">
+        <!-- Left: Level & Keys -->
+        <div class="flex items-center gap-1.5 sm:gap-3 min-w-0">
+            <!-- Brand & Level -->
+            <div class="flex items-center gap-1.5 bg-[#0d47a1] border-2 border-[#64b5f6] px-2 sm:px-3 py-0.5 sm:py-1 rounded-xl sm:rounded-2xl shadow-md shrink-0">
+                <span class="text-base sm:text-2xl">🍄</span>
                 <div>
-                    <div class="text-[10px] uppercase tracking-wider text-blue-200 font-bold leading-none">Wioska Smerfów</div>
-                    <div id="hud-level" class="font-title font-bold text-sm sm:text-lg text-white leading-tight">Poziom 1 / 50</div>
+                    <div id="hud-zone-label" class="hidden sm:block text-[10px] uppercase tracking-wider text-blue-200 font-bold leading-none">Wioska Smerfów</div>
+                    <div id="hud-level" class="font-title font-bold text-xs sm:text-lg text-white leading-tight whitespace-nowrap">Poz. 1/150</div>
                 </div>
             </div>
 
             <!-- Keys Counter (0/5) -->
-            <div class="flex items-center gap-2 bg-[#3e2723] border-2 border-[#ffb300] px-3 py-1 rounded-2xl shadow-md" title="Maksymalnie 5 kluczy. Używaj ich do otwierania skrótów w labiryncie!">
-                <span class="text-xs sm:text-sm font-bold text-amber-200 hidden md:inline">Klucze:</span>
-                <div id="hud-keys-icons" class="flex items-center gap-0.5 sm:gap-1">
-                    <!-- Rendered dynamically -->
-                </div>
-                <span id="hud-keys-text" class="font-title font-bold text-sm sm:text-base text-amber-400 ml-1">0/5</span>
+            <div class="flex items-center gap-1 bg-[#3e2723] border-2 border-[#ffb300] px-2 sm:px-3 py-0.5 sm:py-1 rounded-xl sm:rounded-2xl shadow-md shrink-0" title="Maksymalnie 5 kluczy. Używaj ich do otwierania skrótów!">
+                <span class="text-xs font-bold text-amber-200 hidden lg:inline">Klucze:</span>
+                <div id="hud-keys-icons" class="hidden sm:flex items-center gap-0.5"></div>
+                <span class="sm:hidden text-sm">🗝️</span>
+                <span id="hud-keys-text" class="font-title font-bold text-xs sm:text-base text-amber-400">0/5</span>
             </div>
         </div>
 
-        <!-- Status Badge (Hidden / Visible / Alert) -->
-        <div id="hud-status" class="flex items-center gap-2 px-3 py-1 rounded-full font-bold text-xs sm:text-sm border-2 transition-all duration-200 bg-emerald-800/90 border-emerald-400 text-emerald-100 shadow">
+        <!-- Center: Status Badge (Compact on mobile) -->
+        <div id="hud-status" class="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full font-bold text-[11px] sm:text-sm border-2 transition-all duration-200 bg-emerald-800/90 border-emerald-400 text-emerald-100 shadow shrink-0">
             <span id="hud-status-icon">👀</span>
-            <span id="hud-status-text">Widoczny na ścieżce</span>
+            <span id="hud-status-text" class="hidden md:inline">Widoczny na ścieżce</span>
+            <span id="hud-status-short" class="md:hidden">Widoczny</span>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex items-center gap-1.5 sm:gap-2">
-            <a href="./index.htm" aria-label="Back to home" title="Back to home" class="btn-cartoon bg-blue-700 hover:bg-blue-600 text-white p-2 rounded-xl border border-blue-400 text-sm sm:text-base flex items-center justify-center">
+        <!-- Right: Action Buttons -->
+        <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+            <a href="./index.htm" aria-label="Back to home" title="Strona główna" class="btn-cartoon bg-blue-700 hover:bg-blue-600 text-white w-8 h-8 sm:w-auto sm:h-auto sm:p-2 rounded-xl border border-blue-400 text-xs sm:text-base flex items-center justify-center">
                 🏠
             </a>
-            <button id="btn-sound" class="btn-cartoon bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-xl border border-slate-500 text-sm sm:text-base" title="Dźwięk Wł/Wył">
+            <button id="btn-sound" class="btn-cartoon bg-slate-700 hover:bg-slate-600 text-white w-8 h-8 sm:w-auto sm:h-auto sm:p-2 rounded-xl border border-slate-500 text-xs sm:text-base flex items-center justify-center" title="Dźwięk Wł/Wył">
                 🔊
             </button>
-            <button id="btn-restart" class="btn-cartoon bg-amber-600 hover:bg-amber-500 text-white px-2.5 py-1.5 rounded-xl border border-amber-400 font-bold text-xs sm:text-sm flex items-center gap-1">
-                <span>🔄</span> <span class="hidden sm:inline">Restart</span>
+            <button id="btn-restart" class="btn-cartoon bg-amber-600 hover:bg-amber-500 text-white w-8 h-8 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1.5 rounded-xl border border-amber-400 font-bold text-xs sm:text-sm flex items-center justify-center gap-1" title="Restartuj poziom">
+                <span>🔄</span> <span class="hidden lg:inline">Restart</span>
             </button>
-            <button id="btn-levels" class="btn-cartoon bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1.5 rounded-xl border border-blue-400 font-bold text-xs sm:text-sm flex items-center gap-1">
-                <span>🗺️</span> <span class="hidden sm:inline">Poziomy</span>
+            <button id="btn-levels" class="btn-cartoon bg-blue-600 hover:bg-blue-500 text-white px-2 sm:px-2.5 py-1 sm:py-1.5 h-8 sm:h-auto rounded-xl border border-blue-400 font-bold text-xs sm:text-sm flex items-center justify-center gap-1" title="Mapa 150 poziomów">
+                <span>🗺️</span> <span class="hidden md:inline">Poziomy</span>
             </button>
-            <button id="btn-help" class="btn-cartoon bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-xl border border-emerald-400 font-bold text-xs sm:text-sm flex items-center gap-1">
-                <span>📜</span> <span class="hidden sm:inline">Zasady</span>
+            <button id="btn-help" class="btn-cartoon bg-emerald-600 hover:bg-emerald-500 text-white w-8 h-8 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1.5 rounded-xl border border-emerald-400 font-bold text-xs sm:text-sm flex items-center justify-center gap-1" title="Zasady gry">
+                <span>📜</span> <span class="hidden lg:inline">Zasady</span>
             </button>
         </div>
     </header>
@@ -123,64 +132,80 @@
     <main class="relative flex-1 w-full h-full overflow-hidden flex items-center justify-center bg-[#0c2214]">
         <canvas id="gameCanvas" class="block w-full h-full cursor-pointer"></canvas>
 
+        <!-- Top-Right Mini-Map Toggle Button (Prevents overlap & allows expanding/hiding on mobile) -->
+        <div class="absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5 pointer-events-auto">
+            <button id="btn-toggle-minimap" class="btn-cartoon bg-[#112616]/90 hover:bg-[#1b3b22] text-amber-300 border-2 border-amber-500/80 px-2.5 py-1 rounded-xl text-xs font-title font-bold flex items-center gap-1 shadow-lg">
+                <span>🧭</span>
+                <span id="minimap-btn-label">Mapa</span>
+            </button>
+        </div>
+
         <!-- Contextual Action Prompt (Open Gate / Shortcuts info) -->
-        <div id="gate-prompt" class="hidden absolute top-4 left-1/2 -translate-x-1/2 z-10 pointer-events-auto">
-            <button id="btn-unlock-gate" class="btn-cartoon animate-pulse-fast bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 font-title font-bold px-5 py-2.5 rounded-2xl border-2 border-white shadow-xl flex items-center gap-2 text-sm sm:text-base">
-                <span class="text-xl">🗝️</span>
-                <span id="gate-prompt-text">Otwórz skrót (-1 Klucz) [Spacja / E]</span>
+        <div id="gate-prompt" class="hidden absolute top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-auto max-w-[90vw]">
+            <button id="btn-unlock-gate" class="btn-cartoon animate-pulse-fast bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 font-title font-bold px-3.5 sm:px-5 py-1.5 sm:py-2.5 rounded-2xl border-2 border-white shadow-xl flex items-center gap-1.5 sm:gap-2 text-xs sm:text-base whitespace-nowrap">
+                <span class="text-base sm:text-xl">🗝️</span>
+                <span id="gate-prompt-text">Otwórz skrót (-1 Klucz)</span>
             </button>
         </div>
 
         <!-- Level Info Toast on Start -->
-        <div id="level-toast" class="pointer-events-none absolute top-16 left-1/2 -translate-x-1/2 z-10 transition-opacity duration-500 opacity-0">
-            <div class="bg-black/75 backdrop-blur-md border-2 border-amber-400/80 px-5 py-2 rounded-2xl text-center shadow-2xl">
-                <div id="toast-title" class="font-title text-lg sm:text-xl text-amber-300 font-bold">Poziom 1</div>
-                <div id="toast-subtitle" class="text-xs sm:text-sm text-gray-200">Skróty w tym labiryncie: 0 | Kryjówki: 4</div>
+        <div id="level-toast" class="pointer-events-none absolute top-14 sm:top-16 left-1/2 -translate-x-1/2 z-10 transition-opacity duration-500 opacity-0 w-[88vw] max-w-md">
+            <div class="bg-black/80 backdrop-blur-md border-2 border-amber-400/80 px-3.5 py-2 rounded-2xl text-center shadow-2xl">
+                <div id="toast-title" class="font-title text-sm sm:text-xl text-amber-300 font-bold">Poziom 1 z 150</div>
+                <div id="toast-subtitle" class="text-[11px] sm:text-sm text-gray-200 mt-0.5">Skróty: 0 | Kryjówki: 4</div>
             </div>
         </div>
 
-        <!-- Touch / On-screen Controls (Bottom Left & Right on Mobile/Tablet or optional click) -->
-        <div class=" absolute bottom-4 left-4 z-10 flex flex-col items-center gap-1 opacity-85 hover:opacity-100 transition-opacity select-none">
-            <button data-dir="up" class="dpad-btn btn-cartoon w-12 h-12 sm:w-14 sm:h-14 bg-slate-800/90 active:bg-blue-600 text-white rounded-2xl border-2 border-slate-500 flex items-center justify-center text-xl shadow-lg">▲</button>
+        <!-- ERGONOMIC TOUCH D-PAD (Bottom Left - Supports touch slide / drag across directions) -->
+        <div id="touch-dpad" class="absolute bottom-3 left-3 sm:bottom-5 sm:left-5 z-10 flex flex-col items-center gap-1 opacity-85 hover:opacity-100 transition-opacity select-none touch-none">
+            <button data-dir="up" class="dpad-btn btn-cartoon w-12 h-11 sm:w-14 sm:h-14 bg-slate-800/90 active:bg-blue-600 text-white rounded-2xl border-2 border-slate-500 flex items-center justify-center text-lg sm:text-xl shadow-lg">▲</button>
             <div class="flex gap-1">
-                <button data-dir="left" class="dpad-btn btn-cartoon w-12 h-12 sm:w-14 sm:h-14 bg-slate-800/90 active:bg-blue-600 text-white rounded-2xl border-2 border-slate-500 flex items-center justify-center text-xl shadow-lg">◀</button>
-                <button data-dir="down" class="dpad-btn btn-cartoon w-12 h-12 sm:w-14 sm:h-14 bg-slate-800/90 active:bg-blue-600 text-white rounded-2xl border-2 border-slate-500 flex items-center justify-center text-xl shadow-lg">▼</button>
-                <button data-dir="right" class="dpad-btn btn-cartoon w-12 h-12 sm:w-14 sm:h-14 bg-slate-800/90 active:bg-blue-600 text-white rounded-2xl border-2 border-slate-500 flex items-center justify-center text-xl shadow-lg">▶</button>
+                <button data-dir="left" class="dpad-btn btn-cartoon w-12 h-11 sm:w-14 sm:h-14 bg-slate-800/90 active:bg-blue-600 text-white rounded-2xl border-2 border-slate-500 flex items-center justify-center text-lg sm:text-xl shadow-lg">◀</button>
+                <button data-dir="down" class="dpad-btn btn-cartoon w-12 h-11 sm:w-14 sm:h-14 bg-slate-800/90 active:bg-blue-600 text-white rounded-2xl border-2 border-slate-500 flex items-center justify-center text-lg sm:text-xl shadow-lg">▼</button>
+                <button data-dir="right" class="dpad-btn btn-cartoon w-12 h-11 sm:w-14 sm:h-14 bg-slate-800/90 active:bg-blue-600 text-white rounded-2xl border-2 border-slate-500 flex items-center justify-center text-lg sm:text-xl shadow-lg">▶</button>
             </div>
+        </div>
+
+        <!-- MOBILE ACTION BUTTON (Bottom Right - Quick Gate Unlock & Status) -->
+        <div class="absolute bottom-3 right-3 sm:bottom-5 sm:right-5 z-10 flex flex-col items-end gap-2 select-none pointer-events-auto">
+            <button id="btn-mobile-action" class="btn-cartoon w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-800/85 border-2 border-slate-500 text-white flex flex-col items-center justify-center shadow-xl transition-all opacity-75" title="Otwórz pobliską bramę skrótu (Spacja / E)">
+                <span class="text-xl sm:text-2xl leading-none">🗝️</span>
+                <span id="mobile-action-label" class="text-[9px] sm:text-[10px] font-bold uppercase tracking-tighter mt-0.5 text-amber-300">Skrót</span>
+            </button>
         </div>
     </main>
 
     <!-- MODAL: LEVEL COMPLETE -->
-    <div id="modal-victory" class="hidden fixed inset-0 z-30 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="parchment-panel max-w-md w-full rounded-3xl p-6 text-center relative animate-bounce-once">
-            <div class="w-20 h-20 mx-auto -mt-14 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full border-4 border-white shadow-xl flex items-center justify-center text-4xl">
+    <div id="modal-victory" class="hidden fixed inset-0 z-30 bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+        <div class="parchment-panel max-w-md w-full max-h-[90dvh] overflow-y-auto rounded-3xl p-4 sm:p-6 text-center relative">
+            <div class="w-14 h-14 sm:w-20 sm:h-20 mx-auto bg-gradient-to-b from-amber-400 to-amber-600 rounded-full border-4 border-white shadow-xl flex items-center justify-center text-2xl sm:text-4xl">
                 🏆
             </div>
-            <h2 id="victory-title" class="font-title text-2xl sm:text-3xl font-bold text-[#1b5e20] mt-3">Poziom Ukończony!</h2>
-            <p id="victory-desc" class="text-sm sm:text-base text-amber-900 mt-1 font-semibold">Udało Ci się przechytrzyć Gargamela i dotrzeć do Złotej Skrzyni!</p>
+            <h2 id="victory-title" class="font-title text-xl sm:text-3xl font-bold text-[#1b5e20] mt-2">Poziom Ukończony!</h2>
+            <p id="victory-desc" class="text-xs sm:text-base text-amber-900 mt-1 font-semibold">Udało Ci się przechytrzyć Gargamela i dotrzeć do Złotej Skrzyni!</p>
 
             <!-- Key Reward Box -->
-            <div class="my-5 bg-amber-100/90 border-2 border-amber-400 rounded-2xl p-4 shadow-inner">
-                <div id="victory-key-msg" class="font-title font-bold text-lg text-amber-800 flex items-center justify-center gap-2">
-                    <span class="text-2xl">🗝️</span>
+            <div class="my-3 sm:my-5 bg-amber-100/90 border-2 border-amber-400 rounded-2xl p-3 sm:p-4 shadow-inner">
+                <div id="victory-key-msg" class="font-title font-bold text-sm sm:text-lg text-amber-800 flex items-center justify-center gap-1.5">
+                    <span class="text-xl sm:text-2xl">🗝️</span>
                     <span>Zdobyto +1 Złoty Klucz!</span>
                 </div>
-                <div class="text-xs text-amber-700 mt-1" id="victory-key-sub">
+                <div class="text-[11px] sm:text-xs text-amber-700 mt-1" id="victory-key-sub">
                     Twój stan kluczy: 1 / 5. Zachowaj je na trudniejsze labirynty!
                 </div>
-                <div id="victory-keys-bar" class="flex justify-center gap-2 mt-3"></div>
+                <div id="victory-keys-bar" class="flex justify-center gap-1.5 sm:gap-2 mt-2.5"></div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs sm:text-sm bg-amber-200/60 rounded-xl p-3 mb-5 font-bold text-amber-950">
+            <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm bg-amber-200/60 rounded-xl p-2.5 mb-4 font-bold text-amber-950">
                 <div>Użyte skróty: <span id="stat-shortcuts" class="text-blue-700">0</span></div>
                 <div>Czas przejścia: <span id="stat-time" class="text-blue-700">0s</span></div>
             </div>
 
-            <div class="flex gap-3 justify-center">
-                <button id="btn-victory-levels" class="btn-cartoon bg-slate-600 hover:bg-slate-500 text-white font-title font-bold py-3 px-4 rounded-2xl border-2 border-slate-400 text-sm sm:text-base">
-                    🗺️ Mapa (50)
+            <div class="flex gap-2 sm:gap-3 justify-center">
+                <button id="btn-victory-levels" class="btn-cartoon bg-slate-600 hover:bg-slate-500 text-white font-title font-bold py-2.5 px-3 sm:py-3 sm:px-4 rounded-2xl border-2 border-slate-400 text-xs sm:text-base">
+                    🗺️ Mapa (150)
                 </button>
-                <button id="btn-next-level" class="btn-cartoon flex-1 bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 text-white font-title font-bold py-3 px-6 rounded-2xl border-2 border-emerald-300 text-base sm:text-lg">
+                <button id="btn-next-level" class="btn-cartoon flex-1 bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 text-white font-title font-bold py-2.5 px-4 sm:py-3 sm:px-6 rounded-2xl border-2 border-emerald-300 text-sm sm:text-lg">
                     Następny Poziom ➔
                 </button>
             </div>
@@ -188,97 +213,110 @@
     </div>
 
     <!-- MODAL: CAUGHT BY GARGAMEL / AZRAEL -->
-    <div id="modal-caught" class="hidden fixed inset-0 z-30 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="wood-panel max-w-md w-full rounded-3xl p-6 text-center text-white relative">
-            <div class="w-20 h-20 mx-auto -mt-14 bg-gradient-to-b from-red-600 to-red-900 rounded-full border-4 border-red-300 shadow-xl flex items-center justify-center text-4xl">
+    <div id="modal-caught" class="hidden fixed inset-0 z-30 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+        <div class="wood-panel max-w-md w-full max-h-[90dvh] overflow-y-auto rounded-3xl p-4 sm:p-6 text-center text-white relative">
+            <div class="w-14 h-14 sm:w-20 sm:h-20 mx-auto bg-gradient-to-b from-red-600 to-red-900 rounded-full border-4 border-red-300 shadow-xl flex items-center justify-center text-2xl sm:text-4xl">
                 🧙‍♂️
             </div>
-            <h2 id="caught-title" class="font-title text-2xl sm:text-3xl font-bold text-red-400 mt-3">Złapany!</h2>
-            <p id="caught-desc" class="text-sm sm:text-base text-amber-100 mt-2">
+            <h2 id="caught-title" class="font-title text-xl sm:text-3xl font-bold text-red-400 mt-2">Złapany!</h2>
+            <p id="caught-desc" class="text-xs sm:text-base text-amber-100 mt-1.5">
                 "Mam Cię, mały niebieski Smerfie!" – Gargamel zauważył Cię poza kryjówką.
             </p>
-            <div class="my-4 bg-black/40 border border-amber-500/40 rounded-2xl p-3 text-xs sm:text-sm text-amber-200">
+            <div class="my-3 sm:my-4 bg-black/40 border border-amber-500/40 rounded-2xl p-2.5 sm:p-3 text-xs sm:text-sm text-amber-200">
                 💡 <strong>Wskazówka:</strong> Chowaj się w <span class="text-emerald-300 font-bold">jagodowych krzakach</span> lub <span class="text-red-300 font-bold">smerfnych grzybkach</span>, gdy widzisz nadchodzący stożek wzroku! Twoje klucze sprzed poziomu są bezpieczne.
             </div>
-            <div class="flex gap-3 justify-center mt-5">
-                <button id="btn-caught-levels" class="btn-cartoon bg-slate-700 hover:bg-slate-600 text-white font-title font-bold py-3 px-4 rounded-2xl border-2 border-slate-500 text-sm sm:text-base">
-                    🗺️ Wybór poziomu
+            <div class="flex gap-2 sm:gap-3 justify-center mt-4">
+                <button id="btn-caught-levels" class="btn-cartoon bg-slate-700 hover:bg-slate-600 text-white font-title font-bold py-2.5 px-3 sm:py-3 sm:px-4 rounded-2xl border-2 border-slate-500 text-xs sm:text-base">
+                    🗺️ Poziomy
                 </button>
-                <button id="btn-retry" class="btn-cartoon flex-1 bg-gradient-to-b from-amber-500 to-amber-700 hover:from-amber-400 hover:to-amber-600 text-white font-title font-bold py-3 px-6 rounded-2xl border-2 border-amber-300 text-base sm:text-lg">
+                <button id="btn-retry" class="btn-cartoon flex-1 bg-gradient-to-b from-amber-500 to-amber-700 hover:from-amber-400 hover:to-amber-600 text-white font-title font-bold py-2.5 px-4 sm:py-3 sm:px-6 rounded-2xl border-2 border-amber-300 text-sm sm:text-lg">
                     🔄 Spróbuj Ponownie
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: LEVEL SELECT (1 - 50) -->
-    <div id="modal-levels" class="hidden fixed inset-0 z-30 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
-        <div class="wood-panel max-w-3xl w-full max-h-[88vh] rounded-3xl p-4 sm:p-6 flex flex-col text-white">
-            <div class="flex items-center justify-between border-b-2 border-amber-700/60 pb-3 mb-3">
-                <div class="flex items-center gap-2.5">
-                    <span class="text-2xl sm:text-3xl">🗺️</span>
+    <!-- MODAL: LEVEL SELECT (1 - 150 WITH CHAPTER TABS) -->
+    <div id="modal-levels" class="hidden fixed inset-0 z-30 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-6">
+        <div class="wood-panel max-w-3xl w-full max-h-[90dvh] rounded-3xl p-3.5 sm:p-6 flex flex-col text-white">
+            <div class="flex items-center justify-between border-b-2 border-amber-700/60 pb-2.5 mb-2.5 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl sm:text-3xl">🗺️</span>
                     <div>
-                        <h2 class="font-title text-xl sm:text-2xl font-bold text-amber-300">Mapa Lasu Smerfów (50 Poziomów)</h2>
-                        <p class="text-xs text-amber-200/80">Wybierz odblokowany poziom. Każdy poziom ma unikalny układ i rosnącą liczbę skrótów!</p>
+                        <h2 class="font-title text-base sm:text-2xl font-bold text-amber-300">Mapa Lasu Smerfów (150 Poziomów)</h2>
+                        <p class="text-[11px] sm:text-xs text-amber-200/80">Wybierz rozdział i poziom. Każdy labirynt ma więcej skrótów i wyzwań!</p>
                     </div>
                 </div>
-                <button id="btn-close-levels" class="btn-cartoon bg-red-600 hover:bg-red-500 text-white w-9 h-9 rounded-xl font-bold border border-red-400">✕</button>
+                <button id="btn-close-levels" class="btn-cartoon bg-red-600 hover:bg-red-500 text-white w-8 h-8 sm:w-9 sm:h-9 rounded-xl font-bold border border-red-400 shrink-0">✕</button>
             </div>
 
-            <!-- Level Grid -->
-            <div id="levels-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2 overflow-y-auto p-2 flex-1">
+            <!-- Chapter Filter Tabs (1-50, 51-100, 101-150) -->
+            <div class="grid grid-cols-3 gap-1.5 sm:gap-2.5 mb-2.5 shrink-0">
+                <button data-chapter="0" class="chapter-tab btn-cartoon py-1.5 px-2 rounded-xl font-title font-bold text-xs sm:text-sm border-2 transition-all">
+                    🍄 1–50<span class="hidden sm:inline">: Wioska Smerfów</span>
+                </button>
+                <button data-chapter="1" class="chapter-tab btn-cartoon py-1.5 px-2 rounded-xl font-title font-bold text-xs sm:text-sm border-2 transition-all">
+                    🌲 51–100<span class="hidden sm:inline">: Głęboki Las</span>
+                </button>
+                <button data-chapter="2" class="chapter-tab btn-cartoon py-1.5 px-2 rounded-xl font-title font-bold text-xs sm:text-sm border-2 transition-all">
+                    🏰 101–150<span class="hidden sm:inline">: Zamek Gargamela</span>
+                </button>
+            </div>
+
+            <!-- Level Grid (5 cols on mobile, 10 on desktop) -->
+            <div id="levels-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-1.5 sm:gap-2 overflow-y-auto p-1.5 flex-1 min-h-0">
                 <!-- Populated by JS -->
             </div>
 
-            <div class="mt-4 pt-3 border-t-2 border-amber-700/60 flex flex-wrap items-center justify-between gap-2 text-xs text-amber-200">
-                <div class="flex items-center gap-3">
-                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-600 inline-block"></span> Ukończony</span>
-                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-500 inline-block"></span> Aktualny</span>
-                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-slate-700 inline-block"></span> Zablokowany</span>
+            <div class="mt-2.5 pt-2.5 border-t-2 border-amber-700/60 flex flex-wrap items-center justify-between gap-2 text-[11px] sm:text-xs text-amber-200 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3">
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-600 inline-block"></span> Ukończony</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-amber-500 inline-block"></span> Aktualny</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-slate-700 inline-block"></span> Zablokowany</span>
                 </div>
-                <button id="btn-reset-save" class="text-red-300 hover:text-red-200 underline font-semibold">Resetuj postęp gry</button>
+                <button id="btn-reset-save" class="text-red-300 hover:text-red-200 underline font-semibold">Resetuj postęp</button>
             </div>
         </div>
     </div>
 
     <!-- MODAL: INSTRUCTIONS / WELCOME -->
-    <div id="modal-help" class="hidden fixed inset-0 z-30 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="parchment-panel max-w-lg w-full rounded-3xl p-5 sm:p-6 text-left relative max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between border-b-2 border-amber-500 pb-3 mb-4">
+    <div id="modal-help" class="hidden fixed inset-0 z-30 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+        <div class="parchment-panel max-w-lg w-full rounded-3xl p-4 sm:p-6 text-left relative max-h-[90dvh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b-2 border-amber-500 pb-2.5 mb-3">
                 <div class="flex items-center gap-2">
-                    <span class="text-3xl">🍄</span>
-                    <h2 class="font-title text-xl sm:text-2xl font-bold text-[#0d47a1]">Labirynt Smerfów – Jak grać?</h2>
+                    <span class="text-2xl sm:text-3xl">🍄</span>
+                    <h2 class="font-title text-lg sm:text-2xl font-bold text-[#0d47a1]">Labirynt Smerfów – Zasady</h2>
                 </div>
-                <button id="btn-close-help" class="btn-cartoon bg-amber-600 hover:bg-amber-500 text-white w-8 h-8 rounded-xl font-bold">✕</button>
+                <button id="btn-close-help" class="btn-cartoon bg-amber-600 hover:bg-amber-500 text-white w-8 h-8 rounded-xl font-bold shrink-0">✕</button>
             </div>
 
-            <div class="space-y-3 text-xs sm:text-sm text-amber-950 leading-relaxed">
-                <div class="flex items-start gap-3 bg-white/60 p-3 rounded-2xl border border-amber-300">
-                    <span class="text-2xl">🏃‍♂️</span>
+            <div class="space-y-2.5 text-xs sm:text-sm text-amber-950 leading-relaxed">
+                <div class="flex items-start gap-2.5 bg-white/60 p-2.5 sm:p-3 rounded-2xl border border-amber-300">
+                    <span class="text-xl sm:text-2xl">🏃‍♂️</span>
                     <div>
-                        <strong class="text-blue-800 block">Cel gry i Sterowanie:</strong>
-                        Poruszaj się Smerfem za pomocą <strong>Strzałek / WASD</strong> (lub przycisków na ekranie). Twoim celem w każdym z <strong>50 poziomów</strong> jest dotarcie do <strong>Złotej Skrzyni</strong> na końcu labiryntu.
+                        <strong class="text-blue-800 block">Cel gry i Wygodne Sterowanie (150 Poziomów):</strong>
+                        Poruszaj się Smerfem za pomocą <strong>Strzałek / WASD</strong> lub <strong>przesuwając palcem po krzyżaku (D-Padzie)</strong> na dole ekranu. Dotrzyj do <strong>Złotej Skrzyni</strong>!
                     </div>
                 </div>
 
-                <div class="flex items-start gap-3 bg-white/60 p-3 rounded-2xl border border-amber-300">
-                    <span class="text-2xl">🌿</span>
+                <div class="flex items-start gap-2.5 bg-white/60 p-2.5 sm:p-3 rounded-2xl border border-amber-300">
+                    <span class="text-xl sm:text-2xl">🌿</span>
                     <div>
                         <strong class="text-emerald-800 block">Kryjówki przed Gargamelem i Klakierem:</strong>
-                        Po korytarzach chodzą <strong>Gargamel</strong> (czerwony, szeroki wzrok) oraz <strong>Klakier</strong> (pomarańczowy, szybki zwinny wzrok). Wchodź w <strong>jagodowe krzaki</strong> lub <strong>smerfne grzybki</strong> – w kryjówce jesteś całkowicie niewidoczny!
+                        Po korytarzach chodzą <strong>Gargamel</strong> oraz szybki <strong>Klakier</strong>. Wchodź w <strong>jagodowe krzaki</strong> lub <strong>smerfne grzybki</strong> – w kryjówce jesteś całkowicie niewidoczny!
                     </div>
                 </div>
 
-                <div class="flex items-start gap-3 bg-white/60 p-3 rounded-2xl border border-amber-300">
-                    <span class="text-2xl">🗝️</span>
+                <div class="flex items-start gap-2.5 bg-white/60 p-2.5 sm:p-3 rounded-2xl border border-amber-300">
+                    <span class="text-xl sm:text-2xl">🗝️</span>
                     <div>
                         <strong class="text-amber-800 block">Klucze (Limit 5) i Bramy Skrótów:</strong>
-                        Otwarcie skrzyni kończy poziom i daje <strong>+1 Klucz</strong>. Możesz zebrać maksymalnie <strong>5 kluczy</strong> jednocześnie. Od Poziomu 2 w labiryntach pojawiają się <strong>zamknięte bramy ze skrótami</strong> – podejdź do bramy (lub naciśnij <strong>Spację / E</strong>), aby zużyć 1 klucz i ominąć niebezpieczny odcinek!
+                        Ukończenie poziomu daje <strong>+1 Klucz</strong> (maksymalnie 5 naraz). Od Poziomu 2 w labiryntach są <strong>zamknięte bramy skrótów</strong> – podejdź do bramy lub naciśnij <strong>przycisk 🗝️ / Spację / E</strong>, aby otworzyć przejście!
                     </div>
                 </div>
             </div>
 
-            <button id="btn-start-play" class="btn-cartoon w-full mt-5 bg-gradient-to-b from-blue-500 to-blue-700 hover:from-blue-400 hover:to-blue-600 text-white font-title font-bold py-3 rounded-2xl border-2 border-blue-300 text-base sm:text-lg shadow-lg">
+            <button id="btn-start-play" class="btn-cartoon w-full mt-4 bg-gradient-to-b from-blue-500 to-blue-700 hover:from-blue-400 hover:to-blue-600 text-white font-title font-bold py-2.5 sm:py-3 rounded-2xl border-2 border-blue-300 text-sm sm:text-lg shadow-lg">
                 Zaczynamy Przygodę! 🍄
             </button>
         </div>
@@ -354,7 +392,7 @@
         const sfx = new SoundManager();
 
         /********************************************************************
-         * 2. DETERMINISTIC PRNG & LEVEL GENERATOR (50 Unique Levels)
+         * 2. DETERMINISTIC PRNG & LEVEL GENERATOR (150 Unique Levels)
          ********************************************************************/
         class SeededRNG {
             constructor(seed) {
@@ -378,13 +416,6 @@
             }
         }
 
-        // Tile Types:
-        // 0 = Path
-        // 1 = Hedge Wall
-        // 2 = Hideout (Berry Bush / Smurf Mushroom)
-        // 3 = Locked Shortcut Gate
-        // 4 = Opened Shortcut Gate
-        // 5 = Golden Chest (Goal)
         const TILE_PATH = 0;
         const TILE_WALL = 1;
         const TILE_HIDEOUT = 2;
@@ -392,28 +423,33 @@
         const TILE_GATE_OPEN = 4;
         const TILE_CHEST = 5;
 
+        function getZoneName(level) {
+            if (level <= 50) return 'Wioska Smerfów';
+            if (level <= 100) return 'Głęboki Las';
+            return 'Zamek Gargamela';
+        }
+
         function getLevelParameters(level) {
-            // Level 1 is 11x11, progressively grows up to 31x31 at level 50
-            const rawSize = 11 + Math.floor((level - 1) * 0.42);
+            // Smoothly scale maze size from 11x11 (Level 1) up to 41x41 (Level 150)
+            const rawSize = 11 + Math.floor((level - 1) * 0.205);
             const gridSize = rawSize % 2 === 0 ? rawSize + 1 : rawSize;
 
-            // Level 1 has 0 shortcuts (no key yet). Levels 2..50 have 1 up to 8 shortcuts
+            // Level 1 has 0 shortcuts. Levels 2..150 scale from 1 up to 12 shortcuts
             let numShortcuts = 0;
             if (level >= 2) {
-                numShortcuts = 1 + Math.floor((level - 2) / 7); // 1 on lvl 2-8, 2 on 9-15 ... up to 7-8
+                numShortcuts = 1 + Math.floor((level - 2) / 13);
             }
 
-            // Number of enemies grows with level
-            // Level 1: 1 Gargamel + 1 Klakier
-            // Higher levels add extra patrols
-            const numGargamels = 1 + Math.floor(level / 18);
-            const numKlakiers = 1 + Math.floor((level + 6) / 14);
+            // Number of enemies scales smoothly up to 150
+            const numGargamels = 1 + Math.floor(level / 32); // 1..5 Gargamels
+            const numKlakiers = 1 + Math.floor((level + 12) / 28); // 1..6 Klakiers
 
-            // Speed multiplier scales smoothly from 1.0 to 1.55
-            const speedScale = 1 + (level - 1) * 0.011;
+            // Speed multiplier scales smoothly from 1.00 (lvl 1) to 1.65 (lvl 150)
+            const speedScale = 1 + (level - 1) * 0.0044;
 
             return {
                 level,
+                zoneName: getZoneName(level),
                 cols: gridSize,
                 rows: gridSize,
                 numShortcuts,
@@ -428,11 +464,10 @@
             const { cols, rows, numShortcuts } = params;
             const rng = new SeededRNG(levelNum * 98765 + 1337);
 
-            // Initialize full wall grid
             const grid = Array.from({ length: rows }, () => Array(cols).fill(TILE_WALL));
-            const hideoutVariant = Array.from({ length: rows }, () => Array(cols).fill(0)); // 0=bush, 1=mushroom
+            const hideoutVariant = Array.from({ length: rows }, () => Array(cols).fill(0));
 
-            // 1. Recursive Backtracker Maze Generation (Perfect Maze)
+            // 1. Recursive Backtracker Maze Generation
             const visited = Array.from({ length: rows }, () => Array(cols).fill(false));
             const stack = [];
             const startR = 1, startC = 1;
@@ -462,7 +497,7 @@
                 if (!carved) stack.pop();
             }
 
-            // 2. Compute BFS distances and parent tree from Start (1,1) to all cells on the tree
+            // 2. Compute BFS distances and parent tree from Start (1,1)
             const distFromStart = Array.from({ length: rows }, () => Array(cols).fill(-1));
             const parentMap = Array.from({ length: rows }, () => Array(cols).fill(null));
             const queue = [[startR, startC]];
@@ -475,7 +510,6 @@
             while (queue.length > 0) {
                 const [r, c] = queue.shift();
                 const d = distFromStart[r][c];
-                // Prefer cells near bottom-right corner or very far along the maze tree
                 const cornerBonus = (r + c) * 0.4;
                 if (d + cornerBonus > maxDist && (r > 2 || c > 2)) {
                     maxDist = d + cornerBonus;
@@ -502,16 +536,14 @@
                 mainPathList.push(curr);
                 curr = parentMap[curr[0]][curr[1]];
             }
-            mainPathList.reverse(); // from Start to Chest
+            mainPathList.reverse();
 
-            // 3. Place Locked Shortcut Gates (`TILE_GATE_LOCKED`)
-            // Find internal walls separating two path cells whose tree distance is large (bypasses a long loop!)
+            // 3. Place Locked Shortcut Gates
             const candidateWalls = [];
             for (let r = 1; r < rows - 1; r++) {
                 for (let c = 1; c < cols - 1; c++) {
                     if (grid[r][c] !== TILE_WALL) continue;
 
-                    // Vertical separation (top & bottom are path)
                     if (grid[r - 1][c] === TILE_PATH && grid[r + 1][c] === TILE_PATH) {
                         const d1 = distFromStart[r - 1][c];
                         const d2 = distFromStart[r + 1][c];
@@ -520,9 +552,7 @@
                         if (saved >= 8) {
                             candidateWalls.push({ r, c, saved: saved + (onMain ? 10 : 0) });
                         }
-                    }
-                    // Horizontal separation (left & right are path)
-                    else if (grid[r][c - 1] === TILE_PATH && grid[r][c + 1] === TILE_PATH) {
+                    } else if (grid[r][c - 1] === TILE_PATH && grid[r][c + 1] === TILE_PATH) {
                         const d1 = distFromStart[r][c - 1];
                         const d2 = distFromStart[r][c + 1];
                         const saved = Math.abs(d1 - d2);
@@ -539,8 +569,7 @@
             const placedGates = [];
             for (const cand of candidateWalls) {
                 if (placedGates.length >= numShortcuts) break;
-                // Ensure gates aren't right next to each other or right at start/chest
-                const tooClose = placedGates.some(g => Math.abs(g.r - cand.r) + Math.abs(g.c - cand.c) < 5);
+                const tooClose = placedGates.some(g => Math.abs(g.r - cand.r) + Math.abs(g.c - cand.c) < 4);
                 const nearStart = Math.abs(cand.r - startR) + Math.abs(cand.c - startC) <= 2;
                 const nearChest = Math.abs(cand.r - chestR) + Math.abs(cand.c - chestC) <= 2;
                 if (!tooClose && !nearStart && !nearChest) {
@@ -549,29 +578,28 @@
                 }
             }
 
-            // Also add a few small extra open loops in higher levels so enemies have rich patrol routes
-            const extraLoops = Math.floor(levelNum / 8);
+            // Extra open loops in larger mazes for varied enemy patrols
+            const extraLoops = Math.floor(levelNum / 14);
             let loopsAdded = 0;
             for (let i = candidateWalls.length - 1; i >= 0 && loopsAdded < extraLoops; i--) {
                 const w = candidateWalls[i];
-                if (grid[w.r][w.c] === TILE_WALL && w.saved >= 6 && w.saved <= 14) {
+                if (grid[w.r][w.c] === TILE_WALL && w.saved >= 6 && w.saved <= 16) {
                     grid[w.r][w.c] = TILE_PATH;
                     loopsAdded++;
                 }
             }
 
-            // 4. Place Hideouts (Berry Bushes & Smurf Mushrooms) along corridors & alcoves
+            // 4. Place Hideouts (Berry Bushes & Smurf Mushrooms)
             let hideoutCount = 0;
-            // First, guarantee hideouts every ~5-6 steps along the main path (either in adjacent alcoves or on the path side)
-            for (let i = 3; i < mainPathList.length - 3; i += 5) {
+            const hideoutStep = levelNum > 80 ? 4 : 5;
+            for (let i = 3; i < mainPathList.length - 3; i += hideoutStep) {
                 const [mr, mc] = mainPathList[i];
-                // Look for an adjacent path cell not on main path (alcove), or use the cell itself if safe
                 let placedInAlcove = false;
                 for (const [dr, dc] of rng.shuffle(stepDirs)) {
                     const ar = mr + dr, ac = mc + dc;
                     if (grid[ar][ac] === TILE_PATH && !mainPathSet.has(`${ar},${ac}`)) {
                         grid[ar][ac] = TILE_HIDEOUT;
-                        hideoutVariant[ar][ac] = rng.next() < 0.35 ? 1 : 0;
+                        hideoutVariant[ar][ac] = rng.next() < 0.38 ? 1 : 0;
                         hideoutCount++;
                         placedInAlcove = true;
                         break;
@@ -579,23 +607,20 @@
                 }
                 if (!placedInAlcove && grid[mr][mc] === TILE_PATH) {
                     grid[mr][mc] = TILE_HIDEOUT;
-                    hideoutVariant[mr][mc] = rng.next() < 0.3 ? 1 : 0;
+                    hideoutVariant[mr][mc] = rng.next() < 0.32 ? 1 : 0;
                     hideoutCount++;
                 }
             }
 
-            // Add additional hideouts in dead-ends and side branches across the labyrinth
             for (let r = 1; r < rows - 1; r++) {
                 for (let c = 1; c < cols - 1; c++) {
                     if (grid[r][c] !== TILE_PATH) continue;
                     if ((r === startR && c === startC) || (r === chestR && c === chestC)) continue;
 
-                    // Count open neighbors
                     let openNeighbors = 0;
                     for (const [dr, dc] of stepDirs) {
                         if (grid[r + dr][c + dc] !== TILE_WALL) openNeighbors++;
                     }
-                    // Dead ends have high chance to be a Smurf mushroom or berry bush hideout
                     if (openNeighbors === 1 && rng.next() < 0.65) {
                         grid[r][c] = TILE_HIDEOUT;
                         hideoutVariant[r][c] = rng.next() < 0.5 ? 1 : 0;
@@ -604,12 +629,10 @@
                 }
             }
 
-            // Place the Golden Chest at destination
             grid[chestR][chestC] = TILE_CHEST;
-            // Ensure start is clean path
             grid[startR][startC] = TILE_PATH;
 
-            // 5. Spawn Enemies (Gargamel & Klakier) with Patrol Waypoints
+            // 5. Spawn Enemies (Gargamel & Klakier)
             const enemies = [];
             const candidateSpawns = [];
             for (let r = 1; r < rows - 1; r++) {
@@ -624,7 +647,6 @@
             }
 
             const shuffledSpawns = rng.shuffle(candidateSpawns);
-            // Prioritize some enemies near the main route so the player must use hideouts or shortcuts
             shuffledSpawns.sort((a, b) => (b.onMain ? 1 : 0) - (a.onMain ? 1 : 0));
 
             const totalEnemies = params.numGargamels + params.numKlakiers;
@@ -632,7 +654,7 @@
 
             for (const sp of shuffledSpawns) {
                 if (chosenSpawns.length >= totalEnemies) break;
-                const tooClose = chosenSpawns.some(other => Math.abs(other.r - sp.r) + Math.abs(other.c - sp.c) < 6);
+                const tooClose = chosenSpawns.some(other => Math.abs(other.r - sp.r) + Math.abs(other.c - sp.c) < 5);
                 if (!tooClose) {
                     chosenSpawns.push(sp);
                 }
@@ -648,11 +670,11 @@
                     dirY: 0,
                     angle: 0,
                     targetAngle: 0,
-                    baseSpeed: (isGargamel ? 1.85 : 2.55) * params.speedScale,
-                    chaseSpeed: (isGargamel ? 2.65 : 3.35) * params.speedScale,
-                    fovAngle: isGargamel ? Math.PI * 0.44 : Math.PI * 0.30, // Gargamel wider cone
+                    baseSpeed: (isGargamel ? 1.82 : 2.50) * params.speedScale,
+                    chaseSpeed: (isGargamel ? 2.60 : 3.30) * params.speedScale,
+                    fovAngle: isGargamel ? Math.PI * 0.44 : Math.PI * 0.30,
                     fovDist: isGargamel ? 4.3 : 3.8,
-                    state: 'patrol', // 'patrol' | 'chase' | 'search'
+                    state: 'patrol',
                     alertTimer: 0,
                     nextCell: null,
                     lastCell: { r: sp.r, c: sp.c },
@@ -662,6 +684,7 @@
 
             return {
                 level: levelNum,
+                zoneName: params.zoneName,
                 cols,
                 rows,
                 grid,
@@ -679,19 +702,21 @@
          ********************************************************************/
         const STORAGE_KEY = 'smurfs_labyrinth_save_v1';
         const MAX_KEYS = 5;
-        const TOTAL_LEVELS = 50;
+        const TOTAL_LEVELS = 150;
 
         const gameState = {
             currentLevel: 1,
             unlockedLevel: 1,
-            keys: 0,               // Current keys in inventory (0..5)
-            keysAtLevelStart: 0,   // Snapshot of keys when starting a level (restored if caught!)
+            selectedChapter: 0,    // 0: 1-50, 1: 51-100, 2: 101-150
+            keys: 0,
+            keysAtLevelStart: 0,
             shortcutsUsedInLevel: 0,
             levelStartTime: 0,
-            completedLevels: {},   // { [level]: true }
+            completedLevels: {},
             isPaused: false,
             gameOver: false,
-            victory: false
+            victory: false,
+            minimapMode: window.innerWidth < 640 ? 1 : 2 // 0 = hidden, 1 = compact, 2 = expanded
         };
 
         function loadSaveData() {
@@ -703,6 +728,7 @@
                     gameState.currentLevel = Math.min(gameState.unlockedLevel, Math.max(1, data.currentLevel || 1));
                     gameState.keys = Math.min(MAX_KEYS, Math.max(0, data.keys || 0));
                     gameState.completedLevels = data.completedLevels || {};
+                    gameState.selectedChapter = Math.floor((gameState.currentLevel - 1) / 50);
                 }
             } catch (e) {
                 console.warn('Could not load save data:', e);
@@ -732,12 +758,13 @@
         let particles = [];
         let floatingTexts = [];
         let nearbyLockedGate = null;
+        let minimapBounds = { x: 0, y: 0, w: 0, h: 0 };
 
         const player = {
             x: 1.5,
             y: 1.5,
             radius: 0.30,
-            speed: 3.7,
+            speed: 3.75,
             facingX: 1,
             facingY: 0,
             isMoving: false,
@@ -778,14 +805,13 @@
 
         function startLevel(levelNum, restoreKeysFromSnapshot = false) {
             if (restoreKeysFromSnapshot) {
-                // If retrying after getting caught or manual restart, restore keys from start of level
                 gameState.keys = gameState.keysAtLevelStart;
             } else {
-                // Starting fresh: snapshot current keys
                 gameState.keysAtLevelStart = gameState.keys;
             }
 
             gameState.currentLevel = Math.max(1, Math.min(TOTAL_LEVELS, levelNum));
+            gameState.selectedChapter = Math.floor((gameState.currentLevel - 1) / 50);
             gameState.shortcutsUsedInLevel = 0;
             gameState.levelStartTime = performance.now();
             gameState.gameOver = false;
@@ -808,16 +834,17 @@
             resizeCanvas();
             snapCameraToPlayer();
             updateHUD();
+            updateGatePrompt();
             showLevelToast();
             saveGameData();
         }
 
         function showLevelToast() {
             const toast = document.getElementById('level-toast');
-            document.getElementById('toast-title').textContent = `Poziom ${levelData.level} z ${TOTAL_LEVELS}`;
+            document.getElementById('toast-title').textContent = `Poziom ${levelData.level} / ${TOTAL_LEVELS} • ${levelData.zoneName}`;
             const shortcutInfo = levelData.numShortcuts === 0
-                ? 'Brak skrótów (Poziom wprowadzający)'
-                : `Bramy-skróty: ${levelData.numShortcuts} 🗝️`;
+                ? 'Brak skrótów'
+                : `Skróty: ${levelData.numShortcuts} 🗝️`;
             document.getElementById('toast-subtitle').textContent =
                 `${shortcutInfo} | Kryjówki: ${levelData.hideoutCount} 🌿 | Wrogowie: ${levelData.enemies.length}`;
             toast.classList.remove('opacity-0');
@@ -826,44 +853,51 @@
             window._toastTimer = setTimeout(() => {
                 toast.classList.remove('opacity-100');
                 toast.classList.add('opacity-0');
-            }, 3200);
+            }, 2800);
         }
 
         /********************************************************************
          * 5. HUD & UI UPDATES
          ********************************************************************/
         function updateHUD() {
-            document.getElementById('hud-level').textContent = `Poziom ${gameState.currentLevel} / ${TOTAL_LEVELS}`;
+            const isMobile = window.innerWidth < 640;
+            document.getElementById('hud-level').textContent = isMobile
+                ? `Poz. ${gameState.currentLevel}/${TOTAL_LEVELS}`
+                : `Poziom ${gameState.currentLevel} / ${TOTAL_LEVELS}`;
+            document.getElementById('hud-zone-label').textContent = getZoneName(gameState.currentLevel);
             document.getElementById('hud-keys-text').textContent = `${gameState.keys}/${MAX_KEYS}`;
 
             const keysContainer = document.getElementById('hud-keys-icons');
             keysContainer.innerHTML = '';
             for (let i = 0; i < MAX_KEYS; i++) {
                 const span = document.createElement('span');
-                span.className = `text-base sm:text-lg transition-transform duration-300 ${i < gameState.keys ? 'scale-105 drop-shadow-[0_0_5px_rgba(251,191,36,0.9)]' : 'opacity-25 grayscale'}`;
+                span.className = `text-sm sm:text-base transition-transform duration-300 ${i < gameState.keys ? 'scale-105 drop-shadow-[0_0_5px_rgba(251,191,36,0.9)]' : 'opacity-25 grayscale'}`;
                 span.textContent = '🗝️';
                 keysContainer.appendChild(span);
             }
 
-            // Status Indicator
             const statusEl = document.getElementById('hud-status');
             const statusIcon = document.getElementById('hud-status-icon');
             const statusText = document.getElementById('hud-status-text');
+            const statusShort = document.getElementById('hud-status-short');
 
             const anyChasing = levelData && levelData.enemies.some(e => e.state === 'chase');
 
             if (player.isHidden) {
-                statusEl.className = 'flex items-center gap-2 px-3 py-1 rounded-full font-bold text-xs sm:text-sm border-2 transition-all duration-200 bg-indigo-900/90 border-indigo-400 text-indigo-100 shadow';
+                statusEl.className = 'flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full font-bold text-[11px] sm:text-sm border-2 transition-all duration-200 bg-indigo-900/90 border-indigo-400 text-indigo-100 shadow shrink-0';
                 statusIcon.textContent = '🌿';
                 statusText.textContent = 'Ukryty w kryjówce!';
+                statusShort.textContent = 'Ukryty';
             } else if (anyChasing) {
-                statusEl.className = 'flex items-center gap-2 px-3 py-1 rounded-full font-bold text-xs sm:text-sm border-2 transition-all duration-200 bg-red-800/95 border-red-400 text-white shadow animate-pulse';
+                statusEl.className = 'flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full font-bold text-[11px] sm:text-sm border-2 transition-all duration-200 bg-red-800/95 border-red-400 text-white shadow animate-pulse shrink-0';
                 statusIcon.textContent = '⚠️';
                 statusText.textContent = 'Uciekaj! Gonią Cię!';
+                statusShort.textContent = 'Alarm!';
             } else {
-                statusEl.className = 'flex items-center gap-2 px-3 py-1 rounded-full font-bold text-xs sm:text-sm border-2 transition-all duration-200 bg-emerald-800/90 border-emerald-400 text-emerald-100 shadow';
+                statusEl.className = 'flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full font-bold text-[11px] sm:text-sm border-2 transition-all duration-200 bg-emerald-800/90 border-emerald-400 text-emerald-100 shadow shrink-0';
                 statusIcon.textContent = '👀';
                 statusText.textContent = 'Widoczny na ścieżce';
+                statusShort.textContent = 'Widoczny';
             }
         }
 
@@ -871,26 +905,41 @@
             const promptDiv = document.getElementById('gate-prompt');
             const promptText = document.getElementById('gate-prompt-text');
             const btn = document.getElementById('btn-unlock-gate');
+            const mobileBtn = document.getElementById('btn-mobile-action');
+            const mobileLabel = document.getElementById('mobile-action-label');
 
             if (!nearbyLockedGate || gameState.gameOver || gameState.victory) {
                 promptDiv.classList.add('hidden');
+                mobileBtn.className = 'btn-cartoon w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-800/80 border-2 border-slate-500 text-white flex flex-col items-center justify-center shadow-xl transition-all opacity-65';
+                mobileLabel.textContent = `${gameState.keys}/${MAX_KEYS}`;
                 return;
             }
 
             promptDiv.classList.remove('hidden');
             if (gameState.keys > 0) {
                 btn.disabled = false;
-                btn.className = 'btn-cartoon animate-pulse-fast bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900 font-title font-bold px-5 py-2.5 rounded-2xl border-2 border-white shadow-xl flex items-center gap-2 text-sm sm:text-base cursor-pointer';
-                promptText.textContent = `Otwórz skrót (-1 Klucz) [Spacja / E / Kliknij]`;
+                btn.className = 'btn-cartoon animate-pulse-fast bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900 font-title font-bold px-3.5 sm:px-5 py-1.5 sm:py-2.5 rounded-2xl border-2 border-white shadow-xl flex items-center gap-1.5 sm:gap-2 text-xs sm:text-base cursor-pointer';
+                promptText.textContent = window.innerWidth < 640
+                    ? `Otwórz skrót (-1 🗝️)`
+                    : `Otwórz skrót (-1 Klucz) [Spacja / E]`;
+
+                mobileBtn.className = 'btn-cartoon animate-pulse-fast w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-b from-amber-400 to-amber-600 border-2 border-white text-slate-950 flex flex-col items-center justify-center shadow-2xl transition-all opacity-100 ring-4 ring-amber-300/50';
+                mobileLabel.textContent = 'OTWÓRZ!';
             } else {
                 btn.disabled = true;
-                btn.className = 'bg-slate-800/90 text-slate-300 font-title font-bold px-4 py-2 rounded-2xl border-2 border-slate-500 shadow-xl flex items-center gap-2 text-xs sm:text-sm opacity-90';
-                promptText.textContent = `Zamknięty skrót (Brak kluczy: 0/5)`;
+                btn.className = 'bg-slate-800/90 text-slate-300 font-title font-bold px-3.5 py-1.5 rounded-2xl border-2 border-slate-500 shadow-xl flex items-center gap-1.5 text-xs sm:text-sm opacity-90';
+                promptText.textContent = `Zamknięty skrót (0/5 🗝️)`;
+
+                mobileBtn.className = 'btn-cartoon w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-red-950/90 border-2 border-red-400 text-red-200 flex flex-col items-center justify-center shadow-xl transition-all opacity-90';
+                mobileLabel.textContent = 'Brak 🗝️';
             }
         }
 
         function tryUnlockNearbyGate() {
-            if (!nearbyLockedGate) return false;
+            if (!nearbyLockedGate) {
+                spawnFloatingText(player.x, player.y - 0.4, 'Podejdź do bramy skrótu!', '#fbbf24');
+                return false;
+            }
             if (gameState.keys <= 0) {
                 spawnFloatingText(nearbyLockedGate.c + 0.5, nearbyLockedGate.r + 0.2, 'Brak klucza!', '#ef4444');
                 return false;
@@ -929,7 +978,6 @@
         }
 
         function moveEntityWithCollisions(entity, dx, dy, radius) {
-            // Move X
             let nextX = entity.x + dx;
             const minR_x = Math.floor(entity.y - radius);
             const maxR_x = Math.floor(entity.y + radius);
@@ -952,7 +1000,6 @@
             }
             entity.x = nextX;
 
-            // Move Y
             let nextY = entity.y + dy;
             const minC_y = Math.floor(entity.x - radius);
             const maxC_y = Math.floor(entity.x + radius);
@@ -976,7 +1023,6 @@
             entity.y = nextY;
         }
 
-        // Raycast in tile coordinates for enemy vision cone and line-of-sight
         function castVisionRay(startX, startY, angle, maxDist) {
             const step = 0.12;
             const cos = Math.cos(angle);
@@ -1007,7 +1053,6 @@
             const dy = player.y - enemy.y;
             const dist = Math.hypot(dx, dy);
 
-            // Immediate proximity detection if not hidden
             if (dist < 0.65) return true;
             if (dist > enemy.fovDist) return false;
 
@@ -1018,7 +1063,6 @@
 
             if (Math.abs(angleDiff) > enemy.fovAngle * 0.55) return false;
 
-            // Check raycast for walls between enemy and player
             const ray = castVisionRay(enemy.x, enemy.y, angleToPlayer, dist);
             return !ray.hitWall || ray.dist >= dist - 0.18;
         }
@@ -1044,7 +1088,6 @@
 
             if (valid.length === 0) return { r: cr, c: cc };
 
-            // If chasing and player is not hidden, pick neighbor closest to player via greedy/BFS step
             if (enemy.state === 'chase' && !player.isHidden) {
                 valid.sort((a, b) => {
                     const da = Math.hypot((a.c + 0.5) - player.x, (a.r + 0.5) - player.y);
@@ -1054,11 +1097,9 @@
                 return valid[0];
             }
 
-            // During normal patrol, avoid immediately reversing unless dead end
             const nonReverse = valid.filter(v => !(v.r === enemy.lastCell.r && v.c === enemy.lastCell.c));
             const pool = nonReverse.length > 0 ? nonReverse : valid;
-            const chosen = pool[Math.floor(Math.random() * pool.length)];
-            return chosen;
+            return pool[Math.floor(Math.random() * pool.length)];
         }
 
         function updateEnemies(dt) {
@@ -1075,11 +1116,10 @@
                         spawnFloatingText(enemy.x, enemy.y - 0.5, '!', '#ef4444');
                         statusChanged = true;
                     }
-                    enemy.alertTimer = 2.6; // Keeps chasing for 2.6s after losing sight
+                    enemy.alertTimer = 2.6;
                 } else if (enemy.state === 'chase') {
                     enemy.alertTimer -= dt;
                     if (player.isHidden) {
-                        // Loose sight faster when Smurf ducks into bushes
                         enemy.alertTimer -= dt * 1.4;
                     }
                     if (enemy.alertTimer <= 0) {
@@ -1088,7 +1128,6 @@
                     }
                 }
 
-                // Target cell navigation
                 if (!enemy.nextCell) {
                     enemy.nextCell = pickNextPatrolCell(enemy);
                 }
@@ -1114,13 +1153,11 @@
                     enemy.targetAngle = Math.atan2(dy, dx);
                 }
 
-                // Smoothly interpolate facing angle
                 let diff = enemy.targetAngle - enemy.angle;
                 while (diff > Math.PI) diff -= Math.PI * 2;
                 while (diff < -Math.PI) diff += Math.PI * 2;
                 enemy.angle += diff * Math.min(1, dt * 10);
 
-                // Check Catch Collision (Only if Smurf is NOT hidden in a bush/mushroom!)
                 if (!player.isHidden) {
                     const distToPlayer = Math.hypot(player.x - enemy.x, player.y - enemy.y);
                     if (distToPlayer < 0.52) {
@@ -1155,7 +1192,6 @@
                 player.isMoving = false;
             }
 
-            // Check current tile
             const pr = Math.floor(player.y);
             const pc = Math.floor(player.x);
             const currentTile = levelData.grid[pr]?.[pc];
@@ -1172,7 +1208,6 @@
                 updateHUD();
             }
 
-            // Check proximity to Locked Shortcut Gate (`TILE_GATE_LOCKED`)
             let foundGate = null;
             const checkDirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
             for (const [dr, dc] of checkDirs) {
@@ -1187,14 +1222,12 @@
                 }
             }
 
-            // Auto-unlock if player walks directly against a locked gate while holding a key, or show prompt
-            if (foundGate && vx !== 0 || vy !== 0) {
-                const gateCenterX = foundGate ? foundGate.c + 0.5 : 0;
-                const gateCenterY = foundGate ? foundGate.r + 0.5 : 0;
-                const pushingTowardsGate = foundGate && (
+            if (foundGate && (vx !== 0 || vy !== 0)) {
+                const gateCenterX = foundGate.c + 0.5;
+                const gateCenterY = foundGate.r + 0.5;
+                const pushingTowardsGate =
                     (gateCenterX - player.x) * vx + (gateCenterY - player.y) * vy > 0.25 &&
-                    Math.hypot(gateCenterX - player.x, gateCenterY - player.y) < 0.88
-                );
+                    Math.hypot(gateCenterX - player.x, gateCenterY - player.y) < 0.88;
                 if (pushingTowardsGate && gameState.keys > 0) {
                     nearbyLockedGate = foundGate;
                     tryUnlockNearbyGate();
@@ -1207,7 +1240,6 @@
                 updateGatePrompt();
             }
 
-            // Check if reached Golden Chest (`TILE_CHEST`)
             const distToChest = Math.hypot((levelData.chest.c + 0.5) - player.x, (levelData.chest.r + 0.5) - player.y);
             if (distToChest < 0.65) {
                 triggerVictoryModal();
@@ -1215,18 +1247,16 @@
         }
 
         /********************************************************************
-         * 7. MODALS & GAME FLOW EVENTS
+         * 7. MODALS & GAME FLOW EVENTS (150 Levels + Chapter Tabs)
          ********************************************************************/
         function triggerVictoryModal() {
             if (gameState.victory) return;
             gameState.victory = true;
             sfx.win();
 
-            // Sparkle burst on chest
             spawnParticles(levelData.chest.c + 0.5, levelData.chest.r + 0.5, '#ffca28', 35, 3.8);
             spawnParticles(levelData.chest.c + 0.5, levelData.chest.r + 0.5, '#60a5fa', 20, 3.0);
 
-            // Award +1 Key (up to max 5)
             const hadMaxKeys = gameState.keys >= MAX_KEYS;
             if (!hadMaxKeys) {
                 gameState.keys = Math.min(MAX_KEYS, gameState.keys + 1);
@@ -1243,25 +1273,26 @@
 
             const elapsedSec = Math.max(1, Math.round((performance.now() - gameState.levelStartTime) / 1000));
             document.getElementById('victory-title').textContent =
-                gameState.currentLevel === TOTAL_LEVELS ? '🎉 Wszystkie 50 Poziomów Ukończone!' : `Poziom ${gameState.currentLevel} Ukończony!`;
+                gameState.currentLevel === TOTAL_LEVELS
+                    ? '🎉 Wszystkie 150 Poziomów Ukończone!'
+                    : `Poziom ${gameState.currentLevel} Ukończony!`;
 
             const keyMsg = document.getElementById('victory-key-msg');
             const keySub = document.getElementById('victory-key-sub');
 
             if (hadMaxKeys) {
-                keyMsg.innerHTML = `<span class="text-2xl">🗝️</span><span>Pełna sakwa kluczy (5/5)!</span>`;
+                keyMsg.innerHTML = `<span class="text-xl sm:text-2xl">🗝️</span><span>Pełna sakwa kluczy (5/5)!</span>`;
                 keySub.textContent = `Masz już maksymalną liczbę 5 kluczy – śmiało otwieraj skróty w kolejnych rundach!`;
             } else {
-                keyMsg.innerHTML = `<span class="text-2xl">🗝️</span><span>Zdobyto +1 Złoty Klucz!</span>`;
-                keySub.textContent = `Posiadasz teraz ${gameState.keys} / ${MAX_KEYS} kluczy do otwierania skrótów w kolejnych labiryntach.`;
+                keyMsg.innerHTML = `<span class="text-xl sm:text-2xl">🗝️</span><span>Zdobyto +1 Złoty Klucz!</span>`;
+                keySub.textContent = `Posiadasz teraz ${gameState.keys} / ${MAX_KEYS} kluczy do otwierania skrótów.`;
             }
 
-            // Render keys in modal
             const keysBar = document.getElementById('victory-keys-bar');
             keysBar.innerHTML = '';
             for (let i = 0; i < MAX_KEYS; i++) {
                 const el = document.createElement('div');
-                el.className = `w-10 h-10 rounded-xl flex items-center justify-center text-xl border-2 ${
+                el.className = `w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-lg sm:text-xl border-2 ${
                     i < gameState.keys ? 'bg-amber-400 border-amber-600 shadow-md scale-105' : 'bg-amber-200/50 border-amber-300 opacity-40 grayscale'
                 }`;
                 el.textContent = '🗝️';
@@ -1305,10 +1336,26 @@
             }, 250);
         }
 
-        function populateLevelsModal() {
+        function populateLevelsModal(chapterIdx = gameState.selectedChapter) {
+            gameState.selectedChapter = chapterIdx;
+
+            // Update chapter tab styles
+            document.querySelectorAll('.chapter-tab').forEach(tab => {
+                const idx = parseInt(tab.dataset.chapter, 10);
+                if (idx === chapterIdx) {
+                    tab.className = 'chapter-tab btn-cartoon py-1.5 px-2 rounded-xl font-title font-bold text-xs sm:text-sm border-2 bg-amber-500 border-white text-slate-950 shadow-md';
+                } else {
+                    tab.className = 'chapter-tab btn-cartoon py-1.5 px-2 rounded-xl font-title font-bold text-xs sm:text-sm border-2 bg-slate-800/90 hover:bg-slate-700 border-slate-500 text-amber-100';
+                }
+            });
+
             const gridEl = document.getElementById('levels-grid');
             gridEl.innerHTML = '';
-            for (let lvl = 1; lvl <= TOTAL_LEVELS; lvl++) {
+
+            const startLvl = chapterIdx * 50 + 1;
+            const endLvl = Math.min(TOTAL_LEVELS, (chapterIdx + 1) * 50);
+
+            for (let lvl = startLvl; lvl <= endLvl; lvl++) {
                 const isUnlocked = lvl <= gameState.unlockedLevel;
                 const isCompleted = !!gameState.completedLevels[lvl];
                 const isCurrent = lvl === gameState.currentLevel;
@@ -1324,11 +1371,11 @@
                     bgClass = 'btn-cartoon bg-blue-600 hover:bg-blue-500 border-blue-300 text-white';
                 }
 
-                btn.className = `rounded-xl p-2 border-2 flex flex-col items-center justify-center transition-all ${bgClass}`;
+                btn.className = `rounded-xl p-1.5 sm:p-2 border-2 flex flex-col items-center justify-center transition-all ${bgClass}`;
                 btn.disabled = !isUnlocked;
                 btn.innerHTML = `
-                    <span class="font-title font-bold text-sm sm:text-base">${lvl}</span>
-                    <span class="text-[10px] opacity-90">${isUnlocked ? (params.numShortcuts > 0 ? `🗝️×${params.numShortcuts}` : 'Start') : '🔒'}</span>
+                    <span class="font-title font-bold text-xs sm:text-base leading-tight">${lvl}</span>
+                    <span class="text-[9px] sm:text-[10px] opacity-90 leading-none mt-0.5">${isUnlocked ? (params.numShortcuts > 0 ? `🗝️×${params.numShortcuts}` : 'Start') : '🔒'}</span>
                 `;
                 btn.addEventListener('click', () => {
                     if (!isUnlocked) return;
@@ -1342,7 +1389,7 @@
         }
 
         /********************************************************************
-         * 8. PROCEDURAL GRAPHICS & RENDERING (Canvas 2D)
+         * 8. PROCEDURAL GRAPHICS & RENDERING (Responsive Camera & MiniMap)
          ********************************************************************/
         function resizeCanvas() {
             const rect = canvas.parentElement.getBoundingClientRect();
@@ -1350,59 +1397,74 @@
             canvas.height = rect.height;
 
             if (levelData) {
-                // Choose tile size so small mazes fit comfortably, and larger mazes scroll smoothly
-                const fitW = Math.floor((canvas.width - 32) / levelData.cols);
-                const fitH = Math.floor((canvas.height - 32) / levelData.rows);
-                const minTile = window.innerWidth < 640 ? 38 : 46;
-                tileSize = Math.max(minTile, Math.min(64, Math.min(fitW, fitH)));
+                const isMobilePortrait = canvas.width < 640 && canvas.height > canvas.width;
+                if (isMobilePortrait) {
+                    // On narrow portrait phones, keep tiles large (~44-54px) so corridors & Smurf are crystal clear (~8-9 tiles across)
+                    const portraitTarget = Math.floor(canvas.width / 8.5);
+                    tileSize = Math.max(42, Math.min(54, portraitTarget));
+                } else {
+                    const fitW = Math.floor((canvas.width - 28) / levelData.cols);
+                    const fitH = Math.floor((canvas.height - 28) / levelData.rows);
+                    const minTile = canvas.width < 768 ? 40 : 46;
+                    tileSize = Math.max(minTile, Math.min(64, Math.min(fitW, fitH)));
+                }
             }
+            updateHUD();
+            updateGatePrompt();
+        }
+
+        function getCameraBounds() {
+            const worldW = levelData.cols * tileSize;
+            const worldH = levelData.rows * tileSize;
+            // Extra bottom padding on mobile so the player near the bottom edge isn't obscured by the touch D-Pad
+            const bottomPad = canvas.width < 640 ? 96 : 28;
+            const topPad = 28;
+            const sidePad = 24;
+            return { worldW, worldH, bottomPad, topPad, sidePad };
         }
 
         function snapCameraToPlayer() {
             if (!levelData) return;
-            const worldW = levelData.cols * tileSize;
-            const worldH = levelData.rows * tileSize;
+            const { worldW, worldH, bottomPad, topPad, sidePad } = getCameraBounds();
             const targetX = player.x * tileSize - canvas.width / 2;
             const targetY = player.y * tileSize - canvas.height / 2;
 
-            if (worldW <= canvas.width) {
+            if (worldW <= canvas.width - sidePad * 2) {
                 camera.x = -(canvas.width - worldW) / 2;
             } else {
-                camera.x = Math.max(-24, Math.min(worldW - canvas.width + 24, targetX));
+                camera.x = Math.max(-sidePad, Math.min(worldW - canvas.width + sidePad, targetX));
             }
 
-            if (worldH <= canvas.height) {
+            if (worldH <= canvas.height - (topPad + bottomPad)) {
                 camera.y = -(canvas.height - worldH) / 2;
             } else {
-                camera.y = Math.max(-24, Math.min(worldH - canvas.height + 24, targetY));
+                camera.y = Math.max(-topPad, Math.min(worldH - canvas.height + bottomPad, targetY));
             }
         }
 
         function updateCamera(dt) {
             if (!levelData) return;
-            const worldW = levelData.cols * tileSize;
-            const worldH = levelData.rows * tileSize;
+            const { worldW, worldH, bottomPad, topPad, sidePad } = getCameraBounds();
             const targetX = player.x * tileSize - canvas.width / 2;
             const targetY = player.y * tileSize - canvas.height / 2;
 
             let desiredX, desiredY;
-            if (worldW <= canvas.width) {
+            if (worldW <= canvas.width - sidePad * 2) {
                 desiredX = -(canvas.width - worldW) / 2;
             } else {
-                desiredX = Math.max(-24, Math.min(worldW - canvas.width + 24, targetX));
+                desiredX = Math.max(-sidePad, Math.min(worldW - canvas.width + sidePad, targetX));
             }
 
-            if (worldH <= canvas.height) {
+            if (worldH <= canvas.height - (topPad + bottomPad)) {
                 desiredY = -(canvas.height - worldH) / 2;
             } else {
-                desiredY = Math.max(-24, Math.min(worldH - canvas.height + 24, targetY));
+                desiredY = Math.max(-topPad, Math.min(worldH - canvas.height + bottomPad, targetY));
             }
 
             camera.x += (desiredX - camera.x) * Math.min(1, dt * 8);
             camera.y += (desiredY - camera.y) * Math.min(1, dt * 8);
         }
 
-        // Draw detailed Cartoon Smurf
         function drawSmurf(ctx, px, py, size, time) {
             ctx.save();
             ctx.translate(px, py);
@@ -1417,13 +1479,11 @@
             ctx.scale(crouchScale, crouchScale);
             ctx.translate(0, walkBob);
 
-            // Drop shadow
             ctx.fillStyle = 'rgba(0, 0, 0, 0.32)';
             ctx.beginPath();
             ctx.ellipse(0, size * 0.34, size * 0.28, size * 0.12, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // White Shoes / Feet
             const footOffset = player.isMoving ? Math.sin(player.animTime) * (size * 0.1) : 0;
             ctx.fillStyle = '#f8fafc';
             ctx.strokeStyle = '#cbd5e1';
@@ -1434,19 +1494,16 @@
             ctx.fill();
             ctx.stroke();
 
-            // White Smurf Trousers
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
             ctx.roundRect(-size * 0.18, size * 0.10, size * 0.36, size * 0.20, 6);
             ctx.fill();
 
-            // Blue Torso & Arms
             ctx.fillStyle = '#1e88e5';
             ctx.beginPath();
             ctx.arc(0, size * 0.04, size * 0.18, 0, Math.PI * 2);
             ctx.fill();
 
-            // Blue Head
             ctx.fillStyle = '#29b6f6';
             ctx.strokeStyle = '#0277bd';
             ctx.lineWidth = 2;
@@ -1455,31 +1512,26 @@
             ctx.fill();
             ctx.stroke();
 
-            // Eyes & Nose (oriented slightly towards facing direction)
             const lookX = player.facingX * (size * 0.05);
             const lookY = player.facingY * (size * 0.03);
 
-            // White Eyes
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
             ctx.ellipse(-size * 0.07 + lookX, -size * 0.09 + lookY, size * 0.055, size * 0.07, 0, 0, Math.PI * 2);
             ctx.ellipse(size * 0.07 + lookX, -size * 0.09 + lookY, size * 0.055, size * 0.07, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Pupils
             ctx.fillStyle = '#0f172a';
             ctx.beginPath();
             ctx.arc(-size * 0.06 + lookX * 1.3, -size * 0.09 + lookY * 1.3, size * 0.028, 0, Math.PI * 2);
             ctx.arc(size * 0.08 + lookX * 1.3, -size * 0.09 + lookY * 1.3, size * 0.028, 0, Math.PI * 2);
             ctx.fill();
 
-            // Cute Blue Nose
             ctx.fillStyle = '#039be5';
             ctx.beginPath();
             ctx.arc(lookX * 1.4, -size * 0.03 + lookY, size * 0.055, 0, Math.PI * 2);
             ctx.fill();
 
-            // Iconic White Phrygian Smurf Hat (bent forward/up)
             ctx.fillStyle = '#ffffff';
             ctx.strokeStyle = '#dbeafe';
             ctx.lineWidth = 2;
@@ -1495,7 +1547,6 @@
             ctx.restore();
         }
 
-        // Draw Gargamel (Wizard in black patched robe, bald head, hooked nose)
         function drawGargamel(ctx, ex, ey, size, enemy) {
             ctx.save();
             ctx.translate(ex, ey);
@@ -1503,20 +1554,17 @@
             const stepBob = Math.sin(enemy.animPhase) * (size * 0.05);
             ctx.translate(0, stepBob);
 
-            // Shadow
             ctx.fillStyle = 'rgba(0, 0, 0, 0.42)';
             ctx.beginPath();
             ctx.ellipse(0, size * 0.36, size * 0.32, size * 0.14, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Red Shoes
             ctx.fillStyle = '#b91c1c';
             ctx.beginPath();
             ctx.ellipse(-size * 0.13, size * 0.33, size * 0.11, size * 0.06, 0, 0, Math.PI * 2);
             ctx.ellipse(size * 0.13, size * 0.33, size * 0.11, size * 0.06, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Black Robe with grey patch
             ctx.fillStyle = '#1e293b';
             ctx.strokeStyle = '#0f172a';
             ctx.lineWidth = 2;
@@ -1529,11 +1577,9 @@
             ctx.fill();
             ctx.stroke();
 
-            // Patch on robe
             ctx.fillStyle = '#64748b';
             ctx.fillRect(size * 0.04, size * 0.12, size * 0.12, size * 0.11);
 
-            // Bald Head
             ctx.fillStyle = '#fed7aa';
             ctx.strokeStyle = '#c2410c';
             ctx.lineWidth = 1.5;
@@ -1542,7 +1588,6 @@
             ctx.fill();
             ctx.stroke();
 
-            // Side dark hair tufts
             ctx.fillStyle = '#1f2937';
             ctx.beginPath();
             ctx.arc(-size * 0.20, -size * 0.16, size * 0.06, 0, Math.PI * 2);
@@ -1552,7 +1597,6 @@
             const lookX = Math.cos(enemy.angle) * (size * 0.05);
             const lookY = Math.sin(enemy.angle) * (size * 0.04);
 
-            // Angry Eyes
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
             ctx.arc(-size * 0.07 + lookX, -size * 0.15 + lookY, size * 0.05, 0, Math.PI * 2);
@@ -1565,7 +1609,6 @@
             ctx.arc(size * 0.07 + lookX * 1.2, -size * 0.15 + lookY * 1.2, size * 0.025, 0, Math.PI * 2);
             ctx.fill();
 
-            // Thick Scowling Eyebrows
             ctx.strokeStyle = '#111827';
             ctx.lineWidth = 3;
             ctx.beginPath();
@@ -1575,7 +1618,6 @@
             ctx.lineTo(size * 0.02 + lookX, -size * 0.18 + lookY);
             ctx.stroke();
 
-            // Big Hooked Nose
             ctx.fillStyle = '#fdba74';
             ctx.strokeStyle = '#9a3412';
             ctx.lineWidth = 1.5;
@@ -1584,7 +1626,6 @@
             ctx.fill();
             ctx.stroke();
 
-            // Alert icon if chasing
             if (enemy.state === 'chase') {
                 ctx.fillStyle = '#ef4444';
                 ctx.font = `bold ${Math.round(size * 0.38)}px Fredoka, sans-serif`;
@@ -1595,7 +1636,6 @@
             ctx.restore();
         }
 
-        // Draw Klakier / Azrael (Ginger cat with bristled tail and yellow eyes)
         function drawKlakier(ctx, ex, ey, size, enemy) {
             ctx.save();
             ctx.translate(ex, ey);
@@ -1603,13 +1643,11 @@
             const bounce = Math.abs(Math.sin(enemy.animPhase)) * (size * 0.06);
             ctx.translate(0, -bounce);
 
-            // Shadow
             ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
             ctx.beginPath();
             ctx.ellipse(0, size * 0.30, size * 0.26, size * 0.11, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Bristled Ginger Tail wagging
             const tailWag = Math.sin(enemy.animPhase * 1.5) * 0.25;
             ctx.strokeStyle = '#ea580c';
             ctx.lineWidth = size * 0.10;
@@ -1619,7 +1657,6 @@
             ctx.quadraticCurveTo(-size * 0.34, -size * 0.05 + tailWag * size, -size * 0.26, -size * 0.26);
             ctx.stroke();
 
-            // Ginger Body
             ctx.fillStyle = '#f97316';
             ctx.strokeStyle = '#9a3412';
             ctx.lineWidth = 1.8;
@@ -1628,7 +1665,6 @@
             ctx.fill();
             ctx.stroke();
 
-            // Cat Ears
             ctx.fillStyle = '#ea580c';
             ctx.beginPath();
             ctx.moveTo(-size * 0.18, -size * 0.12);
@@ -1646,7 +1682,6 @@
             ctx.fill();
             ctx.stroke();
 
-            // Cat Head (with nicked ear look)
             ctx.fillStyle = '#fb923c';
             ctx.beginPath();
             ctx.arc(0, -size * 0.06, size * 0.19, 0, Math.PI * 2);
@@ -1656,7 +1691,6 @@
             const lookX = Math.cos(enemy.angle) * (size * 0.04);
             const lookY = Math.sin(enemy.angle) * (size * 0.04);
 
-            // Yellow Slit Eyes
             ctx.fillStyle = '#fde047';
             ctx.beginPath();
             ctx.ellipse(-size * 0.07 + lookX, -size * 0.08 + lookY, size * 0.05, size * 0.06, 0, 0, Math.PI * 2);
@@ -1669,7 +1703,6 @@
             ctx.ellipse(size * 0.07 + lookX * 1.2, -size * 0.08 + lookY * 1.2, size * 0.018, size * 0.045, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Pink Nose & Whiskers
             ctx.fillStyle = '#f43f5e';
             ctx.beginPath();
             ctx.arc(lookX * 1.3, -size * 0.02 + lookY, size * 0.032, 0, Math.PI * 2);
@@ -1732,13 +1765,12 @@
             ctx.save();
             ctx.translate(-Math.round(camera.x), -Math.round(camera.y));
 
-            // Determine visible tile bounds for performance on large 31x31 mazes
             const startC = Math.max(0, Math.floor(camera.x / tileSize) - 1);
             const endC = Math.min(levelData.cols - 1, Math.ceil((camera.x + canvas.width) / tileSize) + 1);
             const startR = Math.max(0, Math.floor(camera.y / tileSize) - 1);
             const endR = Math.min(levelData.rows - 1, Math.ceil((camera.y + canvas.height) / tileSize) + 1);
 
-            // PASS 1: Draw Sandy Forest Paths & Base Floors
+            // PASS 1: Draw Sandy/Stone Forest Paths
             for (let r = startR; r <= endR; r++) {
                 for (let c = startC; c <= endC; c++) {
                     const x = c * tileSize;
@@ -1746,11 +1778,9 @@
                     const tile = levelData.grid[r][c];
 
                     if (tile !== TILE_WALL) {
-                        // Warm sandy forest path
                         ctx.fillStyle = ((r + c) % 2 === 0) ? '#e6ccb2' : '#ddb892';
                         ctx.fillRect(x, y, tileSize + 0.6, tileSize + 0.6);
 
-                        // Subtle cobble pebbles
                         if ((r * 7 + c * 13) % 5 === 0) {
                             ctx.fillStyle = 'rgba(127, 85, 57, 0.18)';
                             ctx.beginPath();
@@ -1762,7 +1792,7 @@
                 }
             }
 
-            // Start Tile Marker (Smurf Village Flag / Cobblestone)
+            // Start Tile Marker
             const sx = levelData.start.c * tileSize;
             const sy = levelData.start.r * tileSize;
             ctx.fillStyle = 'rgba(59, 130, 246, 0.25)';
@@ -1770,7 +1800,7 @@
             ctx.arc(sx + tileSize / 2, sy + tileSize / 2, tileSize * 0.38, 0, Math.PI * 2);
             ctx.fill();
 
-            // PASS 2: Draw Hedges (Walls), Shortcut Gates, Hideouts (Under-layer) & Golden Chest
+            // PASS 2: Walls, Shortcut Gates & Golden Chest
             for (let r = startR; r <= endR; r++) {
                 for (let c = startC; c <= endC; c++) {
                     const x = c * tileSize;
@@ -1778,17 +1808,14 @@
                     const tile = levelData.grid[r][c];
 
                     if (tile === TILE_WALL) {
-                        // Deep Forest Hedge Wall with 3D depth & leaf texture
                         ctx.fillStyle = '#143d1d';
                         ctx.fillRect(x, y, tileSize + 0.8, tileSize + 0.8);
 
-                        // Top leafy crown
                         ctx.fillStyle = '#246331';
                         ctx.beginPath();
                         ctx.roundRect(x + 2, y + 2, tileSize - 4, tileSize - 6, 8);
                         ctx.fill();
 
-                        // Bright foliage highlights
                         ctx.fillStyle = '#338543';
                         ctx.beginPath();
                         ctx.arc(x + tileSize * 0.32, y + tileSize * 0.34, tileSize * 0.18, 0, Math.PI * 2);
@@ -1796,7 +1823,6 @@
                         ctx.arc(x + tileSize * 0.50, y + tileSize * 0.60, tileSize * 0.17, 0, Math.PI * 2);
                         ctx.fill();
 
-                        // Smalldecorative forest berries on some walls
                         if ((r * 3 + c * 5) % 11 === 0) {
                             ctx.fillStyle = '#60a5fa';
                             ctx.beginPath();
@@ -1805,11 +1831,9 @@
                             ctx.fill();
                         }
                     } else if (tile === TILE_GATE_LOCKED) {
-                        // Wooden Iron-Bound Shortcut Gate with Golden Padlock
                         ctx.fillStyle = '#451a03';
                         ctx.fillRect(x + 3, y + 3, tileSize - 6, tileSize - 6);
 
-                        // Wooden planks
                         ctx.fillStyle = '#78350f';
                         ctx.strokeStyle = '#92400e';
                         ctx.lineWidth = 2;
@@ -1817,25 +1841,21 @@
                             ctx.fillRect(x + 6 + p * ((tileSize - 12) / 3), y + 5, (tileSize - 16) / 3, tileSize - 10);
                         }
 
-                        // Iron bands
                         ctx.fillStyle = '#475569';
                         ctx.fillRect(x + 4, y + tileSize * 0.25, tileSize - 8, 5);
                         ctx.fillRect(x + 4, y + tileSize * 0.70, tileSize - 8, 5);
 
-                        // Glowing Gold Padlock in center
                         const pulse = 1 + Math.sin(time * 5) * 0.08;
                         ctx.save();
                         ctx.translate(x + tileSize / 2, y + tileSize / 2);
                         ctx.scale(pulse, pulse);
 
-                        // Shackle
                         ctx.strokeStyle = '#fde047';
                         ctx.lineWidth = 3;
                         ctx.beginPath();
                         ctx.arc(0, -5, 6, Math.PI, 0);
                         ctx.stroke();
 
-                        // Lock body
                         ctx.fillStyle = '#eab308';
                         ctx.strokeStyle = '#713f12';
                         ctx.lineWidth = 1.5;
@@ -1844,19 +1864,16 @@
                         ctx.fill();
                         ctx.stroke();
 
-                        // Keyhole
                         ctx.fillStyle = '#1e293b';
                         ctx.beginPath();
                         ctx.arc(0, 3, 2.2, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.restore();
                     } else if (tile === TILE_GATE_OPEN) {
-                        // Opened Gate Threshold (stone arch floor & side posts)
                         ctx.fillStyle = 'rgba(120, 53, 15, 0.35)';
                         ctx.fillRect(x + 2, y + 2, 6, tileSize - 4);
                         ctx.fillRect(x + tileSize - 8, y + 2, 6, tileSize - 4);
                     } else if (tile === TILE_CHEST) {
-                        // Golden Treasure Chest at the end of the labyrinth
                         const cx = x + tileSize / 2;
                         const cy = y + tileSize / 2;
                         const glowRadius = tileSize * (0.55 + Math.sin(time * 4) * 0.08);
@@ -1869,7 +1886,6 @@
                         ctx.arc(cx, cy, glowRadius, 0, Math.PI * 2);
                         ctx.fill();
 
-                        // Chest base
                         ctx.fillStyle = '#b45309';
                         ctx.strokeStyle = '#fde047';
                         ctx.lineWidth = 2.5;
@@ -1878,29 +1894,27 @@
                         ctx.fill();
                         ctx.stroke();
 
-                        // Chest lid
                         ctx.fillStyle = '#f59e0b';
                         ctx.beginPath();
                         ctx.roundRect(cx - tileSize * 0.32, cy - tileSize * 0.26, tileSize * 0.64, tileSize * 0.16, 6);
                         ctx.fill();
                         ctx.stroke();
 
-                        // Gold clasp
                         ctx.fillStyle = '#fef08a';
                         ctx.fillRect(cx - 4, cy - tileSize * 0.14, 8, 9);
                     }
                 }
             }
 
-            // PASS 3: Draw Enemy Vision Cones
+            // PASS 3: Enemy Vision Cones
             for (const enemy of levelData.enemies) {
                 drawVisionCone(ctx, enemy);
             }
 
-            // PASS 4: Draw Player (Smurf)
+            // PASS 4: Player (Smurf)
             drawSmurf(ctx, player.x * tileSize, player.y * tileSize, tileSize, time);
 
-            // PASS 5: Draw Hideouts (Berry Bushes & Smurf Mushrooms) with slight canopy overlay so Smurf looks tucked inside
+            // PASS 5: Hideouts (Berry Bushes & Smurf Mushrooms)
             for (let r = startR; r <= endR; r++) {
                 for (let c = startC; c <= endC; c++) {
                     if (levelData.grid[r][c] !== TILE_HIDEOUT) continue;
@@ -1915,7 +1929,6 @@
                     }
 
                     if (variant === 0) {
-                        // Lush Smurfberry Bush Hideout
                         ctx.fillStyle = '#15803d';
                         ctx.beginPath();
                         ctx.arc(cx, cy + 2, tileSize * 0.37, 0, Math.PI * 2);
@@ -1928,7 +1941,6 @@
                         ctx.arc(cx, cy + tileSize * 0.10, tileSize * 0.23, 0, Math.PI * 2);
                         ctx.fill();
 
-                        // Red/Purple Smurfberries
                         ctx.fillStyle = '#e11d48';
                         const berryOffsets = [[-0.14, -0.12], [0.14, -0.10], [0.02, 0.12], [-0.10, 0.08], [0.12, 0.08]];
                         for (const [bx, by] of berryOffsets) {
@@ -1937,8 +1949,6 @@
                             ctx.fill();
                         }
                     } else {
-                        // Iconic Smurf Mushroom House Hideout
-                        // Stem
                         ctx.fillStyle = '#fef3c7';
                         ctx.strokeStyle = '#d97706';
                         ctx.lineWidth = 1.5;
@@ -1947,13 +1957,11 @@
                         ctx.fill();
                         ctx.stroke();
 
-                        // Little wooden door
                         ctx.fillStyle = '#92400e';
                         ctx.beginPath();
                         ctx.roundRect(cx - tileSize * 0.08, cy + tileSize * 0.10, tileSize * 0.16, tileSize * 0.22, [6, 6, 0, 0]);
                         ctx.fill();
 
-                        // Red Spotted Mushroom Cap
                         ctx.fillStyle = '#dc2626';
                         ctx.strokeStyle = '#991b1b';
                         ctx.beginPath();
@@ -1962,7 +1970,6 @@
                         ctx.fill();
                         ctx.stroke();
 
-                        // White spots on cap
                         ctx.fillStyle = '#ffffff';
                         ctx.beginPath();
                         ctx.arc(cx - tileSize * 0.15, cy - tileSize * 0.15, tileSize * 0.06, 0, Math.PI * 2);
@@ -1974,7 +1981,7 @@
                 }
             }
 
-            // PASS 6: Draw Enemies (Gargamel & Klakier)
+            // PASS 6: Enemies
             for (const enemy of levelData.enemies) {
                 if (enemy.type === 'gargamel') {
                     drawGargamel(ctx, enemy.x * tileSize, enemy.y * tileSize, tileSize, enemy);
@@ -1983,7 +1990,7 @@
                 }
             }
 
-            // PASS 7: Draw Particles & Floating Texts
+            // PASS 7: Particles & Floating Texts
             for (const p of particles) {
                 ctx.save();
                 ctx.globalAlpha = Math.max(0, p.life);
@@ -2009,7 +2016,7 @@
 
             ctx.restore();
 
-            // PASS 8: Draw Compass Arrow towards Golden Chest & Mini-map Overlay
+            // PASS 8: Compass Arrow & Top-Right Interactive Mini-Map
             drawChestCompass(ctx, time);
             drawMiniMap(ctx);
         }
@@ -2019,8 +2026,7 @@
             const chestScreenX = (levelData.chest.c + 0.5) * tileSize - camera.x;
             const chestScreenY = (levelData.chest.r + 0.5) * tileSize - camera.y;
 
-            // Only show edge indicator if the chest is off-screen or far away
-            const margin = 48;
+            const margin = 42;
             const isOffScreen =
                 chestScreenX < margin || chestScreenX > canvas.width - margin ||
                 chestScreenY < margin || chestScreenY > canvas.height - margin;
@@ -2031,7 +2037,7 @@
             const centerY = canvas.height / 2;
             const angle = Math.atan2(chestScreenY - centerY, chestScreenX - centerX);
 
-            const radius = Math.min(canvas.width, canvas.height) * 0.38;
+            const radius = Math.min(canvas.width, canvas.height) * 0.34;
             const indX = centerX + Math.cos(angle) * radius;
             const indY = centerY + Math.sin(angle) * radius;
 
@@ -2046,10 +2052,10 @@
             ctx.strokeStyle = '#713f12';
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(18, 0);
-            ctx.lineTo(-10, -11);
+            ctx.moveTo(16, 0);
+            ctx.lineTo(-10, -10);
             ctx.lineTo(-6, 0);
-            ctx.lineTo(-10, 11);
+            ctx.lineTo(-10, 10);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
@@ -2057,19 +2063,32 @@
             ctx.restore();
         }
 
+        // Top-Right MiniMap (Does not collide with bottom D-Pad or action button, click to expand/collapse)
         function drawMiniMap(ctx) {
-            if (!levelData) return;
-            const maxDim = window.innerWidth < 640 ? 96 : 135;
-            const cellPx = Math.max(2, Math.floor(maxDim / Math.max(levelData.cols, levelData.rows)));
-            const mapW = levelData.cols * cellPx;
-            const mapH = levelData.rows * cellPx;
-            const pad = 12;
-            const mx = canvas.width - mapW - pad;
-            const my = canvas.height - mapH - pad;
+            if (!levelData || gameState.minimapMode === 0) {
+                minimapBounds = { x: 0, y: 0, w: 0, h: 0 };
+                return;
+            }
+
+            const isMobile = canvas.width < 640;
+            const maxDim = gameState.minimapMode === 2
+                ? (isMobile ? 145 : 185)
+                : (isMobile ? 84 : 120);
+
+            const cellPx = Math.max(1.5, maxDim / Math.max(levelData.cols, levelData.rows));
+            const mapW = Math.round(levelData.cols * cellPx);
+            const mapH = Math.round(levelData.rows * cellPx);
+
+            // Positioned at Top-Right, just below the "🧭 Mapa" toggle button
+            const padRight = 10;
+            const padTop = 44;
+            const mx = canvas.width - mapW - padRight;
+            const my = padTop;
+
+            minimapBounds = { x: mx - 4, y: my - 4, w: mapW + 8, h: mapH + 8 };
 
             ctx.save();
-            // Backing frame
-            ctx.fillStyle = 'rgba(11, 31, 19, 0.85)';
+            ctx.fillStyle = 'rgba(11, 31, 19, 0.88)';
             ctx.strokeStyle = '#ffb300';
             ctx.lineWidth = 2;
             ctx.beginPath();
@@ -2091,32 +2110,38 @@
                     } else {
                         ctx.fillStyle = '#d6ccc2';
                     }
-                    ctx.fillRect(mx + c * cellPx, my + r * cellPx, cellPx, cellPx);
+                    ctx.fillRect(mx + c * cellPx, my + r * cellPx, Math.ceil(cellPx), Math.ceil(cellPx));
                 }
             }
 
-            // Enemies on minimap
             for (const e of levelData.enemies) {
                 ctx.fillStyle = e.type === 'gargamel' ? '#ef4444' : '#f97316';
                 ctx.beginPath();
-                ctx.arc(mx + e.x * cellPx, my + e.y * cellPx, Math.max(2.2, cellPx * 0.6), 0, Math.PI * 2);
+                ctx.arc(mx + e.x * cellPx, my + e.y * cellPx, Math.max(2.0, cellPx * 0.6), 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            // Player on minimap
             ctx.fillStyle = '#38bdf8';
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.arc(mx + player.x * cellPx, my + player.y * cellPx, Math.max(2.8, cellPx * 0.75), 0, Math.PI * 2);
+            ctx.arc(mx + player.x * cellPx, my + player.y * cellPx, Math.max(2.6, cellPx * 0.78), 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
 
             ctx.restore();
         }
 
+        function cycleMinimapMode() {
+            gameState.minimapMode = (gameState.minimapMode + 1) % 3;
+            const label = document.getElementById('minimap-btn-label');
+            if (gameState.minimapMode === 0) label.textContent = 'Pokaż';
+            else if (gameState.minimapMode === 1) label.textContent = 'Mapa +';
+            else label.textContent = 'Mapa -';
+        }
+
         /********************************************************************
-         * 9. MAIN GAME LOOP & EVENT LISTENERS
+         * 9. MAIN GAME LOOP & ERGONOMIC TOUCH / KEYBOARD LISTENERS
          ********************************************************************/
         let lastFrameTime = performance.now();
 
@@ -2130,7 +2155,6 @@
                 updateCamera(dt);
             }
 
-            // Update particles & floating texts even during victory animation
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i];
                 p.x += p.vx * dt;
@@ -2169,31 +2193,99 @@
             }
         });
 
-        // On-Screen Touch / Mouse D-Pad Controls
-        document.querySelectorAll('.dpad-btn').forEach(btn => {
+        // Ergonomic Touch D-Pad with Continuous Finger Slide (`touchmove` + `elementFromPoint`)
+        const dpadContainer = document.getElementById('touch-dpad');
+        const dpadBtns = document.querySelectorAll('.dpad-btn');
+
+        function clearTouchDirs() {
+            inputKeys.up = false;
+            inputKeys.down = false;
+            inputKeys.left = false;
+            inputKeys.right = false;
+            dpadBtns.forEach(b => b.classList.remove('active-dir', 'bg-blue-600'));
+        }
+
+        function handleDpadTouch(e) {
+            e.preventDefault();
+            clearTouchDirs();
+            for (let i = 0; i < e.touches.length; i++) {
+                const t = e.touches[i];
+                const el = document.elementFromPoint(t.clientX, t.clientY);
+                const btn = el ? el.closest('.dpad-btn') : null;
+                if (btn && btn.dataset.dir) {
+                    inputKeys[btn.dataset.dir] = true;
+                    btn.classList.add('active-dir', 'bg-blue-600');
+                } else {
+                    // Fallback angle calculation relative to D-Pad center if sliding slightly outside buttons
+                    const rect = dpadContainer.getBoundingClientRect();
+                    const cx = rect.left + rect.width / 2;
+                    const cy = rect.top + rect.height / 2;
+                    const dx = t.clientX - cx;
+                    const dy = t.clientY - cy;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > 12 && dist < rect.width * 1.1) {
+                        if (Math.abs(dx) > Math.abs(dy)) {
+                            const dir = dx > 0 ? 'right' : 'left';
+                            inputKeys[dir] = true;
+                        } else {
+                            const dir = dy > 0 ? 'down' : 'up';
+                            inputKeys[dir] = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        dpadContainer.addEventListener('touchstart', handleDpadTouch, { passive: false });
+        dpadContainer.addEventListener('touchmove', handleDpadTouch, { passive: false });
+        dpadContainer.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 0) clearTouchDirs();
+            else handleDpadTouch(e);
+        });
+        dpadContainer.addEventListener('touchcancel', clearTouchDirs);
+
+        // Mouse fallback for D-Pad on desktop
+        dpadBtns.forEach(btn => {
             const dir = btn.dataset.dir;
-            const press = (e) => {
+            btn.addEventListener('mousedown', (e) => {
                 e.preventDefault();
                 inputKeys[dir] = true;
-            };
-            const release = (e) => {
-                e.preventDefault();
-                inputKeys[dir] = false;
-            };
-            btn.addEventListener('mousedown', press);
-            btn.addEventListener('touchstart', press, { passive: false });
-            btn.addEventListener('mouseup', release);
-            btn.addEventListener('mouseleave', release);
-            btn.addEventListener('touchend', release);
-            btn.addEventListener('touchcancel', release);
+            });
+            btn.addEventListener('mouseup', () => { inputKeys[dir] = false; });
+            btn.addEventListener('mouseleave', () => { inputKeys[dir] = false; });
         });
 
-        // Clicking directly on a nearby locked gate on Canvas also unlocks it
+        // Mobile Action Button & Minimap Toggle
+        document.getElementById('btn-mobile-action').addEventListener('click', (e) => {
+            e.preventDefault();
+            tryUnlockNearbyGate();
+        });
+
+        document.getElementById('btn-toggle-minimap').addEventListener('click', (e) => {
+            e.preventDefault();
+            cycleMinimapMode();
+        });
+
+        // Clicking on Mini-Map or Locked Gate on Canvas
         canvas.addEventListener('click', (e) => {
             if (!levelData || gameState.gameOver || gameState.victory) return;
             const rect = canvas.getBoundingClientRect();
-            const worldX = (e.clientX - rect.left + camera.x) / tileSize;
-            const worldY = (e.clientY - rect.top + camera.y) / tileSize;
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            // Check if clicked inside Mini-map to expand/collapse it
+            if (
+                gameState.minimapMode > 0 &&
+                clickX >= minimapBounds.x && clickX <= minimapBounds.x + minimapBounds.w &&
+                clickY >= minimapBounds.y && clickY <= minimapBounds.y + minimapBounds.h
+            ) {
+                cycleMinimapMode();
+                return;
+            }
+
+            const worldX = (clickX + camera.x) / tileSize;
+            const worldY = (clickY + camera.y) / tileSize;
             const clickedR = Math.floor(worldY);
             const clickedC = Math.floor(worldX);
 
@@ -2235,20 +2327,27 @@
             startLevel(nextLvl, false);
         });
 
+        // Chapter Tabs in Level Select Modal
+        document.querySelectorAll('.chapter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const ch = parseInt(tab.dataset.chapter, 10);
+                populateLevelsModal(ch);
+            });
+        });
+
         document.getElementById('btn-levels').addEventListener('click', () => {
-            populateLevelsModal();
+            populateLevelsModal(Math.floor((gameState.currentLevel - 1) / 50));
             document.getElementById('modal-levels').classList.remove('hidden');
         });
         document.getElementById('btn-victory-levels').addEventListener('click', () => {
             document.getElementById('modal-victory').classList.add('hidden');
-            populateLevelsModal();
+            populateLevelsModal(Math.floor((gameState.currentLevel - 1) / 50));
             document.getElementById('modal-levels').classList.remove('hidden');
         });
         document.getElementById('btn-caught-levels').addEventListener('click', () => {
             document.getElementById('modal-caught').classList.add('hidden');
-            // Restore keys before switching level after being caught
             gameState.keys = gameState.keysAtLevelStart;
-            populateLevelsModal();
+            populateLevelsModal(Math.floor((gameState.currentLevel - 1) / 50));
             document.getElementById('modal-levels').classList.remove('hidden');
         });
         document.getElementById('btn-close-levels').addEventListener('click', () => {
@@ -2259,11 +2358,12 @@
             localStorage.removeItem(STORAGE_KEY);
             gameState.currentLevel = 1;
             gameState.unlockedLevel = 1;
+            gameState.selectedChapter = 0;
             gameState.keys = 0;
             gameState.keysAtLevelStart = 0;
             gameState.completedLevels = {};
             saveGameData();
-            populateLevelsModal();
+            populateLevelsModal(0);
             startLevel(1, false);
             document.getElementById('modal-levels').classList.add('hidden');
         });
