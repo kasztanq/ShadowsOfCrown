@@ -105,6 +105,20 @@ class GameModuleBrowserTests(unittest.TestCase):
         page.add_style_tag(content=".hidden { display: none !important; }")
         return page, errors
 
+    def test_every_game_module_starts_without_uncaught_javascript_errors(self):
+        for filename in MODULES:
+            with self.subTest(module=filename):
+                page, errors = self.open_page(filename)
+                try:
+                    page.wait_for_timeout(250)
+                    self.assertEqual(
+                        errors,
+                        [],
+                        f"Uncaught JavaScript errors during startup: {errors}",
+                    )
+                finally:
+                    page.close()
+
     def test_every_game_module_loads_and_handles_a_primary_action(self):
         for filename, (
             surface_selector,

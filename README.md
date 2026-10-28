@@ -131,7 +131,7 @@ Interfejs zawiera również syntetyzowane efekty dźwiękowe, które można wyci
 
 ## Testy projektu
 
-Testy sprawdzają wszystkie samodzielne strony gry: strukturę HTML, unikalność identyfikatorów, lokalne odnośniki i zasoby oraz kluczowe elementy portalu. Testy modułów uruchamiają każdą grę w Chromium i wykonują reprezentatywną akcję, weryfikując zmianę stanu i brak błędów JavaScript. Sprawdzają również, czy ukryty odnośnik z portalu otwiera Miami '77.
+Testy sprawdzają wszystkie samodzielne strony gry: poprawne domknięcie znaczników HTML, strukturę dokumentu, unikalność identyfikatorów, lokalne odnośniki i zasoby oraz kluczowe elementy portalu. Testy modułów uruchamiają każdą grę w Chromium, sprawdzają brak błędów JavaScript po starcie i wykonują reprezentatywną akcję, weryfikując zmianę stanu. Sprawdzają również, czy ukryty odnośnik z portalu otwiera Miami '77. Zestaw uruchamia się automatycznie dla każdego pull requestu przez GitHub Actions.
 
 Wymagany jest Python 3.10 lub nowszy. Zainstaluj zależności testowe i przeglądarkę Playwright:
 

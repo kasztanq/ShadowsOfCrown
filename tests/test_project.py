@@ -9,6 +9,22 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 GAME_PAGES = sorted(ROOT.glob("*.html"))
 SITE_PAGES = [ROOT / "index.htm", *GAME_PAGES]
+VOID_ELEMENTS = {
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
+}
 MODULE_CONTRACTS = {
     "chestnut_arcade_game_hub.html": (
         'id="hubView"',
@@ -35,14 +51,24 @@ class PageParser(HTMLParser):
         self.links = []
         self.handlers = []
         self.inline_scripts = []
+        self.markup_errors = []
+        self.open_elements = []
+        self.home_links = 0
         self._current_script = None
 
     def handle_starttag(self, tag, attrs):
         self.tags[tag] += 1
         attributes = dict(attrs)
 
+        if tag not in VOID_ELEMENTS:
+            self.open_elements.append((tag, self.getpos()[0]))
+
         if "id" in attributes:
             self.ids.append(attributes["id"])
+
+        if tag == "a" and attributes.get("href") == "./index.htm":
+            if attributes.get("aria-label", "").strip():
+                self.home_links += 1
 
         for name, value in attrs:
             if name in {"href", "src"} and value:
@@ -61,6 +87,20 @@ class PageParser(HTMLParser):
     def handle_endtag(self, tag):
         if tag == "script":
             self._current_script = None
+        if tag in VOID_ELEMENTS:
+            return
+        if not self.open_elements:
+            self.markup_errors.append(
+                f"Line {self.getpos()[0]}: unexpected closing tag </{tag}>"
+            )
+        elif self.open_elements[-1][0] != tag:
+            open_tag, open_line = self.open_elements[-1]
+            self.markup_errors.append(
+                f"Line {self.getpos()[0]}: </{tag}> closes while "
+                f"<{open_tag}> from line {open_line} is open"
+            )
+        else:
+            self.open_elements.pop()
 
 
 def parse_page(path):
@@ -71,6 +111,16 @@ def parse_page(path):
 
 
 class ProjectPagesTests(unittest.TestCase):
+    def test_all_site_pages_have_balanced_html_tags(self):
+        for path in SITE_PAGES:
+            with self.subTest(page=path.name):
+                parser = parse_page(path)
+                errors = parser.markup_errors + [
+                    f"Unclosed <{tag}> from line {line}"
+                    for tag, line in parser.open_elements
+                ]
+                self.assertEqual(errors, [])
+
     def test_all_game_pages_have_document_structure_and_inline_logic(self):
         for path in GAME_PAGES:
             with self.subTest(page=path.name):
@@ -134,18 +184,14 @@ class ProjectPagesTests(unittest.TestCase):
                     target = (path.parent / parsed.path).resolve()
                     self.assertTrue(target.is_file(), f"Missing local target: {target}")
 
-    def test_every_game_page_has_an_english_home_icon(self):
+    def test_every_game_page_has_an_accessible_home_link(self):
         for path in GAME_PAGES:
             with self.subTest(page=path.name):
-                contents = path.read_text(encoding="utf-8")
                 parser = parse_page(path)
-                has_home_button = (
-                    'aria-label="Back to home"' in contents
-                    and "./index.htm" in parser.links
-                )
-                self.assertTrue(
-                    has_home_button,
-                    f"{path.stem}: missing home page button",
+                self.assertGreater(
+                    parser.home_links,
+                    0,
+                    f"{path.stem}: missing accessible home page link",
                 )
 
     def test_homepage_has_a_discreet_chess_nuts_easter_egg(self):
