@@ -6,7 +6,7 @@ Zestaw samodzielnych gier przeglądarkowych: od kasztanowych automatów arcade i
 
 ### Strona główna
 
-* [index.htm](./index.htm) — portal projektu z wejściem do gier i hubów, animowanym motywem kasztanowym oraz ukrytymi odnośnikami do Chess-Nuts, Miami ’77, Kasztanowego Oczka i Kasztanixowego Tetrisa.
+* [index.htm](./index.htm) — portal projektu z wejściem do gier i hubów, animowanym motywem kasztanowym oraz ukrytymi odnośnikami do gier: Chess-Nuts, Miami ’77, Kasztanowego Oczka, Kasztanixowego Tetrisa, Pasjansa, Chestnut Combat i Chestnut Strike.
 
 ### Huby arcade
 
@@ -22,11 +22,18 @@ Zestaw samodzielnych gier przeglądarkowych: od kasztanowych automatów arcade i
 * [chess\_nuts.html](./chess_nuts.html) — szachy w jesiennej oprawie: gra przeciw AI lub drugiemu graczowi, z przewodnikiem po figurach oraz opcjonalnymi zegarami, w tym ukrytym zegarem ruchu.
 * [KasztanoweOczko.html](./KasztanoweOczko.html) — kasztanowa wersja gry karcianej Oczko (21).
 * [kasztanix\_kasztanowy\_tetris.html](./kasztanix_kasztanowy_tetris.html) — kasztanowy Tetris z serii Kasztanix.
+* [kasztanowy\_pasjans.html](./kasztanowy_pasjans.html) — klasyczny pasjans w kasztanowej oprawie.
+* [chestnut\_combat.html](./chestnut_combat.html) — lokalna bijatyka Chestnut Combat z wyborem postaci.
+* [chestnut\_strike.html](./chestnut_strike.html) — kasztanowy trening strzelecki z różnymi rodzajami broni.
 * [logopedia.html](./logopedia.html) — ćwiczenia logopedyczne w trzech trybach: rozpoznawanie miejsca głoski w słowie, budowanie słów z sylab i słuch fonemowy. Zawiera podpowiedzi dla prowadzącego i odczytywanie słów.
 * [kraina\_wyraznej\_mowy.html](./kraina_wyraznej_mowy.html) — edukacyjny LogoHub z minigrami do sortowania głosek, ćwiczeń głoski R, pamięci i oddechu; zawiera też rozgrzewkę artykulacyjną oraz poradnik dla rodzica i logopedy.
 * [ShadowsOfCrown.html](./ShadowsOfCrown.html) — turowa gra strategiczno-narracyjna o intrygach na średniowiecznym dworze, relacjach z frakcjami i dążeniu do przejęcia korony.
 
 ## Ostatnie aktualizacje
+
+**29 października 2026**
+
+* Dodano ukryte odnośniki do nowych kasztanowych gier w małych kasztankach portalu oraz testy sprawdzające ich widoczność, dostępność i nawigację.
 
 **28 października 2026**
 
@@ -55,7 +62,7 @@ Gry nie wymagają instalowania silnika. Część stron korzysta z zasobów CDN, 
 
 ## Testy projektu
 
-Testy sprawdzają wszystkie samodzielne strony gry: poprawne domknięcie znaczników HTML, strukturę dokumentu, unikalność identyfikatorów, lokalne odnośniki i zasoby oraz kluczowe elementy portalu. Testy modułów uruchamiają każdą grę w Chromium, sprawdzają brak błędów JavaScript po starcie i wykonują reprezentatywną akcję, weryfikując zmianę stanu. Sprawdzają również, czy ukryty odnośnik z portalu otwiera Miami '77. Zestaw uruchamia się automatycznie dla każdego pull requestu przez GitHub Actions.
+Testy sprawdzają wszystkie samodzielne strony gry: poprawne domknięcie znaczników HTML, strukturę dokumentu, unikalność identyfikatorów, lokalne odnośniki i zasoby oraz kluczowe elementy portalu. Testy modułów uruchamiają reprezentatywne gry w Chromium, sprawdzają brak błędów JavaScript po starcie i wykonują reprezentatywne akcje, weryfikując zmianę stanu. Sprawdzają również, czy ukryte odnośniki w portalu prowadzą do Miami '77 oraz nowych gier: Kasztanowego Oczka, Kasztanixowego Tetrisa, Pasjansa, Chestnut Combat i Chestnut Strike. Zestaw uruchamia się automatycznie dla każdego pull requestu przez GitHub Actions.
 
 Wymagany jest Python 3.10 lub nowszy. Zainstaluj zależności testowe i przeglądarkę Playwright:
 

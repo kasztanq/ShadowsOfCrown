@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kasztanowy Pasjans</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      overflow-x: hidden;
+    }
+    .title-font {
+      font-family: 'Cinzel', serif;
+    }
+
+    /* Klasyczny stół w jesiennym kasztanowo-leśnym odcieniu filcu */
+    .table-felt {
+      background: radial-gradient(circle at 50% 20%, #2a3d28 0%, #1a2919 50%, #111b10 100%);
+      min-height: 100vh;
+    }
+
+    /* Prawdziwe, standardowe proporcje karty do gry 2.5 : 3.5 (~5:7) ze sztywnym zachowaniem aspect-ratio */
+    .card-proportions {
+      width: 100%;
+      aspect-ratio: 5 / 7;
+    }
+
+    /* Miejsca bazowe i puste kolumny */
+    .card-slot {
+      border: 2px dashed rgba(245, 218, 175, 0.28);
+      background: rgba(12, 20, 12, 0.45);
+      border-radius: 7px;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .card-slot.highlight {
+      border-color: #f59e0b;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.6), inset 0 0 6px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Animacja podpowiedzi (Hint glow) */
+    @keyframes hintPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 3px #f59e0b, 0 0 16px rgba(245, 158, 11, 0.9);
+        transform: scale(1.03);
+      }
+      50% {
+        box-shadow: 0 0 0 1px #d97706, 0 0 8px rgba(217, 119, 6, 0.5);
+        transform: scale(1);
+      }
+    }
+    .hint-source {
+      animation: hintPulse 0.9s infinite ease-in-out !important;
+      z-index: 50 !important;
+    }
+    .hint-target {
+      outline: 3px dashed #38bdf8 !important;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.8) !important;
+      z-index: 40 !important;
+    }
+
+    /* Karta do gry o naturalnym rozmiarze */
+    .card-container {
+      width: 100%;
+      aspect-ratio: 5 / 7;
+      position: absolute;
+      left: 0;
+      top: 0;
+      border-radius: 7px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: box-shadow 0.15s ease, transform 0.1s ease;
+    }
+
+    .playing-card-body {
+      width: 100%;
+      height: 100%;
+      border-radius: 7px;
+      border: 1px solid #d4c8b8;
+      background: #ffffff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.2);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3px 5px;
+    }
+
+    .card-container:hover .playing-card-body {
+      box-shadow: 0 5px 12px rgba(0,0,0,0.4), 0 0 8px rgba(245, 158, 11, 0.45);
+    }
+
+    /* Rewers karty - elegancki, klasyczny kasztanowy ornament */
+    .card-back-pattern {
+      width: 100%;
+      height: 100%;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #441f10 0%, #2e1307 100%);
+      border: 2px solid #b87333;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-back-pattern::before {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border: 1px solid rgba(226, 178, 131, 0.35);
+      border-radius: 5px;
+    }
+
+    /* Barwy karciane */
+    .suit-red {
+      color: #c21919; /* Czytelna, tradycyjna czerwień */
+    }
+    .suit-black {
+      color: #171514; /* Głęboka czerń */
+    }
+
+    /* Przyciski retro */
+    .retro-btn {
+      background: linear-gradient(180deg, #442a1d 0%, #29180f 100%);
+      border: 1px solid #855335;
+      box-shadow: 0 2px 0 #120904, 0 3px 6px rgba(0,0,0,0.4);
+      transition: all 0.1s ease;
+    }
+    .retro-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 #120904, 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    /* Canvas z animacją zwycięstwa XP */
+    #victoryCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 100;
+      pointer-events: none;
+      display: none;
+    }
+  </style>
+</head>
+<body class="table-felt text-amber-100 flex flex-col justify-between selection:bg-amber-900">
+  <a href="./index.htm" aria-label="Powrót do strony głównej" title="Powrót do strony głównej" class="fixed left-3 top-3 z-[100] rounded-lg border border-amber-400/70 bg-black/80 px-3 py-2 text-sm text-amber-200 shadow-lg">Strona główna</a>
+
+  <!-- Płótno kaskady XP i fajerwerków z kasztanów (wyświetlane TYLKO po wygraniu) -->
+  <canvas id="victoryCanvas"></canvas>
+
+  <!-- Pasek górny: Tytuł i Statystyki -->
+  <header class="w-full bg-black/40 border-b border-amber-900/40 px-3 py-2.5 relative z-20 backdrop-blur-sm">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Logo i nazwa -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-7 h-7 flex-shrink-0">
+          <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow">
+            <ellipse cx="50" cy="56" rx="42" ry="38" fill="#54240f" stroke="#96522c" stroke-width="4"/>
+            <path d="M50 20 C32 22, 22 42, 28 62 C36 48, 64 48, 72 62 C78 42, 68 22, 50 20 Z" fill="#b06b3a"/>
+            <ellipse cx="50" cy="74" rx="26" ry="12" fill="#c98a58"/>
+            <circle cx="36" cy="38" r="4" fill="#ffffff" opacity="0.6"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="title-font font-bold text-base md:text-lg text-amber-200 tracking-wide leading-none">
+            KASZTANOWY PASJANS
+          </h1>
+          <span class="text-[11px] text-amber-400/80 font-normal">Klasyczny Klondike</span>
+        </div>
+      </div>
+
+      <!-- Statystyki -->
+      <div class="flex items-center gap-3 text-xs md:text-sm font-semibold">
+        <div class="bg-black/50 border border-amber-900/60 px-3 py-1 rounded-md flex items-center gap-1.5 shadow-inner">
+          <span class="text-amber-400/70 font-normal">Czas:</span>
+          <span id="timerDisplay" class="font-mono text-amber-100 font-bold">00:00</span>
+        </div>
+        <div class="bg-black/50 border border-amber-900/60 px-3 py-1 rounded-md flex items-center gap-1.5 shadow-inner">
+          <span class="text-amber-400/70 font-normal">Ruchy:</span>
+          <span id="movesDisplay" class="font-mono text-amber-100 font-bold">0</span>
+        </div>
+        <div class="bg-black/50 border border-amber-900/60 px-3 py-1 rounded-md flex items-center gap-1.5 shadow-inner">
+          <span class="text-amber-400/70 font-normal">Wynik:</span>
+          <span id="scoreDisplay" class="font-mono text-amber-300 font-bold">0</span>
+        </div>
+      </div>
+
+      <!-- Akcje menu (BEZ PRZYCISKU FAJERWERKÓW, BEZ MUZYKI) -->
+      <div class="flex items-center gap-2">
+        <button id="btnHint" class="retro-btn text-xs font-semibold px-2.5 py-1.5 rounded text-amber-200 hover:text-white flex items-center gap-1.5" title="Podpowiedź ruchu">
+          <span>🌰 Podpowiedź</span>
+          <span id="hintBadge" class="bg-amber-600/60 text-amber-100 text-[10px] px-1.5 py-0.2 rounded-full font-bold">3</span>
+        </button>
+        <button id="btnSound" class="retro-btn text-xs font-semibold px-2 py-1.5 rounded text-amber-200 hover:text-white" title="Dźwięki kart">
+          <span id="soundIcon">🔊</span>
+        </button>
+        <button id="btnUndo" class="retro-btn text-xs font-semibold px-2.5 py-1.5 rounded text-amber-200 hover:text-white" title="Cofnij ostatni ruch">
+          ↶ Cofnij
+        </button>
+        <button id="btnNewGame" class="retro-btn text-xs font-semibold px-3 py-1.5 rounded text-amber-200 hover:text-white">
+          Nowa Gra
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Główny obszar stołu pasjansa -->
+  <main class="max-w-5xl w-full mx-auto p-2 sm:p-4 flex-grow flex flex-col justify-start relative z-10">
+    
+    <!-- Górny rząd: Talia, Odpad, Odstęp oraz 4 Fundamenty (Aces to Kings) -->
+    <div class="grid grid-cols-7 gap-2 sm:gap-3 md:gap-4 mb-4">
+      
+      <!-- 1. Talia (Stock) -->
+      <div class="col-span-1 relative card-proportions">
+        <div id="stockSlot" class="card-slot w-full h-full flex flex-col items-center justify-center cursor-pointer transition hover:border-amber-400/60">
+          <svg class="w-6 h-6 text-amber-600/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </div>
+        <div id="stockStack" class="absolute inset-0"></div>
+      </div>
+
+      <!-- 2. Odpad (Waste) -->
+      <div class="col-span-1 relative card-proportions">
+        <div id="wasteSlot" class="card-slot w-full h-full flex items-center justify-center">
+          <span class="text-[11px] text-amber-700/30 font-medium">Stos</span>
+        </div>
+        <div id="wasteStack" class="absolute inset-0"></div>
+      </div>
+
+      <!-- 3. Odstęp (Układ tradycyjnego pasjansa) -->
+      <div class="col-span-1"></div>
+
+      <!-- 4-7. Cztery Fundamenty -->
+      <div class="col-span-1 relative card-proportions">
+        <div class="card-slot foundation-slot w-full h-full flex items-center justify-center" data-foundation="0">
+          <span class="text-xl sm:text-2xl text-stone-900/40 font-serif">♠</span>
+        </div>
+        <div id="foundation-0" class="absolute inset-0"></div>
+      </div>
+
+      <div class="col-span-1 relative card-proportions">
+        <div class="card-slot foundation-slot w-full h-full flex items-center justify-center" data-foundation="1">
+          <span class="text-xl sm:text-2xl text-red-900/40 font-serif">♥</span>
+        </div>
+        <div id="foundation-1" class="absolute inset-0"></div>
+      </div>
+
+      <div class="col-span-1 relative card-proportions">
+        <div class="card-slot foundation-slot w-full h-full flex items-center justify-center" data-foundation="2">
+          <span class="text-xl sm:text-2xl text-stone-900/40 font-serif">♣</span>
+        </div>
+        <div id="foundation-2" class="absolute inset-0"></div>
+      </div>
+
+      <div class="col-span-1 relative card-proportions">
+        <div class="card-slot foundation-slot w-full h-full flex items-center justify-center" data-foundation="3">
+          <span class="text-xl sm:text-2xl text-red-900/40 font-serif">♦</span>
+        </div>
+        <div id="foundation-3" class="absolute inset-0"></div>
+      </div>
+
+    </div>
+
+    <!-- Dolny rząd: 7 kolumn Tableau (Karty układane kaskadowo w dół) -->
+    <div class="grid grid-cols-7 gap-2 sm:gap-3 md:gap-4 flex-grow min-h-[480px]">
+      <div class="col-span-1 relative tableau-column" data-col="0">
+        <div class="card-slot card-proportions flex items-center justify-center">
+          <span class="text-amber-700/25 text-xs font-serif font-bold">K</span>
+        </div>
+        <div id="tableau-0" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
+      </div>
+
+      <div class="col-span-1 relative tableau-column" data-col="1">
+        <div class="card-slot card-proportions flex items-center justify-center">
+          <span class="text-amber-700/25 text-xs font-serif font-bold">K</span>
+        </div>
+        <div id="tableau-1" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
+      </div>
+
+      <div class="col-span-1 relative tableau-column" data-col="2">
+        <div class="card-slot card-proportions flex items-center justify-center">
+          <span class="text-amber-700/25 text-xs font-serif font-bold">K</span>
+        </div>
+        <div id="tableau-2" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
+      </div>
+
+      <div class="col-span-1 relative tableau-column" data-col="3">
+        <div class="card-slot card-proportions flex items-center justify-center">
+          <span class="text-amber-700/25 text-xs font-serif font-bold">K</span>
+        </div>
+        <div id="tableau-3" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
+      </div>
+
+      <div class="col-span-1 relative tableau-column" data-col="4">
+        <div class="card-slot card-proportions flex items-center justify-center">
+          <span class="text-amber-700/25 text-xs font-serif font-bold">K</span>
+        </div>
+        <div id="tableau-4" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
+      </div>
+
+      <div class="col-span-1 relative tableau-column" data-col="5">
+        <div class="card-slot card-proportions flex items-center justify-center">
+          <span class="text-amber-700/25 text-xs font-serif font-bold">K</span>
+        </div>
+        <div id="tableau-5" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
+      </div>
+
+      <div class="col-span-1 relative tableau-column" data-col="6">
+        <div class="card-slot card-proportions flex items-center justify-center">
+          <span class="text-amber-700/25 text-xs font-serif font-bold">K</span>
+        </div>
+        <div id="tableau-6" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Pasek dolny: Podpowiedź oraz dyskretny przycisk testowy -->
+  <footer class="w-full bg-black/40 border-t border-amber-900/40 py-2 px-4 flex items-center justify-between text-xs text-amber-300/70 z-10">
+    <span>Klasyczny Klondike • Podwójne kliknięcie przenosi kartę do bazy</span>
+    <button id="btnDevWin" class="opacity-25 hover:opacity-100 transition-opacity text-[10px] text-amber-500 hover:text-amber-300 underline cursor-pointer" title="Przetestuj finał XP bez grania">
+      [Auto-win test]
+    </button>
+  </footer>
+
+  <!-- Modal Gratulacyjny po wygranej -->
+  <div id="winModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-gradient-to-b from-stone-900 to-[#27140e] p-6 sm:p-8 rounded-2xl border-2 border-amber-600 shadow-2xl max-w-sm w-full mx-4 text-center">
+      <div class="w-16 h-16 mx-auto mb-3">
+        <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow">
+          <ellipse cx="50" cy="56" rx="42" ry="38" fill="#582a13" stroke="#e28743" stroke-width="4"/>
+          <path d="M50 18 C30 20, 20 40, 26 62 C34 46, 66 46, 74 62 C80 40, 70 20, 50 18 Z" fill="#b06b3a"/>
+          <ellipse cx="50" cy="74" rx="28" ry="12" fill="#c98a58"/>
+        </svg>
+      </div>
+      <h2 class="title-font text-2xl font-bold text-amber-300 mb-1">ZWYCIĘSTWO!</h2>
+      <p class="text-amber-100/90 text-xs sm:text-sm mb-4">Wszystkie 52 karty trafiły do baz!</p>
+      
+      <div class="grid grid-cols-3 gap-2 bg-black/50 p-3 rounded-lg border border-amber-900/60 mb-5 text-xs">
+        <div>
+          <span class="block text-amber-400/70">Czas</span>
+          <span id="finalTime" class="font-bold text-amber-200">00:00</span>
+        </div>
+        <div>
+          <span class="block text-amber-400/70">Ruchy</span>
+          <span id="finalMoves" class="font-bold text-amber-200">0</span>
+        </div>
+        <div>
+          <span class="block text-amber-400/70">Wynik</span>
+          <span id="finalScore" class="font-bold text-amber-400 font-mono">0</span>
+        </div>
+      </div>
+
+      <div class="flex gap-2 justify-center">
+        <button id="modalNewGame" class="retro-btn px-5 py-2.5 rounded-lg font-bold text-amber-200 hover:text-white text-xs sm:text-sm">
+          Zagraj Ponownie
+        </button>
+        <button id="modalClose" class="bg-stone-800 hover:bg-stone-700 text-stone-300 px-3 py-2.5 rounded-lg text-xs font-semibold">
+          Zamknij
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ====================================================================
+       1. DŹWIĘKI KLIKNIĘĆ (Tylko subtelne efekty przesunięć, BEZ muzyki w tle)
+       ==================================================================== */
+    class AutumnSoundFX {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playCardPlace() {
+        if (!this.enabled) return;
+        this.init();
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(50, this.ctx.currentTime + 0.07);
+
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.07);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.08);
+        } catch(e) {}
+      }
+
+      playCardFlip() {
+        if (!this.enabled) return;
+        this.init();
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(280, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.06);
+
+          gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.06);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.07);
+        } catch(e) {}
+      }
+
+      playChestnutCrack() {
+        if (!this.enabled) return;
+        this.init();
+        try {
+          const bufferSize = this.ctx.sampleRate * 0.08;
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const output = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            output[i] = Math.random() * 2 - 1;
+          }
+          const whiteNoise = this.ctx.createBufferSource();
+          whiteNoise.buffer = buffer;
+
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.value = 1100;
+          filter.Q.value = 4;
+
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+
+          whiteNoise.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.ctx.destination);
+          whiteNoise.start();
+        } catch(e) {}
+      }
+
+      playHintSound() {
+        if (!this.enabled) return;
+        this.init();
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, this.ctx.currentTime); // D5
+          osc.frequency.setValueAtTime(880, this.ctx.currentTime + 0.1); // A5
+
+          gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.32);
+        } catch(e) {}
+      }
+    }
+
+    const sfx = new AutumnSoundFX();
+
+    /* ====================================================================
+       2. REPREZENTACJA KART (Klasyczny i czytelny styl)
+       ==================================================================== */
+    const SUITS = [
+      { name: 'spades', symbol: '♠', color: 'black', label: 'Pik' },
+      { name: 'hearts', symbol: '♥', color: 'red', label: 'Kier' },
+      { name: 'clubs', symbol: '♣', color: 'black', label: 'Trefl' },
+      { name: 'diamonds', symbol: '♦', color: 'red', label: 'Karo' }
+    ];
+
+    const VALUES = [
+      { value: 1, name: 'A' },
+      { value: 2, name: '2' },
+      { value: 3, name: '3' },
+      { value: 4, name: '4' },
+      { value: 5, name: '5' },
+      { value: 6, name: '6' },
+      { value: 7, name: '7' },
+      { value: 8, name: '8' },
+      { value: 9, name: '9' },
+      { value: 10, name: '10' },
+      { value: 11, name: 'J' },
+      { value: 12, name: 'Q' },
+      { value: 13, name: 'K' }
+    ];
+
+    class Card {
+      constructor(suitIdx, valueIdx) {
+        this.suitIdx = suitIdx;
+        this.valueIdx = valueIdx;
+        this.suit = SUITS[suitIdx];
+        this.value = VALUES[valueIdx].value;
+        this.name = VALUES[valueIdx].name;
+        this.isFaceUp = false;
+        this.id = `card-${suitIdx}-${valueIdx}`;
+      }
+
+      get isRed() {
+        return this.suit.color === 'red';
+      }
+    }
+
+    /* ====================================================================
+       3. LOGIKA KLONDIKE SOLITAIRE
+       ==================================================================== */
+    class SolitaireEngine {
+      constructor() {
+        this.stock = [];
+        this.waste = [];
+        this.foundations = [[], [], [], []];
+        this.tableaux = [[], [], [], [], [], [], []];
+        
+        this.moves = 0;
+        this.score = 0;
+        this.seconds = 0;
+        this.hintsRemaining = 3;
+        this.timer = null;
+        this.hasStarted = false;
+        this.isWon = false;
+        this.history = [];
+      }
+
+      newGame() {
+        clearHintHighlights();
+        if (this.timer) {
+          clearInterval(this.timer);
+          this.timer = null;
+        }
+        this.seconds = 0;
+        this.moves = 0;
+        this.score = 0;
+        this.hintsRemaining = 3;
+        this.hasStarted = false;
+        this.isWon = false;
+        this.history = [];
+        updateTimerUI();
+
+        // Generowanie talii 52 kart
+        const deck = [];
+        for (let s = 0; s < 4; s++) {
+          for (let v = 0; v < 13; v++) {
+            deck.push(new Card(s, v));
+          }
+        }
+
+        // Tasowanie Fisher-Yates
+        for (let i = deck.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+
+        // Układ 7 kolumn tableau
+        this.tableaux = [[], [], [], [], [], [], []];
+        for (let col = 0; col < 7; col++) {
+          for (let row = 0; row <= col; row++) {
+            const card = deck.pop();
+            card.isFaceUp = (row === col);
+            this.tableaux[col].push(card);
+          }
+        }
+
+        this.foundations = [[], [], [], []];
+        this.waste = [];
+        this.stock = deck;
+        this.stock.forEach(c => c.isFaceUp = false);
+
+        // Uruchomienie timera od razu na nową partię
+        this.startTimer();
+        updateStatsUI();
+      }
+
+      startTimer() {
+        if (this.timer) {
+          clearInterval(this.timer);
+        }
+        this.hasStarted = true;
+        this.timer = setInterval(() => {
+          this.seconds++;
+          updateTimerUI();
+        }, 1000);
+      }
+
+      saveHistory() {
+        const cloneCard = c => {
+          const nc = new Card(c.suitIdx, c.valueIdx);
+          nc.isFaceUp = c.isFaceUp;
+          return nc;
+        };
+
+        const state = {
+          stock: this.stock.map(cloneCard),
+          waste: this.waste.map(cloneCard),
+          foundations: this.foundations.map(col => col.map(cloneCard)),
+          tableaux: this.tableaux.map(col => col.map(cloneCard)),
+          moves: this.moves,
+          score: this.score
+        };
+        this.history.push(state);
+        if (this.history.length > 30) this.history.shift();
+      }
+
+      undo() {
+        if (this.history.length === 0) return;
+        const prevState = this.history.pop();
+        this.stock = prevState.stock;
+        this.waste = prevState.waste;
+        this.foundations = prevState.foundations;
+        this.tableaux = prevState.tableaux;
+        this.moves = prevState.moves;
+        this.score = prevState.score;
+        sfx.playCardPlace();
+        renderTable();
+        updateStatsUI();
+      }
+
+      canPlaceOnTableau(card, targetColIdx) {
+        const col = this.tableaux[targetColIdx];
+        if (col.length === 0) {
+          // Na puste pole można położyć wyłącznie Króla (wartość 13)
+          return card.value === 13;
+        }
+        const topCard = col[col.length - 1];
+        if (!topCard.isFaceUp) return false;
+        // W dół o 1 oraz naprzemienny kolor (czerwony na czarny / czarny na czerwony)
+        return (card.value === topCard.value - 1) && (card.isRed !== topCard.isRed);
+      }
+
+      canPlaceOnFoundation(card, foundationIdx) {
+        const foundation = this.foundations[foundationIdx];
+        if (foundation.length === 0) {
+          // As w pasującym kolorze fundamentu (lub dowolny As w pustej bazie tego samego koloru)
+          return card.value === 1 && card.suitIdx === foundationIdx;
+        }
+        const topCard = foundation[foundation.length - 1];
+        return (card.suitIdx === topCard.suitIdx) && (card.value === topCard.value + 1);
+      }
+
+      drawCard() {
+        clearHintHighlights();
+        this.startTimer();
+        this.saveHistory();
+
+        if (this.stock.length > 0) {
+          const card = this.stock.pop();
+          card.isFaceUp = true;
+          this.waste.push(card);
+          sfx.playCardFlip();
+        } else if (this.waste.length > 0) {
+          // Przełożenie odpadu z powrotem do talii
+          this.stock = this.waste.reverse();
+          this.stock.forEach(c => c.isFaceUp = false);
+          this.waste = [];
+          this.score = Math.max(0, this.score - 20);
+          sfx.playCardFlip();
+        }
+        this.moves++;
+        renderTable();
+        updateStatsUI();
+      }
+
+      executeMove(source, target, cards, tableauStartIndex = -1) {
+        clearHintHighlights();
+        this.startTimer();
+        this.saveHistory();
+
+        // 1. Usunięcie ze źródła
+        if (source === 'waste') {
+          this.waste.pop();
+        } else if (source.startsWith('tableau-')) {
+          const sColIdx = parseInt(source.split('-')[1]);
+          const sCol = this.tableaux[sColIdx];
+          const idx = (tableauStartIndex !== -1) ? tableauStartIndex : sCol.length - cards.length;
+          sCol.splice(idx);
+
+          // Automatyczne odsłonięcie karty pod spodem (klasyczny pasjans)
+          if (sCol.length > 0 && !sCol[sCol.length - 1].isFaceUp) {
+            sCol[sCol.length - 1].isFaceUp = true;
+            this.score += 5;
+          }
+        } else if (source.startsWith('foundation-')) {
+          const fIdx = parseInt(source.split('-')[1]);
+          this.foundations[fIdx].pop();
+          this.score = Math.max(0, this.score - 15);
+        }
+
+        // 2. Dodanie do celu
+        if (target.startsWith('tableau-')) {
+          const tColIdx = parseInt(target.split('-')[1]);
+          this.tableaux[tColIdx].push(...cards);
+          if (source === 'waste') this.score += 5;
+        } else if (target.startsWith('foundation-')) {
+          const fIdx = parseInt(target.split('-')[1]);
+          this.foundations[fIdx].push(...cards);
+          this.score += 10;
+        }
+
+        this.moves++;
+        sfx.playCardPlace();
+        renderTable();
+        updateStatsUI();
+
+        // Sprawdź warunek zwycięstwa
+        this.checkWinCondition();
+      }
+
+      autoMove(source, tableauIndex = -1) {
+        let card = null;
+        let cards = [];
+
+        if (source === 'waste') {
+          if (this.waste.length === 0) return;
+          card = this.waste[this.waste.length - 1];
+          cards = [card];
+        } else if (source.startsWith('tableau-')) {
+          const colIdx = parseInt(source.split('-')[1]);
+          const col = this.tableaux[colIdx];
+          if (col.length === 0) return;
+          const idx = tableauIndex !== -1 ? tableauIndex : col.length - 1;
+          card = col[idx];
+          if (!card.isFaceUp) {
+            // Jeśli kliknięto ostatnią zakrytą kartę, odkryj ją
+            if (idx === col.length - 1) {
+              card.isFaceUp = true;
+              this.score += 5;
+              sfx.playCardFlip();
+              renderTable();
+              updateStatsUI();
+            }
+            return;
+          }
+          cards = col.slice(idx);
+        } else {
+          return;
+        }
+
+        // Priorytet 1: Fundamenty (tylko pojedyncza wierzchnia karta)
+        if (cards.length === 1) {
+          for (let f = 0; f < 4; f++) {
+            if (this.canPlaceOnFoundation(card, f)) {
+              this.executeMove(source, `foundation-${f}`, cards, tableauIndex);
+              return;
+            }
+          }
+        }
+
+        // Priorytet 2: Inne kolumny Tableau
+        for (let t = 0; t < 7; t++) {
+          if (source === `tableau-${t}`) continue;
+          if (this.canPlaceOnTableau(card, t)) {
+            // Nie przenoś Króla z pustego pola na inne puste pole
+            if (card.value === 13 && source.startsWith('tableau-')) {
+              const sColIdx = parseInt(source.split('-')[1]);
+              if (this.tableaux[sColIdx][0] === card && this.tableaux[t].length === 0) {
+                continue;
+              }
+            }
+            this.executeMove(source, `tableau-${t}`, cards, tableauIndex);
+            return;
+          }
+        }
+      }
+
+      // Wyszukiwanie optymalnego ruchu dla gracza
+      findHint() {
+        // 1. Priorytet: Tableau -> Fundamenty (bezpieczne budowanie bazy)
+        for (let c = 0; c < 7; c++) {
+          const col = this.tableaux[c];
+          if (col.length === 0) continue;
+          const card = col[col.length - 1];
+          if (!card.isFaceUp) continue;
+          for (let f = 0; f < 4; f++) {
+            if (this.canPlaceOnFoundation(card, f)) {
+              return {
+                sourceType: 'tableau',
+                sourceElId: card.id,
+                targetElId: `foundation-${f}`,
+                desc: 'Przenieś do bazy'
+              };
+            }
+          }
+        }
+
+        // 2. Priorytet: Odpad (Waste) -> Fundamenty
+        if (this.waste.length > 0) {
+          const card = this.waste[this.waste.length - 1];
+          for (let f = 0; f < 4; f++) {
+            if (this.canPlaceOnFoundation(card, f)) {
+              return {
+                sourceType: 'waste',
+                sourceElId: card.id,
+                targetElId: `foundation-${f}`,
+                desc: 'Przenieś ze stosu do bazy'
+              };
+            }
+          }
+        }
+
+        // 3. Priorytet: Tableau -> Tableau, które odkrywa zakrytą kartę
+        for (let c = 0; c < 7; c++) {
+          const col = this.tableaux[c];
+          const firstFaceUpIdx = col.findIndex(k => k.isFaceUp);
+          if (firstFaceUpIdx > 0) { // Pod spodem jest zakryta karta!
+            const card = col[firstFaceUpIdx];
+            for (let t = 0; t < 7; t++) {
+              if (t === c) continue;
+              if (this.canPlaceOnTableau(card, t)) {
+                return {
+                  sourceType: 'tableau',
+                  sourceElId: card.id,
+                  targetElId: `tableau-${t}`,
+                  desc: 'Przenieś stos, aby odsłonić kartę'
+                };
+              }
+            }
+          }
+        }
+
+        // 4. Priorytet: Odpad (Waste) -> Tableau
+        if (this.waste.length > 0) {
+          const card = this.waste[this.waste.length - 1];
+          for (let t = 0; t < 7; t++) {
+            if (this.canPlaceOnTableau(card, t)) {
+              return {
+                sourceType: 'waste',
+                sourceElId: card.id,
+                targetElId: `tableau-${t}`,
+                desc: 'Umieść kartę ze stosu w kolumnie'
+              };
+            }
+          }
+        }
+
+        // 5. Priorytet: Ruch królem na puste pole tableau (jeśli odkryje inną kartę)
+        for (let c = 0; c < 7; c++) {
+          const col = this.tableaux[c];
+          if (col.length === 0) continue;
+          const firstFaceUpIdx = col.findIndex(k => k.isFaceUp);
+          if (firstFaceUpIdx > 0 && col[firstFaceUpIdx].value === 13) {
+            for (let empty = 0; empty < 7; empty++) {
+              if (this.tableaux[empty].length === 0) {
+                return {
+                  sourceType: 'tableau',
+                  sourceElId: col[firstFaceUpIdx].id,
+                  targetElId: `tableau-${empty}`,
+                  desc: 'Przenieś Króla na puste pole'
+                };
+              }
+            }
+          }
+        }
+
+        // 6. Inne dozwolone przesunięcia między kolumnami
+        for (let c = 0; c < 7; c++) {
+          const col = this.tableaux[c];
+          if (col.length === 0) continue;
+          const firstFaceUpIdx = col.findIndex(k => k.isFaceUp);
+          if (firstFaceUpIdx === 0 && col.length > 1) { // Nie ma zakrytych, ale można skonsolidować
+            const card = col[firstFaceUpIdx];
+            for (let t = 0; t < 7; t++) {
+              if (t === c) continue;
+              if (this.tableaux[t].length > 0 && this.canPlaceOnTableau(card, t)) {
+                return {
+                  sourceType: 'tableau',
+                  sourceElId: card.id,
+                  targetElId: `tableau-${t}`,
+                  desc: 'Połącz kolumny'
+                };
+              }
+            }
+          }
+        }
+
+        // 7. Brak ruchów na planszy -> dobierz z talii
+        if (this.stock.length > 0 || this.waste.length > 0) {
+          return {
+            sourceType: 'stock',
+            sourceElId: 'stockSlot',
+            targetElId: 'wasteSlot',
+            desc: 'Dobierz kartę z talii'
+          };
+        }
+
+        return null;
+      }
+
+      checkWinCondition() {
+        const totalWon = this.foundations.reduce((acc, f) => acc + f.length, 0);
+        if (totalWon === 52 && !this.isWon) {
+          this.isWon = true;
+          clearInterval(this.timer);
+          // NAGRODA: Uruchomienie kaskady XP i fajerwerków z kasztanów!
+          triggerWindowsXPVictory();
+        }
+      }
+    }
+
+    const game = new SolitaireEngine();
+
+    /* ====================================================================
+       4. GENEROWANIE CZYTELNYCH KART (KLASYCZNY STYL KART)
+       ==================================================================== */
+    function renderCardHTML(card) {
+      if (!card.isFaceUp) {
+        // Rewers: Elegancki wzór kasztanowy
+        return `
+          <div class="card-back-pattern">
+            <svg class="w-8 h-8 opacity-75" viewBox="0 0 100 100">
+              <ellipse cx="50" cy="56" rx="40" ry="34" fill="#6d351a" stroke="#cca27e" stroke-width="3"/>
+              <ellipse cx="50" cy="72" rx="26" ry="11" fill="#cca27e"/>
+              <ellipse cx="38" cy="40" rx="4" ry="2.5" fill="#ffffff" opacity="0.6"/>
+            </svg>
+          </div>
+        `;
+      }
+
+      // Awers: Przejrzysta, czytelna tradycyjna karta
+      const colorClass = card.isRed ? 'suit-red' : 'suit-black';
+      return `
+        <div class="playing-card-body select-none">
+          <!-- Indeks górny lewy -->
+          <div class="flex flex-col items-center leading-none ${colorClass}">
+            <span class="text-xs sm:text-sm font-bold font-serif tracking-tighter">${card.name}</span>
+            <span class="text-xs sm:text-sm font-serif -mt-0.5">${card.suit.symbol}</span>
+          </div>
+
+          <!-- Główny czytelny symbol na środku -->
+          <div class="self-center ${colorClass} opacity-90 my-auto">
+            <span class="text-2xl sm:text-3xl font-serif">${card.suit.symbol}</span>
+          </div>
+
+          <!-- Indeks dolny prawy (odwrócony) -->
+          <div class="flex flex-col items-center leading-none ${colorClass} rotate-180 self-end">
+            <span class="text-xs sm:text-sm font-bold font-serif tracking-tighter">${card.name}</span>
+            <span class="text-xs sm:text-sm font-serif -mt-0.5">${card.suit.symbol}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function createCardElement(card, source, index = -1) {
+      const container = document.createElement('div');
+      container.className = 'card-container pointer-events-auto';
+      container.id = card.id;
+      container.dataset.source = source;
+      if (index !== -1) container.dataset.index = index;
+
+      container.innerHTML = renderCardHTML(card);
+
+      // Podwójne kliknięcie -> natychmiastowe inteligentne przeniesienie
+      container.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        game.autoMove(source, index);
+      });
+
+      return container;
+    }
+
+    function renderTable() {
+      // 1. Talia (Stock)
+      const stockStack = document.getElementById('stockStack');
+      stockStack.innerHTML = '';
+      if (game.stock.length > 0) {
+        const top = game.stock[game.stock.length - 1];
+        const el = createCardElement(top, 'stock');
+        el.addEventListener('click', () => game.drawCard());
+        stockStack.appendChild(el);
+      }
+
+      // 2. Odpad (Waste)
+      const wasteStack = document.getElementById('wasteStack');
+      wasteStack.innerHTML = '';
+      if (game.waste.length > 0) {
+        const top = game.waste[game.waste.length - 1];
+        const el = createCardElement(top, 'waste');
+        setupDrag(el, [top], 'waste');
+        wasteStack.appendChild(el);
+      }
+
+      // 3. Fundamenty (Foundations)
+      for (let f = 0; f < 4; f++) {
+        const fElem = document.getElementById(`foundation-${f}`);
+        fElem.innerHTML = '';
+        const list = game.foundations[f];
+        if (list.length > 0) {
+          const top = list[list.length - 1];
+          const el = createCardElement(top, `foundation-${f}`);
+          setupDrag(el, [top], `foundation-${f}`);
+          fElem.appendChild(el);
+        }
+      }
+
+      // 4. Kolumny Tableau
+      for (let c = 0; c < 7; c++) {
+        const colElem = document.getElementById(`tableau-${c}`);
+        colElem.innerHTML = '';
+        const cards = game.tableaux[c];
+
+        let currentOffset = 0;
+        cards.forEach((card, idx) => {
+          const cardEl = createCardElement(card, `tableau-${c}`, idx);
+          cardEl.style.top = `${currentOffset}px`;
+
+          if (!card.isFaceUp) {
+            currentOffset += 14;
+            if (idx === cards.length - 1) {
+              cardEl.addEventListener('click', () => {
+                card.isFaceUp = true;
+                game.score += 5;
+                sfx.playCardFlip();
+                renderTable();
+                updateStatsUI();
+              });
+            }
+          } else {
+            currentOffset += 24;
+            const subStack = cards.slice(idx);
+            setupDrag(cardEl, subStack, `tableau-${c}`, idx);
+          }
+
+          colElem.appendChild(cardEl);
+        });
+      }
+    }
+
+    /* ====================================================================
+       5. DRAG & DROP ORAZ OBSŁUGA POJEDYNCZYCH KLIKNIĘĆ
+       ==================================================================== */
+    let dragPayload = null;
+    let dragGhost = null;
+
+    function setupDrag(element, cards, source, tableauIndex = -1) {
+      let startX = 0, startY = 0;
+      let isDragging = false;
+
+      const pointerDown = (e) => {
+        if (e.button !== undefined && e.button !== 0) return;
+        startX = e.clientX || (e.touches && e.touches[0].clientX);
+        startY = e.clientY || (e.touches && e.touches[0].clientY);
+
+        dragPayload = {
+          cards,
+          source,
+          tableauIndex,
+          element,
+          startX,
+          startY
+        };
+
+        window.addEventListener('pointermove', pointerMove);
+        window.addEventListener('pointerup', pointerUp);
+      };
+
+      const pointerMove = (e) => {
+        if (!dragPayload) return;
+        const curX = e.clientX || (e.touches && e.touches[0].clientX);
+        const curY = e.clientY || (e.touches && e.touches[0].clientY);
+        const dx = curX - startX;
+        const dy = curY - startY;
+
+        if (!isDragging && Math.hypot(dx, dy) > 6) {
+          isDragging = true;
+          createGhost(dragPayload, curX, curY);
+        }
+
+        if (isDragging && dragGhost) {
+          dragGhost.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
+        }
+      };
+
+      const pointerUp = (e) => {
+        window.removeEventListener('pointermove', pointerMove);
+        window.removeEventListener('pointerup', pointerUp);
+
+        if (isDragging && dragGhost) {
+          const clientX = e.clientX || (e.changedTouches && e.changedTouches[0].clientX);
+          const clientY = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
+          resolveDrop(clientX, clientY);
+        }
+
+        if (dragGhost && dragGhost.parentNode) {
+          dragGhost.remove();
+        }
+        dragGhost = null;
+        if (dragPayload && dragPayload.element) {
+          dragPayload.element.style.opacity = '1';
+        }
+        dragPayload = null;
+        isDragging = false;
+      };
+
+      element.addEventListener('pointerdown', pointerDown);
+    }
+
+    function createGhost(payload, x, y) {
+      dragGhost = document.createElement('div');
+      dragGhost.style.position = 'fixed';
+      dragGhost.style.left = `${payload.startX}px`;
+      dragGhost.style.top = `${payload.startY}px`;
+      dragGhost.style.pointerEvents = 'none';
+      dragGhost.style.zIndex = '9999';
+      dragGhost.style.width = `${payload.element.offsetWidth}px`;
+
+      payload.element.style.opacity = '0.2';
+
+      payload.cards.forEach((card, i) => {
+        const dummy = document.createElement('div');
+        dummy.className = 'card-container';
+        dummy.style.position = 'absolute';
+        dummy.style.top = `${i * 26}px`;
+        dummy.style.left = '0';
+        dummy.style.width = '100%';
+        dummy.style.height = `${payload.element.offsetHeight}px`;
+        dummy.innerHTML = renderCardHTML(card);
+        dragGhost.appendChild(dummy);
+      });
+
+      document.body.appendChild(dragGhost);
+    }
+
+    function resolveDrop(dropX, dropY) {
+      if (!dragPayload) return;
+      const { cards, source, tableauIndex } = dragPayload;
+      const leadCard = cards[0];
+
+      // Tymczasowo ukrywamy widmo, aby elementsFromPoint trafiło w stół/kolumny
+      if (dragGhost) dragGhost.style.display = 'none';
+      const elements = document.elementsFromPoint(dropX, dropY);
+      if (dragGhost) dragGhost.style.display = 'block';
+
+      // 1. Sprawdź fundament (jeśli przeciągamy dokładnie 1 kartę)
+      if (cards.length === 1) {
+        for (let el of elements) {
+          const foundation = el.closest('[data-foundation]');
+          if (foundation) {
+            const fIdx = parseInt(foundation.dataset.foundation);
+            if (game.canPlaceOnFoundation(leadCard, fIdx)) {
+              game.executeMove(source, `foundation-${fIdx}`, cards, tableauIndex);
+              return;
+            }
+          }
+        }
+      }
+
+      // 2. Sprawdź kolumny Tableau
+      for (let el of elements) {
+        const col = el.closest('[data-col]');
+        if (col) {
+          const targetColIdx = parseInt(col.dataset.col);
+          if (`tableau-${targetColIdx}` !== source && game.canPlaceOnTableau(leadCard, targetColIdx)) {
+            game.executeMove(source, `tableau-${targetColIdx}`, cards, tableauIndex);
+            return;
+          }
+        }
+      }
+
+      // Niepoprawny ruch -> odśwież widok
+      renderTable();
+    }
+
+    /* ====================================================================
+       6. AKTUALIZACJA UI & KONTROLA
+       ==================================================================== */
+    function updateStatsUI() {
+      document.getElementById('movesDisplay').textContent = game.moves;
+      document.getElementById('scoreDisplay').textContent = game.score;
+      const badge = document.getElementById('hintBadge');
+      badge.textContent = game.hintsRemaining;
+      const btnHint = document.getElementById('btnHint');
+      if (game.hintsRemaining <= 0) {
+        btnHint.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        btnHint.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    function updateTimerUI() {
+      const mins = Math.floor(game.seconds / 60).toString().padStart(2, '0');
+      const secs = (game.seconds % 60).toString().padStart(2, '0');
+      document.getElementById('timerDisplay').textContent = `${mins}:${secs}`;
+    }
+
+    let hintTimeout = null;
+    function clearHintHighlights() {
+      if (hintTimeout) {
+        clearTimeout(hintTimeout);
+        hintTimeout = null;
+      }
+      document.querySelectorAll('.hint-source').forEach(el => el.classList.remove('hint-source'));
+      document.querySelectorAll('.hint-target').forEach(el => el.classList.remove('hint-target'));
+    }
+
+    document.getElementById('btnHint').addEventListener('click', () => {
+      if (game.hintsRemaining <= 0) return;
+      clearHintHighlights();
+
+      const hint = game.findHint();
+      if (!hint) {
+        // Brak dostępnych ruchów
+        const btn = document.getElementById('btnHint');
+        btn.classList.add('animate-pulse');
+        setTimeout(() => btn.classList.remove('animate-pulse'), 800);
+        return;
+      }
+
+      game.hintsRemaining--;
+      updateStatsUI();
+      sfx.playHintSound();
+
+      const sourceEl = document.getElementById(hint.sourceElId);
+      const targetEl = document.getElementById(hint.targetElId);
+
+      if (sourceEl) sourceEl.classList.add('hint-source');
+      if (targetEl) targetEl.classList.add('hint-target');
+
+      hintTimeout = setTimeout(() => {
+        clearHintHighlights();
+      }, 2400);
+    });
+
+    document.getElementById('stockSlot').addEventListener('click', () => {
+      game.drawCard();
+    });
+
+    document.getElementById('btnUndo').addEventListener('click', () => {
+      clearHintHighlights();
+      game.undo();
+    });
+
+    document.getElementById('btnNewGame').addEventListener('click', () => {
+      stopWindowsXPVictory();
+      document.getElementById('winModal').classList.add('hidden');
+      game.newGame();
+      renderTable();
+    });
+
+    document.getElementById('modalNewGame').addEventListener('click', () => {
+      stopWindowsXPVictory();
+      document.getElementById('winModal').classList.add('hidden');
+      game.newGame();
+      renderTable();
+    });
+
+    document.getElementById('modalClose').addEventListener('click', () => {
+      document.getElementById('winModal').classList.add('hidden');
+    });
+
+    // Przycisk testowy do sprawdzenia animacji wygranej
+    document.getElementById('btnDevWin').addEventListener('click', () => {
+      // Automatycznie zapełnij fundamenty wszystkimi 52 kartami
+      game.foundations = [[], [], [], []];
+      for (let s = 0; s < 4; s++) {
+        for (let v = 0; v < 13; v++) {
+          const c = new Card(s, v);
+          c.isFaceUp = true;
+          game.foundations[s].push(c);
+        }
+      }
+      game.stock = [];
+      game.waste = [];
+      game.tableaux = [[], [], [], [], [], [], []];
+      renderTable();
+      game.checkWinCondition();
+    });
+
+    document.getElementById('btnSound').addEventListener('click', () => {
+      sfx.enabled = !sfx.enabled;
+      document.getElementById('soundIcon').textContent = sfx.enabled ? '🔊' : '🔇';
+    });
+
+    /* ====================================================================
+       7. KULTOWA KASKADA WINDOWS XP & FAJERWERKI Z KASZTANÓW (NAGRODA PO UKOŃCZENIU)
+       ==================================================================== */
+    let animId = null;
+    let bouncingCards = [];
+    let chestnutSparks = [];
+
+    function triggerWindowsXPVictory() {
+      const canvas = document.getElementById('victoryCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.style.display = 'block';
+
+      // Lista 52 kart z 4 fundamentów
+      const deckOrder = [];
+      for (let val = 12; val >= 0; val--) {
+        for (let f = 3; f >= 0; f--) {
+          const card = game.foundations[f][val] || new Card(f, val);
+          const fBox = document.getElementById(`foundation-${f}`).getBoundingClientRect();
+          deckOrder.push({
+            card,
+            x: fBox.left,
+            y: fBox.top,
+            w: fBox.width || 75,
+            h: fBox.height || 105
+          });
+        }
+      }
+
+      bouncingCards = [];
+      chestnutSparks = [];
+      let nextIndex = 0;
+
+      // Kolejne karty odrywają się i skaczą co 260ms
+      const interval = setInterval(() => {
+        if (!game.isWon) {
+          clearInterval(interval);
+          return;
+        }
+
+        if (nextIndex < deckOrder.length) {
+          const item = deckOrder[nextIndex++];
+          bouncingCards.push({
+            card: item.card,
+            x: item.x,
+            y: item.y,
+            w: item.w,
+            h: item.h,
+            vx: (Math.random() * 8 + 3.5) * (Math.random() > 0.5 ? 1 : -1),
+            vy: -(Math.random() * 5 + 4),
+            gravity: 0.65,
+            bounce: -0.82
+          });
+
+          // Wystrzał kasztanowych fajerwerków w miejscu oderwania
+          spawnChestnutBurst(item.x + item.w / 2, item.y + item.h / 2, 14);
+          sfx.playChestnutCrack();
+        } else {
+          clearInterval(interval);
+          setTimeout(() => {
+            document.getElementById('finalTime').textContent = document.getElementById('timerDisplay').textContent;
+            document.getElementById('finalMoves').textContent = game.moves;
+            document.getElementById('finalScore').textContent = game.score;
+            const modal = document.getElementById('winModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 20);
+          }, 1500);
+        }
+      }, 260);
+
+      // Pętla kaskady (z zachowaniem klasycznej smugi Windows XP)
+      function renderLoop() {
+        // Bardzo delikatna przezroczystość, by karty zostawiały nostalgiczny wielokrotny ślad
+        ctx.fillStyle = 'rgba(20, 28, 19, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 1. Karty Klondike XP
+        for (let c of bouncingCards) {
+          drawCardOnCanvas(ctx, c);
+
+          c.x += c.vx;
+          c.vy += c.gravity;
+          c.y += c.vy;
+
+          // Odbicie od dolnej krawędzi
+          if (c.y + c.h > canvas.height) {
+            c.y = canvas.height - c.h;
+            c.vy *= c.bounce;
+            // Wybuch pękających łupin kasztana przy uderzeniu
+            if (Math.abs(c.vy) > 3) {
+              spawnChestnutBurst(c.x + c.w / 2, canvas.height - 10, 10);
+            }
+          }
+
+          // Odbicie od krawędzi bocznych
+          if (c.x <= 0 || c.x + c.w >= canvas.width) {
+            c.vx = -c.vx;
+          }
+        }
+
+        // 2. Kasztanowe fajerwerki (eksplodujące łupiny i błyszczące kasztany)
+        drawAndStepFireworks(ctx);
+
+        animId = requestAnimationFrame(renderLoop);
+      }
+
+      renderLoop();
+    }
+
+    function stopWindowsXPVictory() {
+      if (animId) cancelAnimationFrame(animId);
+      const canvas = document.getElementById('victoryCanvas');
+      canvas.style.display = 'none';
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      bouncingCards = [];
+      chestnutSparks = [];
+    }
+
+    function drawCardOnCanvas(ctx, c) {
+      ctx.save();
+      ctx.translate(c.x, c.y);
+
+      // Korpus karty
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#292524';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.roundRect(0, 0, c.w, c.h, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      // Indeksy i symbole
+      const isRed = c.card.isRed;
+      ctx.fillStyle = isRed ? '#b91c1c' : '#1c1917';
+      ctx.font = 'bold 12px serif';
+      ctx.fillText(c.card.name, 6, 16);
+      ctx.fillText(c.card.suit.symbol, 6, 28);
+
+      // Symbol na środku
+      ctx.font = '22px serif';
+      ctx.fillText(c.card.suit.symbol, c.w / 2 - 8, c.h / 2 + 8);
+
+      ctx.restore();
+    }
+
+    function spawnChestnutBurst(x, y, count) {
+      // 1. Pękające zielone kolczaste łupiny
+      for (let i = 0; i < count; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 8 + 3;
+        chestnutSparks.push({
+          type: 'burr',
+          x, y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd - 2,
+          radius: Math.random() * 5 + 4,
+          life: 1.0,
+          decay: Math.random() * 0.02 + 0.015,
+          color: Math.random() > 0.5 ? '#65a30d' : '#84cc16'
+        });
+      }
+
+      // 2. Lśniące brązowe kasztany
+      for (let i = 0; i < 4; i++) {
+        const ang = -Math.PI / 2 + (Math.random() - 0.5) * 1.5;
+        const spd = Math.random() * 10 + 5;
+        chestnutSparks.push({
+          type: 'chestnut',
+          x, y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          radius: Math.random() * 8 + 10,
+          life: 1.0,
+          decay: 0.01
+        });
+      }
+
+      // 3. Złote iskierki
+      for (let i = 0; i < 15; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 6 + 2;
+        chestnutSparks.push({
+          type: 'spark',
+          x, y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          radius: Math.random() * 2.5 + 1,
+          life: 1.0,
+          decay: 0.03,
+          color: '#f59e0b'
+        });
+      }
+    }
+
+    function drawAndStepFireworks(ctx) {
+      for (let i = chestnutSparks.length - 1; i >= 0; i--) {
+        const p = chestnutSparks[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.28; // grawitacja
+        p.life -= p.decay;
+
+        if (p.life <= 0) {
+          chestnutSparks.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life);
+
+        if (p.type === 'burr') {
+          // Kolczasty odłamek
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (p.type === 'chestnut') {
+          // Kasztan
+          ctx.fillStyle = '#451a03';
+          ctx.beginPath();
+          ctx.ellipse(p.x, p.y, p.radius, p.radius * 0.85, 0, 0, Math.PI * 2);
+          ctx.fill();
+          // Brzuszek
+          ctx.fillStyle = '#c98a58';
+          ctx.beginPath();
+          ctx.ellipse(p.x, p.y + p.radius * 0.4, p.radius * 0.65, p.radius * 0.35, 0, 0, Math.PI * 2);
+          ctx.fill();
+          // Błysk
+          ctx.fillStyle = 'rgba(255,255,255,0.7)';
+          ctx.beginPath();
+          ctx.arc(p.x - p.radius * 0.3, p.y - p.radius * 0.25, p.radius * 0.2, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // Złota iskra
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
+    }
+
+    // Inicjalizacja gry po załadowaniu okna
+    window.onload = function() {
+      game.newGame();
+      renderTable();
+    };
+
+    window.addEventListener('resize', () => {
+      const canvas = document.getElementById('victoryCanvas');
+      if (canvas.style.display !== 'none') {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+    });
+  </script>
+</body>
+</html>

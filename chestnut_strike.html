@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CHESTNUT STRIKE: Tactical Range</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Chakra+Petch:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --c-sand: #c2a677;
+            --c-camo: #4a5335;
+            --c-camo-dark: #22291b;
+            --c-warning: #eab308;
+            --c-danger: #ef4444;
+            --c-neon: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0d0f0c;
+            color: #d8ddcf;
+            font-family: 'Chakra Petch', sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .font-stencil {
+            font-family: 'Black Ops One', cursive;
+            letter-spacing: 2px;
+        }
+
+        .font-mono-tactical {
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Tactical scanlines effect */
+        .scanlines {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.35) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.03),
+                rgba(0, 255, 0, 0.01),
+                rgba(0, 0, 255, 0.03)
+            );
+            background-size: 100% 3px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Vignette */
+        .vignette {
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.85);
+            pointer-events: none;
+        }
+
+        /* Screen Shake */
+        .shake {
+            animation: screenShake 0.18s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes screenShake {
+            10%, 90% { transform: translate3d(-3px, 2px, 0) rotate(-0.5deg); }
+            20%, 80% { transform: translate3d(4px, -3px, 0) rotate(0.8deg); }
+            30%, 50%, 70% { transform: translate3d(-5px, 4px, 0) rotate(-1deg); }
+            40%, 60% { transform: translate3d(5px, -2px, 0) rotate(0.5deg); }
+        }
+
+        /* Gun Muzzle Flash */
+        .muzzle-flash {
+            animation: flashFade 0.08s ease-out forwards;
+        }
+        @keyframes flashFade {
+            0% { opacity: 0.85; transform: scale(1.1); }
+            100% { opacity: 0; transform: scale(1); }
+        }
+
+        /* Camo pattern border */
+        .tactical-border {
+            border: 2px solid #576547;
+            position: relative;
+        }
+        .tactical-border::before {
+            content: '';
+            position: absolute;
+            top: -4px; left: -4px;
+            width: 8px; height: 8px;
+            border-top: 2px solid #eab308;
+            border-left: 2px solid #eab308;
+        }
+        .tactical-border::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; right: -4px;
+            width: 8px; height: 8px;
+            border-bottom: 2px solid #eab308;
+            border-right: 2px solid #eab308;
+        }
+
+        /* Canvas cursor hidden */
+        #gameCanvas {
+            cursor: none;
+        }
+
+        /* Gun Model Viewport Kick */
+        .gun-kick {
+            transform: translateY(22px) rotate(-3deg) scale(0.96);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center relative w-full h-full bg-[#11140e] select-none">
+    <a href="./index.htm" aria-label="Powrót do strony głównej" title="Powrót do strony głównej" class="fixed left-3 top-3 z-[100] border border-amber-500/70 bg-black/90 px-3 py-2 font-mono text-xs text-amber-300 shadow-lg">STRONA GŁÓWNA</a>
+
+    <!-- Game Container -->
+    <div id="gameWrapper" class="relative w-full h-full max-w-[1400px] max-h-[850px] shadow-2xl overflow-hidden flex flex-col justify-between tactical-border bg-[#181d14]">
+        
+        <!-- Scanlines & Atmosphere Overlay -->
+        <div class="scanlines absolute inset-0 z-30"></div>
+        <div class="vignette absolute inset-0 z-20"></div>
+
+        <!-- Muzzle Flash FX Light -->
+        <div id="muzzleFlashOverlay" class="absolute inset-0 bg-yellow-100 opacity-0 pointer-events-none z-25 transition-none"></div>
+
+        <!-- TOP HUD (Only during active gameplay) -->
+        <header id="hudTop" class="hidden absolute top-0 left-0 right-0 z-30 px-6 py-3 flex justify-between items-center bg-gradient-to-b from-black/80 via-black/40 to-transparent font-mono-tactical text-xs md:text-sm">
+            <div class="flex items-center gap-4 md:gap-6">
+                <!-- Sector Info -->
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
+                    <span class="text-amber-500 font-bold uppercase tracking-wider hidden sm:inline">SEKTOR KANDAHAR-9</span>
+                </div>
+                <!-- Score -->
+                <div class="bg-black/60 px-3 py-1.5 rounded border border-neutral-700">
+                    <span class="text-neutral-400">PUNKTY:</span>
+                    <span id="hudScore" class="text-amber-400 font-bold text-base md:text-lg ml-2">00000</span>
+                </div>
+                <!-- Combo -->
+                <div class="bg-black/60 px-3 py-1.5 rounded border border-neutral-700">
+                    <span class="text-neutral-400">SERIA:</span>
+                    <span id="hudCombo" class="text-green-400 font-bold text-base md:text-lg ml-2">x1.0</span>
+                </div>
+            </div>
+
+            <!-- Timer & Accuracy & Mode Tag -->
+            <div class="flex items-center gap-3 md:gap-5">
+                <div class="bg-black/60 px-3 py-1.5 rounded border border-neutral-700 text-right hidden sm:block">
+                    <span class="text-neutral-400">CELNOŚĆ:</span>
+                    <span id="hudAcc" class="text-sky-400 font-bold ml-1">100%</span>
+                </div>
+                <div class="bg-black/80 px-4 py-1.5 rounded border-2 border-amber-500 text-center min-w-[95px]">
+                    <div class="text-[10px] text-neutral-400 uppercase">CZAS MISJI</div>
+                    <div id="hudTimer" class="text-amber-400 font-stencil text-xl md:text-2xl leading-none">60.0s</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN 2D GAME CANVAS -->
+        <canvas id="gameCanvas" class="w-full h-full block z-10"></canvas>
+
+        <!-- BOTTOM HUD (Weapon & Ammo) -->
+        <footer id="hudBottom" class="hidden absolute bottom-0 left-0 right-0 z-30 px-6 py-4 flex justify-between items-end bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none">
+            <!-- Weapon Switcher & Status -->
+            <div class="pointer-events-auto flex items-center gap-2 sm:gap-3 flex-wrap">
+                <button id="btnPistol" class="px-3 md:px-4 py-2 bg-neutral-900/90 border-2 border-amber-500 rounded text-amber-300 font-bold text-[11px] md:text-xs uppercase flex items-center gap-2 hover:bg-neutral-800 transition">
+                    <span class="bg-amber-500 text-black px-1.5 py-0.5 rounded text-[10px]">[1]</span>
+                    <span>P226</span>
+                </button>
+                <button id="btnShotgun" class="px-3 md:px-4 py-2 bg-neutral-900/80 border border-neutral-600 rounded text-neutral-300 font-bold text-[11px] md:text-xs uppercase flex items-center gap-2 hover:bg-neutral-800 transition">
+                    <span class="bg-neutral-700 text-white px-1.5 py-0.5 rounded text-[10px]">[2]</span>
+                    <span>M870</span>
+                </button>
+                <button id="btnRifle" class="px-3 md:px-4 py-2 bg-neutral-900/80 border border-neutral-600 rounded text-neutral-300 font-bold text-[11px] md:text-xs uppercase flex items-center gap-2 hover:bg-neutral-800 transition">
+                    <span class="bg-neutral-700 text-white px-1.5 py-0.5 rounded text-[10px]">[3]</span>
+                    <span>M4A1 RIFLE</span>
+                </button>
+            </div>
+
+            <!-- Ammo Counters & Reload Prompt -->
+            <div class="flex flex-col items-end gap-1">
+                <div id="reloadPrompt" class="hidden animate-bounce text-red-500 font-stencil tracking-widest text-xs md:text-sm bg-black/80 px-3 py-1 rounded border border-red-500">
+                    WCISNIJ [R] ABY PRZEŁADOWAĆ
+                </div>
+                <div class="flex items-center gap-3 md:gap-4 bg-black/80 px-4 md:px-5 py-2.5 rounded-lg border border-neutral-700">
+                    <div class="text-right hidden sm:block">
+                        <div id="weaponNameDisplay" class="text-[11px] text-amber-500 font-bold tracking-widest uppercase">PISTOLET TAKTYCZNY</div>
+                        <div id="weaponModeDisplay" class="text-[10px] text-neutral-400">TRYB OGIEŃ POJEDYNCZY</div>
+                    </div>
+                    <div class="w-[1px] h-8 bg-neutral-600 hidden sm:block"></div>
+                    <div class="flex items-baseline gap-1 font-stencil">
+                        <span id="currentAmmo" class="text-3xl md:text-4xl text-amber-400">15</span>
+                        <span class="text-neutral-500 text-xl">/</span>
+                        <span id="maxAmmo" class="text-neutral-400 text-lg">15</span>
+                    </div>
+                    <button id="btnReload" class="pointer-events-auto ml-2 bg-amber-600/30 hover:bg-amber-600/60 active:scale-95 text-amber-300 p-2 rounded border border-amber-500/50 transition">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0020 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 004 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </footer>
+
+        <!-- START / TITLE SCREEN -->
+        <div id="screenStart" class="absolute inset-0 z-40 flex flex-col justify-between p-6 md:p-10 bg-cover bg-center" style="background-image: linear-gradient(to top, rgba(10,12,8,0.96) 20%, rgba(18,22,14,0.65) 60%, rgba(10,12,8,0.92) 100%), url('watermarked_img_15816230161152023436.jpg');">
+            <!-- Top brand tag -->
+            <div class="flex justify-between items-center text-xs text-amber-400 font-mono-tactical border-b border-amber-900/60 pb-3">
+                <span class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-amber-500 rounded-full animate-ping"></span>
+                    AFGHAN COMBAT TRAINING FACILITY // JW GROM DRILL
+                </span>
+                <span class="hidden sm:inline">WARUNKI: GÓRY KANDAHARU (PYŁ & PIASIEK)</span>
+            </div>
+
+            <!-- Title & Subtitle Banner -->
+            <div class="text-center my-auto flex flex-col items-center">
+                <div class="w-16 h-16 md:w-20 md:h-20 mb-3 text-amber-500 flex items-center justify-center p-3 rounded-full border-2 border-amber-500/50 bg-black/60 shadow-[0_0_30px_rgba(245,158,11,0.3)]">
+                    <svg viewBox="0 0 24 24" class="w-12 h-12 fill-current">
+                        <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9"/>
+                    </svg>
+                </div>
+
+                <h1 class="font-stencil text-5xl md:text-7xl lg:text-8xl text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-400 to-amber-700 tracking-wider drop-shadow-[0_5px_15px_rgba(0,0,0,0.8)]">
+                    CHESTNUT STRIKE
+                </h1>
+                <p class="font-mono-tactical text-amber-300/90 text-xs md:text-base mt-2 tracking-[0.35em] uppercase">
+                    TACTICAL OUTPOST SHOOTING RANGE // AFGHANISTAN
+                </p>
+                <div class="w-28 h-1 bg-amber-500/80 my-4 rounded-full"></div>
+
+                <!-- Best Score Tag -->
+                <div class="inline-flex items-center gap-3 bg-black/80 border border-amber-500/50 px-5 py-2 rounded-full text-xs font-mono-tactical text-amber-300 mb-6 backdrop-blur-sm">
+                    <span>REKORD POLIGONU:</span>
+                    <span id="startBestScore" class="font-bold text-amber-400 text-sm">00000</span>
+                    <span class="text-neutral-500">|</span>
+                    <span>CELNOŚĆ:</span>
+                    <span id="startBestAcc" class="text-sky-300 font-bold">0%</span>
+                </div>
+
+                <!-- Action Button -->
+                <button id="btnStartGame" class="group relative px-10 py-4 bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 active:scale-95 text-black font-stencil text-xl md:text-2xl rounded shadow-[0_0_30px_rgba(234,179,8,0.6)] transition duration-150 flex items-center gap-3">
+                    <svg class="w-6 h-6 fill-current group-hover:scale-125 transition transform" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                    <span>ROZPOCZNIJ STRZELANIE BOJOWE</span>
+                </button>
+            </div>
+
+            <!-- Rules & Legend Footer -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs font-mono-tactical text-neutral-300 border-t border-amber-900/60 pt-4 bg-black/70 p-4 rounded-md backdrop-blur-sm">
+                <div class="flex items-center gap-2">
+                    <span class="text-red-400 font-bold">🎯 HEADSHOT:</span>
+                    <span>Tylko głowa/szyja (2x pkt + Czerwony znacznik)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-amber-400 font-bold">🎯 ŚRODEK MASY:</span>
+                    <span>Klatka piersiowa = Alfa Zone (Biały hitmarker)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-blue-400 font-bold">🚫 NO-SHOOT:</span>
+                    <span>Nie strzelaj do celów cywilnych/niebieskich! (-250 pkt)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-emerald-400 font-bold">⚙️ BRONIE [1, 2, 3]:</span>
+                    <span>P226 / M870 Strzelba / M4A1 Karabin</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BRIEFING / GAME OVER SCREEN -->
+        <div id="screenDebrief" class="hidden absolute inset-0 z-40 flex flex-col justify-center items-center p-6 bg-black/95">
+            <div class="max-w-xl w-full bg-[#181e13] border-2 border-amber-500/80 rounded-lg p-6 md:p-8 shadow-[0_0_50px_rgba(217,119,6,0.25)] font-mono-tactical relative">
+                <!-- Top Stencil Banner -->
+                <div class="text-center border-b border-amber-600/30 pb-4 mb-6">
+                    <span class="text-xs uppercase tracking-widest text-amber-500">RAPORT POOPERACYJNY</span>
+                    <h2 class="font-stencil text-3xl md:text-5xl text-amber-400 mt-1">KONIEC ĆWICZENIA</h2>
+                </div>
+
+        <!-- Stat Grid in screenDebrief -->
+                <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
+                    <div class="bg-black/50 p-3 rounded border border-neutral-700">
+                        <div class="text-neutral-400 text-xs">PUNKTY ŁĄCZNE</div>
+                        <div id="finalScore" class="font-stencil text-3xl text-amber-400">0000</div>
+                    </div>
+                    <div class="bg-black/50 p-3 rounded border border-neutral-700">
+                        <div class="text-neutral-400 text-xs">CELNOŚĆ OGÓLNA</div>
+                        <div id="finalAccuracy" class="font-stencil text-3xl text-sky-400">0%</div>
+                    </div>
+                    <div class="bg-black/50 p-3 rounded border border-neutral-700">
+                        <div class="text-neutral-400 text-xs">TRAFIONE CELE / STRZAŁY</div>
+                        <div id="finalHits" class="font-bold text-lg text-neutral-200">0 / 0</div>
+                    </div>
+                    <div class="bg-black/50 p-3 rounded border border-neutral-700">
+                        <div class="text-neutral-400 text-xs">CZYSTE HEADSHOTY</div>
+                        <div id="finalHeadshots" class="font-bold text-lg text-red-400">0</div>
+                    </div>
+                </div>
+
+                <!-- Award & Medal -->
+                <div class="bg-amber-950/30 border border-amber-500/40 rounded p-4 text-center mb-6">
+                    <div class="text-xs text-amber-400 tracking-wider">ODZNACZENIE MISJI:</div>
+                    <div id="finalMedal" class="font-stencil text-2xl md:text-3xl text-yellow-300 mt-1">OPERATOR SPECJALNY</div>
+                    <p id="finalFeedback" class="text-xs text-neutral-300 mt-1">Znakomity czas reakcji i celność godna elity GROM.</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-4">
+                    <button id="btnRestart" class="flex-1 py-3 bg-amber-500 hover:bg-amber-400 active:scale-95 text-black font-stencil text-lg rounded transition">
+                        POWTÓRZ PRÓBĘ
+                    </button>
+                    <button id="btnBackToMenu" class="py-3 px-6 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-sm rounded border border-neutral-600 transition">
+                        MENU GŁÓWNE
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- AUDIO & GAME LOGIC ENGINE -->
+    <script>
+        /* =========================================================================
+           TACTICAL SYNTHESIZER & SOUND SYSTEM (Web Audio API)
+           Rock guitar rhythm, gunfire, rifle burst, shell drops & vocal callouts
+           ========================================================================= */
+        class TacticalAudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.isMuted = false;
+                this.bgmPlaying = false;
+                this.bgmInterval = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            // Heavy Tactical Pistol Shot (P226)
+            playPistolShot() {
+                if (!this.ctx || this.isMuted) return;
+                const now = this.ctx.currentTime;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(420, now);
+                osc.frequency.exponentialRampToValueAtTime(35, now + 0.12);
+
+                gain.gain.setValueAtTime(0.9, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.14);
+
+                this._playNoiseBurst(now, 1300, 190, 0.22, 1.0);
+            }
+
+            // 5.56mm Assault Rifle Crack (M4A1)
+            playRifleShot() {
+                if (!this.ctx || this.isMuted) return;
+                const now = this.ctx.currentTime;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(650, now);
+                osc.frequency.exponentialRampToValueAtTime(50, now + 0.09);
+
+                gain.gain.setValueAtTime(0.85, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.1);
+
+                this._playNoiseBurst(now, 2600, 400, 0.16, 1.2);
+            }
+
+            // Boom 12-Gauge Shotgun (M870)
+            playShotgunBlast() {
+                if (!this.ctx || this.isMuted) return;
+                const now = this.ctx.currentTime;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(170, now);
+                osc.frequency.exponentialRampToValueAtTime(20, now + 0.35);
+
+                gain.gain.setValueAtTime(1.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.38);
+
+                this._playNoiseBurst(now, 2200, 90, 0.42, 1.6);
+            }
+
+            _playNoiseBurst(time, highFreq, lowFreq, duration, volume) {
+                const bufferSize = this.ctx.sampleRate * duration;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(highFreq, time);
+                filter.frequency.exponentialRampToValueAtTime(lowFreq, time + duration);
+
+                const noiseGain = this.ctx.createGain();
+                noiseGain.gain.setValueAtTime(volume, time);
+                noiseGain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+
+                noise.connect(filter);
+                filter.connect(noiseGain);
+                noiseGain.connect(this.ctx.destination);
+
+                noise.start(time);
+            }
+
+            // High crisp Headshot chime
+            playHeadshotChime() {
+                if (!this.ctx || this.isMuted) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1800, now);
+                osc.frequency.exponentialRampToValueAtTime(2400, now + 0.18);
+
+                gain.gain.setValueAtTime(0.5, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            }
+
+            // Harsh penalty buzzer for shooting civilian/no-shoot
+            playPenaltyBuzzer() {
+                if (!this.ctx || this.isMuted) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.setValueAtTime(100, now + 0.1);
+
+                gain.gain.setValueAtTime(0.7, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.28);
+            }
+
+            // Shell casing brass bounce on dirt
+            playBrassTinkle() {
+                if (!this.ctx || this.isMuted) return;
+                const now = this.ctx.currentTime + 0.15;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(3200 + Math.random() * 800, now);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            }
+
+            // Shotgun Pump Mechanical Action
+            playShotgunPump() {
+                if (!this.ctx || this.isMuted) return;
+                const now = this.ctx.currentTime;
+                this._playMechanicalClick(now, 800, 0.05);
+                this._playMechanicalClick(now + 0.15, 1200, 0.06);
+            }
+
+            _playMechanicalClick(time, freq, dur) {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(freq, time);
+                osc.frequency.exponentialRampToValueAtTime(freq / 2, time + dur);
+                gain.gain.setValueAtTime(0.4, time);
+                gain.gain.exponentialRampToValueAtTime(0.01, time + dur);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(time);
+                osc.stop(time + dur);
+            }
+
+            // Steel Gong Bell Impact (Target Hit)
+            playSteelGong() {
+                if (!this.ctx || this.isMuted) return;
+                const now = this.ctx.currentTime;
+
+                [1420, 2150, 3100].forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now);
+
+                    const decay = 0.5 + idx * 0.2;
+                    gain.gain.setValueAtTime(0.4 / (idx + 1), now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + decay);
+                });
+            }
+
+            // Cardboard Thump Impact
+            playCardboardThud() {
+                if (!this.ctx || this.isMuted) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(60, now + 0.1);
+
+                gain.gain.setValueAtTime(0.6, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.12);
+            }
+
+            // Reload Mechanical Sounds
+            playReload() {
+                if (!this.ctx || this.isMuted) return;
+                const now = this.ctx.currentTime;
+                this._playMechanicalClick(now, 450, 0.08);
+                this._playMechanicalClick(now + 0.35, 750, 0.1);
+                this._playMechanicalClick(now + 0.65, 1100, 0.09);
+            }
+
+            playEmptyClick() {
+                if (!this.ctx || this.isMuted) return;
+                this._playMechanicalClick(this.ctx.currentTime, 1600, 0.03);
+            }
+
+            startRockBGM() {
+                if (!this.ctx || this.isMuted || this.bgmPlaying) return;
+                this.bgmPlaying = true;
+
+                let beat = 0;
+                const notes = [
+                    73.42, 73.42, 0, 73.42, 87.31, 87.31, 0, 98.00,
+                    73.42, 73.42, 0, 73.42, 65.41, 65.41, 0, 87.31
+                ];
+
+                this.bgmInterval = setInterval(() => {
+                    if (!this.bgmPlaying || !this.ctx) return;
+                    const freq = notes[beat % notes.length];
+                    if (freq > 0) {
+                        this._playGuitarChord(freq, 0.18);
+                    }
+                    if (beat % 4 === 0) this._playRockKick();
+                    if (beat % 4 === 2) this._playRockSnare();
+
+                    beat++;
+                }, 160);
+            }
+
+            stopRockBGM() {
+                this.bgmPlaying = false;
+                if (this.bgmInterval) {
+                    clearInterval(this.bgmInterval);
+                    this.bgmInterval = null;
+                }
+            }
+
+            _playGuitarChord(freq, dur) {
+                const now = this.ctx.currentTime;
+                [freq, freq * 1.498, freq * 2.01].forEach(f => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    const filter = this.ctx.createBiquadFilter();
+
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(f, now);
+
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(1400, now);
+
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.start(now);
+                    osc.stop(now + dur);
+                });
+            }
+
+            _playRockKick() {
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.exponentialRampToValueAtTime(35, now + 0.12);
+                gain.gain.setValueAtTime(0.5, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.12);
+            }
+
+            _playRockSnare() {
+                const now = this.ctx.currentTime;
+                const bufferSize = this.ctx.sampleRate * 0.1;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+                noise.connect(gain);
+                gain.connect(this.ctx.destination);
+                noise.start(now);
+            }
+        }
+
+        const AudioFX = new TacticalAudioEngine();
+
+        /* =========================================================================
+           WEAPONS SPECIFICATIONS (Pistol, Shotgun, M4A1 Assault Rifle)
+           ========================================================================= */
+        const WEAPONS = {
+            pistol: {
+                id: 'pistol',
+                name: 'PISTOLET TAKTYCZNY P226',
+                mode: 'OGIEŃ POJEDYNCZY',
+                casingType: 'brass_small',
+                magSize: 15,
+                spread: 5,
+                pellets: 1,
+                damage: 80,
+                fireRate: 200,
+                recoilKick: 16,
+                reloadTime: 1200
+            },
+            shotgun: {
+                id: 'shotgun',
+                name: 'STRZELBA M870 TACTICAL',
+                mode: 'ŚRUT BOJOWY (12/70)',
+                casingType: 'shotgun_shell',
+                magSize: 6,
+                spread: 38,
+                pellets: 8,
+                damage: 30,
+                fireRate: 850,
+                recoilKick: 38,
+                reloadTime: 2000
+            },
+            rifle: {
+                id: 'rifle',
+                name: 'KARABINEK SZTURMOWY M4A1',
+                mode: 'SERIA SZYBKA (5.56 NATO)',
+                casingType: 'brass_rifle',
+                magSize: 30,
+                spread: 12,
+                pellets: 1,
+                damage: 65,
+                fireRate: 110, // Fast cyclic rate
+                recoilKick: 12,
+                reloadTime: 1500
+            }
+        };
+
+        /* =========================================================================
+           SHELL CASING PHYSICS
+           ========================================================================= */
+        class ShellCasing {
+            constructor(startX, startY, type) {
+                this.x = startX;
+                this.y = startY;
+                this.type = type;
+                this.vx = 4 + Math.random() * 4; // eject rightward
+                this.vy = -5 - Math.random() * 3; // kick up
+                this.rotation = Math.random() * Math.PI;
+                this.vRot = (Math.random() - 0.5) * 15;
+                this.gravity = 14;
+                this.bounceCount = 0;
+                this.life = 1.4;
+                this.floorY = startY + 120 + Math.random() * 40;
+            }
+
+            update(dt) {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += this.gravity * dt;
+                this.rotation += this.vRot * dt;
+                this.life -= dt;
+
+                // Ground bounce
+                if (this.y >= this.floorY && this.bounceCount < 2) {
+                    this.y = this.floorY;
+                    this.vy = -this.vy * 0.45;
+                    this.vx *= 0.6;
+                    this.bounceCount++;
+                    AudioFX.playBrassTinkle();
+                }
+            }
+
+            draw(ctx) {
+                if (this.life <= 0) return;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+
+                if (this.type === 'shotgun_shell') {
+                    // Red shotgun shell with brass head
+                    ctx.fillStyle = '#dc2626';
+                    ctx.fillRect(-6, -3, 9, 6);
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.fillRect(3, -3, 3, 6);
+                } else if (this.type === 'brass_rifle') {
+                    // Slim 5.56 brass
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.fillRect(-5, -2, 10, 4);
+                } else {
+                    // Small 9mm brass
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.fillRect(-4, -2.5, 7, 5);
+                }
+                ctx.restore();
+            }
+        }
+
+        /* =========================================================================
+           TARGETS DEFINITIONS & ACCURATE HIT ZONES
+           ========================================================================= */
+        class Target {
+            constructor(lane, type, canvasW, canvasH) {
+                this.type = type; // 'cardboard', 'steel_plate', 'civilian_noshoot'
+                this.lane = lane; // 0: Close, 1: Mid, 2: Far
+                this.canvasW = canvasW;
+                this.canvasH = canvasH;
+
+                this.scale = lane === 0 ? 1.0 : (lane === 1 ? 0.75 : 0.55);
+                this.yBase = canvasH * (0.48 + lane * 0.12);
+                this.x = 100 + Math.random() * (canvasW - 200);
+                this.y = this.yBase;
+
+                this.width = (type === 'steel_plate' ? 44 : 54) * this.scale;
+                this.height = (type === 'steel_plate' ? 70 : 95) * this.scale;
+
+                this.state = 'rising';
+                this.progress = 0;
+                this.riseSpeed = 5.2;
+                this.lifetime = (type === 'civilian_noshoot' ? 4.5 : 3.5) - lane * 0.5;
+                this.lifeTimer = 0;
+                this.health = (type === 'steel_plate' ? 120 : (type === 'civilian_noshoot' ? 40 : 60));
+                this.maxHealth = this.health;
+
+                this.isMoving = (lane >= 1 && Math.random() > 0.4);
+                this.speedX = (Math.random() > 0.5 ? 1 : -1) * (1.3 + Math.random() * 1.6) * (this.isMoving ? 1 : 0);
+
+                this.wobble = 0;
+                this.dead = false;
+                this.bulletHoles = []; // Persistent hit decals on target
+            }
+
+            update(dt) {
+                if (this.state === 'rising') {
+                    this.progress += dt * this.riseSpeed;
+                    if (this.progress >= 1) {
+                        this.progress = 1;
+                        this.state = 'active';
+                    }
+                } else if (this.state === 'active') {
+                    this.lifeTimer += dt;
+                    if (this.isMoving) {
+                        this.x += this.speedX;
+                        if (this.x < 80 || this.x > this.canvasW - 80) {
+                            this.speedX *= -1;
+                        }
+                    }
+                    if (this.lifeTimer >= this.lifetime) {
+                        this.state = 'lowering';
+                    }
+                } else if (this.state === 'lowering') {
+                    this.progress -= dt * this.riseSpeed;
+                    if (this.progress <= 0) {
+                        this.progress = 0;
+                        this.dead = true;
+                    }
+                } else if (this.state === 'hit') {
+                    this.progress -= dt * 6.5;
+                    if (this.progress <= 0) {
+                        this.dead = true;
+                    }
+                }
+
+                if (Math.abs(this.wobble) > 0.01) {
+                    this.wobble *= 0.88;
+                } else {
+                    this.wobble = 0;
+                }
+            }
+
+            draw(ctx) {
+                const drawY = this.yBase + (1 - this.progress) * (this.height + 25);
+
+                ctx.save();
+                ctx.translate(this.x, drawY);
+                if (this.wobble !== 0) ctx.rotate(this.wobble);
+
+                const w = this.width / 2;
+                const h = this.height;
+
+                if (this.type === 'steel_plate') {
+                    // Steel Gong Plate
+                    ctx.fillStyle = '#1e293b';
+                    ctx.fillRect(-3 * this.scale, 0, 6 * this.scale, 35 * this.scale);
+
+                    ctx.fillStyle = '#64748b';
+                    ctx.strokeStyle = '#334155';
+                    ctx.lineWidth = 3 * this.scale;
+                    ctx.beginPath();
+                    ctx.roundRect(-this.width / 2, -h, this.width, h * 0.8, 6 * this.scale);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Center Bullseye gong
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.beginPath();
+                    ctx.arc(0, -h * 0.5, 12 * this.scale, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#ef4444';
+                    ctx.beginPath();
+                    ctx.arc(0, -h * 0.5, 5 * this.scale, 0, Math.PI * 2);
+                    ctx.fill();
+
+                } else if (this.type === 'civilian_noshoot') {
+                    // NO-SHOOT HOSTAGE / CIVILIAN SILHOUETTE (Blue with white X)
+                    ctx.fillStyle = '#78350f';
+                    ctx.fillRect(-4 * this.scale, 0, 8 * this.scale, 28 * this.scale);
+
+                    // Body path
+                    ctx.fillStyle = '#2563eb';
+                    ctx.strokeStyle = '#1d4ed8';
+                    ctx.lineWidth = 2 * this.scale;
+
+                    ctx.beginPath();
+                    ctx.moveTo(-w, 0);
+                    ctx.lineTo(-w, -h * 0.65);
+                    ctx.lineTo(-w * 0.45, -h * 0.78);
+                    ctx.lineTo(-w * 0.35, -h); // head top
+                    ctx.lineTo(w * 0.35, -h);
+                    ctx.lineTo(w * 0.45, -h * 0.78);
+                    ctx.lineTo(w, -h * 0.65);
+                    ctx.lineTo(w, 0);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // White "NO SHOOT / NIE STRZELAĆ" Cross
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 4 * this.scale;
+                    ctx.beginPath();
+                    ctx.moveTo(-w * 0.6, -h * 0.7);
+                    ctx.lineTo(w * 0.6, -h * 0.2);
+                    ctx.moveTo(w * 0.6, -h * 0.7);
+                    ctx.lineTo(-w * 0.6, -h * 0.2);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = `bold ${Math.round(8 * this.scale)}px sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText("NO SHOOT", 0, -h * 0.45);
+
+                } else {
+                    // STANDARD CARDBOARD SILHOUETTE TARGET (IPSC / Military Style)
+                    ctx.fillStyle = '#854d0e';
+                    ctx.fillRect(-4 * this.scale, 0, 8 * this.scale, 30 * this.scale);
+
+                    // Cardboard base body
+                    ctx.fillStyle = '#d4b483';
+                    ctx.strokeStyle = '#6b4f2c';
+                    ctx.lineWidth = 2 * this.scale;
+
+                    ctx.beginPath();
+                    ctx.moveTo(-w, 0);
+                    ctx.lineTo(-w, -h * 0.65);
+                    ctx.lineTo(-w * 0.45, -h * 0.78);
+                    // Neck / Head box
+                    ctx.lineTo(-w * 0.34, -h);
+                    ctx.lineTo(w * 0.34, -h);
+                    ctx.lineTo(w * 0.45, -h * 0.78);
+                    ctx.lineTo(w, -h * 0.65);
+                    ctx.lineTo(w, 0);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // --- ACCURATE ZONING LINES ---
+                    // 1. HEAD ZONE (Top Box)
+                    ctx.strokeStyle = '#854d0e';
+                    ctx.lineWidth = 1.5 * this.scale;
+                    ctx.strokeRect(-w * 0.3, -h * 0.98, w * 0.6, h * 0.2);
+
+                    // 2. CENTER MASS / ALFA ZONE (Chest Oval + Sub-Box)
+                    ctx.beginPath();
+                    ctx.ellipse(0, -h * 0.45, w * 0.52, h * 0.22, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Black Bullseye in center of chest
+                    ctx.fillStyle = '#1c1917';
+                    ctx.beginPath();
+                    ctx.ellipse(0, -h * 0.45, w * 0.2, h * 0.08, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Letters
+                    ctx.fillStyle = '#78350f';
+                    ctx.font = `bold ${Math.round(9 * this.scale)}px 'Share Tech Mono'`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText("A", 0, -h * 0.38);
+                    ctx.fillText("HEAD", 0, -h * 0.86);
+                }
+
+                // Render Bullet Holes on target
+                this.bulletHoles.forEach(hole => {
+                    ctx.fillStyle = '#0a0a0a';
+                    ctx.beginPath();
+                    ctx.arc(hole.rx, hole.ry, 2.5 * this.scale, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#44403c';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                });
+
+                ctx.restore();
+            }
+
+            // Accurate Scoring Check
+            checkHit(hitX, hitY) {
+                const currentY = this.yBase + (1 - this.progress) * (this.height + 25);
+                const minX = this.x - this.width / 2;
+                const maxX = this.x + this.width / 2;
+                const minY = currentY - this.height;
+                const maxY = currentY;
+
+                if (hitX >= minX && hitX <= maxX && hitY >= minY && hitY <= maxY) {
+                    // Record relative hole position for visual decal
+                    this.bulletHoles.push({
+                        rx: hitX - this.x,
+                        ry: hitY - currentY
+                    });
+
+                    // 1. NO-SHOOT TARGET
+                    if (this.type === 'civilian_noshoot') {
+                        return { hit: true, zone: 'civilian' };
+                    }
+
+                    // 2. STEEL PLATE TARGET
+                    if (this.type === 'steel_plate') {
+                        return { hit: true, zone: 'steel' };
+                    }
+
+                    // 3. CARDBOARD ANATOMICAL HIT ZONES:
+                    // Genuine HEADSHOT: Only top ~22% of target where head/neck box sits
+                    const headBottomThreshold = minY + (this.height * 0.22);
+                    const headWidthMargin = this.width * 0.35; // Head is narrower than torso
+                    const isWithinHeadWidth = (hitX >= this.x - headWidthMargin) && (hitX <= this.x + headWidthMargin);
+
+                    if (hitY <= headBottomThreshold && isWithinHeadWidth) {
+                        return { hit: true, zone: 'headshot' };
+                    }
+
+                    // CENTER MASS / ALFA ZONE (Chest Area: 25% to 65% from top)
+                    const chestTopThreshold = minY + (this.height * 0.25);
+                    const chestBottomThreshold = minY + (this.height * 0.65);
+                    const chestCenterWidth = this.width * 0.45;
+
+                    if (hitY >= chestTopThreshold && hitY <= chestBottomThreshold && 
+                        Math.abs(hitX - this.x) <= chestCenterWidth) {
+                        return { hit: true, zone: 'centermass' }; // Solid Center Hit, NOT headshot
+                    }
+
+                    // Peripheral Charlie/Delta Zone (arms, lower stomach)
+                    return { hit: true, zone: 'peripheral' };
+                }
+                return { hit: false };
+            }
+        }
+
+        /* =========================================================================
+           PARTICLES & FLOATING LABELS
+           ========================================================================= */
+        class Particle {
+            constructor(x, y, color, size, vx, vy, life) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.size = size;
+                this.vx = vx;
+                this.vy = vy;
+                this.life = life;
+                this.maxLife = life;
+            }
+            update(dt) {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 3.0 * dt;
+                this.life -= dt;
+            }
+            draw(ctx) {
+                const alpha = Math.max(0, this.life / this.maxLife);
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class FloatingText {
+            constructor(x, y, text, color, isBig = false) {
+                this.x = x;
+                this.y = y;
+                this.text = text;
+                this.color = color;
+                this.life = 0.85;
+                this.maxLife = 0.85;
+                this.isBig = isBig;
+            }
+            update(dt) {
+                this.y -= 38 * dt;
+                this.life -= dt;
+            }
+            draw(ctx) {
+                const alpha = Math.max(0, this.life / this.maxLife);
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = this.color;
+                ctx.font = this.isBig ? "bold 20px 'Black Ops One'" : "bold 14px 'Share Tech Mono'";
+                ctx.textAlign = 'center';
+                ctx.shadowColor = '#000';
+                ctx.shadowBlur = 4;
+                ctx.fillText(this.text, this.x, this.y);
+                ctx.restore();
+            }
+        }
+
+        /* =========================================================================
+           MAIN GAME CONTROLLER
+           ========================================================================= */
+        class GameEngine {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.wrapper = document.getElementById('gameWrapper');
+
+                // State
+                this.gameState = 'menu';
+                this.timeRemaining = 60.0;
+                this.score = 0;
+                this.combo = 1.0;
+                this.totalShots = 0;
+                this.totalHits = 0;
+                this.headshots = 0;
+
+                // Weapon state
+                this.currentWeapon = WEAPONS.pistol;
+                this.ammo = {
+                    pistol: WEAPONS.pistol.magSize,
+                    shotgun: WEAPONS.shotgun.magSize,
+                    rifle: WEAPONS.rifle.magSize
+                };
+                this.isReloading = false;
+                this.lastShotTime = 0;
+                this.isMouseDown = false;
+
+                // Input & Reticle
+                this.crosshair = { x: 0, y: 0, recoilY: 0 };
+                this.hitMarkerTimer = 0;
+                this.hitMarkerColor = '#ffffff';
+
+                // Game Entities
+                this.targets = [];
+                this.particles = [];
+                this.floatingTexts = [];
+                this.shellCasings = [];
+                this.targetSpawnTimer = 0;
+
+                this.initResize();
+                this.initInputs();
+                this.loadHighScore();
+
+                this.lastTime = performance.now();
+                requestAnimationFrame(this.gameLoop.bind(this));
+            }
+
+            initResize() {
+                const resize = () => {
+                    const rect = this.wrapper.getBoundingClientRect();
+                    this.canvas.width = rect.width;
+                    this.canvas.height = rect.height;
+                    this.width = rect.width;
+                    this.height = rect.height;
+                };
+                window.addEventListener('resize', resize);
+                resize();
+            }
+
+            initInputs() {
+                window.addEventListener('mousemove', (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    this.crosshair.x = e.clientX - rect.left;
+                    this.crosshair.y = e.clientY - rect.top;
+                });
+
+                this.canvas.addEventListener('mousedown', (e) => {
+                    this.isMouseDown = true;
+                    if (this.gameState === 'playing') this.tryFire();
+                });
+
+                window.addEventListener('mouseup', () => {
+                    this.isMouseDown = false;
+                });
+
+                this.canvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (this.gameState !== 'playing') return;
+                    const rect = this.canvas.getBoundingClientRect();
+                    const touch = e.touches[0];
+                    this.crosshair.x = touch.clientX - rect.left;
+                    this.crosshair.y = touch.clientY - rect.top;
+                    this.isMouseDown = true;
+                    this.tryFire();
+                });
+
+                this.canvas.addEventListener('touchend', () => {
+                    this.isMouseDown = false;
+                });
+
+                this.canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    const rect = this.canvas.getBoundingClientRect();
+                    const touch = e.touches[0];
+                    this.crosshair.x = touch.clientX - rect.left;
+                    this.crosshair.y = touch.clientY - rect.top;
+                });
+
+                window.addEventListener('keydown', (e) => {
+                    if (e.repeat) return;
+                    if (e.key === '1') this.switchWeapon('pistol');
+                    if (e.key === '2') this.switchWeapon('shotgun');
+                    if (e.key === '3') this.switchWeapon('rifle');
+                    if (e.key === 'r' || e.key === 'R') this.reload();
+                    if (e.code === 'Space' && this.gameState === 'playing') {
+                        this.tryFire();
+                    }
+                });
+
+                // Weapon HUD buttons
+                document.getElementById('btnPistol').addEventListener('click', () => this.switchWeapon('pistol'));
+                document.getElementById('btnShotgun').addEventListener('click', () => this.switchWeapon('shotgun'));
+                document.getElementById('btnRifle').addEventListener('click', () => this.switchWeapon('rifle'));
+                document.getElementById('btnReload').addEventListener('click', () => this.reload());
+
+                document.getElementById('btnStartGame').addEventListener('click', () => {
+                    AudioFX.init();
+                    this.startMission();
+                });
+                document.getElementById('btnRestart').addEventListener('click', () => this.startMission());
+                document.getElementById('btnBackToMenu').addEventListener('click', () => this.showMenu());
+            }
+
+            loadHighScore() {
+                const high = localStorage.getItem('chestnut_highscore') || 0;
+                const highAcc = localStorage.getItem('chestnut_highacc') || 0;
+                document.getElementById('startBestScore').innerText = String(high).padStart(5, '0');
+                document.getElementById('startBestAcc').innerText = highAcc + '%';
+            }
+
+            saveHighScore() {
+                const currentHigh = parseInt(localStorage.getItem('chestnut_highscore') || '0', 10);
+                if (this.score > currentHigh) {
+                    localStorage.setItem('chestnut_highscore', this.score);
+                    const acc = this.totalShots > 0 ? Math.round((this.totalHits / this.totalShots) * 100) : 0;
+                    localStorage.setItem('chestnut_highacc', acc);
+                }
+            }
+
+            startMission() {
+                this.gameState = 'playing';
+                this.timeRemaining = 60.0;
+                this.score = 0;
+                this.combo = 1.0;
+                this.totalShots = 0;
+                this.totalHits = 0;
+                this.headshots = 0;
+                this.targets = [];
+                this.particles = [];
+                this.floatingTexts = [];
+                this.shellCasings = [];
+                this.isReloading = false;
+
+                this.ammo.pistol = WEAPONS.pistol.magSize;
+                this.ammo.shotgun = WEAPONS.shotgun.magSize;
+                this.ammo.rifle = WEAPONS.rifle.magSize;
+                this.switchWeapon('pistol');
+
+                document.getElementById('screenStart').classList.add('hidden');
+                document.getElementById('screenDebrief').classList.add('hidden');
+                document.getElementById('hudTop').classList.remove('hidden');
+                document.getElementById('hudBottom').classList.remove('hidden');
+
+                AudioFX.startRockBGM();
+
+                for (let i = 0; i < 3; i++) {
+                    this.spawnTarget();
+                }
+            }
+
+            showMenu() {
+                this.gameState = 'menu';
+                AudioFX.stopRockBGM();
+                this.loadHighScore();
+                document.getElementById('screenStart').classList.remove('hidden');
+                document.getElementById('screenDebrief').classList.add('hidden');
+                document.getElementById('hudTop').classList.add('hidden');
+                document.getElementById('hudBottom').classList.add('hidden');
+            }
+
+            endMission() {
+                this.gameState = 'debrief';
+                AudioFX.stopRockBGM();
+                this.saveHighScore();
+
+                const accuracy = this.totalShots > 0 ? Math.round((this.totalHits / this.totalShots) * 100) : 0;
+
+                document.getElementById('finalScore').innerText = String(this.score).padStart(5, '0');
+                document.getElementById('finalAccuracy').innerText = accuracy + '%';
+                document.getElementById('finalHits').innerText = `${this.totalHits} / ${this.totalShots}`;
+                document.getElementById('finalHeadshots').innerText = this.headshots;
+
+                const medalEl = document.getElementById('finalMedal');
+                const feedbackEl = document.getElementById('finalFeedback');
+
+                if (this.score >= 5000 && accuracy >= 75) {
+                    medalEl.innerText = "⭐ LEGENDA OPERATORÓW JW GROM";
+                    medalEl.className = "font-stencil text-2xl md:text-3xl text-yellow-400 mt-1";
+                    feedbackEl.innerText = "Bezbłędna eliminacja celów i chirurgiczna precyzja pod presją czasu!";
+                } else if (this.score >= 3200 && accuracy >= 60) {
+                    medalEl.innerText = "🎖️ WYBITNY STRZELEC WYBOROWY";
+                    medalEl.className = "font-stencil text-2xl md:text-3xl text-amber-300 mt-1";
+                    feedbackEl.innerText = "Świetna seria trafień i doskonałe opanowanie odrzutu broni.";
+                } else if (this.score >= 1800) {
+                    medalEl.innerText = "🏅 ZAAWANSOWANY STRZELEC";
+                    medalEl.className = "font-stencil text-2xl md:text-3xl text-blue-300 mt-1";
+                    feedbackEl.innerText = "Dobra dyscyplina ogniowa, pilnuj celności na dalekich dystansach.";
+                } else {
+                    medalEl.innerText = "🪖 REKRUT POLIGONU";
+                    medalEl.className = "font-stencil text-2xl md:text-3xl text-neutral-300 mt-1";
+                    feedbackEl.innerText = "Podstawy opanowane, lecz afgański poligon wymaga szybszego namierzania.";
+                }
+
+                document.getElementById('hudTop').classList.add('hidden');
+                document.getElementById('hudBottom').classList.add('hidden');
+                document.getElementById('screenDebrief').classList.remove('hidden');
+            }
+
+            switchWeapon(type) {
+                if (this.currentWeapon.id === type || this.isReloading) return;
+                this.currentWeapon = WEAPONS[type];
+                AudioFX.playShotgunPump();
+
+                ['btnPistol', 'btnShotgun', 'btnRifle'].forEach(btnId => {
+                    const btn = document.getElementById(btnId);
+                    btn.classList.remove('border-amber-500', 'text-amber-300', 'bg-neutral-900/90');
+                    btn.classList.add('border-neutral-600', 'text-neutral-300');
+                });
+
+                const activeBtn = type === 'pistol' ? 'btnPistol' : (type === 'shotgun' ? 'btnShotgun' : 'btnRifle');
+                document.getElementById(activeBtn).classList.add('border-amber-500', 'text-amber-300', 'bg-neutral-900/90');
+
+                document.getElementById('weaponNameDisplay').innerText = this.currentWeapon.name;
+                document.getElementById('weaponModeDisplay').innerText = this.currentWeapon.mode;
+                this.updateAmmoUI();
+            }
+
+            reload() {
+                if (this.isReloading) return;
+                const current = this.ammo[this.currentWeapon.id];
+                if (current === this.currentWeapon.magSize) return;
+
+                this.isReloading = true;
+                AudioFX.playReload();
+                document.getElementById('reloadPrompt').classList.add('hidden');
+                document.getElementById('currentAmmo').innerText = "--";
+
+                setTimeout(() => {
+                    this.ammo[this.currentWeapon.id] = this.currentWeapon.magSize;
+                    this.isReloading = false;
+                    this.updateAmmoUI();
+                }, this.currentWeapon.reloadTime);
+            }
+
+            tryFire() {
+                if (this.isReloading) return;
+
+                const now = performance.now();
+                if (now - this.lastShotTime < this.currentWeapon.fireRate) return;
+
+                if (this.ammo[this.currentWeapon.id] <= 0) {
+                    AudioFX.playEmptyClick();
+                    document.getElementById('reloadPrompt').classList.remove('hidden');
+                    return;
+                }
+
+                this.ammo[this.currentWeapon.id]--;
+                this.lastShotTime = now;
+                this.totalShots++;
+                this.updateAmmoUI();
+
+                // Recoil & Visual kick
+                this.crosshair.recoilY = this.currentWeapon.recoilKick;
+                this.triggerScreenShake();
+                this.triggerMuzzleFlash();
+
+                // Shell casing ejection from weapon port
+                this.shellCasings.push(new ShellCasing(
+                    this.width * 0.75,
+                    this.height * 0.78,
+                    this.currentWeapon.casingType
+                ));
+
+                // Weapon firing audio
+                if (this.currentWeapon.id === 'pistol') {
+                    AudioFX.playPistolShot();
+                } else if (this.currentWeapon.id === 'rifle') {
+                    AudioFX.playRifleShot();
+                } else {
+                    AudioFX.playShotgunBlast();
+                    setTimeout(() => AudioFX.playShotgunPump(), 320);
+                }
+
+                // Pellets / Hit Scan calculation
+                const pellets = this.currentWeapon.pellets;
+                let anyHit = false;
+
+                for (let p = 0; p < pellets; p++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const spreadRadius = Math.random() * this.currentWeapon.spread;
+                    const shotX = this.crosshair.x + Math.cos(angle) * spreadRadius;
+                    const shotY = this.crosshair.y - this.crosshair.recoilY + Math.sin(angle) * spreadRadius;
+
+                    this.createImpactParticles(shotX, shotY, '#c2a677', 4);
+
+                    for (let i = this.targets.length - 1; i >= 0; i--) {
+                        const target = this.targets[i];
+                        if (target.dead || target.state === 'lowering') continue;
+
+                        const result = target.checkHit(shotX, shotY);
+                        if (result.hit) {
+                            anyHit = true;
+                            this.handleHit(target, result.zone, shotX, shotY);
+                            break;
+                        }
+                    }
+                }
+
+                if (anyHit) {
+                    this.totalHits++;
+                } else {
+                    // Miss penalty: resets combo
+                    this.combo = 1.0;
+                }
+
+                this.updateScoreUI();
+
+                if (this.ammo[this.currentWeapon.id] === 0) {
+                    document.getElementById('reloadPrompt').classList.remove('hidden');
+                }
+            }
+
+            handleHit(target, zone, hitX, hitY) {
+                target.wobble = (Math.random() - 0.5) * 0.3;
+
+                // 1. CIVILIAN / NO-SHOOT PENALTY
+                if (zone === 'civilian') {
+                    AudioFX.playPenaltyBuzzer();
+                    this.hitMarkerTimer = 0.25;
+                    this.hitMarkerColor = '#ef4444'; // Red warning
+                    this.combo = 1.0;
+                    this.score = Math.max(0, this.score - 250);
+                    this.floatingTexts.push(new FloatingText(hitX, hitY - 15, "CEASE FIRE! BRAK CELU! -250", "#ef4444", true));
+                    target.state = 'hit';
+                    return;
+                }
+
+                // 2. STEEL GONG HIT
+                if (zone === 'steel') {
+                    AudioFX.playSteelGong();
+                    this.createImpactParticles(hitX, hitY, '#f8fafc', 8);
+                    this.hitMarkerTimer = 0.18;
+                    this.hitMarkerColor = '#f59e0b'; // Amber
+
+                    const pts = Math.round(150 * this.combo);
+                    this.score += pts;
+                    this.combo = Math.min(4.0, +(this.combo + 0.1).toFixed(1));
+                    this.floatingTexts.push(new FloatingText(hitX, hitY - 10, `STAL +${pts}`, "#facc15"));
+                    target.health -= this.currentWeapon.damage;
+                    if (target.health <= 0) target.state = 'hit';
+                    return;
+                }
+
+                // 3. CARDBOARD TARGET HIT ZONES:
+                AudioFX.playCardboardThud();
+                this.createImpactParticles(hitX, hitY, '#78350f', 5);
+
+                if (zone === 'headshot') {
+                    // GENUINE HEADSHOT ONLY
+                    AudioFX.playHeadshotChime();
+                    this.headshots++;
+                    this.hitMarkerTimer = 0.24;
+                    this.hitMarkerColor = '#ef4444'; // Red hitmarker for true headshot
+
+                    const pts = Math.round(250 * this.combo);
+                    this.score += pts;
+                    this.combo = Math.min(4.0, +(this.combo + 0.2).toFixed(1));
+                    this.floatingTexts.push(new FloatingText(hitX, hitY - 15, `🎯 CZYSTY HEADSHOT! +${pts}`, "#ef4444", true));
+                    target.health = 0; // Instant drop
+                    target.state = 'hit';
+
+                } else if (zone === 'centermass') {
+                    // CENTER MASS / ALFA ZONE (Torso center)
+                    this.hitMarkerTimer = 0.15;
+                    this.hitMarkerColor = '#ffffff'; // White hitmarker
+
+                    const pts = Math.round(120 * this.combo);
+                    this.score += pts;
+                    this.combo = Math.min(4.0, +(this.combo + 0.1).toFixed(1));
+                    this.floatingTexts.push(new FloatingText(hitX, hitY - 10, `ŚRODEK MASY +${pts}`, "#38bdf8"));
+                    target.health -= this.currentWeapon.damage;
+                    if (target.health <= 0) target.state = 'hit';
+
+                } else {
+                    // Peripheral (Charlie/Delta)
+                    this.hitMarkerTimer = 0.12;
+                    this.hitMarkerColor = '#94a3b8';
+
+                    const pts = Math.round(60 * this.combo);
+                    this.score += pts;
+                    this.floatingTexts.push(new FloatingText(hitX, hitY - 10, `TRAFIENIE +${pts}`, "#a3e635"));
+                    target.health -= this.currentWeapon.damage;
+                    if (target.health <= 0) target.state = 'hit';
+                }
+            }
+
+            createImpactParticles(x, y, color, count = 6) {
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 1.5 + Math.random() * 4;
+                    this.particles.push(new Particle(
+                        x, y, color,
+                        1.5 + Math.random() * 2.5,
+                        Math.cos(angle) * speed,
+                        Math.sin(angle) * speed - 1.2,
+                        0.35 + Math.random() * 0.25
+                    ));
+                }
+            }
+
+            triggerScreenShake() {
+                this.wrapper.classList.remove('shake');
+                void this.wrapper.offsetWidth;
+                this.wrapper.classList.add('shake');
+                setTimeout(() => this.wrapper.classList.remove('shake'), 180);
+            }
+
+            triggerMuzzleFlash() {
+                const overlay = document.getElementById('muzzleFlashOverlay');
+                overlay.style.opacity = '0.35';
+                setTimeout(() => { overlay.style.opacity = '0'; }, 50);
+            }
+
+            spawnTarget() {
+                if (this.targets.length >= 7) return;
+                const lane = Math.floor(Math.random() * 3);
+                
+                // Spawn distribution: 60% Cardboard, 25% Steel plate, 15% Civilian No-shoot
+                const roll = Math.random();
+                let type = 'cardboard';
+                if (roll > 0.85) {
+                    type = 'civilian_noshoot';
+                } else if (roll > 0.6) {
+                    type = 'steel_plate';
+                }
+
+                this.targets.push(new Target(lane, type, this.width, this.height));
+            }
+
+            updateAmmoUI() {
+                const current = this.ammo[this.currentWeapon.id];
+                document.getElementById('currentAmmo').innerText = current;
+                document.getElementById('maxAmmo').innerText = this.currentWeapon.magSize;
+            }
+
+            updateScoreUI() {
+                document.getElementById('hudScore').innerText = String(this.score).padStart(5, '0');
+                document.getElementById('hudCombo').innerText = 'x' + this.combo.toFixed(1);
+                const acc = this.totalShots > 0 ? Math.round((this.totalHits / this.totalShots) * 100) : 100;
+                document.getElementById('hudAcc').innerText = acc + '%';
+            }
+
+            gameLoop(timestamp) {
+                const dt = Math.min((timestamp - this.lastTime) / 1000, 0.1);
+                this.lastTime = timestamp;
+
+                if (this.gameState === 'playing') {
+                    // Full-auto fire if holding mouse with rifle
+                    if (this.isMouseDown && this.currentWeapon.id === 'rifle') {
+                        this.tryFire();
+                    }
+
+                    this.timeRemaining -= dt;
+                    if (this.timeRemaining <= 0) {
+                        this.timeRemaining = 0;
+                        this.endMission();
+                    }
+                    document.getElementById('hudTimer').innerText = this.timeRemaining.toFixed(1) + 's';
+
+                    // Target Spawner
+                    this.targetSpawnTimer += dt;
+                    if (this.targetSpawnTimer > 1.15) {
+                        this.targetSpawnTimer = 0;
+                        if (Math.random() > 0.25) {
+                            this.spawnTarget();
+                        }
+                    }
+
+                    this.targets.forEach(t => t.update(dt));
+                    this.targets = this.targets.filter(t => !t.dead);
+
+                    this.particles.forEach(p => p.update(dt));
+                    this.particles = this.particles.filter(p => p.life > 0);
+
+                    this.floatingTexts.forEach(f => f.update(dt));
+                    this.floatingTexts = this.floatingTexts.filter(f => f.life > 0);
+
+                    this.shellCasings.forEach(s => s.update(dt));
+                    this.shellCasings = this.shellCasings.filter(s => s.life > 0);
+
+                    if (this.hitMarkerTimer > 0) {
+                        this.hitMarkerTimer -= dt;
+                    }
+
+                    this.crosshair.recoilY *= 0.84;
+                }
+
+                this.render();
+                requestAnimationFrame(this.gameLoop.bind(this));
+            }
+
+            render() {
+                const ctx = this.ctx;
+                const w = this.width;
+                const h = this.height;
+
+                ctx.clearRect(0, 0, w, h);
+
+                // --- 1. RUGGED DESERT SKY & MOUNTAIN RIDGE ---
+                const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.55);
+                skyGrad.addColorStop(0, '#c2b69d');
+                skyGrad.addColorStop(0.6, '#dad0b8');
+                skyGrad.addColorStop(1, '#e5dcc7');
+                ctx.fillStyle = skyGrad;
+                ctx.fillRect(0, 0, w, h * 0.55);
+
+                // Distant Afghan Mountain Jagged Peaks
+                ctx.fillStyle = '#948369';
+                ctx.beginPath();
+                ctx.moveTo(0, h * 0.42);
+                ctx.lineTo(w * 0.15, h * 0.28);
+                ctx.lineTo(w * 0.32, h * 0.38);
+                ctx.lineTo(w * 0.52, h * 0.22);
+                ctx.lineTo(w * 0.68, h * 0.33);
+                ctx.lineTo(w * 0.88, h * 0.25);
+                ctx.lineTo(w, h * 0.38);
+                ctx.lineTo(w, h * 0.55);
+                ctx.lineTo(0, h * 0.55);
+                ctx.closePath();
+                ctx.fill();
+
+                // Mid Berm
+                ctx.fillStyle = '#b59d78';
+                ctx.beginPath();
+                ctx.moveTo(0, h * 0.48);
+                ctx.quadraticCurveTo(w * 0.35, h * 0.38, w * 0.7, h * 0.46);
+                ctx.quadraticCurveTo(w * 0.9, h * 0.48, w, h * 0.45);
+                ctx.lineTo(w, h * 0.55);
+                ctx.lineTo(0, h * 0.55);
+                ctx.closePath();
+                ctx.fill();
+
+                // --- 2. GROUND & DUSTY SAND RANGE FLOOR ---
+                const groundGrad = ctx.createLinearGradient(0, h * 0.45, 0, h);
+                groundGrad.addColorStop(0, '#ba9664');
+                groundGrad.addColorStop(0.4, '#a27e4d');
+                groundGrad.addColorStop(1, '#6f522e');
+                ctx.fillStyle = groundGrad;
+                ctx.fillRect(0, h * 0.45, w, h * 0.55);
+
+                // --- 3. BARRICADES: TIRE WALLS & DEFENSES ---
+                this.drawTireWall(ctx, 0, h * 0.52, w, 24);
+
+                // Far & Mid targets behind close sandbags
+                this.targets.filter(t => t.lane >= 1).forEach(t => t.draw(ctx));
+
+                // Foreground sandbags
+                this.drawSandbagFortification(ctx, w * 0.04, h * 0.65, 130);
+                this.drawSandbagFortification(ctx, w * 0.80, h * 0.63, 140);
+
+                // Close targets
+                this.targets.filter(t => t.lane === 0).forEach(t => t.draw(ctx));
+
+                // Expended Shell Casings
+                this.shellCasings.forEach(s => s.draw(ctx));
+
+                // Particles & Floating feedback
+                this.particles.forEach(p => p.draw(ctx));
+                this.floatingTexts.forEach(f => f.draw(ctx));
+
+                // Crosshair & Hitmarker
+                if (this.gameState === 'playing') {
+                    this.drawCrosshair(ctx);
+                }
+            }
+
+            drawTireWall(ctx, startX, startY, totalWidth, tireRadius) {
+                ctx.save();
+                ctx.fillStyle = '#1e211b';
+                ctx.strokeStyle = '#11130f';
+                ctx.lineWidth = 2;
+
+                const step = tireRadius * 1.6;
+                const count = Math.ceil(totalWidth / step);
+
+                for (let i = -1; i <= count; i++) {
+                    const cx = i * step;
+                    const cy = startY;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, tireRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#141611';
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, tireRadius * 0.55, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#1e211b';
+                }
+                ctx.restore();
+            }
+
+            drawSandbagFortification(ctx, bx, by, width) {
+                ctx.save();
+                ctx.fillStyle = '#9e8156';
+                ctx.strokeStyle = '#614d30';
+                ctx.lineWidth = 2;
+
+                const bagW = 34;
+                const bagH = 14;
+                const rows = 3;
+                const cols = Math.floor(width / bagW);
+
+                for (let r = 0; r < rows; r++) {
+                    const offset = (r % 2) * (bagW / 2);
+                    for (let c = 0; c < cols; c++) {
+                        const x = bx + c * bagW + offset;
+                        const y = by - r * (bagH - 2);
+                        ctx.beginPath();
+                        ctx.roundRect(x, y, bagW - 2, bagH, 4);
+                        ctx.fill();
+                        ctx.stroke();
+                    }
+                }
+                ctx.restore();
+            }
+
+            // Tactical Reticle with Dynamic Hitmarker Feedback
+            drawCrosshair(ctx) {
+                const x = this.crosshair.x;
+                const y = this.crosshair.y - this.crosshair.recoilY;
+
+                ctx.save();
+                ctx.translate(x, y);
+
+                const isShotgun = this.currentWeapon.id === 'shotgun';
+                const isRifle = this.currentWeapon.id === 'rifle';
+                const rad = isShotgun ? 28 : (isRifle ? 20 : 16);
+
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 1.75;
+                ctx.shadowColor = 'rgba(56, 189, 248, 0.6)';
+                ctx.shadowBlur = 6;
+
+                if (isShotgun) {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, rad, 0, Math.PI * 2);
+                    ctx.setLineDash([8, 6]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                } else if (isRifle) {
+                    // Military Chevron / Circle
+                    ctx.beginPath();
+                    ctx.arc(0, 0, rad, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Inner chevron
+                    ctx.beginPath();
+                    ctx.moveTo(-5, 4);
+                    ctx.lineTo(0, -3);
+                    ctx.lineTo(5, 4);
+                    ctx.stroke();
+                } else {
+                    // Precision Pistol Crosshair
+                    ctx.beginPath();
+                    ctx.moveTo(0, -rad); ctx.lineTo(0, -rad - 8);
+                    ctx.moveTo(0, rad);  ctx.lineTo(0, rad + 8);
+                    ctx.moveTo(-rad, 0); ctx.lineTo(-rad - 8, 0);
+                    ctx.moveTo(rad, 0);  ctx.lineTo(rad + 8, 0);
+                    ctx.stroke();
+
+                    const b = rad * 0.7;
+                    ctx.beginPath();
+                    ctx.strokeRect(-b, -b, b * 2, b * 2);
+                }
+
+                // Center red dot
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // DYNAMIC HITMARKER (X lines radiating outward on hit)
+                if (this.hitMarkerTimer > 0) {
+                    ctx.strokeStyle = this.hitMarkerColor;
+                    ctx.lineWidth = 2.5;
+                    ctx.shadowColor = this.hitMarkerColor;
+                    ctx.shadowBlur = 8;
+                    const s = 10;
+                    ctx.beginPath();
+                    ctx.moveTo(-s, -s); ctx.lineTo(-s / 2, -s / 2);
+                    ctx.moveTo(s, -s);  ctx.lineTo(s / 2, -s / 2);
+                    ctx.moveTo(-s, s);  ctx.lineTo(-s / 2, s / 2);
+                    ctx.moveTo(s, s);   ctx.lineTo(s / 2, s / 2);
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        window.addEventListener('load', () => {
+            new GameEngine();
+        });
+    </script>
+</body>
+</html>

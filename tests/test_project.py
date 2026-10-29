@@ -34,9 +34,12 @@ MODULE_CONTRACTS = {
     "chestnut_arcade_game_hub_v2.html": ("id=\"mainMenuView\"", "returnToMenu"),
     "autumn_neon_chestnut_2p_arcade_hub.html": ("id=\"hub-view\"", "startGame(gameId)"),
     "grinch_chest_conquest.html": ("id=\"hub-view\"", "class GrinchConquestApp"),
-    "miami_77.html": ('id="gameCanvas"', "class Miami77Audio", "function gameLoop"),
+    "miami_77.html": ('id="gameCanvas"', 'id="startGameBtn"', "function gameLoop"),
     "KasztanoweOczko.html": ('id="bankrollDisplay"', "function startRound"),
     "kasztanix_kasztanowy_tetris.html": ('id="tetris-canvas"', 'id="start-btn"'),
+    "kasztanowy_pasjans.html": ('id="stockStack"', "class SolitaireEngine"),
+    "chestnut_combat.html": ('id="gameCanvas"', "class ChestnutCombatEngine"),
+    "chestnut_strike.html": ('id="gameCanvas"', "class GameEngine"),
     "smerfastyczny_labirynt.html": ('id="gameCanvas"', "function generateMazeLevel", "function triggerVictoryModal"),
     "chess_nuts.html": ("id=\"chessboard\"", "Chess-Nuts"),
     "logopedia.html": ("id=\"interaction-area\"", "function switchMode", "function resetTask"),
@@ -240,6 +243,9 @@ class ProjectPagesTests(unittest.TestCase):
         hidden_games = {
             "KasztanoweOczko.html": "oczko-egg",
             "kasztanix_kasztanowy_tetris.html": "tetris-egg",
+            "kasztanowy_pasjans.html": "pasjans-egg",
+            "chestnut_combat.html": "combat-egg",
+            "chestnut_strike.html": "strike-egg",
         }
 
         for game, egg_class in hidden_games.items():

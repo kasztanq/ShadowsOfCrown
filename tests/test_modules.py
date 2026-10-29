@@ -181,6 +181,9 @@ class GameModuleBrowserTests(unittest.TestCase):
                 "./kasztanix_kasztanowy_tetris.html",
                 "Kasztanix - Kasztanowy Tetris 3000",
             ),
+            (".pasjans-egg", "./kasztanowy_pasjans.html", "Kasztanowy Pasjans"),
+            (".combat-egg", "./chestnut_combat.html", "CHESTNUT COMBAT"),
+            (".strike-egg", "./chestnut_strike.html", "CHESTNUT STRIKE"),
         )
         for selector, href, title in hidden_games:
             with self.subTest(game=href):

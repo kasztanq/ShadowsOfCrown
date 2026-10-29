@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CHESTNUT COMBAT: PUNK BARK EDITION</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rubik+Glitch&family=Special+Elite&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0c0806;
+      font-family: 'Special Elite', monospace;
+      color: #e5e5e5;
+    }
+
+    .font-marker { font-family: 'Permanent Marker', cursive; }
+    .font-glitch { font-family: 'Rubik Glitch', cursive; }
+    .font-zine   { font-family: 'Special Elite', monospace; }
+
+    /* LEKKI EFEKT CRT - ZERO KOSZTOWNYCH FILTRÓW BLUR CZY GRAIN */
+    .crt-scanlines {
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+    }
+
+    /* KAPSLE OD BUTELEK (BUTTONS) */
+    .punk-btn-cap {
+      background: radial-gradient(circle at 35% 35%, #e11d48, #881337 75%, #4c0519 100%);
+      border: 3px solid #000;
+      box-shadow: 3px 3px 0px #000;
+      clip-path: polygon(
+        50% 0%, 63% 4%, 75% 0%, 82% 10%, 93% 10%, 96% 23%, 100% 35%, 97% 48%,
+        100% 62%, 94% 74%, 90% 86%, 78% 93%, 68% 100%, 50% 96%, 33% 100%,
+        21% 93%, 10% 86%, 5% 72%, 0% 60%, 4% 48%, 0% 35%, 6% 22%, 8% 10%, 23% 10%, 35% 0%
+      );
+    }
+    .punk-btn-cap:active {
+      transform: translate(2px, 2px) scale(0.95);
+      box-shadow: 1px 1px 0px #000;
+    }
+    .punk-btn-cap-amber {
+      background: radial-gradient(circle at 35% 35%, #f59e0b, #b45309 75%, #451a03 100%);
+    }
+
+    /* TAŚMA SUPER-MOVE */
+    .punk-btn-super {
+      background: repeating-linear-gradient(
+        -45deg,
+        #facc15,
+        #facc15 8px,
+        #000 8px,
+        #000 16px
+      );
+      border: 3px solid #000;
+      box-shadow: 4px 4px 0px #000;
+      clip-path: polygon(0% 4%, 98% 0%, 96% 96%, 4% 100%);
+    }
+    .punk-btn-super:active {
+      transform: translate(2px, 2px) scale(0.95);
+      box-shadow: 1px 1px 0px #000;
+    }
+
+    /* TABLICA KORKOWA / KARTOTEKA WOJOWNIKÓW */
+    .board-card {
+      background: #1c140d;
+      border: 3px solid #000;
+      box-shadow: 5px 5px 0px #000;
+      transition: transform 0.12s ease, border-color 0.12s ease;
+    }
+    .board-card.active {
+      border-color: #f59e0b;
+      transform: scale(1.03) rotate(-1deg);
+      box-shadow: 7px 7px 0px #b91c1c;
+      background: #2a1b10;
+    }
+
+    /* POSZARPANY KARTON REWANŻU */
+    .torn-cardboard {
+      background: #20130a radial-gradient(circle at 50% 50%, #2b180d 0%, #140b06 100%);
+      border: 4px solid #000;
+      box-shadow: 8px 8px 0px #000, 14px 14px 0px rgba(185, 28, 28, 0.45);
+      clip-path: polygon(1% 1%, 99% 0%, 100% 98%, 98% 100%, 75% 98%, 45% 100%, 2% 98%, 0% 50%);
+    }
+
+    .rematch-tile-red {
+      background: #dc2626;
+      color: #000;
+      border: 3px solid #000;
+      box-shadow: 5px 5px 0px #000;
+      clip-path: polygon(0% 0%, 98% 3%, 100% 95%, 2% 98%);
+    }
+    .rematch-tile-red:hover {
+      background: #ef4444;
+      transform: translate(-1px, -1px);
+    }
+    .rematch-tile-red:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0px #000;
+    }
+
+    .rematch-tile-striker {
+      background: #78350f repeating-linear-gradient(
+        45deg,
+        #451a03,
+        #451a03 6px,
+        #78350f 6px,
+        #78350f 12px
+      );
+      border: 3px solid #000;
+      box-shadow: 5px 5px 0px #000;
+      clip-path: polygon(2% 3%, 99% 0%, 97% 97%, 0% 100%);
+    }
+    .rematch-tile-striker:hover {
+      filter: brightness(1.2);
+      transform: translate(-1px, -1px);
+    }
+    .rematch-tile-striker:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0px #000;
+    }
+
+    .rematch-tile-tape {
+      background: #e7e5e4;
+      color: #0c0a09;
+      border: 3px solid #000;
+      box-shadow: 5px 5px 0px #000;
+      clip-path: polygon(1% 0%, 100% 4%, 98% 97%, 3% 96%);
+    }
+    .rematch-tile-tape:hover {
+      background: #fef08a;
+      transform: translate(-1px, -1px);
+    }
+    .rematch-tile-tape:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0px #000;
+    }
+
+    /* PODZIAŁKA LINJKI DREWNIANEJ */
+    .ruler-ticks {
+      background-image: repeating-linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.4) 0px,
+        rgba(0, 0, 0, 0.4) 1px,
+        transparent 1px,
+        transparent 10px
+      );
+    }
+  </style>
+</head>
+<body class="bg-black select-none overflow-hidden">
+  <a href="./index.htm" aria-label="Powrót do strony głównej" title="Powrót do strony głównej" class="fixed left-3 top-3 z-[100] border-2 border-amber-500 bg-black/90 px-3 py-2 font-marker text-xs text-amber-300 shadow-lg">STRONA GŁÓWNA</a>
+
+  <!-- GŁÓWNY WIDOK ROZGRYWKI -->
+  <div id="game-container" class="relative w-full h-full flex flex-col items-center justify-center bg-[#110b08]">
+    
+    <!-- PŁÓTNO CANVAS WALKORAJ -->
+    <canvas id="gameCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+
+    <!-- SCANLINES OVERLAY (ZERO KOSZTU PROCESORA) -->
+    <div class="crt-scanlines absolute inset-0 pointer-events-none z-10"></div>
+
+    <!-- HUD WALKORAJ: STOLARSKIE MIARKI I PASKI ZDROWIA -->
+    <div id="hud" class="absolute top-2 left-0 right-0 px-3 md:px-8 flex justify-between items-start pointer-events-none z-20 transition-opacity duration-200">
+      
+      <!-- P1: LEWA STRONA -->
+      <div class="flex flex-col w-[44%] max-w-sm">
+        <div class="flex items-center gap-2 mb-1">
+          <div class="bg-black px-2 py-0.5 border-2 border-stone-700 shadow-[2px_2px_0px_#000] rotate-[-1deg]">
+            <span id="p1-name" class="font-marker text-amber-400 text-sm md:text-xl">IGŁA</span>
+          </div>
+          <span id="p1-rounds" class="text-red-500 font-black text-xs md:text-sm tracking-widest font-mono">● ○</span>
+        </div>
+        <!-- Pasek zdrowia z linijką stolarską -->
+        <div class="relative w-full h-6 md:h-8 bg-[#23150c] border-3 border-black shadow-[4px_4px_0px_#000] rotate-[-0.5deg] overflow-hidden">
+          <div id="p1-health" class="h-full bg-gradient-to-r from-red-600 via-amber-500 to-amber-300 w-full transition-[width] duration-75"></div>
+          <div class="ruler-ticks absolute inset-0 pointer-events-none"></div>
+          <span id="p1-hp-text" class="absolute right-2 top-0.5 text-[10px] md:text-xs font-mono font-black text-black drop-shadow-[0_1px_0_#fff]">100 HP</span>
+        </div>
+        <!-- Pasek energii Super P1 -->
+        <div class="w-3/4 h-2.5 md:h-3.5 bg-black border border-stone-800 mt-1 shadow-[2px_2px_0px_#000]">
+          <div id="p1-energy" class="h-full bg-cyan-400 w-0 transition-[width] duration-75"></div>
+        </div>
+      </div>
+
+      <!-- TIMER I RUNDA NA ŚRODKU (BRUTALNY ZEGAR WARSZTATOWY) -->
+      <div class="flex flex-col items-center rotate-[1deg]">
+        <div class="bg-black border-3 border-stone-700 px-3 py-1 shadow-[4px_4px_0px_#b91c1c]">
+          <span id="game-timer" class="font-glitch text-3xl md:text-5xl text-amber-400">99</span>
+        </div>
+        <span id="round-indicator" class="font-marker text-[11px] md:text-xs text-stone-400 mt-1 tracking-wider bg-black/70 px-2 py-0.5 border border-stone-800">RUNDA 1</span>
+      </div>
+
+      <!-- P2: PRAWA STRONA -->
+      <div class="flex flex-col items-end w-[44%] max-w-sm text-right">
+        <div class="flex items-center gap-2 mb-1 flex-row-reverse">
+          <div class="bg-black px-2 py-0.5 border-2 border-stone-700 shadow-[-2px_2px_0px_#000] rotate-[1deg]">
+            <span id="p2-name" class="font-marker text-stone-300 text-sm md:text-xl">ZŁOM-ŻOŁĄDŹ</span>
+          </div>
+          <span id="p2-rounds" class="text-red-500 font-black text-xs md:text-sm tracking-widest font-mono">○ ○</span>
+        </div>
+        <!-- Pasek zdrowia P2 z linijką stolarską -->
+        <div class="relative w-full h-6 md:h-8 bg-[#23150c] border-3 border-black shadow-[-4px_4px_0px_#000] rotate-[0.5deg] overflow-hidden">
+          <div id="p2-health" class="h-full bg-gradient-to-l from-red-600 via-amber-500 to-amber-300 w-full ml-auto transition-[width] duration-75"></div>
+          <div class="ruler-ticks absolute inset-0 pointer-events-none"></div>
+          <span id="p2-hp-text" class="absolute left-2 top-0.5 text-[10px] md:text-xs font-mono font-black text-black drop-shadow-[0_1px_0_#fff]">130 HP</span>
+        </div>
+        <!-- Pasek energii Super P2 -->
+        <div class="w-3/4 h-2.5 md:h-3.5 bg-black border border-stone-800 mt-1 shadow-[-2px_2px_0px_#000]">
+          <div id="p2-energy" class="h-full bg-cyan-400 w-0 ml-auto transition-[width] duration-75"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMBO COUNTER -->
+    <div id="combo-display" class="absolute left-6 top-24 pointer-events-none z-20 hidden">
+      <div class="font-glitch text-4xl md:text-6xl text-amber-500 drop-shadow-[3px_3px_0px_#000] rotate-[-5deg]">
+        <span id="combo-count">3</span>x HIT!
+      </div>
+      <div id="combo-comment" class="font-marker text-xs md:text-sm text-red-500 tracking-wider rotate-[-2deg] bg-black/80 px-2 py-0.5 border border-stone-800">
+        DRZAZGI LECĄ!
+      </div>
+    </div>
+
+    <!-- BANER SUPER MOVE -->
+    <div id="super-banner" class="absolute inset-x-0 top-1/3 py-3 md:py-4 bg-black/95 border-y-4 border-amber-400 z-30 transform -translate-y-1/2 flex items-center justify-center pointer-events-none hidden">
+      <div class="text-center rotate-[-1.5deg]">
+        <h2 id="super-banner-title" class="font-glitch text-3xl md:text-6xl text-amber-300 tracking-widest drop-shadow-[4px_4px_0px_#b91c1c]">
+          SZARŻA SKORUPY!
+        </h2>
+        <p class="font-marker text-xs md:text-sm text-stone-300 tracking-wider uppercase mt-1">SUPER ATAK SPECJALNY</p>
+      </div>
+    </div>
+
+    <!-- DOTYKOWY KONTROLER EKRANOWY -->
+    <div id="touch-controls" class="absolute inset-x-0 bottom-2 px-3 md:px-6 flex justify-between items-end pointer-events-none z-20">
+      <!-- D-PAD / RUCH -->
+      <div class="pointer-events-auto flex items-center gap-1.5 md:gap-2">
+        <button id="btn-touch-left" class="w-13 h-13 md:w-15 md:h-15 bg-stone-900 border-3 border-black text-amber-400 font-marker text-xl shadow-[3px_3px_0px_#000] active:translate-y-1 active:translate-x-1 flex items-center justify-center rotate-[-1deg]">
+          ◀
+        </button>
+        <div class="flex flex-col gap-1.5">
+          <button id="btn-touch-jump" class="w-13 h-13 md:w-15 md:h-15 bg-stone-900 border-3 border-black text-amber-400 font-marker text-xl shadow-[3px_3px_0px_#000] active:translate-y-1 active:translate-x-1 flex items-center justify-center rotate-[1deg]">
+            ▲
+          </button>
+          <button id="btn-touch-dash" class="w-13 h-11 md:w-15 md:h-12 bg-stone-800 border-2 border-black text-stone-300 font-marker text-xs shadow-[2px_2px_0px_#000] active:translate-y-1 flex items-center justify-center">
+            DASH
+          </button>
+        </div>
+        <button id="btn-touch-right" class="w-13 h-13 md:w-15 md:h-15 bg-stone-900 border-3 border-black text-amber-400 font-marker text-xl shadow-[3px_3px_0px_#000] active:translate-y-1 active:translate-x-1 flex items-center justify-center rotate-[1deg]">
+          ▶
+        </button>
+      </div>
+
+      <!-- PRZYCISKI AKCJI PO PRAWEJ -->
+      <div class="pointer-events-auto flex flex-col items-end gap-1.5 rotate-[1deg]">
+        <button id="btn-touch-super" class="punk-btn-super px-3 py-1 font-marker text-xs md:text-sm font-black text-white active:scale-95">
+          ★ SUPER!
+        </button>
+        <div class="flex items-center gap-2">
+          <button id="btn-touch-parry" class="w-13 h-13 md:w-15 md:h-15 bg-amber-950 border-3 border-black text-amber-300 font-marker text-xs shadow-[3px_3px_0px_#000] active:translate-y-1 rotate-[-2deg] flex flex-col items-center justify-center">
+            <span>PARRY</span>
+            <span class="text-[8px] font-mono text-amber-500">[BLOK]</span>
+          </button>
+          <button id="btn-touch-light" class="punk-btn-cap w-15 h-15 md:w-16 md:h-16 text-white font-marker text-sm md:text-base flex flex-col items-center justify-center leading-tight">
+            <span>CIĄĆ</span>
+            <span class="text-[8px] font-mono text-rose-200">LEKKI</span>
+          </button>
+          <button id="btn-touch-heavy" class="punk-btn-cap punk-btn-cap-amber w-15 h-15 md:w-16 md:h-16 text-black font-marker text-sm md:text-base flex flex-col items-center justify-center leading-tight rotate-[2deg]">
+            <span>TŁUC!</span>
+            <span class="text-[8px] font-mono text-black font-black">MOCNY</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EKRAN 1: TYTUŁOWY -->
+    <div id="screen-title" class="absolute inset-0 bg-[#0c0806]/95 flex flex-col items-center justify-center p-4 md:p-6 z-40">
+      <div class="relative max-w-lg w-full text-center border-4 border-black bg-[#1b120c] p-6 md:p-8 shadow-[10px_10px_0px_#000] rotate-[-0.5deg]">
+        <div class="inline-block bg-yellow-400 text-black px-3 py-0.5 font-mono text-[10px] md:text-xs font-bold border-2 border-black uppercase tracking-widest mb-3 rotate-[1deg]">
+          PODZIEMNY KLUB STOLARSKI • 60 FPS OPTIMIZED
+        </div>
+
+        <h1 class="font-glitch text-4xl md:text-6xl text-amber-400 mb-1 leading-none drop-shadow-[4px_4px_0px_#b91c1c]">
+          CHESTNUT COMBAT
+        </h1>
+        <div class="font-marker text-lg md:text-2xl text-red-500 tracking-wider mb-5 rotate-[1deg]">
+          PUNK BARK // BITWA NA ZAPAŁKI
+        </div>
+
+        <p class="font-zine text-stone-300 text-xs md:text-sm mb-6 leading-relaxed text-justify px-2 bg-black/50 p-3 border border-stone-800">
+          Brutalny turniej na ponacinanym nożami blacie stolarskim. Wybierz unikalnego wojownika z leśnych odpadków, paruj ataki w ułamku sekundy i obróć rywala w zrębki.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+          <button id="btn-title-play" class="w-full sm:w-auto px-7 py-3.5 bg-amber-500 hover:bg-amber-400 border-3 border-black text-black font-marker text-xl md:text-2xl shadow-[5px_5px_0px_#000] active:translate-x-1 active:translate-y-1 transition-transform rotate-[-1deg]">
+            WEJDŹ DO WARSZTATU
+          </button>
+          <button id="btn-title-help" class="w-full sm:w-auto px-5 py-3.5 bg-stone-900 hover:bg-stone-800 border-2 border-stone-600 text-stone-300 font-marker text-base shadow-[3px_3px_0px_#000] active:translate-x-1 active:translate-y-1">
+            STEROWANIE
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EKRAN 2: WYBÓR POSTACI - KARTOTEKA WARSZTATOWA / TABLICA KORKOWA -->
+    <div id="screen-select" class="absolute inset-0 bg-[#0d0907]/98 flex flex-col items-center justify-center p-3 md:p-6 z-40 hidden overflow-y-auto">
+      <div class="max-w-5xl w-full my-auto">
+        
+        <!-- NAGŁÓWEK KARTOTEKI -->
+        <div class="flex justify-between items-center mb-3 border-b-3 border-black bg-[#17100b] p-3 shadow-[4px_4px_0px_#000]">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-red-600 rounded-full border border-black"></span>
+              <h2 class="font-marker text-2xl md:text-3xl text-amber-400 drop-shadow-[2px_2px_0px_#000]">KARTOTEKA LEŚNEGO ZŁOMU</h2>
+            </div>
+            <p class="font-zine text-[11px] md:text-xs text-stone-400">Wybierz wojownika do dzisiejszej jatki na stole stolarskim.</p>
+          </div>
+          <button id="btn-select-back" class="px-3 py-1.5 bg-stone-900 border-2 border-black text-stone-300 font-marker text-xs md:text-sm hover:text-white shadow-[2px_2px_0px_#000]">
+            WSTECZ
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3">
+          
+          <!-- SIATKA 6 KAFELKÓW (KARTOTEKA) -->
+          <div id="roster-grid" class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <!-- Dynamicznie generowane w JS z podglądem portretu Canvas -->
+          </div>
+
+          <!-- PODGLĄD WOJOWNIKA NA ŻYWO (SZKIC TECHNICZNY + STATS) -->
+          <div class="lg:col-span-5 bg-[#17100b] border-3 border-black p-4 shadow-[6px_6px_0px_#000] flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-start border-b-2 border-stone-800 pb-2 mb-2">
+                <div>
+                  <span id="preview-type" class="text-[10px] font-mono font-bold text-red-500 uppercase tracking-widest">KLASA: BRAWLER</span>
+                  <h3 id="preview-name" class="font-marker text-xl md:text-2xl text-amber-300 leading-tight">„IGŁA” KASZTANOWSKI</h3>
+                </div>
+                <div class="w-4 h-4 bg-amber-500 rounded-full border border-black shadow-[1px_1px_0px_#000]"></div>
+              </div>
+
+              <!-- MINI-PŁÓTNO PODGLĄDU NA ŻYWO (LIVE ANIMACJA IDLE) -->
+              <div class="w-full h-36 bg-[#0a0705] border-2 border-stone-800 mb-3 relative overflow-hidden flex items-center justify-center">
+                <canvas id="previewCanvas" width="220" height="140" class="block"></canvas>
+                <div class="absolute bottom-1 right-2 text-[9px] font-mono text-stone-500">PROTOTYP: DREWNO/ZAPAŁKI</div>
+              </div>
+
+              <p id="preview-desc" class="font-zine text-xs text-stone-300 mb-3 leading-relaxed bg-black/40 p-2 border border-stone-800/60 min-h-[50px]">
+                Ciało ze świeżego kasztana spięte zardzewiałymi zszywkami. Błyskawiczny, zadaje serię kłuć wykałaczkami i szarżuje z główki.
+              </p>
+
+              <!-- PASKI STATYSTYK -->
+              <div class="space-y-1.5 text-[10px] md:text-xs font-mono mb-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-stone-400">SZYBKOŚĆ:</span>
+                  <div class="w-36 h-2.5 bg-black border border-stone-800">
+                    <div id="stat-spd" class="h-full bg-cyan-400" style="width: 85%"></div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-stone-400">SIŁA CIOSU:</span>
+                  <div class="w-36 h-2.5 bg-black border border-stone-800">
+                    <div id="stat-atk" class="h-full bg-red-500" style="width: 60%"></div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-stone-400">ZASIĘG:</span>
+                  <div class="w-36 h-2.5 bg-black border border-stone-800">
+                    <div id="stat-rng" class="h-full bg-amber-400" style="width: 50%"></div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-stone-400">MASA / HP:</span>
+                  <div class="w-36 h-2.5 bg-black border border-stone-800">
+                    <div id="stat-hp" class="h-full bg-emerald-500" style="width: 65%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PRZYCISK START DO WALKI -->
+            <button id="btn-fight-start" class="w-full py-3 bg-red-600 hover:bg-red-500 border-3 border-black text-black font-marker text-xl md:text-2xl shadow-[4px_4px_0px_#000] active:translate-x-1 active:translate-y-1 transition-transform">
+              ZATWIERDŹ I DO WALKI! ▶
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- EKRAN 3: INSTRUKCJA STEROWANIA -->
+    <div id="modal-help" class="absolute inset-0 bg-black/90 flex items-center justify-center p-4 z-50 hidden">
+      <div class="max-w-md w-full bg-[#1b120c] border-4 border-black p-5 shadow-[8px_8px_0px_#000] rotate-[-0.5deg]">
+        <h3 class="font-marker text-2xl text-amber-400 border-b-2 border-stone-700 pb-2 mb-3">INSTRUKCJA WALKI</h3>
+        <ul class="font-mono text-xs space-y-2 text-stone-300">
+          <li><b class="text-amber-400">A / D:</b> Ruch w lewo / prawo</li>
+          <li><b class="text-amber-400">W / Spacja:</b> Skok / Podwójny skok</li>
+          <li><b class="text-amber-400">L-SHIFT lub L:</b> Szybki Dash / Unik z nietykalnością</li>
+          <li><b class="text-amber-400">J:</b> Szybki lekki atak (seria ciosów zapałką)</li>
+          <li><b class="text-amber-400">K:</b> Ciężki cios z odrzutem</li>
+          <li><b class="text-amber-400">I:</b> BLOK / PERFECT PARRY (odbicie ciosu zamraża czas i kontruje rywala!)</li>
+          <li><b class="text-amber-400">U lub O:</b> SUPER MOVE (wymaga pełnego błękitnego paska)</li>
+        </ul>
+        <button id="btn-close-help" class="mt-5 w-full py-2.5 bg-stone-800 hover:bg-stone-700 text-amber-300 font-marker text-base border-2 border-stone-600">
+          ZROZUMIAŁEM, DAWAJ ICH NA STÓŁ!
+        </button>
+      </div>
+    </div>
+
+    <!-- EKRAN 4: RESULT / REWANŻ (POSZARPANY KARTON) -->
+    <div id="screen-result" class="absolute inset-0 bg-black/90 flex items-center justify-center p-3 md:p-6 z-40 hidden">
+      <div class="torn-cardboard w-full max-w-2xl p-5 md:p-8 relative flex flex-col items-center rotate-[-0.5deg]">
+        
+        <div class="absolute -top-3.5 left-8 px-3 py-0.5 bg-[#594d40] border border-black shadow-md rotate-[-2deg] text-[9px] md:text-[10px] font-mono text-black font-black uppercase tracking-widest">
+          PROTOKÓŁ ZNISZCZENIA № 409
+        </div>
+        <div class="absolute -top-2.5 right-8 w-4 h-4 bg-amber-400 rounded-full border border-black shadow-[1px_1px_0px_#000]"></div>
+
+        <div class="w-full flex flex-col sm:flex-row items-center justify-between gap-2 border-b-3 border-black pb-3 mb-3">
+          <div class="text-left">
+            <h2 id="result-headline" class="font-glitch text-3xl md:text-5xl text-amber-400 leading-none drop-shadow-[3px_3px_0px_#000]">
+              KNOCKOUT!
+            </h2>
+            <span class="text-stone-400 font-mono text-[10px] md:text-[11px] uppercase tracking-wider block mt-1">
+              STATUS POJEDYNKU NA ZAPAŁKI I SKORUPY
+            </span>
+          </div>
+          <div id="result-stamp" class="border-3 border-dashed border-red-500 text-red-500 font-glitch text-lg md:text-xl uppercase tracking-wider px-3 py-1 rotate-[-4deg]">
+            ROZŁUPANY W PYŁ
+          </div>
+        </div>
+
+        <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-2.5 mb-5 font-mono text-left">
+          <div class="md:col-span-2 bg-[#100905] border-2 border-stone-800 p-2.5">
+            <div class="text-[9px] text-amber-500 font-bold mb-1 border-b border-stone-800 pb-1">OPINIA WARSZTATOWA:</div>
+            <p id="result-sub" class="text-xs text-stone-300 leading-relaxed">
+              Kasztan wroga roztrzaskany na drzazgi.
+            </p>
+          </div>
+          <div class="bg-[#100905] border-2 border-stone-800 p-2.5 flex flex-col justify-between text-[11px]">
+            <div class="flex justify-between border-b border-stone-800 pb-1">
+              <span class="text-stone-500">MAX COMBO:</span>
+              <span id="stat-max-combo" class="text-red-500 font-bold">x5</span>
+            </div>
+            <div class="flex justify-between border-b border-stone-800 pb-1 mt-1">
+              <span class="text-stone-500">PARRY COUNTER:</span>
+              <span id="stat-parry-count" class="text-amber-400 font-bold">3</span>
+            </div>
+            <div class="flex justify-between mt-1">
+              <span class="text-stone-500">CZAS POJEDYNKU:</span>
+              <span id="stat-final-time" class="text-yellow-300 font-bold">64s</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 KAFLE AKCJI: REWANŻ, ZMIANA WOJOWNIKA, POWRÓT -->
+        <div class="w-full grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <button id="btn-play-again" class="rematch-tile-red p-3 flex flex-col items-center justify-center text-center cursor-pointer">
+            <span class="font-marker text-lg md:text-xl text-black leading-none drop-shadow-[1px_1px_0px_#fff]">
+              KRWAWY REWANŻ
+            </span>
+            <span class="font-mono text-[8px] text-black font-extrabold tracking-tighter mt-1 uppercase">
+              [ NATYCHMIASTOWA RUNDA ]
+            </span>
+          </button>
+
+          <button id="btn-change-fighter" class="rematch-tile-striker p-3 flex flex-col items-center justify-center text-center cursor-pointer">
+            <span class="font-marker text-base md:text-lg text-amber-300 leading-none drop-shadow-[1px_1px_0px_#000]">
+              ZMIEŃ WOJOWNIKA
+            </span>
+            <span class="font-mono text-[8px] text-amber-200 font-bold tracking-tighter mt-1 uppercase">
+              [ WYBÓR Z KARTOTEKI ]
+            </span>
+          </button>
+
+          <button id="btn-to-menu" class="rematch-tile-tape p-3 flex flex-col items-center justify-center text-center cursor-pointer">
+            <span class="font-marker text-base md:text-lg text-stone-900 leading-none">
+              SPIEPRZAJ W LAS
+            </span>
+            <span class="font-mono text-[8px] text-stone-700 font-black tracking-tighter mt-1 uppercase">
+              [ MENU GŁÓWNE ]
+            </span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ==========================================================================
+       1. SYNTEZATOR AUDIO WEB AUDIO (ZERO ZEWNĘTRZNYCH ZALEŻNOŚCI)
+       ========================================================================== */
+    class PunkAudioEngine {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      metalClank() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1200, now);
+        osc.frequency.exponentialRampToValueAtTime(280, now + 0.12);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.12);
+      }
+
+      crunchSnap(heavy = false) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const dur = heavy ? 0.22 : 0.11;
+        const bufferSize = Math.floor(this.ctx.sampleRate * dur);
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const output = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.35));
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(heavy ? 650 : 1300, now);
+        filter.Q.value = 3;
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(heavy ? 0.55 : 0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + dur);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(now);
+
+        if (heavy) {
+          const osc = this.ctx.createOscillator();
+          const oscGain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(110, now);
+          osc.frequency.exponentialRampToValueAtTime(32, now + 0.18);
+          oscGain.gain.setValueAtTime(0.5, now);
+          oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+          osc.connect(oscGain);
+          oscGain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.18);
+        }
+      }
+
+      parrySpark() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(900, now);
+        osc.frequency.linearRampToValueAtTime(2400, now + 0.08);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      }
+
+      whoosh() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(170, now);
+        osc.frequency.exponentialRampToValueAtTime(340, now + 0.05);
+        osc.frequency.exponentialRampToValueAtTime(70, now + 0.11);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.11);
+      }
+
+      superBlast() {
+        if (!this.ctx) return;
+        this.crunchSnap(true);
+        this.metalClank();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(85, now);
+        osc.frequency.exponentialRampToValueAtTime(28, now + 0.45);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.45);
+      }
+    }
+
+    const audio = new PunkAudioEngine();
+
+    /* ==========================================================================
+       2. REJESTR 6 WOJOWNIKÓW O CAŁKOWICIE RÓŻNEJ ANATOMII I ZARYSIE
+       ========================================================================== */
+    const FIGHTERS = [
+      {
+        id: 'staple_kasztan',
+        name: '„IGŁA” KASZTANOWSKI',
+        type: 'BRAWLER / SPEED',
+        color: '#78350f',
+        width: 38,
+        height: 72,
+        speed: 5.8,
+        maxHp: 100,
+        lightDmg: 7,
+        heavyDmg: 16,
+        superDmg: 34,
+        stats: { spd: 85, atk: 60, rng: 55, hp: 65 },
+        desc: 'Szczupły, zwinny zapałczany tułów z błyszczącą skorupą, bandana z poszarpanej czerwonej taśmy i dwie wykałaczki jako zabójcze sztylety.',
+        drawCustom: function(ctx, f, animFrame) {
+          const dir = f.dir;
+          const isAttacking = f.state.startsWith('attack');
+          const isHurt = f.state === 'hurt';
+
+          // 1. Zapałczane, długie nogi
+          ctx.strokeStyle = '#fef08a';
+          ctx.lineWidth = 4;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(-7, -22);
+          ctx.lineTo(-12 + (f.vx * 1.8), 0);
+          ctx.moveTo(7, -22);
+          ctx.lineTo(12 + (f.vx * 1.8), 0);
+          ctx.stroke();
+
+          // Siarka na stopach
+          ctx.fillStyle = '#dc2626';
+          ctx.fillRect(-15 + (f.vx * 1.8), -3, 6, 4);
+          ctx.fillRect(9 + (f.vx * 1.8), -3, 6, 4);
+
+          // 2. Kanciasty, szczupły tułów ze świeżego kasztana
+          ctx.fillStyle = '#78350f';
+          ctx.strokeStyle = '#000';
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.ellipse(0, -38, 16, 24, (f.vx * 0.05), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Jasna poduszka
+          ctx.fillStyle = '#d97706';
+          ctx.beginPath();
+          ctx.ellipse(dir * 3, -34, 9, 14, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Zszywki metalowe
+          ctx.strokeStyle = '#e2e8f0';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(-6, -48, 12, 3);
+          ctx.strokeRect(-4, -40, 8, 3);
+
+          // Czerwona bandana z taśmy
+          ctx.fillStyle = '#dc2626';
+          ctx.fillRect(-16, -55, 32, 7);
+          ctx.beginPath();
+          ctx.moveTo(-16 * dir, -52);
+          ctx.lineTo(-24 * dir, -48 + (animFrame % 2 * 3));
+          ctx.lineTo(-22 * dir, -56);
+          ctx.fill();
+
+          // Oczy bokserskie
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(dir * 3, -48, 6, 5);
+          ctx.fillStyle = '#000';
+          ctx.fillRect(dir * 5, -47, 3, 4);
+
+          // Ramiona ze sztyletami (wykałaczkami)
+          ctx.strokeStyle = '#fef08a';
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          if (f.state === 'attack_light') {
+            ctx.moveTo(0, -38);
+            ctx.lineTo(dir * 42, -38);
+            ctx.stroke();
+            // Wykałaczka-sztylet
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(dir * 42, -38);
+            ctx.lineTo(dir * 65, -38);
+            ctx.stroke();
+          } else if (f.state === 'attack_heavy') {
+            ctx.moveTo(0, -38);
+            ctx.lineTo(dir * 32, -62);
+            ctx.stroke();
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(dir * 32, -62);
+            ctx.lineTo(dir * 60, -70);
+            ctx.stroke();
+          } else {
+            // Postawa bokserska
+            ctx.moveTo(-4, -36);
+            ctx.lineTo(dir * 18, -42);
+            ctx.moveTo(4, -36);
+            ctx.lineTo(dir * 22, -32);
+            ctx.stroke();
+            ctx.strokeStyle = '#fef08a';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(dir * 18, -42);
+            ctx.lineTo(dir * 32, -48);
+            ctx.moveTo(dir * 22, -32);
+            ctx.lineTo(dir * 36, -34);
+            ctx.stroke();
+          }
+        }
+      },
+      {
+        id: 'scrap_acorn',
+        name: 'ZŁOM-ŻOŁĄDŹ',
+        type: 'TANK / HEAVY',
+        color: '#b45309',
+        width: 48,
+        height: 60,
+        speed: 3.7,
+        maxHp: 135,
+        lightDmg: 9,
+        heavyDmg: 24,
+        superDmg: 40,
+        stats: { spd: 40, atk: 90, rng: 45, hp: 95 },
+        desc: 'Niski, pękaty, z wielkim pordzewiałym kapslem od butelki jako hełmem rycerskim ze szczeliną na świecące oczy i brutalnym tasakiem z żyletki.',
+        drawCustom: function(ctx, f, animFrame) {
+          const dir = f.dir;
+
+          // 1. Krótkie, grube nogi
+          ctx.strokeStyle = '#78350f';
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.moveTo(-10, -14);
+          ctx.lineTo(-12 + (f.vx * 1.2), 0);
+          ctx.moveTo(10, -14);
+          ctx.lineTo(12 + (f.vx * 1.2), 0);
+          ctx.stroke();
+
+          // 2. Pękaty, beczkowaty żołądź
+          ctx.fillStyle = '#b45309';
+          ctx.strokeStyle = '#000';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.ellipse(0, -26, 22, 20, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Czapeczka żołędzia w kratkę pod kapslem
+          ctx.fillStyle = '#451a03';
+          ctx.fillRect(-18, -40, 36, 12);
+
+          // 3. WIELKI PORDZEWIAŁY KAPSEL OD PIWA (HEŁM)
+          ctx.save();
+          ctx.translate(0, -42);
+          ctx.fillStyle = '#b91c1c';
+          ctx.strokeStyle = '#000';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(0, 0, 24, Math.PI, 0);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          // Ząbki kapsla
+          for (let i = -22; i <= 22; i += 7) {
+            ctx.fillStyle = '#7f1d1d';
+            ctx.fillRect(i, -2, 5, 5);
+          }
+
+          // Szczelina w hełmie ze świecącymi czerwonymi oczami
+          ctx.fillStyle = '#000';
+          ctx.fillRect(-14, -12, 28, 7);
+          ctx.fillStyle = '#ef4444';
+          ctx.fillRect(dir * 2 - 6, -11, 6, 5);
+          ctx.fillRect(dir * 2 + 2, -11, 6, 5);
+          ctx.restore();
+
+          // 4. Tasak ze złamanej żyletki / agrafki
+          ctx.strokeStyle = '#78350f';
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          if (f.state === 'attack_light' || f.state === 'attack_heavy') {
+            ctx.moveTo(0, -24);
+            ctx.lineTo(dir * 36, -34);
+            ctx.stroke();
+            // Tasak stalowy
+            ctx.fillStyle = '#cbd5e1';
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2.5;
+            ctx.fillRect(dir * 32, -48, dir * 26, 28);
+            ctx.strokeRect(dir * 32, -48, dir * 26, 28);
+          } else {
+            ctx.moveTo(-4, -22);
+            ctx.lineTo(dir * 22, -18);
+            ctx.stroke();
+            ctx.fillStyle = '#94a3b8';
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.fillRect(dir * 18, -32, dir * 18, 22);
+            ctx.strokeRect(dir * 18, -32, dir * 18, 22);
+          }
+        }
+      },
+      {
+        id: 'spiky_conker',
+        name: 'KOLCZASTY „CZOP”',
+        type: 'ZONER / KOLCE',
+        color: '#4d7c0f',
+        width: 52,
+        height: 68,
+        speed: 4.8,
+        maxHp: 95,
+        lightDmg: 6,
+        heavyDmg: 15,
+        superDmg: 35,
+        stats: { spd: 70, atk: 55, rng: 90, hp: 60 },
+        desc: 'Potężny, jaskrawozielony pancerz z otwartej, kolczastej łupiny kasztana z groźnymi igłami. Garbaty profil potwora miotającego kolcami na dystans.',
+        drawCustom: function(ctx, f, animFrame) {
+          const dir = f.dir;
+
+          // 1. Ciemnozielone odnóża
+          ctx.strokeStyle = '#14532d';
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.moveTo(-12, -18);
+          ctx.lineTo(-16 + (f.vx * 1.5), 0);
+          ctx.moveTo(8, -18);
+          ctx.lineTo(14 + (f.vx * 1.5), 0);
+          ctx.stroke();
+
+          // 2. Garbata, soczyście zielona łupina najeżona kolcami
+          ctx.fillStyle = '#65a30d';
+          ctx.strokeStyle = '#052e16';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.ellipse(-4 * dir, -34, 25, 28, -0.2 * dir, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Wyłaniający się ze środka czarny pysk bestii
+          ctx.fillStyle = '#1e293b';
+          ctx.beginPath();
+          ctx.ellipse(dir * 10, -32, 12, 16, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Świecące żółte ślepia
+          ctx.fillStyle = '#facc15';
+          ctx.beginPath();
+          ctx.arc(dir * 12, -36, 4, 0, Math.PI * 2);
+          ctx.arc(dir * 18, -32, 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 3. WIELKIE KOLCE WYSTAJĄCE Z ŁUPINY
+          ctx.fillStyle = '#14532d';
+          ctx.strokeStyle = '#052e16';
+          ctx.lineWidth = 2;
+          const spikes = [
+            [-22, -45, -34, -58],
+            [-10, -58, -15, -74],
+            [6, -60, 10, -75],
+            [-28, -30, -44, -35],
+            [-24, -15, -38, -12],
+            [12, -50, 24, -62]
+          ];
+          spikes.forEach(([x1, y1, x2, y2]) => {
+            ctx.beginPath();
+            ctx.moveTo(x1 * dir, y1);
+            ctx.lineTo(x2 * dir, y2);
+            ctx.lineTo((x1 + 6) * dir, y1 + 4);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+          });
+
+          // Ramiona miotające kolcami
+          ctx.strokeStyle = '#65a30d';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          if (f.state === 'attack_light' || f.state === 'attack_heavy') {
+            ctx.moveTo(dir * 8, -30);
+            ctx.lineTo(dir * 46, -30);
+            ctx.stroke();
+            // Pocisk-kolec
+            ctx.fillStyle = '#facc15';
+            ctx.fillRect(dir * 46, -33, dir * 16, 6);
+          } else {
+            ctx.moveTo(dir * 6, -26);
+            ctx.lineTo(dir * 26, -22);
+            ctx.stroke();
+          }
+        }
+      },
+      {
+        id: 'wing_maple',
+        name: 'CIĘCIE-KLON',
+        type: 'AERIAL / ASASYN',
+        color: '#ca8a04',
+        width: 40,
+        height: 76,
+        speed: 5.6,
+        maxHp: 85,
+        lightDmg: 8,
+        heavyDmg: 17,
+        superDmg: 32,
+        stats: { spd: 95, atk: 65, rng: 70, hp: 45 },
+        desc: 'Smukły wojownik ze skrzydłami z nosków klonowych na plecach niczym husaria. Lewituje i walczy wirującymi ostrzami z nasion klonu.',
+        drawCustom: function(ctx, f, animFrame) {
+          const dir = f.dir;
+          const hoverFloat = Math.sin(Date.now() / 150) * 4;
+
+          // 1. Skrzydła z nosków klonu (husaria nasion)
+          ctx.save();
+          ctx.translate(-14 * dir, -42 + hoverFloat);
+          ctx.rotate((-0.3 + (Math.sin(Date.now() / 100) * 0.15)) * dir);
+          
+          // Podwójne skrzydła
+          ctx.fillStyle = '#fde047';
+          ctx.strokeStyle = '#854d0e';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.ellipse(-16 * dir, -18, 30, 8, 0.4 * dir, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.ellipse(-14 * dir, 2, 26, 7, -0.2 * dir, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+
+          // 2. Smukły, pionowy kadłub nasiona
+          ctx.fillStyle = '#a16207';
+          ctx.strokeStyle = '#000';
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.ellipse(0, -38 + hoverFloat, 13, 26, 0.1 * dir, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Kaptur z liścia
+          ctx.fillStyle = '#15803d';
+          ctx.beginPath();
+          ctx.moveTo(-14, -48 + hoverFloat);
+          ctx.lineTo(0, -68 + hoverFloat);
+          ctx.lineTo(14, -48 + hoverFloat);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          // Cienkie nóżki w locie
+          ctx.strokeStyle = '#fef08a';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(-5, -14 + hoverFloat);
+          ctx.lineTo(-8, 0);
+          ctx.moveTo(5, -14 + hoverFloat);
+          ctx.lineTo(8, 0);
+          ctx.stroke();
+
+          // Ostrza z nosków klonu
+          ctx.strokeStyle = '#ca8a04';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          if (f.state === 'attack_light' || f.state === 'attack_heavy') {
+            ctx.moveTo(0, -36 + hoverFloat);
+            ctx.lineTo(dir * 42, -44 + hoverFloat);
+            ctx.stroke();
+            // Wirujące zielono-żółte noski
+            ctx.fillStyle = '#eab308';
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.ellipse(dir * 46, -44 + hoverFloat, 24, 7, (Date.now() / 50), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+          } else {
+            ctx.moveTo(0, -36 + hoverFloat);
+            ctx.lineTo(dir * 22, -26 + hoverFloat);
+            ctx.stroke();
+          }
+        }
+      },
+      {
+        id: 'shelf_fungus',
+        name: 'PŁYTA-HUBIAK',
+        type: 'TANK / BRUISER',
+        color: '#573318',
+        width: 64,
+        height: 62,
+        speed: 3.5,
+        maxHp: 140,
+        lightDmg: 10,
+        heavyDmg: 20,
+        superDmg: 38,
+        stats: { spd: 35, atk: 85, rng: 50, hp: 100 },
+        desc: 'Gigantyczny, półkolisty grzyb nadrzewny (huba) z twardą korą zamiast kasztana. Brak nóżek — sunie po stole, miażdżąc pięściami z kory dębu.',
+        drawCustom: function(ctx, f, animFrame) {
+          const dir = f.dir;
+
+          // Brak nóżek - szuranie po stole z kłębami kurzu/zarodników
+          ctx.fillStyle = 'rgba(161, 98, 7, 0.4)';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 32, 6, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 1. WIELKIE PÓŁKOLISTE CIAŁO Z HUBY NADRZEWNEJ
+          ctx.fillStyle = '#451a03';
+          ctx.strokeStyle = '#000';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.arc(0, -18, 34, Math.PI, 0);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          // Prążki roczne na hubie
+          ctx.strokeStyle = '#78350f';
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.arc(0, -18, 26, Math.PI, 0);
+          ctx.stroke();
+
+          ctx.strokeStyle = '#a16207';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(0, -18, 16, Math.PI, 0);
+          ctx.stroke();
+
+          // Szczelina pancerza i małe, złowrogie ślepia
+          ctx.fillStyle = '#000';
+          ctx.fillRect(-12, -26, 24, 6);
+          ctx.fillStyle = '#eab308';
+          ctx.fillRect(dir * 2 - 4, -25, 4, 4);
+
+          // 2. POTĘŻNE PIĘŚCI Z KORY DĘBU
+          ctx.fillStyle = '#27170c';
+          ctx.strokeStyle = '#000';
+          ctx.lineWidth = 3;
+          if (f.state === 'attack_light' || f.state === 'attack_heavy') {
+            ctx.beginPath();
+            ctx.roundRect(dir * 26, -34, dir * 28, 26, 6);
+            ctx.fill();
+            ctx.stroke();
+          } else {
+            ctx.beginPath();
+            ctx.roundRect(dir * 14, -24, dir * 20, 20, 5);
+            ctx.fill();
+            ctx.stroke();
+          }
+        }
+      },
+      {
+        id: 'proto_mutant',
+        name: 'PROTO-KASZTAN',
+        type: 'MUTANT / CHAOS',
+        color: '#4a044e',
+        width: 58,
+        height: 70,
+        speed: 5.0,
+        maxHp: 105,
+        lightDmg: 8,
+        heavyDmg: 18,
+        superDmg: 38,
+        stats: { spd: 75, atk: 75, rng: 65, hp: 70 },
+        desc: 'Chory dwugłowy mutant — dwa zrośnięte kasztany owinięte miedzianym drutem i pinezkami, z czterema zapałczanymi ramionami tłukącymi bez opamiętania.',
+        drawCustom: function(ctx, f, animFrame) {
+          const dir = f.dir;
+          const twitch = (animFrame % 2 === 0 ? 2 : -2);
+
+          // Nogi zapałczane w rozkroku
+          ctx.strokeStyle = '#fef08a';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(-16, -18);
+          ctx.lineTo(-20 + (f.vx * 1.5), 0);
+          ctx.moveTo(12, -18);
+          ctx.lineTo(16 + (f.vx * 1.5), 0);
+          ctx.stroke();
+
+          // 1. DWA ZROŚNIĘTE KASZTANY (GŁOWY)
+          ctx.fillStyle = '#581c87';
+          ctx.strokeStyle = '#000';
+          ctx.lineWidth = 3.5;
+
+          // Głowa prawa (główna)
+          ctx.beginPath();
+          ctx.ellipse(8 * dir, -36, 17, 22, 0.2 * dir, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Głowa lewa (zmutowana bliźniaczka)
+          ctx.fillStyle = '#3b0764';
+          ctx.beginPath();
+          ctx.ellipse(-14 * dir + twitch, -44, 15, 18, -0.3 * dir, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // 2. MIEDZIANY DRUT OWIJAJĄCY OBYDWA KASZTANY
+          ctx.strokeStyle = '#ea580c';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(-24 * dir, -38);
+          ctx.lineTo(18 * dir, -42);
+          ctx.moveTo(-20 * dir, -48);
+          ctx.lineTo(12 * dir, -30);
+          ctx.stroke();
+
+          // Oczy pinezki (różne rozmiary)
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(dir * 12, -40, 5, 5);
+          ctx.fillStyle = '#000';
+          ctx.fillRect(dir * 14, -39, 2, 3);
+
+          ctx.fillStyle = '#ef4444';
+          ctx.fillRect(-16 * dir + twitch, -48, 6, 4);
+
+          // 3. CZTERY ZAPAŁCZANE RAMIONA MŁÓCĄCE W POWIETRZU
+          ctx.strokeStyle = '#fef08a';
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          if (f.state === 'attack_light' || f.state === 'attack_heavy') {
+            // Wszystkie 4 ramiona do przodu
+            ctx.moveTo(0, -32);
+            ctx.lineTo(dir * 46, -42);
+            ctx.moveTo(0, -36);
+            ctx.lineTo(dir * 42, -28);
+            ctx.moveTo(-8, -44);
+            ctx.lineTo(dir * 40, -56);
+            ctx.moveTo(-8, -26);
+            ctx.lineTo(dir * 38, -16);
+          } else {
+            ctx.moveTo(0, -32);
+            ctx.lineTo(dir * 22, -42);
+            ctx.moveTo(0, -36);
+            ctx.lineTo(dir * 24, -22);
+            ctx.moveTo(-10, -42);
+            ctx.lineTo(-20 * dir, -60);
+            ctx.moveTo(-6, -26);
+            ctx.lineTo(dir * 16, -14);
+          }
+          ctx.stroke();
+        }
+      }
+    ];
+
+    /* ==========================================================================
+       3. SYSTEM POSTACI (FIGHTER CLASS) Z ANIMACJAMI I PROSZKAMI
+       ========================================================================== */
+    class Fighter {
+      constructor(data, x, groundY, isPlayer = true) {
+        this.data = data;
+        this.x = x;
+        this.y = groundY;
+        this.groundY = groundY;
+        this.isPlayer = isPlayer;
+        this.dir = isPlayer ? 1 : -1;
+
+        this.vx = 0;
+        this.vy = 0;
+        this.hp = data.maxHp;
+        this.energy = 0;
+        this.combo = 0;
+        this.comboTimer = 0;
+
+        this.state = 'idle'; // idle, jump, attack_light, attack_heavy, super, hurt, block, parry_success
+        this.stateTimer = 0;
+        this.canDoubleJump = true;
+        this.isGrounded = true;
+
+        this.blockActive = false;
+        this.parryWindow = 0;
+
+        this.width = data.width || 44;
+        this.height = data.height || 68;
+        this.hitboxes = [];
+        this.invulnerableTimer = 0;
+
+        this.animFrame = 0;
+        this.animTimer = 0;
+      }
+
+      update(engine) {
+        if (this.stateTimer > 0) this.stateTimer--;
+        if (this.comboTimer > 0) {
+          this.comboTimer--;
+          if (this.comboTimer === 0) this.combo = 0;
+        }
+        if (this.parryWindow > 0) this.parryWindow--;
+        if (this.invulnerableTimer > 0) this.invulnerableTimer--;
+
+        // Grawitacja
+        this.vy += 0.85;
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.y >= this.groundY) {
+          this.y = this.groundY;
+          this.vy = 0;
+          this.isGrounded = true;
+          this.canDoubleJump = true;
+        } else {
+          this.isGrounded = false;
+        }
+
+        this.vx *= 0.82;
+
+        const minX = 70;
+        const maxX = engine.width - 70;
+        if (this.x < minX) this.x = minX;
+        if (this.x > maxX) this.x = maxX;
+
+        if (this.state === 'attack_light' && this.stateTimer <= 0) this.state = 'idle';
+        if (this.state === 'attack_heavy' && this.stateTimer <= 0) this.state = 'idle';
+        if (this.state === 'super' && this.stateTimer <= 0) this.state = 'idle';
+        if (this.state === 'hurt' && this.stateTimer <= 0) this.state = 'idle';
+        if (this.state === 'parry_success' && this.stateTimer <= 0) this.state = 'idle';
+
+        this.animTimer++;
+        if (this.animTimer > 5) {
+          this.animTimer = 0;
+          this.animFrame = (this.animFrame + 1) % 4;
+        }
+
+        // Hitboxy ciosów dopasowane do zasięgu postaci
+        this.hitboxes = [];
+        const reachBonus = (this.data.stats ? this.data.stats.rng * 0.3 : 15);
+        if (this.state === 'attack_light' && this.stateTimer > 4 && this.stateTimer < 14) {
+          this.hitboxes.push({
+            x: this.x + (this.dir * (25 + reachBonus * 0.4)),
+            y: this.y - 48,
+            w: 36 + reachBonus,
+            h: 32,
+            dmg: this.data.lightDmg,
+            knockbackX: this.dir * 5,
+            knockbackY: -3,
+            isHeavy: false
+          });
+        } else if (this.state === 'attack_heavy' && this.stateTimer > 8 && this.stateTimer < 22) {
+          this.hitboxes.push({
+            x: this.x + (this.dir * (30 + reachBonus * 0.6)),
+            y: this.y - 56,
+            w: 48 + reachBonus,
+            h: 46,
+            dmg: this.data.heavyDmg,
+            knockbackX: this.dir * 12,
+            knockbackY: -7,
+            isHeavy: true
+          });
+        } else if (this.state === 'super' && this.stateTimer > 10 && this.stateTimer < 32) {
+          this.hitboxes.push({
+            x: this.x + (this.dir * 50),
+            y: this.y - 60,
+            w: 90,
+            h: 60,
+            dmg: this.data.superDmg,
+            knockbackX: this.dir * 18,
+            knockbackY: -10,
+            isHeavy: true
+          });
+        }
+      }
+
+      jump() {
+        if (this.state === 'hurt' || this.state === 'super') return;
+        if (this.isGrounded) {
+          this.vy = -16.5;
+          this.isGrounded = false;
+          audio.whoosh();
+        } else if (this.canDoubleJump) {
+          this.vy = -14.5;
+          this.canDoubleJump = false;
+          audio.whoosh();
+        }
+      }
+
+      move(dir) {
+        if (['hurt', 'super', 'attack_heavy'].includes(this.state)) return;
+        this.vx = dir * this.data.speed;
+        this.dir = dir;
+      }
+
+      dash() {
+        if (this.invulnerableTimer > 0 || this.state === 'hurt') return;
+        this.vx = this.dir * (this.data.speed * 2.8);
+        this.invulnerableTimer = 18;
+        audio.whoosh();
+      }
+
+      startParry() {
+        if (this.state === 'hurt') return;
+        this.blockActive = true;
+        this.parryWindow = 12; // 12 klatek okna parowania
+        this.state = 'block';
+        this.stateTimer = 22;
+      }
+
+      lightAttack() {
+        if (['hurt', 'super', 'attack_light', 'attack_heavy'].includes(this.state)) return;
+        this.state = 'attack_light';
+        this.stateTimer = 18;
+        audio.whoosh();
+      }
+
+      heavyAttack() {
+        if (['hurt', 'super', 'attack_heavy'].includes(this.state)) return;
+        this.state = 'attack_heavy';
+        this.stateTimer = 30;
+        audio.whoosh();
+      }
+
+      triggerSuper(engine) {
+        if (this.energy < 100 || this.state === 'hurt') return;
+        this.energy = 0;
+        this.state = 'super';
+        this.stateTimer = 44;
+        audio.superBlast();
+        engine.triggerSuperBanner(this.data.name);
+        engine.addScreenShake(20);
+      }
+
+      takeHit(box, attacker, engine) {
+        if (this.invulnerableTimer > 0) return;
+
+        // PERFECT PARRY
+        if (this.blockActive && this.parryWindow > 0) {
+          audio.parrySpark();
+          engine.triggerHitStop(14);
+          engine.addScreenShake(16);
+          this.state = 'parry_success';
+          this.stateTimer = 20;
+          this.energy = Math.min(100, this.energy + 35);
+          if (this.isPlayer) engine.matchParryCount++;
+
+          attacker.state = 'hurt';
+          attacker.stateTimer = 30;
+          attacker.vx = -attacker.dir * 8;
+          engine.spawnFloatingText('PERFECT PARRY!', this.x, this.y - 75, '#facc15');
+          return;
+        }
+
+        // Zwykły blok
+        if (this.blockActive) {
+          const reducedDmg = Math.round(box.dmg * 0.25);
+          this.hp = Math.max(0, this.hp - reducedDmg);
+          this.vx = box.knockbackX * 0.35;
+          audio.metalClank();
+          engine.spawnFloatingText(`BLOK -${reducedDmg}`, this.x, this.y - 50, '#9ca3af');
+          return;
+        }
+
+        // Trafienie
+        this.hp = Math.max(0, this.hp - box.dmg);
+        this.vx = box.knockbackX;
+        this.vy = box.knockbackY;
+        this.state = 'hurt';
+        this.stateTimer = box.isHeavy ? 26 : 16;
+        this.invulnerableTimer = 10;
+
+        audio.crunchSnap(box.isHeavy);
+        engine.triggerHitStop(box.isHeavy ? 9 : 4);
+        engine.addScreenShake(box.isHeavy ? 14 : 6);
+        engine.spawnWoodSplinters(this.x, this.y - 35, box.isHeavy ? 24 : 10);
+        engine.spawnFloatingText(`-${box.dmg}`, this.x, this.y - 50, box.isHeavy ? '#ef4444' : '#f97316');
+
+        attacker.energy = Math.min(100, attacker.energy + (box.isHeavy ? 22 : 12));
+        attacker.combo++;
+        attacker.comboTimer = 75;
+        if (attacker.isPlayer && attacker.combo > engine.matchMaxCombo) {
+          engine.matchMaxCombo = attacker.combo;
+        }
+      }
+
+      draw(ctx) {
+        ctx.save();
+        const jitter = (this.state === 'hurt' ? (this.animFrame % 2 === 0 ? 3 : -3) : 0);
+        ctx.translate(this.x + jitter, this.y);
+
+        if (this.invulnerableTimer > 0 && Math.floor(Date.now() / 45) % 2 === 0) {
+          ctx.globalAlpha = 0.4;
+        }
+
+        // Cień
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, this.width * 0.6, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Indywidualna procedura rysowania dla każdego z 6 wojowników
+        this.data.drawCustom(ctx, this, this.animFrame);
+
+        ctx.restore();
+      }
+    }
+
+    /* ==========================================================================
+       4. GŁÓWNY SILNIK (OPTIMIZED CANVAS ENGINE Z POOLEM CZĄSTECZEK)
+       ========================================================================== */
+    class ChestnutCombatEngine {
+      constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d', { alpha: false }); // Optymalizacja GPU bez zbędnego kanału alpha
+
+        this.width = Math.max(window.innerWidth || 0, 320);
+        this.height = Math.max(window.innerHeight || 0, 240);
+        this.groundY = this.height * 0.78;
+
+        // PRE-RENDERUJ TŁO STOŁU NA OSOBNYM CANVASIE (Eliminuje spadek klatek)
+        this.bgCanvas = document.createElement('canvas');
+        this.bgCtx = this.bgCanvas.getContext('2d');
+
+        // PREVIEW CANVAS NA EKRANIE WYBORU
+        this.previewCanvas = document.getElementById('previewCanvas');
+        this.previewCtx = this.previewCanvas.getContext('2d');
+        this.previewFighterObj = null;
+
+        this.p1Data = FIGHTERS[0];
+        this.p2Data = FIGHTERS[1];
+        this.player = null;
+        this.cpu = null;
+
+        this.round = 1;
+        this.p1Wins = 0;
+        this.p2Wins = 0;
+        this.timer = 99;
+        this.timerInterval = null;
+        this.isRunning = false;
+
+        this.matchMaxCombo = 0;
+        this.matchParryCount = 0;
+
+        // STAŁA PULA CZĄSTECZEK (ZERO GARBAGE COLLECTION STUTTER)
+        this.MAX_PARTICLES = 120;
+        this.particlePool = [];
+        for (let i = 0; i < this.MAX_PARTICLES; i++) {
+          this.particlePool.push({ active: false, x: 0, y: 0, vx: 0, vy: 0, rot: 0, vRot: 0, size: 0, color: '#d97706', life: 0 });
+        }
+
+        this.floatingTexts = [];
+        this.hitStop = 0;
+        this.screenShake = 0;
+        this.keys = {};
+
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.setupKeyboard();
+        this.setupTouch();
+        this.setupUI();
+      }
+
+      resize() {
+        this.width = Math.max(window.innerWidth || 0, 320);
+        this.height = Math.max(window.innerHeight || 0, 240);
+        this.canvas.width = this.width;
+        this.canvas.height = this.height;
+        this.groundY = this.height * 0.78;
+        if (this.player) this.player.groundY = this.groundY;
+        if (this.cpu) this.cpu.groundY = this.groundY;
+
+        // Ponowny pre-render tła po zmianie rozmiaru okna
+        this.renderOffscreenBackground();
+      }
+
+      renderOffscreenBackground() {
+        if (this.width <= 0 || this.height <= 0) return;
+        this.bgCanvas.width = this.width;
+        this.bgCanvas.height = this.height;
+        const ctx = this.bgCtx;
+
+        // Blat stołu stolarskiego
+        ctx.fillStyle = '#170f0a';
+        ctx.fillRect(0, 0, this.width, this.height);
+
+        // Słoje drewna
+        ctx.strokeStyle = '#241710';
+        ctx.lineWidth = 2;
+        for (let y = 15; y < this.height; y += 38) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.bezierCurveTo(this.width * 0.3, y + 14, this.width * 0.7, y - 14, this.width, y);
+          ctx.stroke();
+        }
+
+        // Plamy tuszu i po przypaleniach zapałką
+        ctx.fillStyle = 'rgba(8, 5, 3, 0.75)';
+        ctx.beginPath();
+        ctx.arc(this.width * 0.32, this.groundY - 110, 85, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(185, 28, 28, 0.15)';
+        ctx.beginPath();
+        ctx.arc(this.width * 0.68, this.groundY - 60, 55, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Głębokie nacięcia nożem tapicerskim
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.moveTo(this.width * 0.1, this.groundY - 40);
+        ctx.lineTo(this.width * 0.9, this.groundY - 150);
+        ctx.moveTo(this.width * 0.45, this.groundY - 180);
+        ctx.lineTo(this.width * 0.65, this.groundY - 20);
+        ctx.stroke();
+
+        // Krawędź podłoża stołu
+        ctx.fillStyle = '#0c0704';
+        ctx.fillRect(0, this.groundY, this.width, this.height - this.groundY);
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(0, this.groundY);
+        ctx.lineTo(this.width, this.groundY);
+        ctx.stroke();
+
+        // Poszarpane trociny przy krawędzi
+        ctx.fillStyle = '#78350f';
+        for (let x = 10; x < this.width; x += 30) {
+          ctx.fillRect(x, this.groundY - 3, 12, 3);
+        }
+      }
+
+      setupKeyboard() {
+        window.addEventListener('keydown', (e) => {
+          audio.init();
+          this.keys[e.key.toLowerCase()] = true;
+          this.keys[e.code] = true;
+
+          if (!this.isRunning || !this.player) return;
+
+          if (e.key === 'w' || e.key === 'W' || e.code === 'Space') {
+            this.player.jump();
+          } else if (e.code === 'ShiftLeft' || e.key === 'l' || e.key === 'L') {
+            this.player.dash();
+          } else if (e.key === 'j' || e.key === 'J') {
+            this.player.lightAttack();
+          } else if (e.key === 'k' || e.key === 'K') {
+            this.player.heavyAttack();
+          } else if (e.key === 'i' || e.key === 'I') {
+            this.player.startParry();
+          } else if (e.key === 'u' || e.key === 'U' || e.key === 'o' || e.key === 'O') {
+            this.player.triggerSuper(this);
+          }
+        });
+
+        window.addEventListener('keyup', (e) => {
+          this.keys[e.key.toLowerCase()] = false;
+          this.keys[e.code] = false;
+          if (this.player && (e.key === 'i' || e.key === 'I')) {
+            this.player.blockActive = false;
+          }
+        });
+      }
+
+      setupTouch() {
+        const bind = (id, onDown, onUp) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            audio.init();
+            if (onDown) onDown();
+          });
+          el.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if (onUp) onUp();
+          });
+          el.addEventListener('mousedown', () => {
+            audio.init();
+            if (onDown) onDown();
+          });
+          el.addEventListener('mouseup', () => {
+            if (onUp) onUp();
+          });
+        };
+
+        bind('btn-touch-left', () => this.keys['a'] = true, () => this.keys['a'] = false);
+        bind('btn-touch-right', () => this.keys['d'] = true, () => this.keys['d'] = false);
+        bind('btn-touch-jump', () => this.player && this.player.jump());
+        bind('btn-touch-dash', () => this.player && this.player.dash());
+        bind('btn-touch-light', () => this.player && this.player.lightAttack());
+        bind('btn-touch-heavy', () => this.player && this.player.heavyAttack());
+        bind('btn-touch-parry', 
+          () => this.player && this.player.startParry(), 
+          () => { if (this.player) this.player.blockActive = false; }
+        );
+        bind('btn-touch-super', () => this.player && this.player.triggerSuper(this));
+      }
+
+      setupUI() {
+        document.getElementById('btn-title-play').addEventListener('click', () => {
+          audio.init();
+          audio.crunchSnap(true);
+          this.openScreen('screen-select');
+          this.updateCharacterPreview(this.p1Data);
+        });
+        document.getElementById('btn-title-help').addEventListener('click', () => {
+          audio.init();
+          document.getElementById('modal-help').classList.remove('hidden');
+        });
+        document.getElementById('btn-close-help').addEventListener('click', () => {
+          document.getElementById('modal-help').classList.add('hidden');
+        });
+
+        document.getElementById('btn-select-back').addEventListener('click', () => {
+          this.openScreen('screen-title');
+        });
+        document.getElementById('btn-fight-start').addEventListener('click', () => {
+          audio.crunchSnap(true);
+          this.startMatch();
+        });
+
+        document.getElementById('btn-play-again').addEventListener('click', () => {
+          audio.crunchSnap(true);
+          this.startMatch();
+        });
+        document.getElementById('btn-change-fighter').addEventListener('click', () => {
+          audio.metalClank();
+          this.openScreen('screen-select');
+          this.updateCharacterPreview(this.p1Data);
+        });
+        document.getElementById('btn-to-menu').addEventListener('click', () => {
+          audio.crunchSnap(false);
+          this.openScreen('screen-title');
+        });
+
+        this.populateRoster();
+      }
+
+      populateRoster() {
+        const grid = document.getElementById('roster-grid');
+        grid.innerHTML = '';
+        FIGHTERS.forEach((f, idx) => {
+          const card = document.createElement('div');
+          card.className = `board-card p-2 md:p-3 cursor-pointer ${idx === 0 ? 'active' : ''}`;
+          card.innerHTML = `
+            <div class="flex items-center justify-between border-b border-stone-800 pb-1 mb-1">
+              <span class="font-marker text-xs text-amber-400">№ 0${idx + 1}</span>
+              <span class="text-[8px] font-mono text-stone-400 uppercase tracking-tighter">${f.type.split('/')[0]}</span>
+            </div>
+            <div class="font-marker text-xs md:text-sm text-stone-100 leading-tight mb-2">${f.name}</div>
+            <div class="w-full h-1 bg-black border border-stone-800">
+              <div class="h-full bg-red-600" style="width: ${(f.maxHp / 140) * 100}%"></div>
+            </div>
+          `;
+          card.addEventListener('click', () => {
+            audio.metalClank();
+            document.querySelectorAll('#roster-grid > div').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            this.p1Data = f;
+            this.updateCharacterPreview(f);
+          });
+          grid.appendChild(card);
+        });
+      }
+
+      updateCharacterPreview(fighter) {
+        document.getElementById('preview-type').innerText = `KLASA: ${fighter.type}`;
+        document.getElementById('preview-name').innerText = fighter.name;
+        document.getElementById('preview-desc').innerText = fighter.desc;
+
+        if (fighter.stats) {
+          document.getElementById('stat-spd').style.width = `${fighter.stats.spd}%`;
+          document.getElementById('stat-atk').style.width = `${fighter.stats.atk}%`;
+          document.getElementById('stat-rng').style.width = `${fighter.stats.rng}%`;
+          document.getElementById('stat-hp').style.width = `${fighter.stats.hp}%`;
+        }
+
+        // Stwórz instancję do animowanego podglądu na żywo
+        this.previewFighterObj = new Fighter(fighter, 110, 115, true);
+      }
+
+      drawPreviewLoop() {
+        if (!this.previewFighterObj || document.getElementById('screen-select').classList.contains('hidden')) return;
+
+        const ctx = this.previewCtx;
+        ctx.fillStyle = '#0a0705';
+        ctx.fillRect(0, 0, 220, 140);
+
+        // Siatka techniczna
+        ctx.strokeStyle = '#1c140d';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < 220; x += 20) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, 140);
+          ctx.stroke();
+        }
+        for (let y = 0; y < 140; y += 20) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(220, y);
+          ctx.stroke();
+        }
+
+        // Rysuj wojownika w spoczynku z drobną animacją oddechu
+        this.previewFighterObj.animTimer++;
+        if (this.previewFighterObj.animTimer > 6) {
+          this.previewFighterObj.animTimer = 0;
+          this.previewFighterObj.animFrame = (this.previewFighterObj.animFrame + 1) % 4;
+        }
+        this.previewFighterObj.draw(ctx);
+      }
+
+      openScreen(screenId) {
+        ['screen-title', 'screen-select', 'screen-result'].forEach(id => {
+          document.getElementById(id).classList.add('hidden');
+        });
+        if (screenId) {
+          document.getElementById(screenId).classList.remove('hidden');
+        }
+      }
+
+      startMatch() {
+        this.openScreen(null);
+        const cpuCandidates = FIGHTERS.filter(f => f.id !== this.p1Data.id);
+        this.p2Data = cpuCandidates[Math.floor(Math.random() * cpuCandidates.length)] || FIGHTERS[1];
+
+        this.round = 1;
+        this.p1Wins = 0;
+        this.p2Wins = 0;
+        this.matchMaxCombo = 0;
+        this.matchParryCount = 0;
+
+        document.getElementById('p1-name').innerText = this.p1Data.name.split(' ')[0];
+        document.getElementById('p2-name').innerText = this.p2Data.name.split(' ')[0];
+
+        this.startRound();
+      }
+
+      startRound() {
+        this.player = new Fighter(this.p1Data, this.width * 0.28, this.groundY, true);
+        this.cpu = new Fighter(this.p2Data, this.width * 0.72, this.groundY, false);
+
+        this.timer = 99;
+        document.getElementById('game-timer').innerText = this.timer;
+        document.getElementById('round-indicator').innerText = `RUNDA ${this.round}`;
+        this.updateRoundsUI();
+
+        if (this.timerInterval) clearInterval(this.timerInterval);
+        this.timerInterval = setInterval(() => {
+          if (this.isRunning && this.timer > 0) {
+            this.timer--;
+            document.getElementById('game-timer').innerText = this.timer;
+            if (this.timer <= 0) this.handleRoundEnd(true);
+          }
+        }, 1000);
+
+        this.isRunning = true;
+      }
+
+      updateRoundsUI() {
+        const getDots = (wins) => (wins === 1 ? '● ○' : wins >= 2 ? '● ●' : '○ ○');
+        document.getElementById('p1-rounds').innerText = getDots(this.p1Wins);
+        document.getElementById('p2-rounds').innerText = getDots(this.p2Wins);
+      }
+
+      triggerHitStop(frames) {
+        this.hitStop = frames;
+      }
+
+      addScreenShake(intensity) {
+        this.screenShake = intensity;
+      }
+
+      // EFEKTYWNE SPAWNOWANIE Z PULI (ZERO GC LAG)
+      spawnWoodSplinters(x, y, count) {
+        let spawned = 0;
+        const colors = ['#d97706', '#b45309', '#fde047', '#78350f', '#000000'];
+        for (let i = 0; i < this.MAX_PARTICLES && spawned < count; i++) {
+          const p = this.particlePool[i];
+          if (!p.active) {
+            p.active = true;
+            p.x = x;
+            p.y = y;
+            p.vx = (Math.random() * 2 - 1) * 8;
+            p.vy = (Math.random() * -7) - 2;
+            p.rot = Math.random() * Math.PI;
+            p.vRot = (Math.random() - 0.5) * 0.4;
+            p.size = Math.random() * 5 + 3;
+            p.color = colors[Math.floor(Math.random() * colors.length)];
+            p.life = 28;
+            spawned++;
+          }
+        }
+      }
+
+      spawnFloatingText(text, x, y, color = '#facc15') {
+        this.floatingTexts.push({ text, x, y, color, life: 32, vy: -1.6 });
+      }
+
+      triggerSuperBanner(fighterName) {
+        const banner = document.getElementById('super-banner');
+        document.getElementById('super-banner-title').innerText = `${fighterName} UDERZA!`;
+        banner.classList.remove('hidden');
+        setTimeout(() => banner.classList.add('hidden'), 750);
+      }
+
+      updateAI() {
+        if (!this.cpu || !this.player || this.cpu.state === 'hurt') return;
+
+        const dist = Math.abs(this.cpu.x - this.player.x);
+        this.cpu.dir = this.player.x > this.cpu.x ? 1 : -1;
+
+        if (dist > 190) {
+          this.cpu.move(this.cpu.dir);
+        } else {
+          const roll = Math.random();
+          if (roll < 0.045) {
+            this.cpu.lightAttack();
+          } else if (roll < 0.07) {
+            this.cpu.heavyAttack();
+          } else if (roll < 0.085) {
+            this.cpu.startParry();
+          } else if (roll < 0.095 && this.cpu.energy >= 100) {
+            this.cpu.triggerSuper(this);
+          } else if (roll < 0.11) {
+            this.cpu.dash();
+          }
+        }
+      }
+
+      checkCollisions() {
+        if (!this.player || !this.cpu) return;
+
+        const checkHit = (attacker, victim) => {
+          attacker.hitboxes.forEach(box => {
+            const victimBox = {
+              x: victim.x - victim.width / 2,
+              y: victim.y - victim.height,
+              w: victim.width,
+              h: victim.height
+            };
+
+            if (
+              box.x < victimBox.x + victimBox.w &&
+              box.x + box.w > victimBox.x &&
+              box.y < victimBox.y + victimBox.h &&
+              box.y + box.h > victimBox.y
+            ) {
+              victim.takeHit(box, attacker, this);
+            }
+          });
+        };
+
+        checkHit(this.player, this.cpu);
+        checkHit(this.cpu, this.player);
+      }
+
+      update() {
+        if (!this.isRunning) return;
+
+        // Płynny mikro-hitstop bez zamrażania renderowania
+        if (this.hitStop > 0) {
+          this.hitStop--;
+          return;
+        }
+
+        if (this.keys['a'] || this.keys['arrowleft']) this.player.move(-1);
+        if (this.keys['d'] || this.keys['arrowright']) this.player.move(1);
+
+        this.player.update(this);
+        this.updateAI();
+        this.cpu.update(this);
+
+        this.checkCollisions();
+
+        if (this.player.hp <= 0 || this.cpu.hp <= 0) {
+          this.handleRoundEnd(false);
+        }
+
+        // Aktualizacja stałej puli cząsteczek
+        for (let i = 0; i < this.MAX_PARTICLES; i++) {
+          const p = this.particlePool[i];
+          if (p.active) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.42;
+            p.rot += p.vRot;
+            p.life--;
+            if (p.life <= 0) p.active = false;
+          }
+        }
+
+        for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+          const t = this.floatingTexts[i];
+          t.y += t.vy;
+          t.life--;
+          if (t.life <= 0) this.floatingTexts.splice(i, 1);
+        }
+
+        // Aktualizacja pasków HUD
+        document.getElementById('p1-health').style.width = `${Math.max(0, (this.player.hp / this.player.data.maxHp) * 100)}%`;
+        document.getElementById('p2-health').style.width = `${Math.max(0, (this.cpu.hp / this.cpu.data.maxHp) * 100)}%`;
+        document.getElementById('p1-hp-text').innerText = `${this.player.hp} HP`;
+        document.getElementById('p2-hp-text').innerText = `${this.cpu.hp} HP`;
+        document.getElementById('p1-energy').style.width = `${this.player.energy}%`;
+        document.getElementById('p2-energy').style.width = `${this.cpu.energy}%`;
+
+        const comboDisp = document.getElementById('combo-display');
+        if (this.player.combo >= 2) {
+          comboDisp.classList.remove('hidden');
+          document.getElementById('combo-count').innerText = this.player.combo;
+        } else {
+          comboDisp.classList.add('hidden');
+        }
+      }
+
+      handleRoundEnd(isTimeOut) {
+        this.isRunning = false;
+        clearInterval(this.timerInterval);
+
+        const p1Won = isTimeOut ? (this.player.hp > this.cpu.hp) : (this.cpu.hp <= 0);
+
+        if (p1Won) {
+          this.p1Wins++;
+          audio.crunchSnap(true);
+        } else {
+          this.p2Wins++;
+          audio.crunchSnap(true);
+        }
+
+        this.updateRoundsUI();
+
+        setTimeout(() => {
+          if (this.p1Wins >= 2 || this.p2Wins >= 2) {
+            const victory = this.p1Wins >= 2;
+            const headline = document.getElementById('result-headline');
+            const stamp = document.getElementById('result-stamp');
+
+            headline.innerText = victory ? 'MISTRZ STOŁU!' : 'ZMASAKROWANY!';
+            headline.className = `font-glitch text-3xl md:text-5xl leading-none drop-shadow-[3px_3px_0px_#000] ${victory ? 'text-amber-400' : 'text-red-600'}`;
+
+            stamp.innerText = victory ? 'KASZTAN ZE STALI' : 'ROZŁUPANY W WIÓRY';
+            stamp.style.borderColor = victory ? '#facc15' : '#dc2626';
+            stamp.style.color = victory ? '#facc15' : '#dc2626';
+
+            document.getElementById('result-sub').innerText = victory
+              ? `Twój ${this.player.data.name} zamienił pancerz i zapałki rywala w stertę zrębków na opał!`
+              : `Zostałeś bezlitośnie rozłupany na blacie stolarskim. Pozbieraj drzazgi i spróbuj ponownie.`;
+
+            document.getElementById('stat-max-combo').innerText = `x${Math.max(this.matchMaxCombo, 1)}`;
+            document.getElementById('stat-parry-count').innerText = `${this.matchParryCount}`;
+            document.getElementById('stat-final-time').innerText = `${this.timer}s`;
+
+            this.openScreen('screen-result');
+          } else {
+            this.round++;
+            this.startRound();
+          }
+        }, 1100);
+      }
+
+      draw() {
+        this.ctx.save();
+
+        if (this.screenShake > 0) {
+          const sx = (Math.random() - 0.5) * this.screenShake;
+          const sy = (Math.random() - 0.5) * this.screenShake;
+          this.ctx.translate(sx, sy);
+          this.screenShake *= 0.86;
+          if (this.screenShake < 0.4) this.screenShake = 0;
+        }
+
+        // 1. BŁYSKAWICZNE KOPIOWANIE PRE-RENDEROWANEGO TŁA STOŁU Z OFFSCREEN CANVAS
+        if (this.bgCanvas.width > 0 && this.bgCanvas.height > 0) {
+          this.ctx.drawImage(this.bgCanvas, 0, 0);
+        } else {
+          this.ctx.fillStyle = '#170f0a';
+          this.ctx.fillRect(0, 0, this.width, this.height);
+        }
+
+        // 2. WOJOWNICY NA STOLE
+        if (this.player) this.player.draw(this.ctx);
+        if (this.cpu) this.cpu.draw(this.ctx);
+
+        // 3. STAŁA PULA CZĄSTECZEK (ZRĘBKI)
+        for (let i = 0; i < this.MAX_PARTICLES; i++) {
+          const p = this.particlePool[i];
+          if (p.active) {
+            this.ctx.save();
+            this.ctx.translate(p.x, p.y);
+            this.ctx.rotate(p.rot);
+            this.ctx.fillStyle = p.color;
+            this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+            this.ctx.restore();
+          }
+        }
+
+        // 4. PŁYWAJĄCE NAPISY OBRAŻEŃ
+        this.floatingTexts.forEach(t => {
+          this.ctx.font = 'bold 18px "Special Elite", monospace';
+          this.ctx.fillStyle = '#000000';
+          this.ctx.fillText(t.text, t.x + 2, t.y + 2);
+          this.ctx.fillStyle = t.color;
+          this.ctx.fillText(t.text, t.x, t.y);
+        });
+
+        this.ctx.restore();
+
+        // 5. ODRYSOWANIE PODGLĄDU WOJOWNIKA W MENU WYBORU
+        this.drawPreviewLoop();
+      }
+
+      loop() {
+        this.update();
+        this.draw();
+        requestAnimationFrame(() => this.loop());
+      }
+    }
+
+    window.onload = () => {
+      const engine = new ChestnutCombatEngine();
+      engine.loop();
+    };
+  </script>
+</body>
+</html>
