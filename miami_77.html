@@ -19,11 +19,10 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #120d16;
+            background-color: #0d0912;
             font-family: 'Inter', sans-serif;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: none;
         }
         .font-retro {
             font-family: 'Righteous', cursive;
@@ -37,14 +36,15 @@
             height: 100vh;
             cursor: crosshair;
             outline: none;
+            background-color: #120d16;
         }
         .crt-overlay {
             pointer-events: none;
             position: fixed;
             inset: 0;
             background: 
-                radial-gradient(circle at center, transparent 58%, rgba(20, 8, 28, 0.55) 100%),
-                linear-gradient(rgba(255, 140, 80, 0.05), rgba(0, 210, 184, 0.04));
+                radial-gradient(circle at center, transparent 62%, rgba(15, 6, 22, 0.58) 100%),
+                linear-gradient(rgba(255, 140, 80, 0.04), rgba(0, 210, 184, 0.03));
             z-index: 15;
         }
         .scanlines {
@@ -55,12 +55,12 @@
                 to bottom,
                 rgba(255,255,255,0),
                 rgba(255,255,255,0) 50%,
-                rgba(0, 0, 0, 0.14) 50%,
-                rgba(0, 0, 0, 0.14)
+                rgba(0, 0, 0, 0.12) 50%,
+                rgba(0, 0, 0, 0.12)
             );
             background-size: 100% 4px;
             z-index: 16;
-            opacity: 0.4;
+            opacity: 0.35;
         }
         .respect-bar-bg {
             background: repeating-linear-gradient(
@@ -79,7 +79,7 @@
             animation: pulseGlow 3s infinite;
         }
         .hud-panel {
-            background: rgba(20, 14, 28, 0.88);
+            background: rgba(18, 12, 24, 0.90);
             backdrop-filter: blur(6px);
             border: 2px solid rgba(247, 197, 72, 0.45);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.65), inset 0 0 12px rgba(255, 107, 53, 0.12);
@@ -106,13 +106,13 @@
     <div class="crt-overlay"></div>
     <div class="scanlines"></div>
 
-    <!-- EKRAN POWITALNY / PROLOG (W pełni responsywny na telefonach) -->
+    <!-- EKRAN POWITALNY / PROLOG -->
     <div id="startModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-2 sm:p-4">
         <div class="max-w-2xl w-full max-h-[92vh] overflow-y-auto custom-scroll hud-panel rounded-2xl p-4 sm:p-6 md:p-8 border-2 border-amber-400/70 shadow-2xl relative">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-500/30 pb-3 mb-4">
                 <div>
                     <span class="text-[10px] sm:text-xs font-mono-tech uppercase tracking-widest px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 border border-orange-400/40">
-                        EDYCJA ROZSZERZONA: KASZTANOWY SYNDYKAT
+                        EDYCJA AUDIOWIZUALNA & HIGH-PERFORMANCE 🍂
                     </span>
                     <h1 class="font-retro text-2xl sm:text-4xl md:text-5xl tracking-wider mt-1.5 bg-gradient-to-r from-amber-300 via-orange-400 to-pink-500 bg-clip-text text-transparent retro-title-glow">
                         MIAMI '77: CIENIE PODZIEMIA
@@ -126,43 +126,41 @@
 
             <div class="space-y-2.5 text-xs sm:text-sm md:text-base text-amber-100/90 leading-relaxed mb-4">
                 <p>
-                    Nazywasz się <strong class="text-amber-300">Jack „Viper” Kowalski</strong>. Jesteś byłym żołnierzem sił specjalnych, który po powrocie do skąpanego w jesiennym słońcu i neonach Miami zaciągnął się jako cyngiel do rodziny <strong class="text-amber-400">Chestnuts 🌰</strong>.
+                    Wcielasz się w <strong class="text-amber-300">Jacka „Vipera” Kowalskiego</strong>. Wojskowa kurtka M65, aviatory, kabura na udzie i broń w gotowości. W mieście panuje jesienny, duszny klimat Miami.
                 </p>
-                <p>
-                    Miasto podzielone jest między <strong class="text-teal-300">4 uzbrojone syndykaty</strong>: <span class="text-amber-400">Chestnuts</span>, <span class="text-indigo-400">Rhavens</span>, <span class="text-emerald-400">Magicians (Magic Froggy's)</span> oraz <span class="text-red-400">Wild-Weasels</span>. Dopóki nie zaczynasz strzelaniny na ich terenie i nie atakujesz ich ludzi, możesz swobodnie poruszać się po mieście.
-                </p>
-                <div class="bg-black/45 border-l-4 border-pink-500 p-2.5 rounded text-xs text-pink-200 space-y-1">
-                    <div><strong>🕵️ ŚLEDZTWO KRETA & NOWOŚCI:</strong> Kapitan <strong>Grinch</strong> zdradza Kasztanów na rzecz Rhavensów. Zbierz <strong>4 dowody zdrady</strong> i wykonuj zróżnicowane misje (napady na <strong>Froggy Shopy 🐸</strong>, likwidacje gangów, kradzieże fur).</div>
-                    <div><strong>🚓 POLICJA (0-5 🌰) & UKRYTY CZOŁG:</strong> Gra zaczyna się przy <strong>0 Kasztanów</strong> — radiowozy spokojnie patrolują miasto. Dopiero Twoje przewinienia stopniowo podnoszą pościg od 1 do 5 Kasztanów! Odnajdź też <strong>Czołg M60</strong> w bazie NW!</div>
+                <div class="bg-black/45 border-l-4 border-amber-400 p-2.5 rounded text-xs text-amber-200 space-y-1">
+                    <div><strong>📻 SYSTEM RADIOWY & AMBIENT:</strong> Radio z synth-funkem gra <em>wyłącznie w pojazdach</em>! Po wyjściu z auta słyszysz bogate odgłosy ulicy: kroki, wiatr w palmach, daleki szum oceanu, rozmowy przechodniów i klaksony.</div>
+                    <div><strong>🚗 INTELIGENTNY RUCH ULICZNY:</strong> Samochody nie klinują się już na skrzyżowaniach – posiadają system dynamicznego wycofywania i omijania kolizji.</div>
+                    <div><strong>⚡ MAKSYMALNA PŁYNNOŚĆ:</strong> Zoptymalizowany silnik renderowania z buforowaniem podłoża zapewnia 60 FPS na każdym urządzeniu.</div>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5 text-[11px] font-mono-tech">
                 <div class="bg-black/50 p-2 rounded-lg border border-amber-500/20">
                     <div class="text-amber-400 font-bold">[WASD] / Dotyk</div>
-                    <div class="text-amber-100/70">Ruch / Prowadzenie</div>
+                    <div class="text-amber-100/70">Ruch Vipera / Jazda</div>
                 </div>
                 <div class="bg-black/50 p-2 rounded-lg border border-amber-500/20">
                     <div class="text-teal-400 font-bold">[E] lub [F]</div>
-                    <div class="text-amber-100/70">Auto / Telefon / Napad</div>
+                    <div class="text-amber-100/70">Pojazd / Telefon / Sklep</div>
                 </div>
                 <div class="bg-black/50 p-2 rounded-lg border border-amber-500/20">
                     <div class="text-pink-400 font-bold">[1-4] lub [Q]</div>
-                    <div class="text-amber-100/70">Zmiana broni (RPG/Granat)</div>
+                    <div class="text-amber-100/70">Wybór broni w dłoniach</div>
                 </div>
                 <div class="bg-black/50 p-2 rounded-lg border border-amber-500/20">
-                    <div class="text-emerald-400 font-bold">[LPM] / [SPACJA]</div>
-                    <div class="text-amber-100/70">Strzał / Drift ręcznym</div>
+                    <div class="text-emerald-400 font-bold">[LPM] / [R] w aucie</div>
+                    <div class="text-amber-100/70">Strzał / Stacja radiowa</div>
                 </div>
             </div>
 
-            <button id="startGameBtn" class="w-full py-3 sm:py-3.5 px-4 rounded-xl font-retro text-base sm:text-xl tracking-wider uppercase bg-gradient-to-r from-orange-500 via-amber-500 to-pink-600 hover:from-orange-400 hover:to-pink-500 text-slate-950 font-bold shadow-lg shadow-orange-500/30 transition transform active:scale-95 cursor-pointer">
-                WKROCZ DO MIAMI '77 (START GRY)
+            <button id="startGameBtn" class="w-full py-3.5 px-4 rounded-xl font-retro text-base sm:text-xl tracking-wider uppercase bg-gradient-to-r from-orange-500 via-amber-500 to-pink-600 hover:from-orange-400 hover:to-pink-500 text-slate-950 font-bold shadow-lg shadow-orange-500/30 transition transform active:scale-95 cursor-pointer">
+                URUCHOM SILNIK I WKROCZ DO GRY
             </button>
         </div>
     </div>
 
-    <!-- EKRAN GAME OVER (JESIEŃ ŚREDNIOWIECZA KASZTANIE) -->
+    <!-- EKRAN GAME OVER -->
     <div id="gameOverModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-red-950/90 backdrop-blur-md p-3 sm:p-6">
         <div class="max-w-xl w-full max-h-[90vh] overflow-y-auto hud-panel rounded-2xl p-5 sm:p-8 border-2 border-red-500 text-center shadow-2xl relative">
             <div class="text-5xl sm:text-6xl mb-2 animate-bounce">🌰🔥🍂</div>
@@ -184,7 +182,7 @@
         </div>
     </div>
 
-    <!-- LEWY GÓRNY RÓG: RESPEKT SYNDYKATÓW & CEL (Kompaktowy na telefonie) -->
+    <!-- LEWY GÓRNY RÓG: RESPEKT SYNDYKATÓW & CEL -->
     <div class="fixed top-2 left-2 sm:top-3 sm:left-3 z-20 w-48 sm:w-76 md:w-80 hud-panel rounded-xl p-2 sm:p-3 pointer-events-auto">
         <div class="flex items-center justify-between border-b border-amber-400/20 pb-1 mb-1.5">
             <button id="toggleRespectBtn" class="font-retro text-[10px] sm:text-xs tracking-wider text-amber-300 uppercase flex items-center gap-1 text-left">
@@ -242,26 +240,26 @@
         <div class="mt-1.5 pt-1.5 border-t border-amber-500/20 text-[9px] sm:text-[11px] font-mono-tech flex items-start gap-1">
             <span class="text-teal-400 font-bold shrink-0">CEL:</span>
             <span id="activeObjectiveText" class="text-amber-100/90 line-clamp-3 sm:line-clamp-none">
-                Odbierz dzwoniącą budkę telefoniczną (ikona telefonu), obrabuj Froggy Shop 🐸 lub znajdź czołg w bazie NW!
+                Wsiądź do auta, by włączyć radio, lub idź do dzwoniącej budki [E]!
             </span>
         </div>
     </div>
 
-    <!-- ŚRODKOWY GÓRNY BANER DZIELNICY / KOMUNIKATÓW -->
+    <!-- ŚRODKOWY GÓRNY BANER DZIELNICY -->
     <div id="districtBanner" class="fixed top-14 sm:top-5 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-all duration-500 opacity-0 transform -translate-y-4">
         <div class="hud-panel px-4 py-1.5 sm:px-6 sm:py-2.5 rounded-full border-2 border-teal-400/70 text-center shadow-2xl">
-            <div class="text-[8px] sm:text-[10px] font-mono-tech uppercase tracking-[0.2em] text-teal-300" id="districtSub">TERYTORIUM NEUTRALNE</div>
+            <div class="text-[8px] sm:text-[10px] font-mono-tech uppercase tracking-[0.2em] text-teal-300" id="districtSub">STREFA NEUTRALNA</div>
             <div class="font-retro text-sm sm:text-xl md:text-2xl tracking-wider text-amber-300" id="districtTitle">PALM BEACH DOWNTOWN</div>
         </div>
     </div>
 
-    <!-- PRAWY GÓRNY RÓG: POZIOM POSZUKIWANIA (0-5 KASZTANÓW), MINIMAPA, BROŃ, ZDROWIE -->
+    <!-- PRAWY GÓRNY RÓG: POZIOM POSZUKIWANIA, MINIMAPA, BROŃ, RADIO -->
     <div class="fixed top-2 right-2 sm:top-3 sm:right-3 z-20 flex flex-col items-end gap-1.5 pointer-events-auto">
         <div class="hud-panel rounded-xl p-2 sm:p-2.5 flex flex-col items-center w-36 sm:w-48">
             <!-- Wskaźnik Pościgu 0-5 Kasztanów -->
             <div class="w-full flex items-center justify-between bg-black/60 px-2 py-1 rounded-lg border border-amber-500/40 mb-1.5">
                 <span class="text-[9px] font-mono-tech text-amber-300 uppercase">POŚCIG:</span>
-                <div id="wantedChestnutsDisplay" class="flex gap-0.5 text-xs sm:text-sm leading-none" title="Poziom poszukiwania (0-5 Kasztanów)">
+                <div id="wantedChestnutsDisplay" class="flex gap-0.5 text-xs sm:text-sm leading-none">
                     <span class="opacity-25">🌰</span><span class="opacity-25">🌰</span><span class="opacity-25">🌰</span><span class="opacity-25">🌰</span><span class="opacity-25">🌰</span>
                 </div>
             </div>
@@ -269,10 +267,6 @@
             <!-- Minimapa -->
             <div class="relative rounded-lg overflow-hidden border-2 border-amber-400/50 bg-slate-950">
                 <canvas id="minimapCanvas" width="136" height="136" class="block w-28 h-28 sm:w-40 sm:h-40"></canvas>
-                <div class="absolute bottom-0.5 left-1 right-1 flex justify-between text-[8px] font-mono-tech text-amber-200/80 pointer-events-none">
-                    <span>🛡️NW:Czołg</span>
-                    <span>🐸Sklepy</span>
-                </div>
             </div>
 
             <!-- Statystyki Gracza i Pojazdu -->
@@ -283,11 +277,15 @@
                         PIESZO
                     </span>
                 </div>
+                <div class="flex items-center justify-between text-[10px] text-teal-300">
+                    <span>PRĘDKOŚĆ:</span>
+                    <span id="speedometerDisplay" class="font-bold text-amber-300">0 MPH</span>
+                </div>
 
                 <!-- Pasek Zdrowia Gracza -->
                 <div>
                     <div class="flex justify-between text-[9px] text-rose-300 mb-0.5">
-                        <span>ŻYCIE VIPERA</span>
+                        <span>VIPER (M65)</span>
                         <span id="healthText">100%</span>
                     </div>
                     <div class="w-full bg-black/60 h-2 rounded overflow-hidden border border-red-500/40 p-0.5">
@@ -295,7 +293,7 @@
                     </div>
                 </div>
 
-                <!-- Pasek Stanu Pojazdu (widoczny w aucie) -->
+                <!-- Pasek Stanu Pojazdu -->
                 <div id="carHealthContainer" class="hidden">
                     <div class="flex justify-between text-[9px] text-orange-300 mb-0.5">
                         <span>PANCERZ AUTA</span>
@@ -306,10 +304,10 @@
                     </div>
                 </div>
 
-                <!-- Aktualna Broń -->
+                <!-- Aktualna Broń w dłoniach -->
                 <div class="bg-black/50 p-1.5 rounded border border-teal-500/40 flex items-center justify-between">
                     <div class="truncate">
-                        <div class="text-[8px] text-teal-400 uppercase">BROŃ [1-4 / Q]:</div>
+                        <div class="text-[8px] text-teal-400 uppercase">W DŁONIACH:</div>
                         <div id="currentWeaponDisplay" class="text-[10px] sm:text-xs font-bold text-amber-200 truncate">🔫 M1911 (∞)</div>
                     </div>
                     <button id="switchWeaponHudBtn" class="px-1.5 py-1 rounded bg-teal-500/30 hover:bg-teal-500/50 text-teal-200 text-[10px] border border-teal-400/40 cursor-pointer shrink-0">
@@ -317,14 +315,10 @@
                     </button>
                 </div>
 
-                <div class="hidden sm:flex items-center justify-between text-[10px] text-teal-300">
-                    <span>PRĘDKOŚĆ:</span>
-                    <span id="speedometerDisplay" class="font-bold">0 MPH</span>
-                </div>
-
+                <!-- Stan Radia (Tylko w pojeździe) -->
                 <div class="flex items-center justify-between pt-1 border-t border-amber-500/20 text-[10px]">
                     <button id="radioBtn" class="px-1.5 py-0.5 rounded bg-teal-500/20 hover:bg-teal-500/30 border border-teal-400/40 text-teal-200 transition cursor-pointer truncate">
-                        📻 <span id="radioStationName">Funk 77</span>
+                        📻 <span id="radioStationName">Otoczenie</span>
                     </button>
                     <button id="muteBtn" class="px-1.5 py-0.5 rounded bg-orange-500/20 hover:bg-orange-500/30 border border-orange-400/40 text-orange-200 transition cursor-pointer">
                         🔊
@@ -342,17 +336,18 @@
         </div>
     </div>
 
-    <!-- DOLNY PANEL DIALOGOWY (Responsywny) -->
+    <!-- DOLNY PANEL DIALOGOWY Z EFEKTEM ROZMOWY TELEFONICZNEJ -->
     <div id="dialogueModal" class="fixed bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-40 w-[96%] max-w-3xl max-h-[82vh] overflow-y-auto custom-scroll hud-panel rounded-2xl p-3 sm:p-5 border-2 border-amber-400 hidden">
         <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start">
             <div class="flex items-center gap-3 sm:block">
-                <div id="speakerAvatar" class="w-12 h-12 sm:w-20 sm:h-20 rounded-xl shrink-0 flex flex-col items-center justify-center border-2 border-amber-300 bg-gradient-to-br from-amber-700 to-slate-900 text-center p-1 shadow-inner">
+                <div id="speakerAvatar" class="w-12 h-12 sm:w-20 sm:h-20 rounded-xl shrink-0 flex flex-col items-center justify-center border-2 border-amber-300 bg-gradient-to-br from-amber-700 to-slate-900 text-center p-1 shadow-inner relative overflow-hidden">
                     <div class="text-xl sm:text-2xl" id="speakerEmoji">📞</div>
                     <div class="text-[8px] sm:text-[9px] font-mono-tech uppercase tracking-tighter text-amber-200 mt-0.5" id="speakerFactionTag">CHESTNUTS</div>
+                    <div class="absolute inset-0 bg-teal-500/10 pointer-events-none animate-pulse"></div>
                 </div>
                 <div class="sm:hidden">
                     <h3 id="speakerNameMobile" class="font-retro text-sm text-amber-300 tracking-wide">KAPITAN GRINCH</h3>
-                    <span class="text-[10px] font-mono-tech text-pink-300 bg-pink-500/15 px-1.5 py-0.5 rounded border border-pink-400/30">AKTA KRETA</span>
+                    <span class="text-[10px] font-mono-tech text-teal-300">POLĄCZENIE TELEFONICZNE [SŁUCHAWKA]</span>
                 </div>
             </div>
             <div class="flex-1 min-w-0 w-full">
@@ -360,8 +355,8 @@
                     <h3 id="speakerName" class="font-retro text-lg text-amber-300 tracking-wide">
                         KAPITAN GRINCH - OFICER CHESTNUTS
                     </h3>
-                    <span class="text-[11px] font-mono-tech text-pink-300 bg-pink-500/15 px-2 py-0.5 rounded border border-pink-400/30" id="clueCounterTag">
-                        AKTA KRETA
+                    <span class="text-[11px] font-mono-tech text-teal-300 bg-teal-500/15 px-2 py-0.5 rounded border border-teal-400/30">
+                        SZYFROWANE POŁĄCZENIE KABLOWE
                     </span>
                 </div>
                 <p id="dialogueText" class="text-xs sm:text-sm text-amber-50/95 leading-relaxed font-mono-tech mb-2.5">
@@ -375,7 +370,7 @@
                         PRZYJMIJ MISJĘ (+RESPEKT)
                     </button>
                     <button id="closeDialogueBtn" class="px-3 py-2 sm:py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-200 border border-amber-400/30 text-xs font-mono-tech uppercase cursor-pointer">
-                        ZAMKNIJ [ESC]
+                        ODŁÓŻ SŁUCHAWKĘ [ESC]
                     </button>
                 </div>
             </div>
@@ -418,28 +413,60 @@
     <!-- STOPKA STEROWANIA NA DESKTOPIE -->
     <div class="hidden md:flex fixed bottom-2.5 left-14 z-20 hud-panel px-3 py-1.5 rounded-lg text-[11px] font-mono-tech text-amber-200/80 gap-4 pointer-events-none">
         <span><strong class="text-amber-400">WASD/Strzałki</strong> Ruch / Jazda</span>
-        <span><strong class="text-teal-400">E / F</strong> Auto / Telefon / Napad na Froggy Shop</span>
-        <span><strong class="text-pink-400">1-4 lub Q</strong> Zmiana Broni</span>
-        <span><strong class="text-orange-400">LPM</strong> Strzał / Rzut granatem</span>
-        <span><strong class="text-emerald-400">SPACJA</strong> Drift</span>
+        <span><strong class="text-teal-400">E / F</strong> Wsiądź/Wysiądź / Budka tel.</span>
+        <span><strong class="text-pink-400">1-4 lub Q</strong> Zmiana broni</span>
+        <span><strong class="text-orange-400">LPM</strong> Strzał z broni w dłoniach</span>
+        <span><strong class="text-emerald-400">R</strong> Zmiana radia (w pojeździe)</span>
     </div>
 
 <script>
 // ============================================================================
-// SYNTH AUDIO ENGINE LAT 70. + EFEKTY WYBUCHÓW I SYREN POLICYJNYCH
+// SYSTEM AUDIO: MUZYKA TYLKO W POJEŹDZIE + BOGATE DŹWIĘKI OTOCZENIA NA PIECHOTĘ
 // ============================================================================
-class Miami77Audio {
+class Miami77SoundSystem {
     constructor() {
         this.ctx = null;
         this.isMuted = false;
         this.stationIndex = 0;
         this.stations = [
-            { name: "Funk 77", tempo: 112, bassNotes: [55, 55, 65.41, 73.42, 82.41, 73.42, 65.41, 61.74] },
-            { name: "Vice FM", tempo: 120, bassNotes: [49, 49, 58.27, 65.41, 73.42, 65.41, 58.27, 55.00] },
-            { name: "Chestnut", tempo: 98,  bassNotes: [41.2, 41.2, 49.0, 55.0, 61.74, 55.0, 49.0, 46.25] }
+            {
+                name: "Vice Funk 77",
+                tempo: 114,
+                scale: [130.81, 146.83, 155.56, 174.61, 196.00, 220.00, 233.08], // C-dorian funk
+                bassSeq: [65.41, 65.41, 77.78, 87.31, 98.00, 87.31, 77.78, 73.42],
+                chords: [
+                    [261.63, 311.13, 392.00, 466.16], // Cm7
+                    [293.66, 349.23, 440.00, 523.25], // Dm7
+                    [349.23, 440.00, 523.25, 622.25]  // F7
+                ]
+            },
+            {
+                name: "Neon Sunset Groove",
+                tempo: 104,
+                scale: [146.83, 164.81, 174.61, 196.00, 220.00, 246.94, 261.63], // D-minor
+                bassSeq: [73.42, 73.42, 87.31, 98.00, 110.0, 98.00, 87.31, 82.41],
+                chords: [
+                    [293.66, 349.23, 440.00, 554.37], // Dm9
+                    [261.63, 329.63, 392.00, 493.88], // Cmaj7
+                    [220.00, 261.63, 329.63, 392.00]  // Am7
+                ]
+            },
+            {
+                name: "Chestnut Heights FM",
+                tempo: 122,
+                scale: [110.0, 123.47, 130.81, 146.83, 164.81, 174.61, 196.00], // A-minor drive
+                bassSeq: [55.00, 55.00, 65.41, 73.42, 82.41, 73.42, 65.41, 61.74],
+                chords: [
+                    [220.00, 261.63, 329.63, 440.00],
+                    [174.61, 220.00, 261.63, 349.23],
+                    [196.00, 246.94, 293.66, 392.00]
+                ]
+            }
         ];
         this.step = 0;
         this.timer = null;
+        this.ambientTimer = null;
+        this.footstepTimer = 0;
     }
 
     init() {
@@ -449,39 +476,77 @@ class Miami77Audio {
         }
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         this.ctx = new AudioCtx();
-        this.startMusicLoop();
+        this.startEngineLoops();
     }
 
-    startMusicLoop() {
+    startEngineLoops() {
         if (this.timer) clearInterval(this.timer);
-        const st = this.stations[this.stationIndex];
-        const stepMs = (60 / st.tempo / 2) * 1000;
+        if (this.ambientTimer) clearInterval(this.ambientTimer);
 
+        // Pętla muzyczna radia (Działa TYLKO GDY GRACZ JEST W AUCIE)
         this.timer = setInterval(() => {
             if (!this.ctx || this.isMuted || this.ctx.state !== 'running') return;
-            const currentStation = this.stations[this.stationIndex];
-            const idx = this.step % 8;
 
-            this.playFunkBass(currentStation.bassNotes[idx], 0.19);
-            if (idx === 0 || idx === 4) this.playKick();
-            if (idx === 2 || idx === 6) this.playSnare();
-            this.playHiHat(idx % 2 === 1 ? 0.05 : 0.025);
-            if (idx === 0) this.playWarmChord(currentStation.bassNotes[0] * 4);
+            // Muzyka gra wyłącznie w pojeździe!
+            if (player.inCar) {
+                const st = this.stations[this.stationIndex];
+                const idx = this.step % 8;
 
-            // Syrena policyjna w tle tylko gdy gracz ma co najmniej 1 pełny Kasztan pościgu
-            if (Math.floor(gameState.wantedLevel) >= 1 && idx % 4 === 0) {
-                this.playSfx('siren');
+                this.playSynthBass(st.bassSeq[idx], 0.22);
+
+                if (idx === 0 || idx === 4) this.playKick();
+                if (idx === 2 || idx === 6) this.playSnare();
+                this.playHiHat(idx % 2 === 1 ? 0.05 : 0.02);
+
+                // Ciepły akord rhodes/brass co 4 kroki
+                if (idx === 0 || idx === 4) {
+                    const chord = st.chords[(Math.floor(this.step / 8)) % st.chords.length];
+                    this.playWarmRhodes(chord, 0.7);
+                }
+
+                // Melodyjny lead synth co parę taktów
+                if (Math.random() < 0.38) {
+                    const note = st.scale[Math.floor(Math.random() * st.scale.length)] * 2;
+                    this.playLeadSynth(note, 0.25);
+                }
+
+                // Dźwięk syreny policyjnej jeśli pościg jest aktywny
+                if (Math.floor(gameState.wantedLevel) >= 1 && idx % 4 === 0) {
+                    this.playPoliceSirenTone();
+                }
+
+                this.step++;
             }
+        }, 130);
 
-            this.step++;
-        }, stepMs);
+        // Pętla bogatych dźwięków otoczenia (Działa zawsze, zwłaszcza na piechotę)
+        this.ambientTimer = setInterval(() => {
+            if (!this.ctx || this.isMuted || this.ctx.state !== 'running') return;
+
+            if (!player.inCar) {
+                // Losowe odgłosy tła miejskiego lat 70.
+                const r = Math.random();
+                if (r < 0.22) {
+                    this.playDistantCityHorn();
+                } else if (r < 0.35) {
+                    this.playWindBreeze();
+                } else if (r < 0.45) {
+                    this.playDistantEngineRumble();
+                }
+
+                // Syrena w oddali jeśli gracz jest poszukiwany
+                if (Math.floor(gameState.wantedLevel) >= 1 && Math.random() < 0.4) {
+                    this.playPoliceSirenTone(true);
+                }
+            }
+        }, 1500);
     }
 
     nextStation() {
+        if (!player.inCar) return;
         this.stationIndex = (this.stationIndex + 1) % this.stations.length;
         document.getElementById('radioStationName').textContent = this.stations[this.stationIndex].name;
-        this.startMusicLoop();
-        this.playSfx('pickup');
+        this.playRadioTuningNoise();
     }
 
     toggleMute() {
@@ -489,71 +554,104 @@ class Miami77Audio {
         document.getElementById('muteBtn').textContent = this.isMuted ? '🔇' : '🔊';
     }
 
-    playFunkBass(freq, duration) {
+    playSynthBass(freq, duration) {
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const filter = this.ctx.createBiquadFilter();
         const gain = this.ctx.createGain();
+
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(freq, now);
+
         filter.type = 'lowpass';
-        filter.Q.value = 6;
-        filter.frequency.setValueAtTime(170, now);
-        filter.frequency.exponentialRampToValueAtTime(1150, now + 0.05);
-        filter.frequency.exponentialRampToValueAtTime(220, now + duration);
-        gain.gain.setValueAtTime(0.09, now);
+        filter.Q.value = 7.5;
+        filter.frequency.setValueAtTime(220, now);
+        filter.frequency.exponentialRampToValueAtTime(1400, now + 0.04);
+        filter.frequency.exponentialRampToValueAtTime(260, now + duration);
+
+        gain.gain.setValueAtTime(0.12, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
         osc.connect(filter);
         filter.connect(gain);
         gain.connect(this.ctx.destination);
+
         osc.start(now);
         osc.stop(now + duration);
     }
 
-    playWarmChord(rootFreq) {
+    playWarmRhodes(chord, duration) {
         const now = this.ctx.currentTime;
-        [1, 1.2, 1.5].forEach(r => {
+        chord.forEach(f => {
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(rootFreq * r, now);
-            gain.gain.setValueAtTime(0.02, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
+            osc.frequency.setValueAtTime(f, now);
+
+            gain.gain.setValueAtTime(0.025, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
             osc.connect(gain);
             gain.connect(this.ctx.destination);
             osc.start(now);
-            osc.stop(now + 0.85);
+            osc.stop(now + duration);
         });
+    }
+
+    playLeadSynth(freq, duration) {
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const filter = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.02, now + duration);
+
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1200, now);
+
+        gain.gain.setValueAtTime(0.035, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + duration);
     }
 
     playKick() {
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.frequency.setValueAtTime(120, now);
-        osc.frequency.exponentialRampToValueAtTime(35, now + 0.12);
-        gain.gain.setValueAtTime(0.14, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        osc.frequency.setValueAtTime(110, now);
+        osc.frequency.exponentialRampToValueAtTime(32, now + 0.12);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
         osc.connect(gain);
         gain.connect(this.ctx.destination);
         osc.start(now);
-        osc.stop(now + 0.14);
+        osc.stop(now + 0.13);
     }
 
     playSnare() {
         const now = this.ctx.currentTime;
-        const bufferSize = this.ctx.sampleRate * 0.09;
+        const bufferSize = this.ctx.sampleRate * 0.08;
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
         const noise = this.ctx.createBufferSource();
         noise.buffer = buffer;
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'highpass';
-        filter.frequency.value = 600;
+        filter.frequency.value = 650;
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.06, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+        gain.gain.setValueAtTime(0.07, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
         noise.connect(filter);
         filter.connect(gain);
         gain.connect(this.ctx.destination);
@@ -562,22 +660,177 @@ class Miami77Audio {
 
     playHiHat(vol) {
         const now = this.ctx.currentTime;
-        const bufferSize = this.ctx.sampleRate * 0.035;
+        const bufferSize = this.ctx.sampleRate * 0.03;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 6500;
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(vol, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(now);
+    }
+
+    // Odgłosy kroków Jacka Vipera na asfalcie i chodniku
+    playFootstep() {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(80 + Math.random() * 25, now);
+        gain.gain.setValueAtTime(0.04, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.06);
+    }
+
+    // Dźwięk szumu strojenia radia
+    playRadioTuningNoise() {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const bufferSize = this.ctx.sampleRate * 0.12;
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
         const noise = this.ctx.createBufferSource();
         noise.buffer = buffer;
-        const filter = this.ctx.createBiquadFilter();
-        filter.type = 'highpass';
-        filter.frequency.value = 5000;
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(vol, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+        gain.gain.setValueAtTime(0.09, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        noise.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(now);
+    }
+
+    // Odgłosy otoczenia (klaksony w oddali, wiatr, silniki)
+    playDistantCityHorn() {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const freq = [260, 310, 370, 420][Math.floor(Math.random() * 4)];
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.015 + Math.random() * 0.02, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.45);
+    }
+
+    playWindBreeze() {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const bufferSize = this.ctx.sampleRate * 0.6;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
+
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(320, now);
+        filter.frequency.linearRampToValueAtTime(540, now + 0.3);
+        filter.frequency.linearRampToValueAtTime(260, now + 0.6);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.02, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
         noise.connect(filter);
         filter.connect(gain);
         gain.connect(this.ctx.destination);
         noise.start(now);
+    }
+
+    playDistantEngineRumble() {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(45 + Math.random() * 15, now);
+        gain.gain.setValueAtTime(0.025, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.8);
+    }
+
+    // Telefoniczny filtr mowy przy odbiorze budki
+    playPhoneVoiceClick() {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(750, now);
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.08);
+    }
+
+    // Pomruki przechodniów / reakcje
+    playPedestrianReaction(isAngry = false) {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const filter = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(isAngry ? 190 : 130, now);
+        osc.frequency.linearRampToValueAtTime(isAngry ? 280 : 160, now + 0.15);
+
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(800, now);
+
+        gain.gain.setValueAtTime(0.035, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.16);
+    }
+
+    playPoliceSirenTone(distant = false) {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(620, now);
+        osc.frequency.linearRampToValueAtTime(900, now + 0.18);
+        osc.frequency.linearRampToValueAtTime(620, now + 0.36);
+
+        gain.gain.setValueAtTime(distant ? 0.018 : 0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.37);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.37);
     }
 
     playSfx(type) {
@@ -588,16 +841,15 @@ class Miami77Audio {
 
         if (type === 'shoot') {
             osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(440, now);
-            osc.frequency.exponentialRampToValueAtTime(60, now + 0.1);
+            osc.frequency.setValueAtTime(450, now);
+            osc.frequency.exponentialRampToValueAtTime(55, now + 0.11);
             gain.gain.setValueAtTime(0.18, now);
-            gain.gain.exponentialRampToValueAtTime(0.005, now + 0.11);
+            gain.gain.exponentialRampToValueAtTime(0.005, now + 0.12);
             osc.connect(gain);
             gain.connect(this.ctx.destination);
             osc.start(now);
-            osc.stop(now + 0.11);
+            osc.stop(now + 0.12);
         } else if (type === 'explosion') {
-            // Głęboki wybuch z szumem
             const bufferSize = this.ctx.sampleRate * 0.55;
             const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
             const data = buffer.getChannelData(0);
@@ -606,7 +858,7 @@ class Miami77Audio {
             noise.buffer = buffer;
             const filter = this.ctx.createBiquadFilter();
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(480, now);
+            filter.frequency.setValueAtTime(460, now);
             filter.frequency.exponentialRampToValueAtTime(55, now + 0.5);
             gain.gain.setValueAtTime(0.42, now);
             gain.gain.exponentialRampToValueAtTime(0.01, now + 0.55);
@@ -614,17 +866,6 @@ class Miami77Audio {
             filter.connect(gain);
             gain.connect(this.ctx.destination);
             noise.start(now);
-        } else if (type === 'siren') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(620, now);
-            osc.frequency.linearRampToValueAtTime(920, now + 0.18);
-            osc.frequency.linearRampToValueAtTime(620, now + 0.35);
-            gain.gain.setValueAtTime(0.05, now);
-            gain.gain.exponentialRampToValueAtTime(0.002, now + 0.36);
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            osc.start(now);
-            osc.stop(now + 0.36);
         } else if (type === 'pickup' || type === 'respectUp') {
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(440, now);
@@ -638,8 +879,8 @@ class Miami77Audio {
             osc.stop(now + 0.32);
         } else if (type === 'carDoor' || type === 'phoneRing') {
             osc.type = 'square';
-            osc.frequency.setValueAtTime(type === 'phoneRing' ? 880 : 190, now);
-            osc.frequency.exponentialRampToValueAtTime(type === 'phoneRing' ? 1140 : 100, now + 0.15);
+            osc.frequency.setValueAtTime(type === 'phoneRing' ? 880 : 180, now);
+            osc.frequency.exponentialRampToValueAtTime(type === 'phoneRing' ? 1120 : 95, now + 0.15);
             gain.gain.setValueAtTime(0.12, now);
             gain.gain.exponentialRampToValueAtTime(0.005, now + 0.16);
             osc.connect(gain);
@@ -659,10 +900,10 @@ class Miami77Audio {
     }
 }
 
-const audio = new Miami77Audio();
+const audio = new Miami77SoundSystem();
 
 // ============================================================================
-// STAŁE ŚWIATA (POWIĘKSZONA MAPA + SZEROKIE PRZEJŚCIA MIĘDZY BUDYNKAMI)
+// STAŁE ŚWIATA I OPTYMALIZACJA PERFORMANCE (OFFSCREEN MAP BUFFER)
 // ============================================================================
 const WORLD_SIZE = 4500;
 const BLOCK_SIZE = 500;
@@ -720,23 +961,15 @@ function getDistrictAt(x, y) {
     return DISTRICTS.weasels;
 }
 
-// Funkcja gwarantująca, że każdy znacznik misji, zrzut broni i sklep leży na dostępnej drodze lub placu
 function snapToAccessibleRoadOrPlaza(x, y) {
     const nearestRoadX = Math.round(x / BLOCK_SIZE) * BLOCK_SIZE;
     const nearestRoadY = Math.round(y / BLOCK_SIZE) * BLOCK_SIZE;
-    let rx = x;
-    let ry = y;
-
-    if (Math.abs(x - nearestRoadX) < Math.abs(y - nearestRoadY)) {
-        rx = nearestRoadX;
-    } else {
-        ry = nearestRoadY;
-    }
+    let rx = (Math.abs(x - nearestRoadX) < Math.abs(y - nearestRoadY)) ? nearestRoadX : x;
+    let ry = (rx === nearestRoadX) ? y : nearestRoadY;
 
     rx = Math.max(BLOCK_SIZE, Math.min(WORLD_SIZE - BLOCK_SIZE, rx));
     ry = Math.max(BLOCK_SIZE, Math.min(WORLD_SIZE - BLOCK_SIZE, ry));
 
-    // Jeśli nadal zahacza o budynek, przesuń na środek najbliższego skrzyżowania
     if (isPointInBuilding(rx, ry, 34)) {
         rx = Math.max(BLOCK_SIZE, Math.min(WORLD_SIZE - BLOCK_SIZE, nearestRoadX));
         ry = Math.max(BLOCK_SIZE, Math.min(WORLD_SIZE - BLOCK_SIZE, nearestRoadY));
@@ -745,22 +978,31 @@ function snapToAccessibleRoadOrPlaza(x, y) {
 }
 
 // ============================================================================
-// BRONIE I SYSTEM UZBROJENIA
+// BRONIE I POSTAĆ GRACZA (JACK „VIPER” KOWALSKI)
 // ============================================================================
 const WEAPONS = [
-    { id: 'pistol',   name: 'Pistolet M1911',       icon: '🔫', fireRate: 0.26, speed: 920, damage: 28, spread: 0.04, infinite: true },
+    { id: 'pistol',   name: 'Pistolet M1911',       icon: '🔫', fireRate: 0.25, speed: 920, damage: 28, spread: 0.04, infinite: true },
     { id: 'smg',      name: 'Automat Kałach \'77',  icon: '💥', fireRate: 0.09, speed: 980, damage: 22, spread: 0.12, infinite: false },
     { id: 'grenade',  name: 'Granaty Kasztanowe',   icon: '🌰', fireRate: 0.65, speed: 460, damage: 140, spread: 0.05, infinite: false, isGrenade: true },
     { id: 'rpg',      name: 'Wyrzutnia RPG-77',     icon: '🚀', fireRate: 0.95, speed: 680, damage: 280, spread: 0.02, infinite: false, isRocket: true }
 ];
 
-// Teksty na ekran Game Over w klimacie jesieni i kasztanów
 const CHESTNUT_DEATH_QUOTES = [
     "Zrobili Ci z dupy jesień średniowiecza, kasztanie! Spadłeś z drzewa szybciej niż październikowy liść!",
     "Została z Ciebie tylko kolczasta łupina na gorącym asfalcie Miami '77!",
     "Twój kasztan właśnie pękł! Gangsterzy zrobili z Ciebie jesienny kompost!",
     "Koniec balu, kasztaniarzu! Nawet kapitan Grinch nie pozbiera Twoich liści!",
     "Rozgnietli Cię jak kasztana pod podeszwą wojskowego trepa M65!"
+];
+
+const PED_CHATTER = [
+    "Uważaj jak leziesz, kasztanie!",
+    "Widziałeś te furę? Klasyk!",
+    "Miami w październiku... złoto!",
+    "Lepiej omijaj doki Grincha...",
+    "Rechoczą żaby, idzie deszcz!",
+    "Spadaj stąd, człowieku!",
+    "O, nie! Tylko nie strzelanina!"
 ];
 
 const gameState = {
@@ -808,6 +1050,7 @@ const player = {
     inCar: null,
     weaponIndex: 0,
     fireCooldown: 0,
+    walkCycle: 0,
     ammo: {
         pistol: 999,
         smg: 90,
@@ -817,7 +1060,7 @@ const player = {
 };
 
 // ============================================================================
-// GENEROWANIE ŚWIATA (SZEROKIE ALEJKI MIĘDZY BUDYNKAMI + MOTYWY KASZTANOWE)
+// GENEROWANIE ŚWIATA (LEKKIE, BEZ ZABÓJCZEGO OFFSCREEN CANVAS 4500x4500)
 // ============================================================================
 function generateWorld() {
     gameState.buildings = [];
@@ -839,13 +1082,27 @@ function generateWorld() {
             const centerY = plotY + plotH / 2;
             const dist = getDistrictAt(centerX, centerY);
 
-            // Baza Wojskowa / Forteca Kasztanów w NW (bx===0, by===0) -> Miejsce na UKRYTY CZOŁG!
+            // BAZA WOJSKOWA NW (KASZTAN HQ - M60 TANK)
             if (bx === 0 && by === 0) {
-                addBuilding(plotX, plotY, plotW, 65, dist, bx, by, 0, 'BAZA PANCERNA „KASZTAN” (CZOŁG M60)');
+                // Hangar pancerny z tyłu
+                addBuilding(plotX, plotY, plotW, 80, dist, bx, by, 0, '🛡️ HANGAR CZOŁGÓW M60');
+                // Koszary wojskowe po lewej stronie placu
+                addBuilding(plotX, plotY + 95, 80, plotH - 95, dist, bx, by, 1, 'KOSZARY WOJSKOWE');
+                // Magazyn amunicji po prawej stronie (zostaje szeroka brama wjazdowa 140px od dołu)
+                addBuilding(plotX + plotW - 80, plotY + 95, 80, plotH - 95, dist, bx, by, 2, 'MAGAZYN AMUNICJI');
                 continue;
             }
 
-            // Centralny Park Kasztanowy na środku mapy (bx===4, by===4)
+            // BAZA POLICYJNA I LOTNICZA RHAVENS (NE - HELIKOPTER MIAMI PD)
+            if (bx === 7 && by === 0) {
+                // Główny komisariat po lewej stronie działki
+                addBuilding(plotX, plotY, (plotW - 120) * 0.55, plotH, dist, bx, by, 0, '🚨 BAZA MIAMI PD & RHAVENS');
+                // Hangar lotniczy z tyłu po prawej
+                addBuilding(plotX + plotW - 120, plotY, 120, 85, dist, bx, by, 1, 'HANGAR LOTNICZY');
+                // Reszta placu to otwarte betonowe lądowisko helikopterów
+                continue;
+            }
+
             if (bx === 4 && by === 4) {
                 for (let p = 0; p < 12; p++) {
                     const angle = (p / 12) * Math.PI * 2;
@@ -859,8 +1116,7 @@ function generateWorld() {
                 continue;
             }
 
-            // Gwarantowana szeroka alejka (minimum 72px odstępu!) pomiędzy budynkami w każdym kwartale
-            const alleyGap = 74;
+            const alleyGap = 76;
             const splitVertical = (bx + by) % 2 === 0;
             if (splitVertical) {
                 const w = (plotW - alleyGap) / 2;
@@ -872,25 +1128,21 @@ function generateWorld() {
                 addBuilding(plotX, plotY + h + alleyGap, plotW, h, dist, bx, by, 1);
             }
 
-            // Drzewa: Kasztanowce (w Chestnut Heights i całym mieście) oraz Palmy
             const isChestnutTree = dist.id === 'chestnuts' || (bx + by) % 2 === 0;
             gameState.trees.push({ x: plotX - 12, y: plotY - 12, size: 19, isChestnut: isChestnutTree });
             gameState.trees.push({ x: plotX + plotW + 12, y: plotY + plotH + 12, size: 19, isChestnut: !isChestnutTree });
         }
     }
 
-    // Rozsypane jesienne liście i kasztany na chodnikach i skwerach
-    for (let i = 0; i < 240; i++) {
+    for (let i = 0; i < 220; i++) {
         gameState.autumnLeaves.push({
             x: 120 + Math.random() * (WORLD_SIZE - 240),
             y: 120 + Math.random() * (WORLD_SIZE - 240),
             color: ['#d97706', '#b45309', '#f59e0b', '#9a3412', '#78350f'][i % 5],
-            size: 3 + (i % 4),
-            isChestnutSeed: i % 6 === 0
+            size: 3 + (i % 4)
         });
     }
 
-    // Lokacje FROGGY SHOP w każdej dzielnicy z dostępnym markerem na ulicy
     const shopBlocks = [
         { bx: 2, by: 1, district: 'chestnuts' },
         { bx: 6, by: 2, district: 'rhavens' },
@@ -912,7 +1164,6 @@ function generateWorld() {
         }
     });
 
-    // Budki telefoniczne z urozmaiconymi misjami i śledztwem ws. Grincha (zawsze na chodniku przy ulicy)
     gameState.phoneBooths = [
         {
             id: 'grinch_hq',
@@ -927,7 +1178,7 @@ function generateWorld() {
             clueId: 'clue_1',
             clueText: 'DOWÓD 1/4: W kaburze Grincha dostrzegłeś pistolet ze srebrnym krukiem — odznaką zabójców gangu Rhavens!',
             missionTarget: snapToAccessibleRoadOrPlaza(3 * BLOCK_SIZE, 1 * BLOCK_SIZE),
-            missionDesc: 'PRZEMYT: Udaj się na północną aleję (żółty znacznik), by odebrać przesyłkę dla Grincha.',
+            missionDesc: 'PRZEMYT: Odbierz przesyłkę dla Grincha z północnej alei.',
             rewardRespect: 20,
             rewardCash: 650
         },
@@ -940,11 +1191,11 @@ function generateWorld() {
             tag: 'DON VITO',
             color: '#f59e0b',
             missionType: 'eliminate',
-            dialogue: '„Tu Don Vito! Ktoś sprzedał kody do naszych magazynów ludziom z Rhaven Bay, a znał je tylko kapitan Grinch! Zlikwiduj szwadron najemników na moście granicznym!”',
+            dialogue: '„Tu Don Vito! Ktoś sprzedał kody do naszych magazynów ludziom z Rhaven Bay, a znał je tylko kapitan Grinch! Zlikwiduj szwadron najemników na moście!”',
             clueId: 'clue_2',
             clueText: 'DOWÓD 2/4: Don Vito potwierdził, że wyłącznie kapitan Grinch znał szyfry do magazynów przejętych przez Rhavensów.',
             missionTarget: snapToAccessibleRoadOrPlaza(5 * BLOCK_SIZE, 2 * BLOCK_SIZE),
-            missionDesc: 'LIKWIDACJA: Wyeliminuj wrogi patrol (3 gangsterów z czerwoną czaszką) na granicy dzielnic!',
+            missionDesc: 'LIKWIDACJA: Wyeliminuj wrogi patrol (3 gangsterów z czaszką) na granicy dzielnic!',
             rewardRespect: 25,
             rewardCash: 900
         },
@@ -961,7 +1212,7 @@ function generateWorld() {
             clueId: 'clue_3',
             clueText: 'DOWÓD 3/4: Oficer wywiadu Rhavens przyznał przez szyfrowaną linię, że Grinch jest ich opłacanym agentem w Chestnuts!',
             missionTarget: snapToAccessibleRoadOrPlaza(7 * BLOCK_SIZE, 4 * BLOCK_SIZE),
-            missionDesc: 'KRADZIEŻ FURY: Zdobądź oznaczoną Złotą Limuzynę VIP i zaparkuj ją w strefie zrzutu!',
+            missionDesc: 'KRADZIEŻ FURY: Zdobądź Złotą Limuzynę VIP i zaparkuj ją w strefie zrzutu!',
             rewardRespect: 30,
             rewardCash: 1100
         },
@@ -978,7 +1229,7 @@ function generateWorld() {
             clueId: 'clue_4',
             clueText: 'DOWÓD 4/4: Magic Froggy przekazał Ci nagranie wideo, na którym Grinch bierze walizkę dolarów od szefa Rhavensów!',
             missionTarget: gameState.froggyShops[1] ? gameState.froggyShops[1].marker : snapToAccessibleRoadOrPlaza(6 * BLOCK_SIZE, 2 * BLOCK_SIZE),
-            missionDesc: 'NAPAD NA FROGGY SHOP: Wpadnij do wyznaczonego Froggy Shopu (zielony punkt), zgarnij utarg i przeżyj pościg!',
+            missionDesc: 'NAPAD NA FROGGY SHOP: Wpadnij do Froggy Shopu, zgarnij utarg i uciekaj!',
             rewardRespect: 30,
             rewardCash: 1200
         },
@@ -991,11 +1242,11 @@ function generateWorld() {
             tag: 'WILD-WEASELS',
             color: '#ef4444',
             missionType: 'eliminate',
-            dialogue: '„Słuchaj no, wojak! Grinch zamówił u nas opancerzenie swojej fury na koszt Kasztanów. Rozwal naszych dłużników przy południowej rafinerii, a staniemy po Twojej stronie!”',
+            dialogue: '„Słuchaj no, wojak! Grinch zamówił u nas opancerzenie swojej fury na koszt Kasztanów. Rozwal naszych dłużników przy rafinerii, a staniemy po Twojej stronie!”',
             clueId: null,
             clueText: '',
             missionTarget: snapToAccessibleRoadOrPlaza(6 * BLOCK_SIZE, 8 * BLOCK_SIZE),
-            missionDesc: 'ZASADZKA V8: Zlikwiduj uzbrojony gang dłużników na południu Weasel Flats!',
+            missionDesc: 'ZASADZKA V8: Zlikwiduj uzbrojony gang dłużników na południu!',
             rewardRespect: 30,
             rewardCash: 950
         }
@@ -1033,9 +1284,7 @@ function spawnWeaponDrops() {
         { x: 6 * BLOCK_SIZE, y: 3 * BLOCK_SIZE, type: 'smg',     label: 'Automat Kałach (+60)' },
         { x: 2 * BLOCK_SIZE, y: 6 * BLOCK_SIZE, type: 'grenade', label: 'Granaty Kasztanowe (+5)' },
         { x: 7 * BLOCK_SIZE, y: 5 * BLOCK_SIZE, type: 'rpg',     label: 'Wyrzutnia RPG-77 (+3)' },
-        { x: 5 * BLOCK_SIZE, y: 7 * BLOCK_SIZE, type: 'health',  label: 'Apteczka & Kamizelka (+50 HP)' },
-        { x: 3 * BLOCK_SIZE, y: 8 * BLOCK_SIZE, type: 'smg',     label: 'Automat Kałach (+60)' },
-        { x: 8 * BLOCK_SIZE, y: 2 * BLOCK_SIZE, type: 'grenade', label: 'Granaty Kasztanowe (+5)' }
+        { x: 5 * BLOCK_SIZE, y: 7 * BLOCK_SIZE, type: 'health',  label: 'Apteczka & Kamizelka (+50 HP)' }
     ];
 
     dropLocations.forEach(loc => {
@@ -1052,17 +1301,18 @@ function spawnWeaponDrops() {
 }
 
 // ============================================================================
-// POJAZDY, UKRYTY CZOŁG M60 ORAZ RADIOWOZY POLICYJNE
+// MODELE AUT LAT 70. & SYSTEM ODBLOKOWYWANIA ZAKLESZCZEŃ (UNSTUCK ENGINE)
 // ============================================================================
 const CAR_MODELS_70S = [
-    { id: 'muscle',  name: 'Stallion V8 \'77',        width: 56, height: 28, maxSpeed: 540, accel: 430, maxHp: 180, colors: ['#ff6b35', '#f7c548', '#ef4444'], stripe: true },
-    { id: 'cabrio',  name: 'Eldorado Cabrio \'75',    width: 58, height: 29, maxSpeed: 480, accel: 370, maxHp: 160, colors: ['#00d2b8', '#ff2a85', '#f4a261'], convertible: true },
-    { id: 'limo',    name: 'Chestnut Limo \'76',      width: 68, height: 30, maxSpeed: 455, accel: 350, maxHp: 240, colors: ['#8d4925', '#1e293b', '#eab308'], stripe: false },
-    { id: 'van',     name: 'Froggy Funk Van \'74',    width: 58, height: 32, maxSpeed: 420, accel: 320, maxHp: 230, colors: ['#10b981', '#06b6d4', '#a855f7'], stripe: true },
-    { id: 'gt',      name: 'Miami GT Turbo \'77',     width: 54, height: 27, maxSpeed: 600, accel: 480, maxHp: 150, colors: ['#facc15', '#ec4899', '#38bdf8'], stripe: true },
-    { id: 'pickup',  name: 'Weasel Pickup 4x4',       width: 60, height: 31, maxSpeed: 460, accel: 390, maxHp: 250, colors: ['#b91c1c', '#d97706', '#475569'], stripe: false },
-    { id: 'police',  name: 'Radiowóz Policyjny \'77', width: 58, height: 29, maxSpeed: 565, accel: 450, maxHp: 210, colors: ['#1e3a8a'], isPolice: true },
-    { id: 'tank',    name: 'Czołg M60 „Kasztan”',     width: 74, height: 44, maxSpeed: 330, accel: 290, maxHp: 1200, colors: ['#3f6212'], isTank: true }
+    { id: 'muscle',     name: 'Stallion V8 \'77',        width: 56, height: 28, maxSpeed: 540, accel: 430, maxHp: 180, colors: ['#ff6b35', '#f7c548', '#ef4444'], stripe: true },
+    { id: 'cabrio',     name: 'Eldorado Cabrio \'75',    width: 58, height: 29, maxSpeed: 480, accel: 370, maxHp: 160, colors: ['#00d2b8', '#ff2a85', '#f4a261'], convertible: true },
+    { id: 'limo',       name: 'Chestnut Limo \'76',      width: 68, height: 30, maxSpeed: 455, accel: 350, maxHp: 240, colors: ['#8d4925', '#1e293b', '#eab308'], stripe: false },
+    { id: 'van',        name: 'Froggy Funk Van \'74',    width: 58, height: 32, maxSpeed: 420, accel: 320, maxHp: 230, colors: ['#10b981', '#06b6d4', '#a855f7'], stripe: true },
+    { id: 'gt',         name: 'Miami GT Turbo \'77',     width: 54, height: 27, maxSpeed: 600, accel: 480, maxHp: 150, colors: ['#facc15', '#ec4899', '#38bdf8'], stripe: true },
+    { id: 'pickup',     name: 'Weasel Pickup 4x4',       width: 60, height: 31, maxSpeed: 460, accel: 390, maxHp: 250, colors: ['#b91c1c', '#d97706', '#475569'], stripe: false },
+    { id: 'police',     name: 'Radiowóz Policyjny \'77', width: 58, height: 29, maxSpeed: 565, accel: 450, maxHp: 210, colors: ['#1e3a8a'], isPolice: true },
+    { id: 'tank',       name: 'Czołg M60 „Kasztan”',     width: 74, height: 44, maxSpeed: 330, accel: 290, maxHp: 1200, colors: ['#3f6212'], isTank: true },
+    { id: 'helicopter', name: 'Helikopter Miami PD \'77', width: 62, height: 26, maxSpeed: 620, accel: 460, maxHp: 380, colors: ['#1e3a8a'], isHeli: true, isPolice: true }
 ];
 
 function createCar(x, y, angle, model, color, hasDriver = false, aiState = 'parked') {
@@ -1078,56 +1328,87 @@ function createCar(x, y, angle, model, color, hasDriver = false, aiState = 'park
         aiState,
         aiTargetSpeed: 165 + Math.random() * 55,
         shootCooldown: 0,
-        isMissionTarget: false
+        stuckTimer: 0,      // Detektor zakleszczenia
+        unstuckAction: 0,   // Czas trwania manewru wycofywania
+        isMissionTarget: false,
+        rotorAngle: 0,
+        altitude: 0,        // Dla helikoptera (0 = ziemia, 1 = pełny pułap)
+        roadType: 'h',      // 'h' (pozioma) lub 'v' (pionowa)
+        laneDir: 1,         // 1 lub -1
+        roadCoord: y        // ustalona oś drogi
     };
 }
 
 function spawnTrafficAndParkedCars() {
     gameState.cars = [];
 
-    // 1. UKRYTY CZOŁG M60 w Północno-Zachodniej Bazie Pancernej (Dzielnica Chestnuts)
+    // 1. CZOŁG M60 W ŚRODKU BAZY WOJSKOWEJ „KASZTAN” (NW: bx=0, by=0)
     const tankModel = CAR_MODELS_70S.find(m => m.id === 'tank');
-    const tankPos = snapToAccessibleRoadOrPlaza(0.55 * BLOCK_SIZE, 0.65 * BLOCK_SIZE);
-    gameState.cars.push(createCar(tankPos.x, tankPos.y, 0, tankModel, '#3f6212', false, 'parked'));
+    const baseNWPlotX = 0 * BLOCK_SIZE + ROAD_WIDTH / 2 + 26;
+    const baseNWPlotY = 0 * BLOCK_SIZE + ROAD_WIDTH / 2 + 26;
+    const baseNWPlotW = BLOCK_SIZE - ROAD_WIDTH - 52;
+    const baseNWPlotH = BLOCK_SIZE - ROAD_WIDTH - 52;
+    // Środek placu apelowego bazy wojskowej
+    const tankInsideX = baseNWPlotX + baseNWPlotW / 2;
+    const tankInsideY = baseNWPlotY + baseNWPlotH / 2 + 35;
+    gameState.cars.push(createCar(tankInsideX, tankInsideY, Math.PI / 2, tankModel, '#3f6212', false, 'parked'));
 
-    // 2. Auta startowe blisko gracza
+    // 2. HELIKOPTER POLICYJNY MIAMI PD NA ŚRODKU LĄDOWISKA W BAZIE RHAVENS (NE: bx=7, by=0)
+    const heliModel = CAR_MODELS_70S.find(m => m.id === 'helicopter');
+    const baseNEPlotX = 7 * BLOCK_SIZE + ROAD_WIDTH / 2 + 26;
+    const baseNEPlotY = 0 * BLOCK_SIZE + ROAD_WIDTH / 2 + 26;
+    const baseNEPlotW = BLOCK_SIZE - ROAD_WIDTH - 52;
+    const baseNEPlotH = BLOCK_SIZE - ROAD_WIDTH - 52;
+    // Precyzyjny środek płyty lądowiska "H"
+    const heliPadX = baseNEPlotX + baseNEPlotW - 75;
+    const heliPadY = baseNEPlotY + baseNEPlotH / 2;
+    gameState.cars.push(createCar(heliPadX, heliPadY, 0, heliModel, '#1e3a8a', false, 'parked'));
+
+    // Auta startowe
     gameState.cars.push(createCar(player.x + 85, player.y - 35, 0, CAR_MODELS_70S[0], '#ff6b35', false, 'parked'));
     gameState.cars.push(createCar(player.x - 95, player.y + 45, Math.PI / 2, CAR_MODELS_70S[1], '#00d2b8', false, 'parked'));
-    gameState.cars.push(createCar(player.x + 140, player.y + 85, Math.PI, CAR_MODELS_70S[5], '#d97706', false, 'parked'));
 
-    // 3. Ruch uliczny + patrolujące radiowozy policyjne
+    // Ruch uliczny - poruszający się ściśle po swoich pasach ruchu
     const numBlocks = Math.floor(WORLD_SIZE / BLOCK_SIZE);
-    const civilModels = CAR_MODELS_70S.filter(m => !m.isTank && !m.isPolice);
-    const policeModel = CAR_MODELS_70S.find(m => m.isPolice);
+    const civilModels = CAR_MODELS_70S.filter(m => !m.isTank && !m.isPolice && !m.isHeli);
+    const policeModel = CAR_MODELS_70S.find(m => m.isPolice && !m.isHeli);
 
-    for (let i = 0; i < 46; i++) {
-        const isCop = i % 6 === 0;
+    const LANE_OFFSET = 36; // Odległość pasa ruchu od osi jezdni
+
+    for (let i = 0; i < 36; i++) {
+        const isCop = (i % 6 === 0);
         const model = isCop ? policeModel : civilModels[i % civilModels.length];
         const color = model.colors[i % model.colors.length];
-        const horizontal = i % 2 === 0;
+        const horizontal = (i % 2 === 0);
         const roadIndex = (i % (numBlocks - 1)) + 1;
+        const roadPos = roadIndex * BLOCK_SIZE;
+        const forwardDir = (i % 4 === 0 || i % 4 === 1) ? 1 : -1;
 
         let x, y, angle;
         if (horizontal) {
             x = 250 + Math.random() * (WORLD_SIZE - 500);
-            y = roadIndex * BLOCK_SIZE + 28;
-            angle = 0;
+            y = roadPos + (forwardDir === 1 ? LANE_OFFSET : -LANE_OFFSET);
+            angle = forwardDir === 1 ? 0 : Math.PI;
         } else {
-            x = roadIndex * BLOCK_SIZE - 28;
+            x = roadPos + (forwardDir === 1 ? -LANE_OFFSET : LANE_OFFSET);
             y = 250 + Math.random() * (WORLD_SIZE - 500);
-            angle = Math.PI / 2;
+            angle = forwardDir === 1 ? Math.PI / 2 : -Math.PI / 2;
         }
 
-        gameState.cars.push(createCar(x, y, angle, model, color, true, 'driving'));
+        const car = createCar(x, y, angle, model, color, true, 'driving');
+        car.roadType = horizontal ? 'h' : 'v';
+        car.laneDir = forwardDir;
+        car.roadCoord = roadPos;
+        gameState.cars.push(car);
     }
 }
 
 // ============================================================================
-// PIESI ORAZ UZBROJENI CZŁONKOWIE 4 MAFII
+// PIESI I CZŁONKOWIE GANGÓW
 // ============================================================================
 function spawnPedestrians() {
     gameState.peds = [];
-    for (let i = 0; i < 115; i++) {
+    for (let i = 0; i < 110; i++) {
         const x = 180 + Math.random() * (WORLD_SIZE - 360);
         const y = 180 + Math.random() * (WORLD_SIZE - 360);
         if (isPointInBuilding(x, y, 18)) continue;
@@ -1148,6 +1429,7 @@ function spawnPedestrians() {
             speed: 45 + Math.random() * 25,
             hp: isGangMember ? 65 : 35,
             panicTimer: 0,
+            walkCycle: Math.random() * Math.PI * 2,
             outfitColor,
             hairColor: ['#1c1917', '#78350f', '#d97706', '#44403c'][i % 4],
             afro: i % 3 === 0,
@@ -1164,7 +1446,7 @@ function spawnPedestrians() {
 }
 
 // ============================================================================
-// WEJŚCIE KLAWIATURY, MYSZY I EKRANU DOTYKOWEGO
+// STEROWANIE KLAWIATURĄ, MYSZĄ I EKRANEM DOTYKOWYM
 // ============================================================================
 const inputState = {
     up: false,
@@ -1222,9 +1504,8 @@ const ctx = canvas.getContext('2d');
 const minimapCanvas = document.getElementById('minimapCanvas');
 const minimapCtx = minimapCanvas.getContext('2d');
 
-// Dynamiczny zoom kamery na telefonach, aby gracz widział szeroki plan miasta zamiast samego środka
 function getCameraZoom() {
-    if (window.innerWidth < 640) return 0.62;
+    if (window.innerWidth < 640) return 0.65;
     if (window.innerWidth < 1024) return 0.82;
     return 1.0;
 }
@@ -1258,7 +1539,7 @@ window.addEventListener('mouseup', () => {
     inputState.shooting = false;
 });
 
-// Obsługa przycisków dotykowych
+// Dotyk na telefonie
 document.querySelectorAll('.touch-btn').forEach(btn => {
     const keyName = btn.getAttribute('data-key');
     const setTouch = (val) => {
@@ -1287,79 +1568,67 @@ document.getElementById('switchWeaponHudBtn').addEventListener('click', (e) => {
     cycleWeapon();
 });
 
-const touchShootBtn = document.getElementById('touchShootBtn');
-touchShootBtn.addEventListener('touchstart', (e) => {
+document.getElementById('touchShootBtn').addEventListener('touchstart', (e) => {
     e.preventDefault();
     inputState.shooting = true;
     shootWeapon(true);
 });
-touchShootBtn.addEventListener('touchend', (e) => {
+document.getElementById('touchShootBtn').addEventListener('touchend', (e) => {
     e.preventDefault();
     inputState.shooting = false;
 });
-touchShootBtn.addEventListener('mousedown', (e) => {
+document.getElementById('touchShootBtn').addEventListener('mousedown', (e) => {
     e.preventDefault();
     inputState.shooting = true;
     shootWeapon(true);
 });
-touchShootBtn.addEventListener('mouseup', (e) => {
+document.getElementById('touchShootBtn').addEventListener('mouseup', (e) => {
     e.preventDefault();
     inputState.shooting = false;
 });
 
-// Składanie panelu syndykatów na małych ekranach
 document.getElementById('toggleRespectBtn').addEventListener('click', () => {
-    const bars = document.getElementById('syndicateBarsContainer');
+    const cont = document.getElementById('syndicateBarsContainer');
     const icon = document.getElementById('respectCollapseIcon');
-    bars.classList.toggle('hidden');
-    icon.textContent = bars.classList.contains('hidden') ? '[▶]' : '[▼]';
+    if (cont.classList.contains('hidden')) {
+        cont.classList.remove('hidden');
+        if (icon) icon.textContent = '[▼]';
+    } else {
+        cont.classList.add('hidden');
+        if (icon) icon.textContent = '[▶]';
+    }
 });
 
 function cycleWeapon() {
     player.weaponIndex = (player.weaponIndex + 1) % WEAPONS.length;
-    audio.playSfx('pickup');
     updateHUD();
 }
 
 function selectWeapon(idx) {
     if (idx >= 0 && idx < WEAPONS.length) {
         player.weaponIndex = idx;
-        audio.playSfx('pickup');
         updateHUD();
     }
 }
 
-// ============================================================================
-// POZIOM POSZUKIWANIA (0 DO 5 KASZTANÓW 🌰) I RADIOWOZY
-// ============================================================================
-function addWantedLevel(amount, reasonText = '') {
-    if (!gameState.started || gameState.isGameOver) return;
-    const prevStars = Math.floor(gameState.wantedLevel);
+function addWantedLevel(amount, crimeReason = '') {
+    if (gameState.safeStartCooldown > 0) return;
+    const oldLevel = Math.floor(gameState.wantedLevel);
     gameState.wantedLevel = Math.min(5, gameState.wantedLevel + amount);
-    const newStars = Math.floor(gameState.wantedLevel);
-    gameState.wantedDecayTimer = 16;
+    gameState.wantedDecayTimer = 16.0;
 
-    if (newStars > prevStars) {
-        audio.playSfx('siren');
-        const levelDescriptions = {
-            1: 'PATROL DROGÓWKI (Bez ognia - chcą Cię zatrzymać)',
-            2: 'POŚCIG RADIOWOZÓW (Próba blokady)',
-            3: 'OSTRZAŁ POLICYJNY (Funkcjonariusze sięgają po broń!)',
-            4: 'OBŁAWA SWAT MIAMI \'77 (Ciężki ostrzał!)',
-            5: 'MAKSYMALNY ALARM KASZTANOWY (5/5 🌰 - Pełna mobilizacja!)'
-        };
-        const subText = levelDescriptions[newStars] || 'ALARM POLICYJNY MIAMI \'77';
-        showFloatingBanner(`🚓 POŚCIG: ${newStars}/5 🌰 (${reasonText || 'Wykroczenie'})`, subText);
-
-        // Aktywuj odpowiednią liczbę radiowozów do pościgu (stopniowo wg liczby Kasztanów)
-        const activeChasers = gameState.cars.filter(c => c.model.isPolice && c.aiState === 'police_chase' && c.hp > 0).length;
-        if (activeChasers < newStars) {
-            // Najpierw przełącz najbliższy patrolujący radiowóz w tryb pościgu, a jeśli brakuje - doślij wsparcie
-            const patrollingCop = gameState.cars.find(c => c.model.isPolice && c.aiState !== 'police_chase' && c.hp > 0);
-            if (patrollingCop) {
-                patrollingCop.aiState = 'police_chase';
-            } else {
-                spawnPoliceReinforcement();
+    const newLevel = Math.floor(gameState.wantedLevel);
+    if (newLevel > oldLevel && newLevel >= 1) {
+        showFloatingBanner(
+            `🚨 POŚCIG POLICYJNY: ${newLevel}/5 KASZTANÓW 🌰`,
+            crimeReason || 'NARUSZENIE PRAWA W PALM BEACH!'
+        );
+        audio.playPoliceSirenTone();
+        for (const car of gameState.cars) {
+            if (car.model.isPolice && car !== player.inCar) {
+                if (Math.hypot(car.x - player.x, car.y - player.y) < 780) {
+                    car.aiState = 'police_chase';
+                }
             }
         }
     }
@@ -1377,9 +1646,6 @@ function spawnPoliceReinforcement() {
     gameState.cars.push(copCar);
 }
 
-// ============================================================================
-// STRZELANIE, GRANATY KASZTANOWE, WYRZUTNIA RAKIET I DZIAŁO CZOŁGU
-// ============================================================================
 function shootWeapon(useFacingAngle = false) {
     if (!gameState.started || gameState.isGameOver || gameState.safeStartCooldown > 0 || player.fireCooldown > 0) return;
 
@@ -1395,14 +1661,13 @@ function shootWeapon(useFacingAngle = false) {
         if (!player.inCar) player.angle = aimAngle;
     }
 
-    // Jeśli gracz siedzi w Ukrytym Czołgu M60 -> strzela z działa kalibru 105mm!
     if (player.inCar && player.inCar.model.isTank) {
         player.fireCooldown = 0.85;
         audio.playSfx('explosion');
         gameState.screenShake = 10;
         gameState.bullets.push({
-            x: originX + Math.cos(aimAngle) * 42,
-            y: originY + Math.sin(aimAngle) * 42,
+            x: originX + Math.cos(aimAngle) * 44,
+            y: originY + Math.sin(aimAngle) * 44,
             vx: Math.cos(aimAngle) * 760,
             vy: Math.sin(aimAngle) * 760,
             damage: 320,
@@ -1414,56 +1679,54 @@ function shootWeapon(useFacingAngle = false) {
         return;
     }
 
+    if (player.inCar && player.inCar.model.isHeli) {
+        player.fireCooldown = 0.12;
+        audio.playSfx('shoot');
+        gameState.bullets.push({
+            x: originX + Math.cos(player.inCar.angle) * 32,
+            y: originY + Math.sin(player.inCar.angle) * 32,
+            vx: Math.cos(player.inCar.angle) * 940,
+            vy: Math.sin(player.inCar.angle) * 940,
+            damage: 35,
+            life: 0.9,
+            fromPlayer: true
+        });
+        addWantedLevel(0.4, 'Ogień z działka helikoptera Miami PD!');
+        return;
+    }
+
     let w = WEAPONS[player.weaponIndex];
     if (!w.infinite && player.ammo[w.id] <= 0) {
-        // Automatyczny powrót do pistoletu gdy skończy się amunicja
         player.weaponIndex = 0;
         w = WEAPONS[0];
     }
 
-    if (!w.infinite) {
-        player.ammo[w.id]--;
-    }
-
     player.fireCooldown = w.fireRate;
+    if (!w.infinite) player.ammo[w.id]--;
+
+    const spreadAngle = aimAngle + (Math.random() - 0.5) * w.spread;
     audio.playSfx('shoot');
 
-    const finalAngle = aimAngle + (Math.random() - 0.5) * w.spread;
     gameState.bullets.push({
-        x: originX + Math.cos(finalAngle) * 22,
-        y: originY + Math.sin(finalAngle) * 22,
-        vx: Math.cos(finalAngle) * w.speed,
-        vy: Math.sin(finalAngle) * w.speed,
+        x: originX + Math.cos(aimAngle) * 20,
+        y: originY + Math.sin(aimAngle) * 20,
+        vx: Math.cos(spreadAngle) * w.speed,
+        vy: Math.sin(spreadAngle) * w.speed,
         damage: w.damage,
-        life: w.isGrenade ? 0.95 : 0.85,
+        life: 0.85,
         fromPlayer: true,
         isGrenade: !!w.isGrenade,
         isRocket: !!w.isRocket
     });
 
-    // Pojedynczy strzał w powietrze dodaje niewielkie „ciepło” (+0.35), więc dopiero seria strzałów lub trafienie kogoś wbija 1 Kasztana
-    addWantedLevel(w.isRocket || w.isGrenade ? 0.65 : 0.35, 'Strzały z broni w miejscu publicznym');
-    triggerPanicAround(originX, originY, 420, 'Strzelają! Padnij!');
-    provokeNearbyGangs(originX, originY, 260);
+    triggerPanicAround(originX, originY, 360, 'Strzelanina!');
+    addWantedLevel(0.25, 'Nielegalne użycie broni w miejscu publicznym');
     updateHUD();
 }
 
-function provokeNearbyGangs(x, y, radius) {
-    for (const ped of gameState.peds) {
-        if (ped.armed && Math.hypot(ped.x - x, ped.y - y) < radius) {
-            // Członkowie własnej rodziny Chestnuts nie atakują gracza, chyba że strzeli bezpośrednio w nich
-            if (ped.faction && ped.faction !== 'chestnuts') {
-                ped.hostile = true;
-                ped.shoutText = `Zaatakowałeś teren ${ped.faction.toUpperCase()}!`;
-                ped.shoutTimer = 2.5;
-            }
-        }
-    }
-}
-
-function createExplosion(x, y, radius = 125, damage = 180, causedByPlayer = false) {
+function createExplosion(x, y, radius, damage, causedByPlayer = false) {
     audio.playSfx('explosion');
-    gameState.screenShake = 18;
+    gameState.screenShake = 14;
 
     gameState.explosions.push({
         x, y,
@@ -1472,29 +1735,26 @@ function createExplosion(x, y, radius = 125, damage = 180, causedByPlayer = fals
         alpha: 1.0
     });
 
-    for (let i = 0; i < 28; i++) {
+    for (let k = 0; k < 24; k++) {
         const ang = Math.random() * Math.PI * 2;
-        const spd = 40 + Math.random() * 210;
+        const spd = 40 + Math.random() * 120;
         gameState.particles.push({
             x, y,
             vx: Math.cos(ang) * spd,
             vy: Math.sin(ang) * spd,
-            size: 8 + Math.random() * 14,
-            alpha: 0.95,
-            color: ['#ef4444', '#f97316', '#facc15', '#1f2937'][i % 4]
+            size: 6 + Math.random() * 8,
+            alpha: 0.9,
+            color: Math.random() < 0.6 ? '#f97316' : '#ef4444'
         });
     }
 
-    // Obrażenia obszarowe dla pieszych i gangsterów
     for (let i = gameState.peds.length - 1; i >= 0; i--) {
         const ped = gameState.peds[i];
-        const d = Math.hypot(ped.x - x, ped.y - y);
-        if (d < radius) {
+        if (Math.hypot(ped.x - x, ped.y - y) < radius) {
             killPedestrian(i, true, causedByPlayer);
         }
     }
 
-    // Obrażenia obszarowe dla pojazdów
     for (const car of gameState.cars) {
         if (car.hp <= 0) continue;
         const d = Math.hypot(car.x - x, car.y - y);
@@ -1504,7 +1764,6 @@ function createExplosion(x, y, radius = 125, damage = 180, causedByPlayer = fals
         }
     }
 
-    // Obrażenia dla gracza (jeśli jest pieszo blisko wybuchu)
     if (!player.inCar) {
         const dPlayer = Math.hypot(player.x - x, player.y - y);
         if (dPlayer < radius) {
@@ -1516,7 +1775,7 @@ function createExplosion(x, y, radius = 125, damage = 180, causedByPlayer = fals
 
 function damageCar(car, amount, byPlayer = false) {
     if (car.hp <= 0) return;
-    if (car.model.isTank) amount *= 0.25; // Czołg ma potężny pancerz
+    if (car.model.isTank) amount *= 0.25;
     if (byPlayer) car.damagedByPlayer = true;
 
     car.hp -= amount;
@@ -1531,11 +1790,9 @@ function explodeCar(car, causedByPlayer = false) {
     const cx = car.x;
     const cy = car.y;
 
-    // Usuń zniszczony pojazd
     const idx = gameState.cars.indexOf(car);
     if (idx !== -1) gameState.cars.splice(idx, 1);
 
-    // Tylko wybuch spowodowany przez gracza zwiększa wskaźnik Kasztanów
     if (causedByPlayer || wasPlayerInside) {
         addWantedLevel(car.model.isPolice ? 1.5 : 1.0, 'Zniszczenie pojazdu!');
     }
@@ -1594,20 +1851,18 @@ document.getElementById('restartGameBtn').addEventListener('click', () => {
 });
 
 // ============================================================================
-// INTERAKCJE: BUDKI TELEFONICZNE, NAPADY NA FROGGY SHOP, KRADZIEŻ AUT
+// INTERAKCJE I BUDKI Z DŹWIĘKIEM SŁUCHAWKI TELEFONICZNEJ
 // ============================================================================
 function handleContextAction() {
     if (!gameState.started || gameState.isGameOver) return;
 
     if (!player.inCar) {
-        // 1. Sprawdź czy gracz stoi przy budce telefonicznej
         const booth = getNearestPhoneBooth(player.x, player.y, 75);
         if (booth) {
             openDialogue(booth);
             return;
         }
 
-        // 2. Sprawdź czy gracz stoi przy wejściu do FROGGY SHOP 🐸 -> NAPAD!
         for (const shop of gameState.froggyShops) {
             if (Math.hypot(player.x - shop.marker.x, player.y - shop.marker.y) < 75) {
                 robFroggyShop(shop);
@@ -1616,7 +1871,6 @@ function handleContextAction() {
         }
     }
 
-    // 3. Wysiadanie z pojazdu
     if (player.inCar) {
         const car = player.inCar;
         car.speed = 0;
@@ -1637,7 +1891,6 @@ function handleContextAction() {
         return;
     }
 
-    // 4. Wsiadanie / Kradzież najbliższego pojazdu (w tym Czołgu M60)
     let nearestCar = null;
     let minDist = 92;
     for (const car of gameState.cars) {
@@ -1660,6 +1913,7 @@ function handleContextAction() {
                 speed: 130,
                 hp: 40,
                 panicTimer: 6.0,
+                walkCycle: 0,
                 outfitColor: '#fb7185',
                 hairColor: '#1c1917',
                 afro: true,
@@ -1667,9 +1921,10 @@ function handleContextAction() {
                 faction: null,
                 armed: false,
                 hostile: false,
-                shoutText: 'Złodziej! Moja fura! Kasztan kradnie!',
+                shoutText: 'Złodziej! Moja fura!',
                 shoutTimer: 3.5
             });
+            audio.playPedestrianReaction(true);
         }
 
         nearestCar.aiState = 'player_controlled';
@@ -1677,9 +1932,7 @@ function handleContextAction() {
         player.x = nearestCar.x;
         player.y = nearestCar.y;
 
-        if (nearestCar.model.isTank) {
-            showFloatingBanner('🛡️ CZOŁG M60 „KASZTANOWY NISZCZYCIEL” AKTYWNY!', 'TARANUJ AUTA I STRZELAJ Z DZIAŁA [LPM]');
-        }
+        showFloatingBanner(`📻 RADIO WŁĄCZONE: ${audio.stations[audio.stationIndex].name}`, 'ZMIANA STACJI: KLAWISZ [R]');
         updateHUD();
         canvas.focus();
     }
@@ -1696,13 +1949,12 @@ function robFroggyShop(shop) {
     audio.playSfx('respectUp');
     addWantedLevel(1.5, `Napad na ${shop.label}!`);
 
-    // Jeśli aktywna jest misja napadu na Froggy Shop, przełącz na etap ucieczki do kryjówki
     if (gameState.activeMission && gameState.activeMission.type === 'robbery' && !gameState.activeMission.lootCollected) {
         gameState.activeMission.lootCollected = true;
         const escapePt = snapToAccessibleRoadOrPlaza(1 * BLOCK_SIZE, 6 * BLOCK_SIZE);
         gameState.activeMission.targetX = escapePt.x;
         gameState.activeMission.targetY = escapePt.y;
-        gameState.activeMission.desc = 'UCIEKAJ Z ŁUPEM! Zgub radiowozy i dostarcz skradzioną gotówkę do punktu zrzutu (zielony znacznik)!';
+        gameState.activeMission.desc = 'UCIEKAJ Z ŁUPEM! Zgub radiowozy i dostarcz gotówkę do kryjówki!';
         document.getElementById('activeObjectiveText').textContent = gameState.activeMission.desc;
         showFloatingBanner(`💰 ZGARNĄŁEŚ $${loot}! UCIEKAJ DO KRYJÓWKI!`, 'NAPAD NA FROGGY SHOP');
     } else {
@@ -1711,9 +1963,6 @@ function robFroggyShop(shop) {
     updateHUD();
 }
 
-// ============================================================================
-// SYSTEM ZRÓŻNICOWANYCH MISJI I DIALOGÓW
-// ============================================================================
 let currentBoothDialogue = null;
 
 function getNearestPhoneBooth(x, y, maxDist) {
@@ -1732,6 +1981,7 @@ function getNearestPhoneBooth(x, y, maxDist) {
 function openDialogue(booth) {
     currentBoothDialogue = booth;
     audio.playSfx('phoneRing');
+    audio.playPhoneVoiceClick();
 
     document.getElementById('speakerEmoji').textContent = booth.emoji;
     document.getElementById('speakerFactionTag').textContent = booth.tag;
@@ -1758,6 +2008,7 @@ function closeDialogue() {
     document.getElementById('dialogueModal').classList.add('hidden');
     currentBoothDialogue = null;
     gameState.safeStartCooldown = 0.5;
+    audio.playPhoneVoiceClick();
     canvas.focus();
 }
 
@@ -1771,7 +2022,6 @@ document.getElementById('acceptMissionBtn').addEventListener('click', () => {
 });
 
 function startMissionFromBooth(b) {
-    // Wyczyść poprzednie cele misji
     gameState.peds.forEach(p => p.isMissionTarget = false);
     gameState.cars.forEach(c => c.isMissionTarget = false);
 
@@ -1792,7 +2042,6 @@ function startMissionFromBooth(b) {
     };
 
     if (mission.type === 'eliminate') {
-        // Stwórz 3 uzbrojonych gangsterów do likwidacji na dostępnym skrzyżowaniu
         for (let i = 0; i < 3; i++) {
             const angle = (i / 3) * Math.PI * 2;
             gameState.peds.push({
@@ -1802,6 +2051,7 @@ function startMissionFromBooth(b) {
                 speed: 65,
                 hp: 85,
                 panicTimer: 0,
+                walkCycle: 0,
                 outfitColor: '#dc2626',
                 hairColor: '#111827',
                 afro: false,
@@ -1816,7 +2066,6 @@ function startMissionFromBooth(b) {
             });
         }
     } else if (mission.type === 'carjack') {
-        // Stwórz specjalną Złotą Limuzynę VIP do kradzieży
         const limoModel = CAR_MODELS_70S.find(m => m.id === 'limo');
         const vipCar = createCar(safeTarget.x, safeTarget.y, 0, limoModel, '#facc15', false, 'parked');
         vipCar.isMissionTarget = true;
@@ -1831,7 +2080,7 @@ function startMissionFromBooth(b) {
 }
 
 // ============================================================================
-// FIZYKA, KOLIZJE, AI GANGÓW, POŚCIGI POLICYJNE I POŻARY POJAZDÓW
+// FIZYKA KOLIZJI I SYSTEM ANTYBLOKUJĄCY (UNSTUCK SYSTEM DLA AUT)
 // ============================================================================
 function isPointInBuilding(x, y, margin = 0) {
     for (const b of gameState.buildings) {
@@ -1874,7 +2123,6 @@ function killPedestrian(index, fromExplosion = false, causedByPlayer = false) {
     const ped = gameState.peds[index];
     if (!ped) return;
 
-    // Plama i cząsteczki
     for (let k = 0; k < 6; k++) {
         gameState.particles.push({
             x: ped.x,
@@ -1892,7 +2140,6 @@ function killPedestrian(index, fromExplosion = false, causedByPlayer = false) {
         if (!fromExplosion) {
             addWantedLevel(1.0, 'Potrącenie / Zabójstwo na ulicy');
         }
-        // Jeśli zabito członka gangu, okoliczni gangsterzy tej frakcji odpowiadają ogniem
         if (ped.faction) {
             gameState.respect[ped.faction] = Math.max(0, gameState.respect[ped.faction] - 5);
             for (const other of gameState.peds) {
@@ -1918,11 +2165,15 @@ function triggerPanicAround(x, y, radius, customShout = '') {
             if (customShout && Math.random() < 0.35) {
                 ped.shoutText = customShout;
                 ped.shoutTimer = 2.5;
+                audio.playPedestrianReaction(true);
             }
         }
     }
 }
 
+// ============================================================================
+// GŁÓWNA PĘTLA LOGIKI GRY
+// ============================================================================
 function updateGame(dt) {
     if (!gameState.started || gameState.isGameOver) return;
 
@@ -1930,17 +2181,15 @@ function updateGame(dt) {
     if (player.fireCooldown > 0) player.fireCooldown -= dt;
     if (gameState.screenShake > 0) gameState.screenShake = Math.max(0, gameState.screenShake - dt * 28);
 
-    // Ciągły ogień dla automatu Kałach
     if (inputState.shooting && player.fireCooldown <= 0 && gameState.safeStartCooldown <= 0) {
         shootWeapon();
     }
 
-    // Odliczanie czasu odnowienia napadów na Froggy Shopy
     for (const shop of gameState.froggyShops) {
         if (shop.robberyCooldown > 0) shop.robberyCooldown = Math.max(0, shop.robberyCooldown - dt);
     }
 
-    // Spadek poziomu pościgu, gdy gracz unika kolejnych wykroczeń
+    // Stopniowe wygaszanie pościgu
     if (gameState.wantedLevel > 0) {
         gameState.wantedDecayTimer -= dt;
         if (gameState.wantedDecayTimer <= 0) {
@@ -1949,7 +2198,6 @@ function updateGame(dt) {
             const currentStars = Math.floor(gameState.wantedLevel);
             if (currentStars === 0 && prevStars > 0) {
                 gameState.wantedLevel = 0;
-                // Wszystkie radiowozy wracają do spokojnego patrolowania ulic
                 gameState.cars.forEach(c => {
                     if (c.model.isPolice && c !== player.inCar) c.aiState = 'driving';
                 });
@@ -1958,7 +2206,6 @@ function updateGame(dt) {
             updateHUD();
         }
 
-        // Stopniowe dosyłanie radiowozów tylko do aktualnego limitu Kasztanów (1 do 5)
         const wantedStars = Math.floor(gameState.wantedLevel);
         if (wantedStars >= 1) {
             gameState.policeSpawnTimer += dt;
@@ -1970,7 +2217,7 @@ function updateGame(dt) {
         }
     }
 
-    // 1. RUCH GRACZA PIESZO LUB W POJEŹDZIE
+    // 1. RUCH VIPERA (PIESZO LUB W POJEŹDZIE)
     if (!player.inCar) {
         let moveX = 0, moveY = 0;
         if (inputState.up) moveY -= 1;
@@ -1989,11 +2236,21 @@ function updateGame(dt) {
             player.y += player.vy * dt;
             resolveCircleBuildingCollision(player, player.radius, false);
             player.angle = Math.atan2(player.vy, player.vx);
+
+            // Animacja chodu & odgłosy kroków
+            player.walkCycle += dt * 11 * sprint;
+            audio.footstepTimer += dt * sprint;
+            if (audio.footstepTimer > 0.32) {
+                audio.footstepTimer = 0;
+                audio.playFootstep();
+            }
         } else {
             player.vx = 0;
             player.vy = 0;
+            player.walkCycle = 0;
         }
-        document.getElementById('speedometerDisplay').textContent = '0 MPH';
+        const speedo = document.getElementById('speedometerDisplay');
+        if (speedo) speedo.textContent = '0 MPH';
     } else {
         const car = player.inCar;
         const m = car.model;
@@ -2043,26 +2300,32 @@ function updateGame(dt) {
         car.x += car.vx * dt;
         car.y += car.vy * dt;
 
-        // Kolizja auta gracza z budynkiem powoduje uszkodzenia przy dużej prędkości
-        if (resolveCircleBuildingCollision(car, 22)) {
-            if (car.speed > 170) {
-                damageCar(car, (car.speed - 140) * 0.08);
+        // Lot helikoptera: unosi się ponad budynkami (brak kolizji z murami na pułapie)
+        if (m.isHeli) {
+            car.rotorAngle += dt * 32;
+            car.altitude = Math.min(1.0, car.altitude + dt * 0.8);
+        } else {
+            car.altitude = 0;
+            if (resolveCircleBuildingCollision(car, 22)) {
+                if (car.speed > 170) {
+                    damageCar(car, (car.speed - 140) * 0.08);
+                }
             }
         }
 
-        // Ślady opon przy drifcie
-        if (Math.abs(lateralSpeed) > 45 || (isHandbrake && Math.abs(forwardSpeed) > 80)) {
+        if (!m.isHeli && (Math.abs(lateralSpeed) > 45 || (isHandbrake && Math.abs(forwardSpeed) > 80))) {
             gameState.skidMarks.push({ x: car.x - forwardX * 18 + rightX * 10, y: car.y - forwardY * 18 + rightY * 10, alpha: 0.5 });
-            if (gameState.skidMarks.length > 350) gameState.skidMarks.shift();
+            if (gameState.skidMarks.length > 250) gameState.skidMarks.shift();
         }
 
         player.x = car.x;
         player.y = car.y;
         player.angle = car.angle;
-        document.getElementById('speedometerDisplay').textContent = `${Math.round(Math.abs(forwardSpeed) * 0.18)} MPH`;
+        const speedo = document.getElementById('speedometerDisplay');
+        if (speedo) speedo.textContent = `${Math.round(Math.abs(forwardSpeed) * 0.18)} MPH`;
     }
 
-    // 2. ZBIERANIE ZRZUTÓW BRONI I APTECZEK NA MAPIE
+    // 2. ZRZUTY ZAOPATRZENIA
     for (const drop of gameState.weaponDrops) {
         if (!drop.active) {
             drop.respawnTimer -= dt;
@@ -2087,72 +2350,79 @@ function updateGame(dt) {
                 gameState.health = Math.min(100, gameState.health + 50);
                 if (player.inCar) player.inCar.hp = player.inCar.maxHp;
             }
-            showFloatingBanner(`🎁 ZEBRANO: ${drop.label.toUpperCase()}`, 'ZRZUT ZAOPATRZENIA MIAMI \'77');
+            showFloatingBanner(`🎁 ZEBRANO: ${drop.label.toUpperCase()}`, 'ZAOPATRZENIE MIAMI \'77');
             updateHUD();
         }
     }
 
-    // 3. AKTUALIZACJA WSZYSTKICH POJAZDÓW (POŚCIGI POLICYJNE, USZKODZENIA, POŻARY I WYBUCHY)
+    // 3. AKTUALIZACJA SAMOCHODÓW I SYSTEMU JAZDY PO PASACH
     for (let i = gameState.cars.length - 1; i >= 0; i--) {
         const car = gameState.cars[i];
         if (!car) continue;
 
-        // Wizualny dym (<60% HP) i płomienie + powolne spalanie (<30% HP)
         const hpRatio = car.hp / car.maxHp;
-        if (hpRatio < 0.6 && Math.random() < 0.35) {
+        if (hpRatio < 0.6 && Math.random() < 0.3) {
             const isBurning = hpRatio < 0.32;
             gameState.particles.push({
-                x: car.x + Math.cos(car.angle) * 16 + (Math.random() - 0.5) * 10,
-                y: car.y + Math.sin(car.angle) * 16 + (Math.random() - 0.5) * 10,
-                vx: (Math.random() - 0.5) * 20,
-                vy: -15 - Math.random() * 20,
-                size: isBurning ? 7 + Math.random() * 6 : 5 + Math.random() * 5,
-                alpha: 0.75,
+                x: car.x + Math.cos(car.angle) * 16 + (Math.random() - 0.5) * 8,
+                y: car.y + Math.sin(car.angle) * 16 + (Math.random() - 0.5) * 8,
+                vx: (Math.random() - 0.5) * 15,
+                vy: -15 - Math.random() * 18,
+                size: isBurning ? 7 + Math.random() * 5 : 5 + Math.random() * 4,
+                alpha: 0.7,
                 color: isBurning ? (Math.random() < 0.5 ? '#ef4444' : '#f97316') : '#94a3b8'
             });
         }
         if (hpRatio < 0.32) {
-            damageCar(car, dt * 9.5); // Płonące auto stopniowo traci życie aż do wybuchu!
+            damageCar(car, dt * 9.5);
             if (car.hp <= 0) continue;
         }
 
-        // Kolizje między pojazdami
-        for (let j = i - 1; j >= 0; j--) {
-            const other = gameState.cars[j];
-            if (!other) continue;
-            const dx = car.x - other.x;
-            const dy = car.y - other.y;
-            const dist = Math.hypot(dx, dy);
-            const minDist = (car.model.isTank || other.model.isTank) ? 52 : 42;
-            if (dist < minDist && dist > 0.001) {
-                const overlap = minDist - dist;
-                const nx = dx / dist;
-                const ny = dy / dist;
-                car.x += nx * overlap * 0.5;
-                car.y += ny * overlap * 0.5;
-                other.x -= nx * overlap * 0.5;
-                other.y -= ny * overlap * 0.5;
+        // Helikopter w powietrzu ignoruje kolizje naziemne
+        const isAirborne = car.model.isHeli && (car.altitude || 0) > 0.05;
 
-                const relSpeed = Math.hypot(car.vx - other.vx, car.vy - other.vy);
-                const playerInvolved = (car === player.inCar || other === player.inCar);
-                if (relSpeed > 135 && playerInvolved) {
-                    // Czołg miażdży inne auta przy zderzeniu!
-                    if (car.model.isTank) damageCar(other, 140, true);
-                    else if (other.model.isTank) damageCar(car, 140, true);
-                    else {
-                        damageCar(car, relSpeed * 0.06, car !== player.inCar);
-                        damageCar(other, relSpeed * 0.06, other !== player.inCar);
-                    }
-                    // Uderzenie w radiowóz policyjny przez gracza podnosi poziom pościgu
-                    if ((car.model.isPolice || other.model.isPolice) && relSpeed > 160) {
-                        addWantedLevel(1.0, 'Staranowanie radiowozu Miami PD!');
+        // KOLIZJE POMIĘDZY POJAZDAMI (tylko na ziemi)
+        if (!isAirborne) {
+            for (let j = i - 1; j >= 0; j--) {
+                const other = gameState.cars[j];
+                if (!other) continue;
+                if (other.model.isHeli && (other.altitude || 0) > 0.05) continue; // Inny helikopter też w locie
+
+                const dx = car.x - other.x;
+                const dy = car.y - other.y;
+                const dist = Math.hypot(dx, dy);
+                const minDist = (car.model.isTank || other.model.isTank) ? 54 : 44;
+
+                if (dist < minDist && dist > 0.0001) {
+                    const overlap = (minDist - dist);
+                    const nx = dx / dist;
+                    const ny = dy / dist;
+
+                    car.x += nx * overlap * 0.52;
+                    car.y += ny * overlap * 0.52;
+                    other.x -= nx * overlap * 0.52;
+                    other.y -= ny * overlap * 0.52;
+
+                    const relSpeed = Math.hypot(car.vx - other.vx, car.vy - other.vy);
+                    const playerInvolved = (car === player.inCar || other === player.inCar);
+
+                    if (relSpeed > 135 && playerInvolved) {
+                        if (car.model.isTank) damageCar(other, 140, true);
+                        else if (other.model.isTank) damageCar(car, 140, true);
+                        else {
+                            damageCar(car, relSpeed * 0.06, car !== player.inCar);
+                            damageCar(other, relSpeed * 0.06, other !== player.inCar);
+                        }
+                        if ((car.model.isPolice || other.model.isPolice) && relSpeed > 160) {
+                            addWantedLevel(1.0, 'Staranowanie radiowozu Miami PD!');
+                        }
                     }
                 }
             }
         }
 
-        // Potrącanie przechodniów (tylko auto prowadzone przez gracza nabija Kasztany za potrącenia!)
-        if (Math.hypot(car.vx, car.vy) > 115) {
+        // Potrącanie pieszych przez pojazdy naziemne
+        if (!isAirborne && Math.hypot(car.vx, car.vy) > 115) {
             const isPlayerDriver = (car === player.inCar);
             for (let p = gameState.peds.length - 1; p >= 0; p--) {
                 const ped = gameState.peds[p];
@@ -2160,7 +2430,6 @@ function updateGame(dt) {
                     if (isPlayerDriver) {
                         killPedestrian(p, false, true);
                     } else {
-                        // Auta AI omijają / lekko odpychają pieszych zamiast ich zabijać i wywoływać alarm
                         const pushAngle = Math.atan2(ped.y - car.y, ped.x - car.x);
                         ped.x += Math.cos(pushAngle) * 20;
                         ped.y += Math.sin(pushAngle) * 20;
@@ -2171,7 +2440,7 @@ function updateGame(dt) {
 
         if (car === player.inCar) continue;
 
-        // AI Radiowozów Policyjnych: stopniowa eskalacja od 0 do 5 Kasztanów
+        // Logika jazdy radiowozów policyjnych (W POŚCIGU MAJĄ PRAWO ŚCINAĆ TRASĘ)
         const wantedStars = Math.floor(gameState.wantedLevel);
         if (car.model.isPolice && car.hasDriver && wantedStars >= 1 && car.aiState === 'police_chase') {
             const toPlayerAngle = Math.atan2(player.y - car.y, player.x - car.x);
@@ -2180,7 +2449,6 @@ function updateGame(dt) {
             while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
 
             car.angle += Math.sign(angleDiff) * Math.min(Math.abs(angleDiff), (1.9 + wantedStars * 0.22) * dt);
-            // Przy 1 Kasztanie radiowóz jedzie umiarkowanie, przy 4-5 Kasztanach ściga z pełną mocą
             const chaseSpeed = 195 + wantedStars * 38;
             car.vx = Math.cos(car.angle) * chaseSpeed;
             car.vy = Math.sin(car.angle) * chaseSpeed;
@@ -2189,11 +2457,9 @@ function updateGame(dt) {
             resolveCircleBuildingCollision(car, 22);
 
             const distToPlayer = Math.hypot(player.x - car.x, player.y - car.y);
-            // Taranowanie pieszego gracza tylko od 2 Kasztanów wzwyż
             if (wantedStars >= 2 && distToPlayer < 44 && !player.inCar) {
                 damagePlayer(14 * dt, 'Potrącony przez radiowóz pościgowy Miami PD');
             }
-            // Policja otwiera ogień z broni palnej DOPIERO od 3 Kasztanów (3/5 🌰) wzwyż!
             if (wantedStars >= 3 && distToPlayer < 330) {
                 car.shootCooldown -= dt;
                 if (car.shootCooldown <= 0) {
@@ -2212,40 +2478,84 @@ function updateGame(dt) {
                 }
             }
         } else if (car.hasDriver && (car.aiState === 'driving' || car.aiState === 'police_chase')) {
-            // Spokojny patrol uliczny (gdy wantedStars === 0 lub radiowóz nie jest przypisany do pościgu)
+            // ==============================================================
+            // STABILNY RUCH ULICZNY: TRZYMANIE SIĘ SWOJEGO PASA RUCHU
+            // ==============================================================
             car.aiState = 'driving';
+            const LANE_OFFSET = 36;
+            const rType = car.roadType || 'h';
+            const dir = car.laneDir || 1;
+            const rCoord = car.roadCoord || (Math.round((rType === 'h' ? car.y : car.x) / BLOCK_SIZE) * BLOCK_SIZE);
+
+            // Wyznacz cel kąta wzdłuż wybranego pasa
+            let targetAngle = 0;
+            if (rType === 'h') {
+                targetAngle = (dir === 1) ? 0 : Math.PI;
+                // Korygowanie zjazdu z pasa poziomego
+                const targetY = rCoord + (dir === 1 ? LANE_OFFSET : -LANE_OFFSET);
+                car.y += (targetY - car.y) * dt * 2.5;
+            } else {
+                targetAngle = (dir === 1) ? Math.PI / 2 : -Math.PI / 2;
+                // Korygowanie zjazdu z pasa pionowego
+                const targetX = rCoord + (dir === 1 ? -LANE_OFFSET : LANE_OFFSET);
+                car.x += (targetX - car.x) * dt * 2.5;
+            }
+            car.angle = targetAngle;
+
+            // Wykrywanie przeszkód przed maską w swoim pasie
             const fwdX = Math.cos(car.angle);
             const fwdY = Math.sin(car.angle);
-            const probeX = car.x + fwdX * 70;
-            const probeY = car.y + fwdY * 70;
-            const blocked = Math.hypot(probeX - player.x, probeY - player.y) < 52;
-            const spd = blocked ? 0 : car.aiTargetSpeed;
-            car.vx = fwdX * spd;
-            car.vy = fwdY * spd;
+            const probeDist = 58;
+            const probeX = car.x + fwdX * probeDist;
+            const probeY = car.y + fwdY * probeDist;
+
+            let carAhead = false;
+            if (Math.hypot(probeX - player.x, probeY - player.y) < 46) {
+                carAhead = true;
+            }
+            if (!carAhead) {
+                for (let k = 0; k < gameState.cars.length; k++) {
+                    const otherCar = gameState.cars[k];
+                    if (otherCar !== car && (!otherCar.model.isHeli || (otherCar.altitude || 0) < 0.1)) {
+                        if (Math.hypot(probeX - otherCar.x, probeY - otherCar.y) < 44) {
+                            carAhead = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            const currentSpeed = carAhead ? 0 : (car.aiTargetSpeed || 170);
+            car.vx = fwdX * currentSpeed;
+            car.vy = fwdY * currentSpeed;
             car.x += car.vx * dt;
             car.y += car.vy * dt;
 
-            if (car.x < 160 || car.x > WORLD_SIZE - 160 || car.y < 160 || car.y > WORLD_SIZE - 160 || isPointInBuilding(probeX, probeY, 15)) {
-                car.angle += Math.PI / 2;
-            }
+            // Zawracanie/płynny zjazd przy krawędziach świata
+            if (car.x < 120) { car.x = 125; car.laneDir = 1; car.roadCoord = Math.round(car.y / BLOCK_SIZE) * BLOCK_SIZE; }
+            if (car.x > WORLD_SIZE - 120) { car.x = WORLD_SIZE - 125; car.laneDir = -1; car.roadCoord = Math.round(car.y / BLOCK_SIZE) * BLOCK_SIZE; }
+            if (car.y < 120) { car.y = 125; car.laneDir = 1; car.roadCoord = Math.round(car.x / BLOCK_SIZE) * BLOCK_SIZE; }
+            if (car.y > WORLD_SIZE - 120) { car.y = WORLD_SIZE - 125; car.laneDir = -1; car.roadCoord = Math.round(car.x / BLOCK_SIZE) * BLOCK_SIZE; }
+
             resolveCircleBuildingCollision(car, 21);
         } else {
             car.vx *= 0.9;
             car.vy *= 0.9;
             car.x += car.vx * dt;
             car.y += car.vy * dt;
-            resolveCircleBuildingCollision(car, 21);
+            if (!isAirborne) {
+                resolveCircleBuildingCollision(car, 21);
+            }
         }
     }
 
-    // 4. AKTUALIZACJA PRZECHODNIÓW I CZŁONKÓW MAFII (NIE STRZELAJĄ BEZ POWODU NA STARCIE)
+    // 4. PRZECHODNIE I GANGSTERZY
     for (let i = gameState.peds.length - 1; i >= 0; i--) {
         const ped = gameState.peds[i];
         if (ped.shoutTimer > 0) ped.shoutTimer -= dt;
 
         const distToPlayer = Math.hypot(ped.x - player.x, player.y - player.y);
 
-        // Gangsterzy strzelają TYLKO gdy zostali sprowokowani (ped.hostile), są celem misji, lub respekt ich gangu spadł poniżej 10%
         if (ped.armed && distToPlayer < 290) {
             const factionRespect = ped.faction ? (gameState.respect[ped.faction] ?? 25) : 25;
             if (ped.hostile || ped.isMissionTarget || factionRespect < 10) {
@@ -2265,19 +2575,29 @@ function updateGame(dt) {
                     });
                     audio.playSfx('shoot');
                     if (ped.shoutTimer <= 0) {
-                        ped.shoutText = `Zadarłeś z ${ped.faction ? ped.faction.toUpperCase() : 'GANGIEM'}, Kasztanie!`;
+                        ped.shoutText = `Zadarłeś z ${ped.faction ? ped.faction.toUpperCase() : 'GANGIEM'}!`;
                         ped.shoutTimer = 2.5;
+                        audio.playPedestrianReaction(true);
                     }
                 }
             }
         }
 
         if (ped.panicTimer > 0) ped.panicTimer -= dt;
-        else if (Math.random() < 0.015) ped.angle += (Math.random() - 0.5) * 1.1;
+        else if (Math.random() < 0.015) {
+            ped.angle += (Math.random() - 0.5) * 1.1;
+            // Czasem przechodzień rzuca komentarz
+            if (Math.random() < 0.08 && ped.shoutTimer <= 0 && distToPlayer < 180) {
+                ped.shoutText = PED_CHATTER[Math.floor(Math.random() * PED_CHATTER.length)];
+                ped.shoutTimer = 2.4;
+                audio.playPedestrianReaction(false);
+            }
+        }
 
         const spd = ped.panicTimer > 0 ? ped.speed * 2.2 : ped.speed;
         const nx = ped.x + Math.cos(ped.angle) * spd * dt;
         const ny = ped.y + Math.sin(ped.angle) * spd * dt;
+        ped.walkCycle += dt * (spd * 0.12);
 
         if (isPointInBuilding(nx, ny, 14) || nx < 70 || nx > WORLD_SIZE - 70 || ny < 70 || ny > WORLD_SIZE - 70) {
             ped.angle += Math.PI * 0.75;
@@ -2287,7 +2607,7 @@ function updateGame(dt) {
         }
     }
 
-    // 5. POCISKI, GRANATY I RAKIETY
+    // 5. POCISKI
     for (let i = gameState.bullets.length - 1; i >= 0; i--) {
         const b = gameState.bullets[i];
         b.x += b.vx * dt;
@@ -2299,7 +2619,6 @@ function updateGame(dt) {
             explodeNow = true;
         }
 
-        // Trafienie w przechodnia / gangstera
         if (!explodeNow && b.fromPlayer) {
             for (let p = gameState.peds.length - 1; p >= 0; p--) {
                 const ped = gameState.peds[p];
@@ -2313,17 +2632,16 @@ function updateGame(dt) {
             }
         }
 
-        // Trafienie w pojazd
         if (!explodeNow) {
             for (const car of gameState.cars) {
                 if (b.fromPlayer && car === player.inCar) continue;
+                // Pocisk nie trafia helikoptera, jeśli leci on na pułapie
+                if (car.model.isHeli && (car.altitude || 0) > 0.35 && !b.isRocket) continue;
+
                 if (Math.hypot(b.x - car.x, b.y - car.y) < 26) {
                     damageCar(car, b.damage, b.fromPlayer);
                     if (b.fromPlayer && car.model.isPolice) {
                         addWantedLevel(1.0, 'Ostrzelanie radiowozu Miami PD!');
-                    }
-                    if (!b.fromPlayer && car === player.inCar) {
-                        updateHUD();
                     }
                     explodeNow = true;
                     break;
@@ -2331,7 +2649,6 @@ function updateGame(dt) {
             }
         }
 
-        // Trafienie w gracza (pieszo)
         if (!explodeNow && !b.fromPlayer && !player.inCar) {
             if (Math.hypot(b.x - player.x, b.y - player.y) < 15) {
                 damagePlayer(b.damage, 'Postrzelony w ulicznej strzelaninie');
@@ -2347,7 +2664,7 @@ function updateGame(dt) {
         }
     }
 
-    // 6. EFEKTY WYBUCHÓW I CZĄSTECZEK
+    // 6. EKSPLOZJE I CZĄSTECZKI
     for (let i = gameState.explosions.length - 1; i >= 0; i--) {
         const ex = gameState.explosions[i];
         ex.radius += (ex.maxRadius - ex.radius) * dt * 10;
@@ -2364,21 +2681,21 @@ function updateGame(dt) {
         if (p.alpha <= 0) gameState.particles.splice(i, 1);
     }
 
-    // 7. SPRAWDZANIE WARUNKÓW UKOŃCZENIA AKTYWNEJ MISJI
+    // 7. MISJE
     if (gameState.activeMission) {
         const m = gameState.activeMission;
         let completed = false;
 
         if (m.type === 'eliminate') {
-            const remainingTargets = gameState.peds.filter(p => p.isMissionTarget).length;
-            if (remainingTargets === 0) completed = true;
+            const remaining = gameState.peds.filter(p => p.isMissionTarget).length;
+            if (remaining === 0) completed = true;
         } else if (m.type === 'carjack') {
             if (player.inCar && player.inCar.isMissionTarget && !m.lootCollected) {
                 m.lootCollected = true;
                 const dropOff = snapToAccessibleRoadOrPlaza(6 * BLOCK_SIZE, 1 * BLOCK_SIZE);
                 m.targetX = dropOff.x;
                 m.targetY = dropOff.y;
-                m.desc = 'DOSTARCZ SKRADZIONĄ LIMUZYNĘ VIP do doku w Rhaven Bay (fioletowy znacznik)!';
+                m.desc = 'DOSTARCZ SKRADZIONĄ LIMUZYNĘ VIP do doku w Rhaven Bay!';
                 document.getElementById('activeObjectiveText').textContent = m.desc;
                 showFloatingBanner('🚗 ZDOBYŁEŚ LIMUZYNĘ VIP! JEDŹ DO DOKU!', 'MISJA DLA RHAVENS');
             } else if (m.lootCollected && player.inCar && player.inCar.isMissionTarget) {
@@ -2400,7 +2717,7 @@ function updateGame(dt) {
         if (completed) {
             gameState.respect[m.faction] = Math.min(100, gameState.respect[m.faction] + m.rewardRespect);
             gameState.money += m.rewardCash;
-            gameState.wantedLevel = 0; // Ukończenie misji czyści pościg policyjny
+            gameState.wantedLevel = 0;
             audio.playSfx('respectUp');
 
             const completedName = m.faction.toUpperCase();
@@ -2411,14 +2728,13 @@ function updateGame(dt) {
                     `ZLECENIE WYKONANE! Zebrałeś wszystkie 4 DOWODY zdrady kapitana Grincha!`;
             } else {
                 document.getElementById('activeObjectiveText').textContent =
-                    `Misja dla ${completedName} ukończona! (+${m.rewardRespect}% Respektu, +$${m.rewardCash}). Odbierz kolejną budkę telefoniczną!`;
+                    `Misja dla ${completedName} ukończona! (+${m.rewardRespect}% Respektu, +$${m.rewardCash}). Odbierz kolejną budkę!`;
             }
             showFloatingBanner(`✅ MISJA UKOŃCZONA! +$${m.rewardCash}`, `RESPEKT ${completedName} +${m.rewardRespect}%`);
             updateHUD();
         }
     }
 
-    // Baner dzielnicy
     const currentDist = getDistrictAt(player.x, player.y);
     if (currentDist.id !== gameState.currentDistrictId) {
         gameState.currentDistrictId = currentDist.id;
@@ -2483,31 +2799,39 @@ function updateHUD() {
     document.getElementById('moneyDisplay').textContent = `$${gameState.money.toLocaleString()}`;
     document.getElementById('InvestigationBadge').textContent = `Dowody: ${gameState.cluesFound.length}/4`;
 
-    // Zdrowie gracza
     const hpPct = Math.max(0, Math.round(gameState.health));
     document.getElementById('healthBar').style.width = `${hpPct}%`;
     document.getElementById('healthText').textContent = `${hpPct}%`;
 
-    // Pasek pancerza pojazdu
     const carHpContainer = document.getElementById('carHealthContainer');
     const vehEl = document.getElementById('vehicleStatusDisplay');
+    const radioBtn = document.getElementById('radioBtn');
+
     if (player.inCar) {
-        vehEl.textContent = player.inCar.model.isTank ? '🛡️ CZOŁG M60' : `🚗 ${player.inCar.model.name.split(' ')[0]}`;
+        if (player.inCar.model.isTank) {
+            vehEl.textContent = '🛡️ CZOŁG M60';
+        } else if (player.inCar.model.isHeli) {
+            vehEl.textContent = '🚁 HELIKOPTER PD';
+        } else {
+            vehEl.textContent = `🚗 ${player.inCar.model.name.split(' ')[0]}`;
+        }
         carHpContainer.classList.remove('hidden');
         const carPct = Math.max(0, Math.round((player.inCar.hp / player.inCar.maxHp) * 100));
         document.getElementById('carHealthBar').style.width = `${carPct}%`;
         document.getElementById('carHealthText').textContent = `${carPct}%`;
+        radioBtn.classList.remove('opacity-40', 'pointer-events-none');
+        document.getElementById('radioStationName').textContent = audio.stations[audio.stationIndex].name;
     } else {
-        vehEl.textContent = '🥾 PIESZO';
+        vehEl.textContent = '🥾 PIESZO (VIPER)';
         carHpContainer.classList.add('hidden');
+        radioBtn.classList.add('opacity-40', 'pointer-events-none');
+        document.getElementById('radioStationName').textContent = 'Otoczenie 🍂';
     }
 
-    // Aktualna broń
     const w = WEAPONS[player.weaponIndex];
     const ammoStr = w.infinite ? '∞' : player.ammo[w.id];
     document.getElementById('currentWeaponDisplay').textContent = `${w.icon} ${w.name.split(' ')[1] || w.name} (${ammoStr})`;
 
-    // Wskaźnik 0 do 5 Kasztanów 🌰
     const activeChestnuts = Math.floor(gameState.wantedLevel);
     let chestnutsHtml = '';
     for (let i = 1; i <= 5; i++) {
@@ -2521,7 +2845,139 @@ function updateHUD() {
 }
 
 // ============================================================================
-// RENDEROWANIE ŚWIATA 2D Z DYNAMICZNYM ZOOMEM NA TELEFONACH
+// WYSPECJALIZOWANE RYSOWANIE POSTACI VIPERA (DŁONIE, BROŃ, BUTY, M65)
+// ============================================================================
+function renderDetailedViper(px, py, angle, walkCycle, currentWeapon) {
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(angle);
+
+    const legSwing = Math.sin(walkCycle) * 6;
+
+    // 1. Cień postaci
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+    ctx.beginPath();
+    ctx.ellipse(0, 2, 13, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 2. Wojskowe buty bojowe M65 (czarne trepy)
+    ctx.fillStyle = '#1c1917';
+    // Lewa noga
+    ctx.beginPath();
+    ctx.roundRect(-7, -9 + legSwing, 6, 8, 2);
+    ctx.fill();
+    // Prawa noga
+    ctx.beginPath();
+    ctx.roundRect(-7, 2 - legSwing, 6, 8, 2);
+    ctx.fill();
+
+    // 3. Spodnie bojówki (oliwkowy rip-stop)
+    ctx.fillStyle = '#3f4f24';
+    ctx.fillRect(-6, -8 + legSwing * 0.5, 6, 6);
+    ctx.fillRect(-6, 2 - legSwing * 0.5, 6, 6);
+
+    // 4. Kurtka wojskowa M65 (klasyczna zieleń US Army)
+    ctx.fillStyle = '#4d5d29';
+    ctx.beginPath();
+    ctx.roundRect(-7, -8, 14, 16, 4);
+    ctx.fill();
+    ctx.strokeStyle = '#2b3614';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // Pagony na ramionach i kołnierz M65
+    ctx.fillStyle = '#657b34';
+    ctx.fillRect(-5, -9, 4, 2);
+    ctx.fillRect(-5, 7, 4, 2);
+    ctx.fillStyle = '#38451c';
+    ctx.fillRect(-6, -3, 3, 6); // Zamek / plisa kurtki
+
+    // 5. Skórzana kabura na prawym udzie & pas taktyczny
+    ctx.fillStyle = '#78350f';
+    ctx.fillRect(-2, 7, 6, 3);
+    ctx.fillStyle = '#1f2937';
+    ctx.fillRect(1, 8, 3, 2);
+
+    // 6. RĘCE I BROŃ W DŁONIACH
+    ctx.fillStyle = '#e5b887'; // Skóra dłoni
+
+    if (currentWeapon.id === 'pistol') {
+        // Dwie ręce trzymają pistolet M1911 z przodu
+        ctx.fillRect(5, -4, 5, 3);
+        ctx.fillRect(5, 1, 5, 3);
+        // Pistolet
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(7, -2.5, 12, 4);
+        ctx.fillStyle = '#78350f'; // Skórzany chwyt pistoletu
+        ctx.fillRect(6, -2, 3, 3);
+    } else if (currentWeapon.id === 'smg') {
+        // Automat Kałach '77 (dłuższa lufa, charakterystyczny łukowy magazynek)
+        ctx.fillRect(4, -5, 5, 3);
+        ctx.fillRect(8, 1, 5, 3);
+        // Drewniana kolba i łoże
+        ctx.fillStyle = '#9a3412';
+        ctx.fillRect(2, -2, 6, 4);
+        // Komora i lufa
+        ctx.fillStyle = '#18181b';
+        ctx.fillRect(7, -2, 17, 3.5);
+        // Magazynek bananowy
+        ctx.fillStyle = '#d97706';
+        ctx.beginPath();
+        ctx.arc(11, -3, 5, 0, Math.PI * 0.7);
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+    } else if (currentWeapon.id === 'grenade') {
+        // Prawa ręka wysunięta z kasztanowym granatem
+        ctx.fillRect(5, 3, 5, 4);
+        // Granat kasztanowy (kolczasta łupina z zapalnikiem)
+        ctx.fillStyle = '#78350f';
+        ctx.beginPath();
+        ctx.arc(11, 5, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#eab308';
+        ctx.fillRect(11, 4, 3, 2);
+    } else if (currentWeapon.id === 'rpg') {
+        // Wyrzutnia RPG-77 oparta na ramieniu
+        ctx.fillRect(3, -6, 5, 3);
+        ctx.fillRect(7, 2, 5, 3);
+        // Rura wyrzutni
+        ctx.fillStyle = '#3f6212';
+        ctx.fillRect(-6, 2, 22, 5);
+        // Głowica rakietowa na przodzie
+        ctx.fillStyle = '#166534';
+        ctx.beginPath();
+        ctx.moveTo(16, 1);
+        ctx.lineTo(24, 4.5);
+        ctx.lineTo(16, 8);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // 7. Głowa, aviatory i wojskowa opaska na czole
+    ctx.fillStyle = '#e5b887';
+    ctx.beginPath();
+    ctx.arc(0, 0, 5.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ciemne brązowe włosy
+    ctx.fillStyle = '#291e10';
+    ctx.beginPath();
+    ctx.arc(-1.5, 0, 5, Math.PI * 0.4, Math.PI * 1.6);
+    ctx.fill();
+
+    // Okulary Aviator z błyskiem
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(2.5, -3.5, 3, 2.5);
+    ctx.fillRect(2.5, 1, 3, 2.5);
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(3, -3, 1.5, 1);
+    ctx.fillRect(3, 1.5, 1.5, 1);
+
+    ctx.restore();
+}
+
+// ============================================================================
+// WYSOKOWYDAJNY RENDERER Z FRUSTUM CULLING
 // ============================================================================
 function renderGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -2540,7 +2996,7 @@ function renderGame() {
     const camX = player.x - viewW / 2;
     const camY = player.y - viewH / 2;
 
-    // 1. Tło dzielnic
+    // 1. ZOPTYMALIZOWANE RYSOWANIE PODŁOŻA (TYLKO DLA WIDOCZNYCH SEKTORÓW)
     const half = WORLD_SIZE / 2;
     ctx.fillStyle = DISTRICTS.chestnuts.groundColor;
     ctx.fillRect(0, 0, half, half);
@@ -2556,48 +3012,60 @@ function renderGame() {
     ctx.arc(half, half, 820, 0, Math.PI * 2);
     ctx.fill();
 
-    // 2. Siatka ulic
     const numBlocks = Math.floor(WORLD_SIZE / BLOCK_SIZE);
-    ctx.fillStyle = '#242228';
-    for (let i = 0; i <= numBlocks; i++) {
-        const pos = i * BLOCK_SIZE;
-        ctx.fillRect(0, pos - ROAD_WIDTH / 2, WORLD_SIZE, ROAD_WIDTH);
-        ctx.fillRect(pos - ROAD_WIDTH / 2, 0, ROAD_WIDTH, WORLD_SIZE);
+    const minBlockX = Math.max(0, Math.floor((camX - ROAD_WIDTH) / BLOCK_SIZE));
+    const maxBlockX = Math.min(numBlocks, Math.ceil((camX + viewW + ROAD_WIDTH) / BLOCK_SIZE));
+    const minBlockY = Math.max(0, Math.floor((camY - ROAD_WIDTH) / BLOCK_SIZE));
+    const maxBlockY = Math.min(numBlocks, Math.ceil((camY + viewH + ROAD_WIDTH) / BLOCK_SIZE));
+
+    ctx.fillStyle = '#221e25';
+    for (let bx = minBlockX; bx <= maxBlockX; bx++) {
+        const pos = bx * BLOCK_SIZE;
+        ctx.fillRect(pos - ROAD_WIDTH / 2, Math.max(0, camY - 20), ROAD_WIDTH, viewH + 40);
+    }
+    for (let by = minBlockY; by <= maxBlockY; by++) {
+        const pos = by * BLOCK_SIZE;
+        ctx.fillRect(Math.max(0, camX - 20), pos - ROAD_WIDTH / 2, viewW + 40, ROAD_WIDTH);
     }
 
     ctx.strokeStyle = '#eab308';
     ctx.lineWidth = 2;
     ctx.setLineDash([18, 16]);
-    for (let i = 0; i <= numBlocks; i++) {
-        const pos = i * BLOCK_SIZE;
+    for (let bx = minBlockX; bx <= maxBlockX; bx++) {
+        const pos = bx * BLOCK_SIZE;
         ctx.beginPath();
-        ctx.moveTo(0, pos);
-        ctx.lineTo(WORLD_SIZE, pos);
-        ctx.moveTo(pos, 0);
-        ctx.lineTo(pos, WORLD_SIZE);
+        ctx.moveTo(pos, Math.max(0, camY - 20));
+        ctx.lineTo(pos, Math.min(WORLD_SIZE, camY + viewH + 20));
+        ctx.stroke();
+    }
+    for (let by = minBlockY; by <= maxBlockY; by++) {
+        const pos = by * BLOCK_SIZE;
+        ctx.beginPath();
+        ctx.moveTo(Math.max(0, camX - 20), pos);
+        ctx.lineTo(Math.min(WORLD_SIZE, camX + viewW + 20), pos);
         ctx.stroke();
     }
     ctx.setLineDash([]);
 
-    // 3. Jesienne liście i kasztany na ziemi
+    // 2. Jesienne liście
     for (const leaf of gameState.autumnLeaves) {
-        if (leaf.x < camX - 40 || leaf.x > camX + viewW + 40 || leaf.y < camY - 40 || leaf.y > camY + viewH + 40) continue;
+        if (leaf.x < camX - 20 || leaf.x > camX + viewW + 20 || leaf.y < camY - 20 || leaf.y > camY + viewH + 20) continue;
         ctx.fillStyle = leaf.color;
         ctx.beginPath();
         ctx.arc(leaf.x, leaf.y, leaf.size, 0, Math.PI * 2);
         ctx.fill();
     }
 
-    // 4. Ślady opon
+    // 3. Ślady opon
     for (const s of gameState.skidMarks) {
         ctx.fillStyle = `rgba(12, 10, 14, ${s.alpha})`;
         ctx.fillRect(s.x - 3, s.y - 3, 6, 6);
     }
 
-    // 5. Budynki z szerokimi alejkami
+    // 4. Budynki
     for (const b of gameState.buildings) {
-        if (b.x + b.w < camX - 120 || b.x > camX + viewW + 120 ||
-            b.y + b.h < camY - 120 || b.y > camY + viewH + 120) continue;
+        if (b.x + b.w < camX - 100 || b.x > camX + viewW + 100 ||
+            b.y + b.h < camY - 100 || b.y > camY + viewH + 100) continue;
 
         ctx.fillStyle = '#47424f';
         ctx.fillRect(b.x - 12, b.y - 12, b.w + 24, b.h + 24);
@@ -2622,7 +3090,69 @@ function renderGame() {
         }
     }
 
-    // 6. Wejścia do sklepów FROGGY SHOP 🐸
+    // Lądowisko dla helikoptera w bazie Rhavens (BX=7, BY=0)
+    const baseNEPlotX = 7 * BLOCK_SIZE + ROAD_WIDTH / 2 + 26;
+    const baseNEPlotY = 0 * BLOCK_SIZE + ROAD_WIDTH / 2 + 26;
+    const baseNEPlotW = BLOCK_SIZE - ROAD_WIDTH - 52;
+    const baseNEPlotH = BLOCK_SIZE - ROAD_WIDTH - 52;
+    const heliPadX = baseNEPlotX + baseNEPlotW - 75;
+    const heliPadY = baseNEPlotY + baseNEPlotH / 2;
+
+    if (heliPadX >= camX - 100 && heliPadX <= camX + viewW + 100 &&
+        heliPadY >= camY - 100 && heliPadY <= camY + viewH + 100) {
+        // Betonowa płyta lądowiska
+        ctx.fillStyle = 'rgba(30, 41, 59, 0.95)';
+        ctx.beginPath();
+        ctx.arc(heliPadX, heliPadY, 46, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 3.5;
+        ctx.stroke();
+
+        // Żółty pierścień ostrzegawczy i litera H
+        ctx.strokeStyle = 'rgba(250, 204, 21, 0.4)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.arc(heliPadX, heliPadY, 36, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = '#facc15';
+        ctx.font = 'bold 36px "Righteous", cursive';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('H', heliPadX, heliPadY);
+        ctx.textBaseline = 'alphabetic';
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 10px "Share Tech Mono", monospace';
+        ctx.fillText('LĄDOWISKO MIAMI PD', heliPadX, heliPadY - 50);
+    }
+
+    // Plac apelowy i brama Bazy Pancernej „Kasztan” (BX=0, BY=0)
+    const baseNWPlotX = 0 * BLOCK_SIZE + ROAD_WIDTH / 2 + 26;
+    const baseNWPlotY = 0 * BLOCK_SIZE + ROAD_WIDTH / 2 + 26;
+    const baseNWPlotW = BLOCK_SIZE - ROAD_WIDTH - 52;
+    const baseNWPlotH = BLOCK_SIZE - ROAD_WIDTH - 52;
+    const tankBaseX = baseNWPlotX + baseNWPlotW / 2;
+    const tankBaseY = baseNWPlotY + baseNWPlotH / 2 + 35;
+
+    if (tankBaseX >= camX - 120 && tankBaseX <= camX + viewW + 120 &&
+        tankBaseY >= camY - 120 && tankBaseY <= camY + viewH + 120) {
+        ctx.fillStyle = 'rgba(20, 28, 14, 0.85)';
+        ctx.fillRect(baseNWPlotX + 80, baseNWPlotY + 80, baseNWPlotW - 160, baseNWPlotH - 80);
+        ctx.strokeStyle = '#4d7c0f';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(baseNWPlotX + 80, baseNWPlotY + 80, baseNWPlotW - 160, baseNWPlotH - 80);
+
+        ctx.fillStyle = '#a3e635';
+        ctx.font = 'bold 10px "Share Tech Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('PLAC APELOWY: STANOWISKO CZOŁGU M60', tankBaseX, baseNWPlotY + 100);
+    }
+
+    // 5. Froggy Shopy 🐸
     const time = performance.now() * 0.005;
     for (const shop of gameState.froggyShops) {
         const pulse = 20 + Math.sin(time * 2) * 5;
@@ -2645,7 +3175,7 @@ function renderGame() {
         ctx.fillText(shop.robberyCooldown > 0 ? 'OBRABOWANY' : 'NAPAD [E]', shop.marker.x, shop.marker.y - 22);
     }
 
-    // 7. Zrzuty broni i apteczek na mapie
+    // 6. Zrzuty broni
     for (const drop of gameState.weaponDrops) {
         if (!drop.active) continue;
         const glow = 18 + Math.sin(time * 3) * 4;
@@ -2665,7 +3195,7 @@ function renderGame() {
         ctx.fillText(icon, drop.x, drop.y + 6);
     }
 
-    // 8. Znacznik aktywnej misji
+    // 7. Znacznik celu aktywnej misji
     if (gameState.activeMission) {
         const m = gameState.activeMission;
         const pulse = 32 + Math.sin(time * 2.5) * 10;
@@ -2681,7 +3211,7 @@ function renderGame() {
         ctx.fill();
     }
 
-    // 9. Budki telefoniczne
+    // 8. Budki telefoniczne
     for (const booth of gameState.phoneBooths) {
         const ringRadius = 22 + Math.sin(time * 2) * 6;
         ctx.strokeStyle = booth.color;
@@ -2703,7 +3233,7 @@ function renderGame() {
         ctx.fillText(booth.tag, booth.x, booth.y - 18);
     }
 
-    // 10. Przechodnie i uzbrojeni członkowie mafii
+    // 9. Przechodnie z animacją kroków
     for (const ped of gameState.peds) {
         if (ped.x < camX - 70 || ped.x > camX + viewW + 70 ||
             ped.y < camY - 70 || ped.y > camY + viewH + 70) continue;
@@ -2712,9 +3242,14 @@ function renderGame() {
         ctx.translate(ped.x, ped.y);
         ctx.rotate(ped.angle);
 
+        const legW = Math.sin(ped.walkCycle) * 4;
+        ctx.fillStyle = '#1c1917';
+        ctx.fillRect(-5, -6 + legW, 4, 4);
+        ctx.fillRect(-5, 2 - legW, 4, 4);
+
         ctx.fillStyle = ped.outfitColor;
         ctx.beginPath();
-        ctx.roundRect(-7, -10, 14, 20, 5);
+        ctx.roundRect(-7, -8, 14, 16, 4);
         ctx.fill();
 
         if (ped.armed) {
@@ -2750,7 +3285,7 @@ function renderGame() {
         }
     }
 
-    // 11. Pojazdy, Radiowozy z kogutami i Ukryty Czołg M60
+    // 10. Pojazdy ze światłami i unikalnymi sylwetkami
     for (const car of gameState.cars) {
         if (car.x < camX - 140 || car.x > camX + viewW + 140 ||
             car.y < camY - 140 || car.y > camY + viewH + 140) continue;
@@ -2763,7 +3298,103 @@ function renderGame() {
         const h = car.model.height;
         const mId = car.model.id;
 
-        // Snopy świateł przednich reflektorów (wyraźnie wskazują przód pojazdu!)
+        // HELIKOPTER POLICYJNY MIAMI PD '77
+        if (car.model.isHeli) {
+            const alt = car.altitude || 0;
+            const shadowOffset = 8 + alt * 28;
+
+            // Cień helikoptera na ziemi
+            ctx.save();
+            ctx.fillStyle = `rgba(0,0,0,${0.55 - alt * 0.25})`;
+            ctx.beginPath();
+            ctx.ellipse(shadowOffset, shadowOffset, w * 0.45, h * 0.55, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // Reflektor policyjny szperacz (Searchlight)
+            const beamLen = car === player.inCar ? 180 : 120;
+            const grad = ctx.createLinearGradient(w / 2, 0, w / 2 + beamLen, 0);
+            grad.addColorStop(0, 'rgba(125, 211, 252, 0.55)');
+            grad.addColorStop(1, 'rgba(125, 211, 252, 0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(w * 0.35, -8);
+            ctx.lineTo(w / 2 + beamLen, -h * 1.6);
+            ctx.lineTo(w / 2 + beamLen, h * 1.6);
+            ctx.lineTo(w * 0.35, 8);
+            ctx.closePath();
+            ctx.fill();
+
+            // Płozy podwozia (skids)
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(-w * 0.35, -h / 2 - 3, w * 0.7, 3);
+            ctx.fillRect(-w * 0.35, h / 2, w * 0.7, 3);
+            ctx.fillRect(-w * 0.15, -h / 2 - 3, 3, h + 6);
+            ctx.fillRect(w * 0.15, -h / 2 - 3, 3, h + 6);
+
+            // Kadłub (granatowo-biały Miami PD)
+            ctx.fillStyle = '#1e3a8a';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, w * 0.38, h * 0.42, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = car === player.inCar ? '#fde047' : '#38bdf8';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Biały pas policyjny i napis PD
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(-w * 0.2, -h * 0.3, w * 0.35, h * 0.6);
+            ctx.fillStyle = '#1e3a8a';
+            ctx.font = 'bold 8px "Share Tech Mono", monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('PD', -w * 0.05, 3);
+
+            // Szklana kopuła kokpitu (błękitna)
+            ctx.fillStyle = '#38bdf8';
+            ctx.beginPath();
+            ctx.ellipse(w * 0.22, 0, w * 0.16, h * 0.32, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Ogon i statecznik (Tail boom)
+            ctx.fillStyle = '#1e3a8a';
+            ctx.fillRect(-w * 0.75, -3, w * 0.45, 6);
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(-w * 0.82, -8, 8, 16);
+
+            // Wirnik ogonowy (animowany)
+            ctx.fillStyle = 'rgba(226, 232, 240, 0.8)';
+            const tailRot = (car.rotorAngle || 0) * 3;
+            ctx.save();
+            ctx.translate(-w * 0.82, 0);
+            ctx.rotate(tailRot);
+            ctx.fillRect(-1.5, -9, 3, 18);
+            ctx.restore();
+
+            // Wirnik główny (animowane łopaty)
+            const rAng = (car.rotorAngle || 0);
+            ctx.save();
+            ctx.translate(0, 0);
+            ctx.rotate(rAng);
+            ctx.fillStyle = 'rgba(241, 245, 249, 0.85)';
+            ctx.fillRect(-45, -2.5, 90, 5);
+            ctx.fillRect(-2.5, -45, 5, 90);
+            ctx.fillStyle = '#facc15';
+            ctx.beginPath();
+            ctx.arc(0, 0, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // Kogut policyjny
+            const flash = Math.floor(performance.now() / 150) % 2 === 0;
+            ctx.fillStyle = flash ? '#ef4444' : '#3b82f6';
+            ctx.beginPath();
+            ctx.arc(-w * 0.1, 0, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+            continue;
+        }
+
         if (!car.model.isTank) {
             const beamLen = car === player.inCar ? 135 : 95;
             const grad = ctx.createLinearGradient(w / 2, 0, w / 2 + beamLen, 0);
@@ -2778,7 +3409,6 @@ function renderGame() {
             ctx.closePath();
             ctx.fill();
         } else {
-            // Szperacz czołgowy z przodu kadłuba
             const grad = ctx.createLinearGradient(w / 2, 0, w / 2 + 120, 0);
             grad.addColorStop(0, 'rgba(163, 230, 53, 0.35)');
             grad.addColorStop(1, 'rgba(163, 230, 53, 0)');
@@ -2792,14 +3422,12 @@ function renderGame() {
             ctx.fill();
         }
 
-        // Cień pod pojazdem
         ctx.fillStyle = 'rgba(0,0,0,0.5)';
         ctx.beginPath();
         ctx.roundRect(-w / 2 + 4, -h / 2 + 5, w, h, 6);
         ctx.fill();
 
         if (car.model.isTank) {
-            // Gąsienice czołgu z wyraźnym bieżnikiem
             ctx.fillStyle = '#1c1917';
             ctx.fillRect(-w / 2, -h / 2 - 3, w, 9);
             ctx.fillRect(-w / 2, h / 2 - 6, w, 9);
@@ -2809,7 +3437,6 @@ function renderGame() {
                 ctx.fillRect(tx, h / 2 - 6, 3, 9);
             }
 
-            // Pancerz czołgu (ścięty przód ze strzałką kierunkową)
             ctx.fillStyle = '#3f6212';
             ctx.beginPath();
             ctx.moveTo(-w / 2 + 4, -h / 2 + 3);
@@ -2823,11 +3450,9 @@ function renderGame() {
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // Tylne kraty silnika czołgu
             ctx.fillStyle = '#1a2e05';
             ctx.fillRect(-w / 2 + 8, -h / 2 + 7, 12, h - 14);
 
-            // Wieżyczka i długa lufa działa 105mm skierowana do przodu
             ctx.fillStyle = '#365314';
             ctx.beginPath();
             ctx.arc(-2, 0, 14, 0, Math.PI * 2);
@@ -2836,29 +3461,23 @@ function renderGame() {
             ctx.fillStyle = '#1f2937';
             ctx.fillRect(10, -3.5, 38, 7);
             ctx.fillStyle = '#4d7c0f';
-            ctx.fillRect(42, -5, 7, 10); // Hamulec wylotowy na końcu lufy
+            ctx.fillRect(42, -5, 7, 10);
         } else {
-            // Koła wystające lekko z nadkoli (przednie i tylne)
             ctx.fillStyle = '#09090b';
             const wheelW = 10;
             const wheelH = 3.5;
-            // Przednie koła (bliżej przodu +w/2)
             ctx.fillRect(w * 0.22, -h / 2 - 2, wheelW, wheelH);
             ctx.fillRect(w * 0.22, h / 2 - 1.5, wheelW, wheelH);
-            // Tylne koła (bliżej tyłu -w/2)
             ctx.fillRect(-w * 0.36, -h / 2 - 2, wheelW, wheelH);
             ctx.fillRect(-w * 0.36, h / 2 - 1.5, wheelW, wheelH);
 
-            // Lusterka boczne z przodu kabiny (dodatkowo podkreślają orientację przodu)
             ctx.fillStyle = car.color;
             ctx.fillRect(w * 0.12, -h / 2 - 3, 4, 4);
             ctx.fillRect(w * 0.12, h / 2 - 1, 4, 4);
 
-            // Kształt karoserii zależny od modelu (zwężany/profilowany przód po prawej stronie +X)
             ctx.fillStyle = car.color;
             ctx.beginPath();
             if (mId === 'gt') {
-                // Klinowy przód supersamochodu lat 70. (szpiczasty nos z przodu)
                 ctx.moveTo(-w / 2, -h / 2 + 2);
                 ctx.lineTo(w * 0.22, -h / 2);
                 ctx.lineTo(w / 2, -h * 0.30);
@@ -2868,7 +3487,6 @@ function renderGame() {
                 ctx.lineTo(-w / 2, h / 2 - 2);
                 ctx.closePath();
             } else if (mId === 'muscle' || mId === 'cabrio' || mId === 'limo') {
-                // Długa maska z lekko wysuniętym chromowanym dziobem z przodu
                 ctx.moveTo(-w / 2, -h / 2 + 2);
                 ctx.lineTo(w / 2 - 5, -h / 2);
                 ctx.lineTo(w / 2 + 2, -h / 2 + 5);
@@ -2877,7 +3495,6 @@ function renderGame() {
                 ctx.lineTo(-w / 2, h / 2 - 2);
                 ctx.closePath();
             } else {
-                // Van, Pickup, Radiowóz - wyraźnie zaokrąglony przód i kanciasty tył
                 ctx.roundRect(-w / 2, -h / 2, w, h, [3, 9, 9, 3]);
             }
             ctx.fill();
@@ -2886,46 +3503,35 @@ function renderGame() {
             ctx.lineWidth = car === player.inCar ? 2.2 : 1.5;
             ctx.stroke();
 
-            // Pasy wyścigowe i detale specyficzne dla każdego modelu
             if (mId === 'muscle') {
-                // Podwójne pasy wyścigowe + wlot powietrza (blower/scoop) na przedniej masce
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
                 ctx.fillRect(-w / 2 + 2, -5.5, w - 4, 3.5);
                 ctx.fillRect(-w / 2 + 2, 2, w - 4, 3.5);
                 ctx.fillStyle = '#18181b';
                 ctx.fillRect(w * 0.16, -5, 11, 10);
             } else if (mId === 'gt') {
-                // Centralny pas, wloty na masce oraz czarny spojler z tyłu (-w/2)
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
                 ctx.fillRect(-w / 2 + 4, -2.5, w - 6, 5);
                 ctx.fillStyle = '#09090b';
-                ctx.fillRect(-w / 2, -h / 2 + 1, 6, h - 2); // Tylny spojler
+                ctx.fillRect(-w / 2, -h / 2 + 1, 6, h - 2);
             } else if (mId === 'pickup') {
-                // Odkryta paka ładunkowa z tyłu pojazdu (-w/2) z deskowaniem i kołem zapasowym
                 ctx.fillStyle = '#27272a';
                 ctx.fillRect(-w / 2 + 3, -h / 2 + 3.5, w * 0.44, h - 7);
-                ctx.strokeStyle = '#52525b';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(-w / 2 + 3, -h / 2 + 3.5, w * 0.44, h - 7);
-                // Koło zapasowe na pace
                 ctx.fillStyle = '#09090b';
                 ctx.beginPath();
                 ctx.arc(-w * 0.28, 0, 5.5, 0, Math.PI * 2);
                 ctx.fill();
             } else if (mId === 'van') {
-                // Boczna linia Funk Vana oraz okrągły szyberdach
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
                 ctx.fillRect(-w / 2 + 3, -h / 2 + 2, w - 8, 2.5);
                 ctx.fillRect(-w / 2 + 3, h / 2 - 4.5, w - 8, 2.5);
             } else if (mId === 'police') {
-                // Biało-czarne malowanie radiowozu (białe drzwi pośrodku) + przedni taran (pushbar)
                 ctx.fillStyle = '#f8fafc';
                 ctx.fillRect(-w * 0.18, -h / 2 + 1.5, w * 0.36, h - 3);
                 ctx.fillStyle = '#111827';
-                ctx.fillRect(w / 2 - 1, -h * 0.32, 4, h * 0.64); // Taran z przodu
+                ctx.fillRect(w / 2 - 1, -h * 0.32, 4, h * 0.64);
             }
 
-            // PRZEDNIA SZYBA (pochylona trapezowo z przodu kabiny - jasno wskazuje przód!)
             const wsFrontX = mId === 'van' ? w * 0.36 : w * 0.22;
             const wsBackX = mId === 'van' ? w * 0.18 : w * 0.04;
             ctx.fillStyle = '#38bdf8';
@@ -2936,64 +3542,40 @@ function renderGame() {
             ctx.lineTo(wsBackX, -h / 2 + 3.5);
             ctx.closePath();
             ctx.fill();
-            ctx.strokeStyle = '#0284c7';
-            ctx.lineWidth = 1;
-            ctx.stroke();
 
-            // DACH LUB WNĘTRZE KABRIOLETU + TYLNA SZYBA
             if (car.model.convertible) {
-                // Otwarte wnętrze kabrioletu z widocznymi fotelami i kierownicą z przodu
                 ctx.fillStyle = '#31102f';
                 ctx.fillRect(-w * 0.32, -h / 2 + 4.5, w * 0.36, h - 9);
-                // Fotele
                 ctx.fillStyle = '#f4a261';
                 ctx.fillRect(-w * 0.08, -h / 2 + 6, 7, 6);
                 ctx.fillRect(-w * 0.08, h / 2 - 12, 7, 6);
-                // Złożony miękki dach z tyłu
                 ctx.fillStyle = '#1e1b4b';
                 ctx.fillRect(-w * 0.38, -h / 2 + 4, 8, h - 8);
             } else if (mId === 'pickup') {
-                // Krótki dach kabiny pickupa
                 ctx.fillStyle = car.color;
                 ctx.fillRect(-w * 0.04, -h / 2 + 4, w * 0.10, h - 8);
-                ctx.strokeStyle = '#0f172a';
-                ctx.strokeRect(-w * 0.04, -h / 2 + 4, w * 0.10, h - 8);
             } else if (mId === 'van') {
-                // Długi dach furgonetki aż do tyłu
                 ctx.fillStyle = car.color;
                 ctx.fillRect(-w * 0.44, -h / 2 + 3.5, w * 0.62, h - 7);
-                ctx.strokeStyle = 'rgba(0,0,0,0.45)';
-                ctx.strokeRect(-w * 0.44, -h / 2 + 3.5, w * 0.62, h - 7);
-                ctx.fillStyle = '#0f172a';
-                ctx.beginPath();
-                ctx.arc(-w * 0.08, 0, 5, 0, Math.PI * 2);
-                ctx.fill();
             } else {
-                // Standardowy dach sedana / coupe / limuzyny + ciemna tylna szyba
                 const roofBack = mId === 'limo' ? -w * 0.36 : -w * 0.26;
                 ctx.fillStyle = '#0f172a';
-                ctx.fillRect(roofBack - 5, -h / 2 + 4.5, 6, h - 9); // Tylna szyba
+                ctx.fillRect(roofBack - 5, -h / 2 + 4.5, 6, h - 9);
                 ctx.fillStyle = mId === 'police' ? '#f8fafc' : car.color;
                 ctx.fillRect(roofBack, -h / 2 + 4, wsBackX - roofBack, h - 8);
-                ctx.strokeStyle = 'rgba(0,0,0,0.45)';
-                ctx.strokeRect(roofBack, -h / 2 + 4, wsBackX - roofBack, h - 8);
             }
 
-            // Chromowany grill z przodu (+w/2) oraz zderzak
             ctx.fillStyle = '#e2e8f0';
             ctx.fillRect(w / 2 - 2, -h * 0.26, 2.5, h * 0.52);
 
-            // PRZEDNIE REFLEKTORY (jasnożółte klosze na przednich narożnikach +w/2)
             ctx.fillStyle = '#fef08a';
             ctx.fillRect(w / 2 - 3.5, -h / 2 + 2.5, 4, 5.5);
             ctx.fillRect(w / 2 - 3.5, h / 2 - 8, 4, 5.5);
 
-            // TYLNE ŚWIATŁA STOP (czerwone klosze na tylnej krawędzi -w/2)
             ctx.fillStyle = '#ef4444';
             ctx.fillRect(-w / 2 - 0.5, -h / 2 + 2.5, 3, 5.5);
             ctx.fillRect(-w / 2 - 0.5, h / 2 - 8, 3, 5.5);
 
-            // Koguty policyjne na dachu radiowozu (błyskają podczas aktywnego pościgu)
             if (car.model.isPolice) {
                 ctx.fillStyle = '#cbd5e1';
                 ctx.fillRect(-9, -h / 2 + 3, 8, h - 6);
@@ -3012,7 +3594,6 @@ function renderGame() {
             }
         }
 
-        // Płomienie na przedniej masce gdy HP < 32%
         if (car.hp / car.maxHp < 0.32) {
             ctx.fillStyle = Math.random() < 0.5 ? '#ef4444' : '#facc15';
             ctx.beginPath();
@@ -3030,31 +3611,12 @@ function renderGame() {
         }
     }
 
-    // 12. Postać gracza (gdy pieszo)
+    // 11. BOGATY, SZCZEGÓŁOWY MODEL VIPERA (DŁONIE, BROŃ, KURTKA M65, KROKI)
     if (!player.inCar) {
-        ctx.save();
-        ctx.translate(player.x, player.y);
-        ctx.rotate(player.angle);
-
-        ctx.fillStyle = '#4d7c0f';
-        ctx.beginPath();
-        ctx.roundRect(-8, -12, 16, 24, 6);
-        ctx.fill();
-        ctx.strokeStyle = '#facc15';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        ctx.fillStyle = '#1e293b';
-        ctx.fillRect(6, 4, 12, 4);
-
-        ctx.fillStyle = '#451a03';
-        ctx.beginPath();
-        ctx.arc(0, 0, 6.5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
+        renderDetailedViper(player.x, player.y, player.angle, player.walkCycle, WEAPONS[player.weaponIndex]);
     }
 
-    // 13. Pociski, granaty kasztanowe i rakiety
+    // 12. Pociski, granaty i rakiety
     for (const b of gameState.bullets) {
         ctx.fillStyle = b.isGrenade ? '#d97706' : (b.isRocket ? '#ef4444' : '#fde047');
         ctx.beginPath();
@@ -3062,7 +3624,7 @@ function renderGame() {
         ctx.fill();
     }
 
-    // 14. Fale uderzeniowe eksplozji i cząsteczki
+    // 13. Fale wybuchów i cząsteczki
     for (const ex of gameState.explosions) {
         ctx.strokeStyle = `rgba(251, 146, 60, ${ex.alpha})`;
         ctx.lineWidth = 6;
@@ -3082,7 +3644,7 @@ function renderGame() {
     }
     ctx.globalAlpha = 1.0;
 
-    // 15. Drzewa: Kasztanowce (złoto-rude korony z kasztanami) oraz Palmy
+    // 14. Drzewa (Kasztanowce i Palmy)
     for (const tree of gameState.trees) {
         if (tree.x < camX - 50 || tree.x > camX + viewW + 50 ||
             tree.y < camY - 50 || tree.y > camY + viewH + 50) continue;
@@ -3119,6 +3681,7 @@ function renderGame() {
     renderMinimap();
 }
 
+// Minimapa
 function renderMinimap() {
     const mw = minimapCanvas.width;
     const mh = minimapCanvas.height;
@@ -3135,7 +3698,6 @@ function renderMinimap() {
     minimapCtx.fillStyle = '#450a0a';
     minimapCtx.fillRect(mw / 2, mh / 2, mw / 2, mh / 2);
 
-    // Ulice na minimapie
     minimapCtx.strokeStyle = 'rgba(255,255,255,0.18)';
     minimapCtx.lineWidth = 1;
     const numBlocks = Math.floor(WORLD_SIZE / BLOCK_SIZE);
@@ -3149,7 +3711,6 @@ function renderMinimap() {
         minimapCtx.stroke();
     }
 
-    // Budki telefoniczne
     for (const booth of gameState.phoneBooths) {
         minimapCtx.fillStyle = booth.color;
         minimapCtx.beginPath();
@@ -3157,16 +3718,17 @@ function renderMinimap() {
         minimapCtx.fill();
     }
 
-    // Froggy Shopy
     for (const shop of gameState.froggyShops) {
         minimapCtx.fillStyle = '#10b981';
         minimapCtx.fillRect(shop.marker.x * scale - 2.5, shop.marker.y * scale - 2.5, 5, 5);
     }
 
-    // Radiowozy i Czołg na minimapie
     for (const car of gameState.cars) {
         if (car.model.isTank) {
             minimapCtx.fillStyle = '#a3e635';
+            minimapCtx.fillRect(car.x * scale - 3, car.y * scale - 3, 6, 6);
+        } else if (car.model.isHeli) {
+            minimapCtx.fillStyle = '#38bdf8';
             minimapCtx.fillRect(car.x * scale - 3, car.y * scale - 3, 6, 6);
         } else if (car.model.isPolice && gameState.wantedLevel >= 1) {
             minimapCtx.fillStyle = '#3b82f6';
@@ -3174,7 +3736,6 @@ function renderMinimap() {
         }
     }
 
-    // Aktywny cel misji
     if (gameState.activeMission) {
         minimapCtx.strokeStyle = '#fde047';
         minimapCtx.lineWidth = 2;
@@ -3187,7 +3748,6 @@ function renderMinimap() {
         minimapCtx.stroke();
     }
 
-    // Pozycja gracza
     minimapCtx.fillStyle = '#ffffff';
     minimapCtx.beginPath();
     minimapCtx.arc(player.x * scale, player.y * scale, 3.5, 0, Math.PI * 2);
@@ -3207,12 +3767,15 @@ function gameLoop(now) {
 
 document.getElementById('startGameBtn').addEventListener('click', (e) => {
     e.stopPropagation();
-    audio.init();
+    try {
+        audio.init();
+    } catch (err) {
+        console.warn("Audio init warning:", err);
+    }
     gameState.started = true;
     gameState.wantedLevel = 0;
     gameState.safeStartCooldown = 0.8;
     document.getElementById('startModal').classList.add('hidden');
-    // Na małych ekranach domyślnie zwiń paski respektu, by odsłonić więcej ekranu
     if (window.innerWidth < 640) {
         document.getElementById('syndicateBarsContainer').classList.add('hidden');
         document.getElementById('respectCollapseIcon').textContent = '[▶]';
