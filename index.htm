@@ -735,7 +735,34 @@
       opacity: 0;
     }
 
+    .oczko-egg {
+      position: absolute;
+      top: 8px;
+      right: 21px;
+      z-index: 3;
+      width: 8px;
+      height: 8px;
+      opacity: 0;
+    }
+
+    .tetris-egg {
+      position: absolute;
+      top: 29px;
+      right: 7px;
+      z-index: 3;
+      width: 8px;
+      height: 8px;
+      opacity: 0;
+    }
+
     .miami-egg:focus-visible {
+      opacity: 1;
+      outline: 2px solid #ffe58a;
+      outline-offset: 2px;
+    }
+
+    .oczko-egg:focus-visible,
+    .tetris-egg:focus-visible {
       opacity: 1;
       outline: 2px solid #ffe58a;
       outline-offset: 2px;
@@ -948,6 +975,8 @@
             </span>
           </a>
           <a class="miami-egg" href="./miami_77.html" aria-label="Play hidden Miami '77"></a>
+          <a class="oczko-egg" href="./KasztanoweOczko.html" aria-label="Play hidden Kasztanowe Oczko"></a>
+          <a class="tetris-egg" href="./kasztanix_kasztanowy_tetris.html" aria-label="Play hidden Kasztanix Kasztanowy Tetris"></a>
         </div>
       </div>
     </section>

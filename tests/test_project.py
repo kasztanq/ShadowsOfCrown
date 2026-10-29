@@ -35,6 +35,8 @@ MODULE_CONTRACTS = {
     "autumn_neon_chestnut_2p_arcade_hub.html": ("id=\"hub-view\"", "startGame(gameId)"),
     "grinch_chest_conquest.html": ("id=\"hub-view\"", "class GrinchConquestApp"),
     "miami_77.html": ('id="gameCanvas"', "class Miami77Audio", "function gameLoop"),
+    "KasztanoweOczko.html": ('id="bankrollDisplay"', "function startRound"),
+    "kasztanix_kasztanowy_tetris.html": ('id="tetris-canvas"', 'id="start-btn"'),
     "smerfastyczny_labirynt.html": ('id="gameCanvas"', "function generateMazeLevel", "function triggerVictoryModal"),
     "chess_nuts.html": ("id=\"chessboard\"", "Chess-Nuts"),
     "logopedia.html": ("id=\"interaction-area\"", "function switchMode", "function resetTask"),
@@ -231,6 +233,31 @@ class ProjectPagesTests(unittest.TestCase):
             contents,
             r"\.miami-egg:focus-visible\s*\{[^}]*opacity:\s*1;",
         )
+
+    def test_homepage_has_hidden_links_to_the_new_games(self):
+        parser = parse_page(ROOT / "index.htm")
+        contents = (ROOT / "index.htm").read_text(encoding="utf-8")
+        hidden_games = {
+            "KasztanoweOczko.html": "oczko-egg",
+            "kasztanix_kasztanowy_tetris.html": "tetris-egg",
+        }
+
+        for game, egg_class in hidden_games.items():
+            with self.subTest(game=game):
+                self.assertIn(f'class="{egg_class}" href="./{game}"', contents)
+                self.assertEqual(
+                    sum(reference == f"./{game}" for reference in parser.links),
+                    1,
+                )
+                self.assertRegex(
+                    contents,
+                    rf"\.{egg_class}\s*\{{[^}}]*opacity:\s*0;",
+                )
+                self.assertIn(f".{egg_class}:focus-visible", contents)
+                self.assertRegex(
+                    contents,
+                    rf"\.{egg_class}:focus-visible[\s\S]*?opacity:\s*1;",
+                )
 
     def test_arcade_cabinet_one_describes_the_current_hub(self):
         contents = (ROOT / "index.htm").read_text(encoding="utf-8")

@@ -173,6 +173,36 @@ class GameModuleBrowserTests(unittest.TestCase):
         finally:
             page.close()
 
+    def test_homepage_hidden_new_game_links_open_the_games(self):
+        hidden_games = (
+            (".oczko-egg", "./KasztanoweOczko.html", "Kasztanowe Oczko"),
+            (
+                ".tetris-egg",
+                "./kasztanix_kasztanowy_tetris.html",
+                "Kasztanix - Kasztanowy Tetris 3000",
+            ),
+        )
+        for selector, href, title in hidden_games:
+            with self.subTest(game=href):
+                page, errors = self.open_page("index.htm")
+                try:
+                    link = page.locator(selector)
+                    self.assertEqual(link.get_attribute("href"), href)
+                    self.assertEqual(
+                        link.evaluate(
+                            "(element) => getComputedStyle(element).opacity"
+                        ),
+                        "0",
+                    )
+
+                    with page.expect_navigation(wait_until="load"):
+                        link.click(force=True)
+
+                    self.assertIn(title, page.title())
+                    self.assertEqual(errors, [])
+                finally:
+                    page.close()
+
 
 if __name__ == "__main__":
     unittest.main()

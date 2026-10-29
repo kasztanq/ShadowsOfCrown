@@ -428,45 +428,154 @@ class Miami77SoundSystem {
         this.ctx = null;
         this.isMuted = false;
         this.stationIndex = 0;
-        this.stations = [
-            {
-                name: "Vice Funk 77",
-                tempo: 114,
-                scale: [130.81, 146.83, 155.56, 174.61, 196.00, 220.00, 233.08], // C-dorian funk
-                bassSeq: [65.41, 65.41, 77.78, 87.31, 98.00, 87.31, 77.78, 73.42],
-                chords: [
-                    [261.63, 311.13, 392.00, 466.16], // Cm7
-                    [293.66, 349.23, 440.00, 523.25], // Dm7
-                    [349.23, 440.00, 523.25, 622.25]  // F7
-                ]
-            },
-            {
-                name: "Neon Sunset Groove",
-                tempo: 104,
-                scale: [146.83, 164.81, 174.61, 196.00, 220.00, 246.94, 261.63], // D-minor
-                bassSeq: [73.42, 73.42, 87.31, 98.00, 110.0, 98.00, 87.31, 82.41],
-                chords: [
-                    [293.66, 349.23, 440.00, 554.37], // Dm9
-                    [261.63, 329.63, 392.00, 493.88], // Cmaj7
-                    [220.00, 261.63, 329.63, 392.00]  // Am7
-                ]
-            },
-            {
-                name: "Chestnut Heights FM",
-                tempo: 122,
-                scale: [110.0, 123.47, 130.81, 146.83, 164.81, 174.61, 196.00], // A-minor drive
-                bassSeq: [55.00, 55.00, 65.41, 73.42, 82.41, 73.42, 65.41, 61.74],
-                chords: [
-                    [220.00, 261.63, 329.63, 440.00],
-                    [174.61, 220.00, 261.63, 349.23],
-                    [196.00, 246.94, 293.66, 392.00]
-                ]
-            }
-        ];
         this.step = 0;
         this.timer = null;
         this.ambientTimer = null;
         this.footstepTimer = 0;
+
+        // Baza nut (częstotliwości w Hz)
+        const N = {
+            C2: 65.41, D2: 73.42, Eb2: 77.78, E2: 82.41, F2: 87.31, G2: 98.00, A2: 110.0, Bb2: 116.54, B2: 123.47,
+            C3: 130.81, Cs3: 138.59, Db3: 138.59, D3: 146.83, Eb3: 155.56, E3: 164.81, F3: 174.61, Fs3: 185.00, G3: 196.00, Ab3: 207.65, A3: 220.00, Bb3: 233.08, B3: 246.94,
+            C4: 261.63, Cs4: 277.18, Db4: 277.18, D4: 293.66, Eb4: 311.13, E4: 329.63, F4: 349.23, Fs4: 369.99, G4: 392.00, Ab4: 415.30, A4: 440.00, Bb4: 466.16, B4: 493.88,
+            C5: 523.25, Cs5: 554.37, Db5: 554.37, D5: 587.33, Eb5: 622.25, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00, Bb5: 932.33,
+            REST: 0
+        };
+
+        // 4 ZUPEŁNIE RÓŻNE, CHARAKTERYSTYCZNE STACJE LAT 70. Z PEŁNĄ MELODIĄ I BRZMIENIEM
+        this.stations = [
+            // 1. FUNK & DISCO 1977 (Chic / Kool & Gang style - rytmiczny funk, brass synth, slap bass)
+            {
+                name: "Vice Funk 77",
+                genre: "FUNK / DISCO",
+                tempo: 116,
+                stepMs: 129,
+                drums: [
+                    'K', 'H', 'H', 'H',  'S', 'H', 'H', 'H',
+                    'K', 'H', 'K', 'H',  'S', 'H', 'OH', 'H',
+                    'K', 'H', 'H', 'H',  'S', 'H', 'H', 'H',
+                    'K', 'H', 'K', 'H',  'S', 'H', 'OH', 'H'
+                ],
+                bass: [
+                    N.D2, N.REST, N.D2, N.F2,   N.REST, N.G2, N.REST, N.Ab2,
+                    N.A2, N.REST, N.C3, N.REST,  N.D3,   N.REST, N.C3, N.A2,
+                    N.D2, N.REST, N.D2, N.F2,   N.REST, N.G2, N.REST, N.Ab2,
+                    N.A2, N.C3,   N.D3, N.F3,   N.G3,   N.F3, N.D3, N.C3
+                ],
+                melody: [
+                    N.D4, N.REST, N.F4, N.G4,   N.A4, N.REST, N.D5, N.REST,
+                    N.C5, N.REST, N.A4, N.F4,   N.G4, N.A4, N.G4, N.REST,
+                    N.D4, N.REST, N.F4, N.G4,   N.A4, N.REST, N.D5, N.REST,
+                    N.F5, N.D5, N.C5, N.A4,     N.G4, N.F4, N.D4, N.REST
+                ],
+                chords: [
+                    [N.D3, N.F3, N.A3, N.C4],   // Dm7
+                    [N.G3, N.B3, N.D4, N.F4],   // G7
+                    [N.Bb3, N.D4, N.F4, N.A4],  // Bbmaj7
+                    [N.A3, N.Cs4, N.E4, N.G4]   // A7
+                ],
+                instrument: 'brass'
+            },
+
+            // 2. YACHT ROCK & SMOOTH SOUL (Steely Dan / Doobie Bros - Rhodes, łagodny Moog, ciepło)
+            {
+                name: "Sunset Yacht Rock",
+                genre: "SMOOTH SOUL / RHODES",
+                tempo: 92,
+                stepMs: 163,
+                drums: [
+                    'K', 'H', 'H', 'H',  'S', 'H', 'H', 'H',
+                    'H', 'H', 'K', 'H',  'S', 'H', 'H', 'OH',
+                    'K', 'H', 'H', 'H',  'S', 'H', 'H', 'H',
+                    'H', 'H', 'K', 'K',  'S', 'H', 'H', 'OH'
+                ],
+                bass: [
+                    N.F2, N.REST, N.F2, N.REST,  N.C3, N.REST, N.F2, N.REST,
+                    N.G2, N.REST, N.G2, N.REST,  N.D3, N.REST, N.G2, N.REST,
+                    N.A2, N.REST, N.A2, N.REST,  N.E3, N.REST, N.A2, N.REST,
+                    N.Bb2, N.REST, N.C3, N.REST, N.D3, N.REST, N.C3, N.REST
+                ],
+                melody: [
+                    N.A4, N.REST, N.C5, N.REST,  N.D5, N.REST, N.C5, N.A4,
+                    N.G4, N.REST, N.E4, N.REST,  N.D4, N.E4, N.G4, N.REST,
+                    N.A4, N.REST, N.C5, N.D5,    N.E5, N.REST, N.D5, N.C5,
+                    N.D5, N.REST, N.C5, N.A4,    N.G4, N.REST, N.A4, N.REST
+                ],
+                chords: [
+                    [N.F3, N.A3, N.C4, N.E4],   // Fmaj7
+                    [N.G3, N.Bb3, N.D4, N.F4],  // Gm7
+                    [N.A3, N.C4, N.E4, N.G4],   // Am7
+                    [N.Bb3, N.D4, N.F4, N.A4]   // Bbmaj7
+                ],
+                instrument: 'rhodes'
+            },
+
+            // 3. 70s HARD ROCK & HEAVY DRIVE (Led Zep / Deep Purple / Muscle Car V8 Riff)
+            {
+                name: "Chestnut Heavy Rock",
+                genre: "HARD ROCK '77",
+                tempo: 128,
+                stepMs: 117,
+                drums: [
+                    'K', 'H', 'K', 'H',  'S', 'H', 'K', 'H',
+                    'K', 'H', 'K', 'H',  'S', 'H', 'OH', 'H',
+                    'K', 'H', 'K', 'H',  'S', 'H', 'K', 'H',
+                    'K', 'H', 'K', 'H',  'S', 'S', 'S', 'OH'
+                ],
+                bass: [
+                    N.E2, N.E2, N.G2, N.E2,     N.A2, N.REST, N.Bb2, N.A2,
+                    N.G2, N.E2, N.D2, N.REST,   N.E2, N.G2, N.E2, N.REST,
+                    N.E2, N.E2, N.G2, N.E2,     N.D3, N.REST, N.B2, N.REST,
+                    N.A2, N.G2, N.E2, N.D2,     N.E2, N.REST, N.E2, N.REST
+                ],
+                melody: [
+                    N.E4, N.E4, N.G4, N.E4,     N.A4, N.REST, N.Bb4, N.A4,
+                    N.G4, N.E4, N.D4, N.REST,   N.E4, N.G4, N.E4, N.REST,
+                    N.G4, N.A4, N.Bb4, N.B4,    N.D5, N.REST, N.B4, N.REST,
+                    N.A4, N.G4, N.E4, N.D4,     N.E4, N.REST, N.E4, N.REST
+                ],
+                chords: [
+                    [N.E3, N.B3, N.E4],         // E5 Powerchord
+                    [N.G3, N.D4, N.G4],         // G5 Powerchord
+                    [N.A3, N.E4, N.A4],         // A5 Powerchord
+                    [N.B3, N.Fs4, N.B4]         // B5 Powerchord
+                ],
+                instrument: 'rockGuitar'
+            },
+
+            // 4. CALYPSO & SUNSHINE REGGAE (Island Miami vibes, skank organs & sunny marimba)
+            {
+                name: "Magic Froggy Island",
+                genre: "REGGAE & CALYPSO",
+                tempo: 84,
+                stepMs: 178,
+                drums: [
+                    'H', 'H', 'H', 'K',  'S', 'H', 'H', 'H',
+                    'H', 'H', 'H', 'K',  'S', 'H', 'OH', 'H',
+                    'H', 'H', 'H', 'K',  'S', 'H', 'H', 'H',
+                    'H', 'H', 'H', 'K',  'S', 'H', 'OH', 'H'
+                ],
+                bass: [
+                    N.C2, N.REST, N.REST, N.C2,  N.G2, N.REST, N.C3, N.REST,
+                    N.A2, N.REST, N.REST, N.A2,  N.E2, N.REST, N.A2, N.REST,
+                    N.F2, N.REST, N.REST, N.F2,  N.C3, N.REST, N.F2, N.REST,
+                    N.G2, N.REST, N.G2, N.REST,  N.D3, N.REST, N.G2, N.REST
+                ],
+                melody: [
+                    N.E5, N.G5, N.C5, N.REST,    N.D5, N.E5, N.G5, N.REST,
+                    N.A5, N.C5, N.E5, N.REST,    N.D5, N.C5, N.A4, N.REST,
+                    N.A4, N.C5, N.F5, N.REST,    N.G5, N.A5, N.C5, N.REST,
+                    N.B4, N.D5, N.G5, N.REST,    N.F5, N.D5, N.B4, N.REST
+                ],
+                chords: [
+                    [N.C4, N.E4, N.G4],         // C dur
+                    [N.A3, N.C4, N.E4],         // A moll
+                    [N.F3, N.A3, N.C4],         // F dur
+                    [N.G3, N.B3, N.D4]          // G dur
+                ],
+                instrument: 'marimba'
+            }
+        ];
     }
 
     init() {
@@ -483,70 +592,106 @@ class Miami77SoundSystem {
         if (this.timer) clearInterval(this.timer);
         if (this.ambientTimer) clearInterval(this.ambientTimer);
 
-        // Pętla muzyczna radia (Działa TYLKO GDY GRACZ JEST W AUCIE)
-        this.timer = setInterval(() => {
-            if (!this.ctx || this.isMuted || this.ctx.state !== 'running') return;
+        // Funkcja uruchamiająca taktowanie aktualnej stacji
+        const launchRadioClock = () => {
+            if (this.timer) clearInterval(this.timer);
+            const st = this.stations[this.stationIndex];
 
-            // Muzyka gra wyłącznie w pojeździe!
-            if (player.inCar) {
-                const st = this.stations[this.stationIndex];
-                const idx = this.step % 8;
+            this.timer = setInterval(() => {
+                if (!this.ctx || this.isMuted || this.ctx.state !== 'running') return;
 
-                this.playSynthBass(st.bassSeq[idx], 0.22);
+                // RADIO GRA TYLKO WTEDY, GDY GRACZ JEST W POJEŹDZIE!
+                if (player.inCar) {
+                    const stepIdx = this.step % 32;
 
-                if (idx === 0 || idx === 4) this.playKick();
-                if (idx === 2 || idx === 6) this.playSnare();
-                this.playHiHat(idx % 2 === 1 ? 0.05 : 0.02);
+                    // 1. Sekcja rytmiczna (Drums)
+                    const drumHit = st.drums[stepIdx];
+                    if (drumHit === 'K') this.playKick();
+                    else if (drumHit === 'S') this.playSnare();
+                    else if (drumHit === 'OH') this.playHiHat(0.08, 0.16);
+                    else if (drumHit === 'H') this.playHiHat(0.03, 0.04);
 
-                // Ciepły akord rhodes/brass co 4 kroki
-                if (idx === 0 || idx === 4) {
-                    const chord = st.chords[(Math.floor(this.step / 8)) % st.chords.length];
-                    this.playWarmRhodes(chord, 0.7);
+                    // 2. Linia basowa (Charakterystyczna dla stylu)
+                    const bassNote = st.bass[stepIdx];
+                    if (bassNote && bassNote > 0) {
+                        if (st.instrument === 'rockGuitar') {
+                            this.playDistortedRockBass(bassNote, st.stepMs * 0.001 * 0.95);
+                        } else if (st.instrument === 'marimba') {
+                            this.playReggaeSubBass(bassNote, st.stepMs * 0.001 * 0.85);
+                        } else {
+                            this.playSynthFunkBass(bassNote, st.stepMs * 0.001 * 0.85);
+                        }
+                    }
+
+                    // 3. Akordy tła / Rytm akordowy
+                    // Funk: tnące akordy na 2 i 4; Reggae: skank na off-beat (nieparzyste kroki); Rock: power-chordy
+                    if (st.instrument === 'marimba' && (stepIdx % 2 === 1)) {
+                        const chord = st.chords[Math.floor(stepIdx / 8) % st.chords.length];
+                        this.playReggaeSkankChord(chord, 0.08);
+                    } else if (st.instrument === 'rockGuitar' && (stepIdx % 4 === 0)) {
+                        const chord = st.chords[Math.floor(stepIdx / 8) % st.chords.length];
+                        this.playPowerChord(chord, st.stepMs * 0.001 * 2);
+                    } else if (st.instrument === 'rhodes' && (stepIdx % 4 === 0)) {
+                        const chord = st.chords[Math.floor(stepIdx / 8) % st.chords.length];
+                        this.playWarmRhodes(chord, st.stepMs * 0.001 * 3.5);
+                    } else if (st.instrument === 'brass' && (stepIdx % 4 === 2)) {
+                        const chord = st.chords[Math.floor(stepIdx / 8) % st.chords.length];
+                        this.playDiscoFunkStab(chord, 0.12);
+                    }
+
+                    // 4. Wiodąca linia melodyczna (Solo Lead)
+                    const melNote = st.melody[stepIdx];
+                    if (melNote && melNote > 0) {
+                        if (st.instrument === 'rockGuitar') {
+                            this.playRockLead(melNote, st.stepMs * 0.001 * 0.9);
+                        } else if (st.instrument === 'marimba') {
+                            this.playCalypsoMarimba(melNote, st.stepMs * 0.001 * 0.7);
+                        } else if (st.instrument === 'rhodes') {
+                            this.playMoogLead(melNote, st.stepMs * 0.001 * 1.1);
+                        } else {
+                            this.playBrassLead(melNote, st.stepMs * 0.001 * 0.8);
+                        }
+                    }
+
+                    // 5. Pościg policyjny - wtrącenie syreny w radiu
+                    if (Math.floor(gameState.wantedLevel) >= 1 && stepIdx % 8 === 0) {
+                        this.playPoliceSirenTone();
+                    }
+
+                    this.step++;
                 }
+            }, st.stepMs);
+        };
 
-                // Melodyjny lead synth co parę taktów
-                if (Math.random() < 0.38) {
-                    const note = st.scale[Math.floor(Math.random() * st.scale.length)] * 2;
-                    this.playLeadSynth(note, 0.25);
-                }
+        this.launchRadioClock = launchRadioClock;
+        launchRadioClock();
 
-                // Dźwięk syreny policyjnej jeśli pościg jest aktywny
-                if (Math.floor(gameState.wantedLevel) >= 1 && idx % 4 === 0) {
-                    this.playPoliceSirenTone();
-                }
-
-                this.step++;
-            }
-        }, 130);
-
-        // Pętla bogatych dźwięków otoczenia (Działa zawsze, zwłaszcza na piechotę)
+        // Pętla bogatych dźwięków otoczenia (na piechotę)
         this.ambientTimer = setInterval(() => {
             if (!this.ctx || this.isMuted || this.ctx.state !== 'running') return;
 
             if (!player.inCar) {
-                // Losowe odgłosy tła miejskiego lat 70.
                 const r = Math.random();
-                if (r < 0.22) {
-                    this.playDistantCityHorn();
-                } else if (r < 0.35) {
-                    this.playWindBreeze();
-                } else if (r < 0.45) {
-                    this.playDistantEngineRumble();
-                }
+                if (r < 0.25) this.playDistantCityHorn();
+                else if (r < 0.40) this.playWindBreeze();
+                else if (r < 0.52) this.playDistantEngineRumble();
 
-                // Syrena w oddali jeśli gracz jest poszukiwany
-                if (Math.floor(gameState.wantedLevel) >= 1 && Math.random() < 0.4) {
+                if (Math.floor(gameState.wantedLevel) >= 1 && Math.random() < 0.45) {
                     this.playPoliceSirenTone(true);
                 }
             }
-        }, 1500);
+        }, 1400);
     }
 
     nextStation() {
         if (!player.inCar) return;
         this.stationIndex = (this.stationIndex + 1) % this.stations.length;
-        document.getElementById('radioStationName').textContent = this.stations[this.stationIndex].name;
+        const cur = this.stations[this.stationIndex];
+        document.getElementById('radioStationName').textContent = cur.name;
+        showFloatingBanner(`📻 ${cur.name.toUpperCase()}`, `GATUNEK: ${cur.genre} [1977]`);
         this.playRadioTuningNoise();
+        this.step = 0;
+        if (this.launchRadioClock) this.launchRadioClock();
     }
 
     toggleMute() {
@@ -554,7 +699,10 @@ class Miami77SoundSystem {
         document.getElementById('muteBtn').textContent = this.isMuted ? '🔇' : '🔊';
     }
 
-    playSynthBass(freq, duration) {
+    // --- SYNTEZA INSTRUMENTÓW LAT 70. ---
+
+    // 1. Funk Slap/Moog Bass
+    playSynthFunkBass(freq, duration) {
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const filter = this.ctx.createBiquadFilter();
@@ -564,33 +712,189 @@ class Miami77SoundSystem {
         osc.frequency.setValueAtTime(freq, now);
 
         filter.type = 'lowpass';
-        filter.Q.value = 7.5;
-        filter.frequency.setValueAtTime(220, now);
-        filter.frequency.exponentialRampToValueAtTime(1400, now + 0.04);
-        filter.frequency.exponentialRampToValueAtTime(260, now + duration);
+        filter.Q.value = 8;
+        filter.frequency.setValueAtTime(280, now);
+        filter.frequency.exponentialRampToValueAtTime(1800, now + 0.04);
+        filter.frequency.exponentialRampToValueAtTime(320, now + duration);
 
-        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.setValueAtTime(0.14, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
         osc.connect(filter);
         filter.connect(gain);
         gain.connect(this.ctx.destination);
-
         osc.start(now);
         osc.stop(now + duration);
     }
 
+    // 2. Przesterowany bas rockowy
+    playDistortedRockBass(freq, duration) {
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const drive = this.ctx.createWaveShaper();
+        const filter = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+
+        // Krzywa przesteru typu soft-clipping
+        const curve = new Float32Array(256);
+        for (let i = 0; i < 256; i++) {
+            const x = (i * 2) / 256 - 1;
+            curve[i] = Math.tanh(x * 2.5);
+        }
+        drive.curve = curve;
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(650, now);
+
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(drive);
+        drive.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+    }
+
+    // 3. Głęboki bas reggae/island
+    playReggaeSubBass(freq, duration) {
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.16, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+    }
+
+    // 4. Dęciaki Funk/Disco (Brass Lead)
+    playBrassLead(freq, duration) {
+        const now = this.ctx.currentTime;
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const filter = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+
+        osc1.type = 'sawtooth';
+        osc2.type = 'sawtooth';
+        osc1.frequency.setValueAtTime(freq, now);
+        osc2.frequency.setValueAtTime(freq * 1.004, now); // Naturalny chorusing analogowy
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(800, now);
+        filter.frequency.exponentialRampToValueAtTime(2600, now + 0.08);
+        filter.frequency.exponentialRampToValueAtTime(1100, now + duration);
+
+        gain.gain.setValueAtTime(0.07, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc1.connect(filter);
+        osc2.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + duration);
+        osc2.stop(now + duration);
+    }
+
+    // 5. Śpiewny syntezator Moog (Smooth 70s Solo)
+    playMoogLead(freq, duration) {
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const filter = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+        // Delikatne vibrato
+        osc.frequency.linearRampToValueAtTime(freq * 1.015, now + duration * 0.5);
+        osc.frequency.linearRampToValueAtTime(freq, now + duration);
+
+        filter.type = 'lowpass';
+        filter.Q.value = 5;
+        filter.frequency.setValueAtTime(1400, now);
+
+        gain.gain.setValueAtTime(0.065, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+    }
+
+    // 6. Gitara Rockowa '77 (Przesterowane solo)
+    playRockLead(freq, duration) {
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const drive = this.ctx.createWaveShaper();
+        const filter = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+
+        const curve = new Float32Array(256);
+        for (let i = 0; i < 256; i++) {
+            const x = (i * 2) / 256 - 1;
+            curve[i] = Math.tanh(x * 3.5);
+        }
+        drive.curve = curve;
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now);
+
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1300, now);
+
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(drive);
+        drive.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+    }
+
+    // 7. Tropikalna Marimba (Island Calypso)
+    playCalypsoMarimba(freq, duration) {
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+    }
+
+    // 8. Ciepłe pianino Rhodes
     playWarmRhodes(chord, duration) {
         const now = this.ctx.currentTime;
         chord.forEach(f => {
+            if (!Number.isFinite(f) || f <= 0) return;
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(f, now);
-
-            gain.gain.setValueAtTime(0.025, now);
+            gain.gain.setValueAtTime(0.024, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
             osc.connect(gain);
             gain.connect(this.ctx.destination);
             osc.start(now);
@@ -598,37 +902,76 @@ class Miami77SoundSystem {
         });
     }
 
-    playLeadSynth(freq, duration) {
+    // 9. Akordy rockowe PowerChord
+    playPowerChord(chord, duration) {
         const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const filter = this.ctx.createBiquadFilter();
-        const gain = this.ctx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now);
-        osc.frequency.exponentialRampToValueAtTime(freq * 1.02, now + duration);
-
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(1200, now);
-
-        gain.gain.setValueAtTime(0.035, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.ctx.destination);
-
-        osc.start(now);
-        osc.stop(now + duration);
+        chord.forEach(f => {
+            if (!Number.isFinite(f) || f <= 0) return;
+            const osc = this.ctx.createOscillator();
+            const filter = this.ctx.createBiquadFilter();
+            const gain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(f, now);
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(950, now);
+            gain.gain.setValueAtTime(0.022, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + duration);
+        });
     }
 
+    // 10. Krótkie uderzenie dęte funk (Disco Stab)
+    playDiscoFunkStab(chord, duration) {
+        const now = this.ctx.currentTime;
+        chord.forEach(f => {
+            if (!Number.isFinite(f) || f <= 0) return;
+            const osc = this.ctx.createOscillator();
+            const filter = this.ctx.createBiquadFilter();
+            const gain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(f, now);
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(1500, now);
+            gain.gain.setValueAtTime(0.03, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + duration);
+        });
+    }
+
+    // 11. Reggae Skank na organach Hammonda
+    playReggaeSkankChord(chord, duration) {
+        const now = this.ctx.currentTime;
+        chord.forEach(f => {
+            if (!Number.isFinite(f) || f <= 0) return;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, now);
+            gain.gain.setValueAtTime(0.04, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + duration);
+        });
+    }
+
+    // Sekcja perkusyjna
     playKick() {
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.frequency.setValueAtTime(110, now);
+        osc.frequency.setValueAtTime(118, now);
         osc.frequency.exponentialRampToValueAtTime(32, now + 0.12);
-        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.setValueAtTime(0.16, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
         osc.connect(gain);
         gain.connect(this.ctx.destination);
@@ -638,7 +981,7 @@ class Miami77SoundSystem {
 
     playSnare() {
         const now = this.ctx.currentTime;
-        const bufferSize = this.ctx.sampleRate * 0.08;
+        const bufferSize = this.ctx.sampleRate * 0.09;
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
@@ -647,10 +990,10 @@ class Miami77SoundSystem {
         noise.buffer = buffer;
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'highpass';
-        filter.frequency.value = 650;
+        filter.frequency.value = 600;
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.07, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
 
         noise.connect(filter);
         filter.connect(gain);
@@ -658,9 +1001,9 @@ class Miami77SoundSystem {
         noise.start(now);
     }
 
-    playHiHat(vol) {
+    playHiHat(vol = 0.04, duration = 0.04) {
         const now = this.ctx.currentTime;
-        const bufferSize = this.ctx.sampleRate * 0.03;
+        const bufferSize = Math.floor(this.ctx.sampleRate * duration);
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
@@ -672,7 +1015,7 @@ class Miami77SoundSystem {
         filter.frequency.value = 6500;
         const gain = this.ctx.createGain();
         gain.gain.setValueAtTime(vol, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
         noise.connect(filter);
         filter.connect(gain);
@@ -700,15 +1043,15 @@ class Miami77SoundSystem {
     playRadioTuningNoise() {
         if (!this.ctx || this.isMuted) return;
         const now = this.ctx.currentTime;
-        const bufferSize = this.ctx.sampleRate * 0.12;
+        const bufferSize = Math.floor(this.ctx.sampleRate * 0.14);
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
         const noise = this.ctx.createBufferSource();
         noise.buffer = buffer;
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.09, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        gain.gain.setValueAtTime(0.10, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
         noise.connect(gain);
         gain.connect(this.ctx.destination);
         noise.start(now);
@@ -734,7 +1077,7 @@ class Miami77SoundSystem {
     playWindBreeze() {
         if (!this.ctx || this.isMuted) return;
         const now = this.ctx.currentTime;
-        const bufferSize = this.ctx.sampleRate * 0.6;
+        const bufferSize = Math.floor(this.ctx.sampleRate * 0.6);
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
@@ -850,7 +1193,7 @@ class Miami77SoundSystem {
             osc.start(now);
             osc.stop(now + 0.12);
         } else if (type === 'explosion') {
-            const bufferSize = this.ctx.sampleRate * 0.55;
+            const bufferSize = Math.floor(this.ctx.sampleRate * 0.55);
             const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
             const data = buffer.getChannelData(0);
             for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.18));

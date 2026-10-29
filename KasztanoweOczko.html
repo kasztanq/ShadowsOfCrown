@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasztanowe Oczko (21) - Leśny Stół Karciarza</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --wood-dark: #2b1810;
+            --wood-light: #4a2818;
+            --felt-green: #1c3829;
+            --felt-border: #8b5a2b;
+            --chestnut-gold: #d4a373;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: radial-gradient(circle at 50% 20%, #3a2016 0%, #1a0d08 100%);
+            min-height: 100vh;
+            color: #fefae0;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        .cinzel {
+            font-family: 'Cinzel', serif;
+        }
+
+        .playfair {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Felt table surface with cloth texture and subtle vignette */
+        .table-surface {
+            background: radial-gradient(ellipse at center, #1e4530 0%, #133020 70%, #0d2116 100%);
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.8), 0 20px 50px rgba(0,0,0,0.6);
+            border: 12px solid #5a3219;
+            border-image: linear-gradient(to bottom right, #7a4625, #42200f, #7a4625) 1;
+        }
+
+        /* Stylized Playing Cards */
+        .card {
+            width: 90px;
+            height: 130px;
+            border-radius: 10px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2);
+            animation: cardDeal 0.4s ease-out forwards;
+        }
+
+        @media (min-width: 640px) {
+            .card {
+                width: 108px;
+                height: 156px;
+                border-radius: 12px;
+            }
+        }
+
+        @keyframes cardDeal {
+            0% {
+                opacity: 0;
+                transform: translateY(-40px) scale(0.85) rotate(-5deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotate(0deg);
+            }
+        }
+
+        .card-front {
+            background: #fffdf5;
+            border: 2px solid #d4c5a9;
+            color: #2b1810;
+        }
+
+        .card-back {
+            background: repeating-linear-gradient(
+                45deg,
+                #501a14,
+                #501a14 10px,
+                #3b110d 10px,
+                #3b110d 20px
+            );
+            border: 3px solid #d4a373;
+        }
+
+        /* Leaf / Autumn Particle Falling */
+        .leaf-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 40;
+            will-change: transform, opacity;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translate(0, -50px) rotate(0deg);
+                opacity: 0.9;
+            }
+            100% {
+                transform: translate(120px, 105vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Glowing pulses */
+        .chestnut-badge {
+            background: linear-gradient(135deg, #8a4823 0%, #4a2411 100%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3);
+            border: 2px solid #b87333;
+        }
+
+        .button-wood {
+            background: linear-gradient(180deg, #96532b 0%, #683416 100%);
+            border: 2px solid #caa06d;
+            box-shadow: 0 5px 0 #3e1b09, 0 8px 12px rgba(0,0,0,0.5);
+            transition: all 0.1s ease-in-out;
+        }
+
+        .button-wood:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #3e1b09, 0 12px 18px rgba(0,0,0,0.6);
+            background: linear-gradient(180deg, #aa6034 0%, #753b1b 100%);
+        }
+
+        .button-wood:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #3e1b09, 0 3px 6px rgba(0,0,0,0.4);
+        }
+
+        .button-wood:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            filter: grayscale(60%);
+            transform: none;
+            box-shadow: 0 3px 0 #281005;
+        }
+
+        .chip-btn {
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .chip-btn:hover {
+            transform: translateY(-4px) scale(1.08);
+        }
+        .chip-btn:active {
+            transform: translateY(2px) scale(0.96);
+        }
+
+        /* Toast notification */
+        #toast {
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #5a3219;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-between min-h-screen p-2 sm:p-4 text-amber-50">
+    <a href="./index.htm" aria-label="Back to home" title="Back to home" class="fixed bottom-3 left-3 z-50 h-10 w-10 rounded-xl flex items-center justify-center bg-black/70 border border-amber-400/70 text-amber-200 shadow-lg">🏠</a>
+
+    <!-- Top Navigation / Status Bar -->
+    <header class="w-full max-w-5xl flex items-center justify-between py-2 px-3 sm:px-6 bg-stone-900/80 backdrop-blur-md rounded-2xl border border-amber-900/50 shadow-xl mb-3">
+        <div class="flex items-center space-x-2 sm:space-x-3">
+            <span class="text-3xl sm:text-4xl filter drop-shadow">🌰</span>
+            <div>
+                <h1 class="text-base sm:text-2xl font-black cinzel tracking-wider text-amber-300 drop-shadow-sm flex items-center gap-1 sm:gap-2">
+                    Kasztanowe Oczko
+                    <span class="text-xs bg-amber-800 text-amber-100 font-sans font-bold px-2 py-0.5 rounded-full border border-amber-600">21</span>
+                </h1>
+                <p class="text-[10px] sm:text-xs text-amber-200/70 font-semibold hidden sm:block">Klasyczna polska talia 24 kart &bull; As=11, K=4, D=3, W=2, 10=10, 9=0</p>
+            </div>
+        </div>
+
+        <!-- Bankroll & Stats Counters -->
+        <div class="flex items-center gap-2 sm:gap-5">
+            <!-- Audio Toggle Button -->
+            <button id="soundToggleBtn" onclick="toggleAudio()" class="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/60 border border-amber-700/60 text-amber-200 text-xs flex items-center gap-1.5 transition">
+                <span id="soundIcon">🔊</span>
+                <span class="hidden md:inline font-bold">Dźwięki</span>
+            </button>
+
+            <!-- Rules Modal Trigger -->
+            <button onclick="openRulesModal()" class="px-2.5 py-1.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/60 border border-amber-700/60 text-amber-200 text-xs font-bold transition flex items-center gap-1">
+                <span>📜</span>
+                <span class="hidden sm:inline">Zasady</span>
+            </button>
+
+            <!-- Kasztany Counter -->
+            <div class="chestnut-badge px-3 sm:px-4 py-1.5 rounded-2xl flex items-center space-x-2">
+                <span class="text-xl sm:text-2xl">🌰</span>
+                <div class="flex flex-col text-right">
+                    <span class="text-[9px] uppercase tracking-wider text-amber-300 font-extrabold leading-none">Twój Mieszek</span>
+                    <span id="bankrollDisplay" class="text-base sm:text-xl font-black text-amber-200 font-mono tracking-tight leading-tight">50</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Table Container -->
+    <main class="w-full max-w-5xl flex-1 flex flex-col table-surface rounded-3xl p-3 sm:p-6 relative overflow-hidden">
+        
+        <!-- Subtle Table Pattern Overlay -->
+        <div class="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+        <!-- DEALER / PAN KASZTANIAK SECTION -->
+        <section class="flex flex-col sm:flex-row items-center justify-between border-b border-emerald-900/80 pb-3 gap-3">
+            <!-- Dealer Avatar & Speech Bubble -->
+            <div class="flex items-center space-x-3 w-full sm:w-auto">
+                <div class="relative group">
+                    <div id="dealerAvatar" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-amber-950 border-2 border-amber-600 flex items-center justify-center text-3xl sm:text-4xl shadow-inner transition-transform duration-300">
+                        🌰
+                    </div>
+                    <span class="absolute -bottom-1 -right-1 text-xs bg-amber-900 px-1.5 py-0.2 rounded-full border border-amber-500 font-bold">🌲</span>
+                </div>
+
+                <div class="flex-1 sm:flex-initial">
+                    <div class="flex items-center gap-2">
+                        <h2 class="font-bold text-amber-300 text-sm sm:text-base cinzel">Pan Kasztaniak</h2>
+                        <span class="text-[10px] text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-700 font-semibold">Bankier</span>
+                    </div>
+                    <!-- Dialogue Bubble -->
+                    <div id="dealerDialogue" class="text-xs sm:text-sm text-amber-100/90 italic bg-black/40 px-3 py-1.5 rounded-xl border border-amber-900/50 mt-1 max-w-xs sm:max-w-md shadow-sm">
+                        "Czołem leśny graczu! Postaw kilka kasztanów i sprawdź swoje szczęście!"
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dealer Cards & Points -->
+            <div class="flex flex-col items-center sm:items-end w-full sm:w-auto">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-emerald-300/80">Karty Bankiera:</span>
+                    <span id="dealerScoreBadge" class="bg-black/60 px-2.5 py-0.5 rounded-lg border border-emerald-500/50 text-xs sm:text-sm font-black text-amber-300 font-mono">
+                        ?
+                    </span>
+                </div>
+                <div id="dealerCardsContainer" class="flex items-center justify-center gap-2 sm:gap-3 min-h-[135px] sm:min-h-[160px] p-1">
+                    <!-- Dynamic Dealer Cards Injected Here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- CENTER TABLE: Bet Pot, Game Messages & Alerts -->
+        <section class="flex-1 flex flex-col items-center justify-center my-2 sm:my-4 relative z-10 min-h-[90px]">
+            <!-- Current Bet Indicator -->
+            <div id="potContainer" class="hidden items-center gap-2 px-4 py-1.5 rounded-full bg-amber-950/80 border border-amber-600/80 shadow-lg mb-2">
+                <span class="text-lg">🌰</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Stawka w grze:</span>
+                <span id="currentBetDisplay" class="font-mono font-black text-amber-100 text-base">0</span>
+                <span class="text-xs text-amber-400">kasztanów</span>
+            </div>
+
+            <!-- Central Round Outcome Notice -->
+            <div id="gameNotice" class="text-center font-bold text-lg sm:text-2xl drop-shadow-md transition-all duration-300 playfair text-amber-200">
+                Wybierz stawkę i kliknij "Rozdaj karty"
+            </div>
+        </section>
+
+        <!-- PLAYER SECTION -->
+        <section class="flex flex-col sm:flex-row items-center justify-between border-t border-emerald-900/80 pt-3 gap-3">
+            <!-- Player Info & Points -->
+            <div class="flex items-center space-x-3 w-full sm:w-auto order-2 sm:order-1">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-950 border-2 border-emerald-500 flex items-center justify-center text-2xl sm:text-3xl shadow-inner">
+                    🦔
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold text-amber-200 text-sm sm:text-base">Twoja Ręka</span>
+                        <span id="playerScoreBadge" class="bg-black/60 px-2.5 py-0.5 rounded-lg border border-amber-500/60 text-xs sm:text-sm font-black text-amber-300 font-mono">
+                            0
+                        </span>
+                    </div>
+                    <div id="playerHandStatus" class="text-xs text-emerald-300 font-semibold mt-0.5">
+                        Czeka na rozpoczęcie gry
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player Cards Container -->
+            <div class="flex flex-col items-center sm:items-end w-full sm:w-auto order-1 sm:order-2">
+                <div id="playerCardsContainer" class="flex items-center justify-center gap-2 sm:gap-3 min-h-[135px] sm:min-h-[160px] p-1">
+                    <!-- Dynamic Player Cards Injected Here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ACTION & BETTING CONTROLS BAR -->
+        <footer class="mt-4 pt-3 border-t border-amber-900/60 flex flex-col md:flex-row items-center justify-between gap-3 bg-stone-950/60 p-3 rounded-2xl">
+            
+            <!-- Betting Chips / Controls -->
+            <div id="bettingControls" class="flex flex-wrap items-center justify-center gap-2 w-full md:w-auto">
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-300/80 mr-1 hidden sm:inline">Postaw:</span>
+                
+                <button onclick="adjustBet(5)" class="chip-btn px-3 py-1.5 rounded-xl bg-amber-900/90 hover:bg-amber-800 border border-amber-500/60 text-amber-100 text-xs font-black shadow flex items-center gap-1">
+                    <span>🌰</span> +5
+                </button>
+                <button onclick="adjustBet(10)" class="chip-btn px-3 py-1.5 rounded-xl bg-amber-800/90 hover:bg-amber-700 border border-amber-400/60 text-amber-100 text-xs font-black shadow flex items-center gap-1">
+                    <span>🌰</span> +10
+                </button>
+                <button onclick="adjustBet(25)" class="chip-btn px-3 py-1.5 rounded-xl bg-orange-950/90 hover:bg-orange-900 border border-orange-500/60 text-amber-100 text-xs font-black shadow flex items-center gap-1">
+                    <span>🌰</span> +25
+                </button>
+                <button onclick="setAllIn()" class="chip-btn px-2.5 py-1.5 rounded-xl bg-yellow-950 hover:bg-yellow-900 border border-yellow-500 text-yellow-300 text-xs font-black shadow">
+                    Va Banque!
+                </button>
+                <button onclick="clearBet()" class="px-2 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-bold">
+                    Wyczyść
+                </button>
+            </div>
+
+            <!-- In-Game Action Buttons -->
+            <div class="flex items-center justify-center gap-3 w-full md:w-auto">
+                <!-- Deal / Start Button -->
+                <button id="dealBtn" onclick="startRound()" class="button-wood px-6 py-2.5 rounded-2xl text-amber-100 font-black text-sm uppercase tracking-wider flex items-center gap-2">
+                    <span>🃏</span> Rozdaj (Graj)
+                </button>
+
+                <!-- Hit Button (Dobierz) -->
+                <button id="hitBtn" onclick="playerHit()" disabled class="button-wood px-5 py-2.5 rounded-2xl text-amber-100 font-black text-sm uppercase tracking-wider flex items-center gap-2">
+                    <span>➕</span> Dobierz
+                </button>
+
+                <!-- Stand Button (Czekaj/Pas) -->
+                <button id="standBtn" onclick="playerStand()" disabled class="button-wood px-5 py-2.5 rounded-2xl text-amber-100 font-black text-sm uppercase tracking-wider flex items-center gap-2">
+                    <span>✋</span> Pas (Czekaj)
+                </button>
+
+                <!-- New Round Button -->
+                <button id="nextRoundBtn" onclick="resetToBetting()" class="hidden button-wood px-6 py-2.5 rounded-2xl text-yellow-200 font-black text-sm uppercase tracking-wider flex items-center gap-2 bg-gradient-to-r from-amber-700 to-amber-900 border-yellow-500">
+                    <span>🔄</span> Następna runda
+                </button>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- Footer Stats & Credit -->
+    <footer class="w-full max-w-5xl text-center text-xs text-amber-200/50 py-2 flex flex-col sm:flex-row items-center justify-between px-4">
+        <div>
+            Tradycyjne polskie Oczko &bull; Karty: 9 (0), 10 (10), Walet (2), Dama (3), Król (4), As (11).
+        </div>
+        <div class="flex items-center gap-3 font-semibold mt-1 sm:mt-0">
+            <span>Wygrane: <strong id="winsCount" class="text-emerald-400">0</strong></span>
+            <span>Przegrane: <strong id="lossesCount" class="text-rose-400">0</strong></span>
+            <span>Remisy: <strong id="tiesCount" class="text-amber-400">0</strong></span>
+        </div>
+    </footer>
+
+    <!-- RULES MODAL -->
+    <div id="rulesModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-stone-900 border-2 border-amber-600 rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative text-amber-100">
+            <button onclick="closeRulesModal()" class="absolute top-4 right-4 text-amber-400 hover:text-amber-200 text-xl font-bold w-8 h-8 rounded-full bg-stone-800 flex items-center justify-center">✕</button>
+            
+            <h3 class="text-xl font-black cinzel text-amber-400 border-b border-amber-800/80 pb-2 mb-3 flex items-center gap-2">
+                <span>📜</span> Zasady Kasztanowego Oczka (21)
+            </h3>
+            
+            <div class="text-xs sm:text-sm space-y-2.5 text-amber-200/90 leading-relaxed max-h-[70vh] overflow-y-auto pr-1">
+                <p>Gra toczy się tradycyjną polską małą talią <strong>24 kart</strong> (od 9 do Asa).</p>
+                
+                <div class="bg-amber-950/60 p-3 rounded-xl border border-amber-800/60 space-y-1">
+                    <p class="font-bold text-amber-300">Wartości kart:</p>
+                    <ul class="grid grid-cols-2 gap-1.5 text-xs">
+                        <li>🌰 <strong>As:</strong> 11 punktów</li>
+                        <li>👑 <strong>Król:</strong> 4 punkty</li>
+                        <li>👸 <strong>Dama:</strong> 3 punkty</li>
+                        <li>🛡️ <strong>Walet:</strong> 2 punkty</li>
+                        <li>🔟 <strong>Dziesiątka:</strong> 10 punktów</li>
+                        <li>🍂 <strong>Dziewiątka:</strong> 0 punktów</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-1.5">
+                    <p><strong class="text-yellow-400">✨ Perskie Oczko:</strong> Jeśli w dwóch pierwszych kartach otrzymasz <strong>dwa Asy (11 + 11 = 22 pkt)</strong>, jest to układ specjalny wygrywający z każdym innym (wypłata 2:1)!</p>
+                    <p><strong class="text-rose-400">💥 Fura (przelot):</strong> Przekroczenie 21 punktów oznacza natychmiastową przegraną (z wyjątkiem układu dwóch asów).</p>
+                    <p><strong class="text-amber-300">🎩 Ruchy Bankiera:</strong> Pan Kasztaniak musi dobierać karty, dopóki ma 15 lub mniej punktów. Czeka przy 16 lub więcej.</p>
+                    <p><strong class="text-amber-400">⚖️ Tradycyjny Remis:</strong> Przy równej liczbie punktów wg starych polskich zasad towarzyskich wygrywa Bankier!</p>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-amber-800/60 text-center">
+                <button onclick="closeRulesModal()" class="button-wood px-6 py-2 rounded-xl text-amber-100 font-bold text-xs uppercase tracking-wider">
+                    Rozumiem, gramy!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BANKRUPTCY MODAL (when out of chestnuts) -->
+    <div id="bankruptModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-stone-900 border-2 border-amber-500 rounded-3xl max-w-sm w-full p-6 text-center text-amber-100 shadow-2xl">
+            <div class="text-5xl mb-2 animate-bounce">🍂</div>
+            <h3 class="text-2xl font-black cinzel text-amber-400 mb-1">Mieszek jest pusty!</h3>
+            <p class="text-xs sm:text-sm text-amber-200/80 mb-5">
+                Przegrałeś wszystkie swoje kasztany! Na szczęście wiewiórka z pobliskiego dębu zlitowała się i przyniosła świeży zapas.
+            </p>
+            <button onclick="restartBankroll()" class="button-wood w-full py-3 rounded-2xl text-amber-100 font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+                <span>🌰</span> Weź 50 nowych kasztanów
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST POPUP NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-amber-950 text-amber-200 border-2 border-amber-500 px-5 py-2.5 rounded-2xl shadow-2xl text-xs sm:text-sm font-bold opacity-0 pointer-events-none z-50 flex items-center gap-2">
+        <span id="toastIcon">🍁</span>
+        <span id="toastMessage">Komunikat</span>
+    </div>
+
+    <script>
+        /* =====================================================================
+           AUDIO SYNTHESIZER (Web Audio API - No external files needed)
+           ===================================================================== */
+        let audioCtx = null;
+        let isAudioEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!isAudioEnabled) return;
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+
+                if (type === 'card') {
+                    // Card flip sound (filtered soft noise click)
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.exponentialRampToValueAtTime(80, now + 0.08);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+
+                } else if (type === 'chestnut') {
+                    // Chestnut clack / wooden rattle
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(540, now);
+                    osc.frequency.exponentialRampToValueAtTime(220, now + 0.1);
+                    gain.gain.setValueAtTime(0.4, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+
+                } else if (type === 'win') {
+                    // Cheerful melodic jingle
+                    const notes = [440, 554, 659, 880];
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+                        gain.gain.setValueAtTime(0.25, now + idx * 0.09);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.25);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + idx * 0.09);
+                        osc.stop(now + idx * 0.09 + 0.25);
+                    });
+
+                } else if (type === 'persian') {
+                    // Epic Persian 21 fanfare!
+                    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+                        gain.gain.setValueAtTime(0.35, now + idx * 0.12);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.4);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + idx * 0.12);
+                        osc.stop(now + idx * 0.12 + 0.4);
+                    });
+
+                } else if (type === 'lose') {
+                    // Low thud
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(140, now);
+                    osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                }
+            } catch (e) {
+                // AudioContext not allowed or unsupported
+            }
+        }
+
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            document.getElementById('soundIcon').textContent = isAudioEnabled ? '🔊' : '🔇';
+            showToast(isAudioEnabled ? "Dźwięki włączone" : "Dźwięki wyłączone", "🎵");
+        }
+
+        /* =====================================================================
+           POLISH TRADITIONAL "OCZKO" (21) GAME ENGINE
+           Talia 24 kart: 9, 10, W, D, K, A
+           ===================================================================== */
+        const SUITS = [
+            { name: 'Pik', symbol: '♠', color: 'text-stone-900', icon: '♠' },
+            { name: 'Kier', symbol: '♥', color: 'text-red-700', icon: '♥' },
+            { name: 'Karo', symbol: '♦', color: 'text-amber-800', icon: '♦' },
+            { name: 'Trefl', symbol: '♣', color: 'text-stone-900', icon: '♣' }
+        ];
+
+        // Traditional card values in Polish Oczko:
+        // 9 = 0 pkt (pusta karta)
+        // 10 = 10 pkt
+        // Walet = 2 pkt
+        // Dama = 3 pkt
+        // Król = 4 pkt
+        // As = 11 pkt
+        const RANKS = [
+            { label: '9', name: 'Dziewiątka', value: 0 },
+            { label: '10', name: 'Dziesiątka', value: 10 },
+            { label: 'W', name: 'Walet', value: 2 },
+            { label: 'D', name: 'Dama', value: 3 },
+            { label: 'K', name: 'Król', value: 4 },
+            { label: 'A', name: 'As', value: 11 }
+        ];
+
+        // Quotes for Pan Kasztaniak (the Bankier)
+        const DEALER_QUOTES = {
+            idle: [
+                "Czołem leśny graczu! Postaw kilka kasztanów i sprawdź swoje szczęście!",
+                "Stół z dębowego drewna, pachnie jesienią... Grasz?",
+                "Pamiętaj: As to aż 11, a 9 to pusta karta!",
+                "Wiewiórki donoszą, że dzisiaj dobrze idą damy i króle."
+            ],
+            hit: [
+                "Śmiało, dobieraj! Kto nie ryzykuje, ten nie zbiera kasztanów!",
+                "Kolejna karta do ręki... Oby nie przelot!",
+                "Drzewa szumią, karta płynie na stół."
+            ],
+            persianPlayer: [
+                "Nie do wiary! Dwa Asy na starcie?! Toż to Perskie Oczko!",
+                "Święty Dębie! Perskie Oczko! Tego żaden bankier nie przebije!",
+                "Czysta magia jesieni! Podwójna wypłata dla Ciebie!"
+            ],
+            persianDealer: [
+                "Cha cha! Mam dwa Asy w ręku! Perskie Oczko po stronie Bankiera!",
+                "Przykro mi, leśny wędrowcze – moje dwa Asy zgarniają wszystko!"
+            ],
+            playerBust: [
+                "Ojojoj! Fura! Przelot nad lasem! Przekroczyłeś 21!",
+                "Za dużo żołędzi w kieszeni! Fura! Kasztany zostają u mnie.",
+                "Pech! Fura to natychmiastowa przegrana!"
+            ],
+            dealerBust: [
+                "A niech to korniki zjedzą! Moja własna fura! Przeliczyłem się...",
+                "Pękła gałąź! Mam ponad 21, Twoja wygrana!",
+                "Ech, zachłanny ten mój leśny nos. Zbankrutowałem w tym rozdaniu!"
+            ],
+            playerWin: [
+                "Brawo! Twoje punkty biją moją talię na głowę!",
+                "Znakomita ręka! Bierz te kasztany, zasłużyłeś!",
+                "Dobra intuicja! Następnym razem nie pójdzie Ci tak łatwo."
+            ],
+            dealerWin: [
+                "Wygrywa Bankier! Tradycja to tradycja, kasztany wędrują do dziupli.",
+                "Moje oczko bliżej 21! Dziękuję za dorodne kasztany!",
+                "Kasztaniak dzisiaj w formie! Następnym razem spróbuj mocniej!"
+            ],
+            tie: [
+                "Remis! A jak wie każdy stary karciarz: w polskim oczku remis to wygrana Bankiera!",
+                "Mamy po tyle samo, lecz przywilej stołu należy do Pana Kasztaniaka!",
+                "Równy wynik, lecz kasztany zostają u rozdającego!"
+            ]
+        };
+
+        // Game State Variables
+        let bankroll = 50;
+        let currentBet = 10;
+        let deck = [];
+        let playerHand = [];
+        let dealerHand = [];
+        let isRoundActive = false;
+        let dealerHoleCardRevealed = false;
+
+        let stats = {
+            wins: 0,
+            losses: 0,
+            ties: 0
+        };
+
+        /* =====================================================================
+           DECK & LOGIC FUNCTIONS
+           ===================================================================== */
+        function createDeck() {
+            const newDeck = [];
+            for (const suit of SUITS) {
+                for (const rank of RANKS) {
+                    newDeck.push({
+                        suit: suit,
+                        rank: rank.label,
+                        name: rank.name,
+                        value: rank.value
+                    });
+                }
+            }
+            return shuffle(newDeck);
+        }
+
+        // Fisher-Yates Shuffle
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        // Check if hand is "Perskie Oczko" (exactly 2 cards and both are Aces = 22 pkt)
+        function isPersianEye(hand) {
+            return hand.length === 2 && hand[0].rank === 'A' && hand[1].rank === 'A';
+        }
+
+        // Calculate hand score strictly based on Polish Oczko rules
+        function calculateScore(hand) {
+            if (isPersianEye(hand)) {
+                return 22; // Special case: Perskie Oczko
+            }
+            let sum = 0;
+            for (const card of hand) {
+                sum += card.value;
+            }
+            return sum;
+        }
+
+        /* =====================================================================
+           GAME LIFECYCLE & ROUND ACTIONS
+           ===================================================================== */
+        function adjustBet(amount) {
+            if (isRoundActive) return;
+            initAudio();
+            if (currentBet + amount <= bankroll) {
+                currentBet += amount;
+                playSound('chestnut');
+            } else {
+                currentBet = bankroll;
+                showToast("Maksymalna dostępna stawka!", "🌰");
+            }
+            updateBetUI();
+        }
+
+        function setAllIn() {
+            if (isRoundActive || bankroll <= 0) return;
+            initAudio();
+            currentBet = bankroll;
+            playSound('chestnut');
+            updateBetUI();
+            showToast("Va Banque! Stawiasz wszystko!", "🔥");
+        }
+
+        function clearBet() {
+            if (isRoundActive) return;
+            currentBet = Math.min(5, bankroll);
+            updateBetUI();
+        }
+
+        function updateBetUI() {
+            document.getElementById('currentBetDisplay').textContent = currentBet;
+            document.getElementById('bankrollDisplay').textContent = bankroll;
+        }
+
+        // Start a new dealing round
+        function startRound() {
+            initAudio();
+            if (bankroll < 5) {
+                showBankruptModal();
+                return;
+            }
+
+            if (currentBet > bankroll) {
+                currentBet = bankroll;
+            }
+            if (currentBet <= 0) {
+                currentBet = 5;
+            }
+
+            // Deduct bet into the active pot
+            bankroll -= currentBet;
+            updateBetUI();
+            document.getElementById('potContainer').classList.remove('hidden');
+            document.getElementById('potContainer').classList.add('flex');
+
+            // Setup fresh deck and hands
+            deck = createDeck();
+            playerHand = [];
+            dealerHand = [];
+            dealerHoleCardRevealed = false;
+            isRoundActive = true;
+
+            // UI Buttons Toggle
+            document.getElementById('dealBtn').classList.add('hidden');
+            document.getElementById('bettingControls').classList.add('opacity-40', 'pointer-events-none');
+            document.getElementById('hitBtn').disabled = false;
+            document.getElementById('standBtn').disabled = false;
+            document.getElementById('nextRoundBtn').classList.add('hidden');
+
+            setDialogue(randomChoice(DEALER_QUOTES.idle));
+            document.getElementById('gameNotice').textContent = "Trwa rozdanie...";
+
+            // Initial Deal: Player gets 2 cards, Dealer gets 2 cards (one hidden)
+            dealCardToPlayer();
+            setTimeout(() => {
+                dealCardToDealer(false); // First dealer card visible
+                setTimeout(() => {
+                    dealCardToPlayer();
+                    setTimeout(() => {
+                        dealCardToDealer(true); // Second dealer card hidden
+                        checkInitialNaturals();
+                    }, 280);
+                }, 280);
+            }, 280);
+        }
+
+        function dealCardToPlayer() {
+            if (deck.length === 0) deck = createDeck();
+            const card = deck.pop();
+            playerHand.push(card);
+            playSound('card');
+            renderPlayerCards();
+        }
+
+        function dealCardToDealer(isHidden = false) {
+            if (deck.length === 0) deck = createDeck();
+            const card = deck.pop();
+            card.isHidden = isHidden;
+            dealerHand.push(card);
+            playSound('card');
+            renderDealerCards();
+        }
+
+        // Check for immediate "Perskie Oczko" on initial deal
+        function checkInitialNaturals() {
+            const playerPersian = isPersianEye(playerHand);
+            const playerScore = calculateScore(playerHand);
+
+            if (playerPersian) {
+                // Dealer reveals hole card
+                revealDealerHoleCard();
+                const dealerPersian = isPersianEye(dealerHand);
+
+                if (dealerPersian) {
+                    // Both have Persian eye: traditional tie goes to dealer
+                    handleEndRound('tie', "Obaj macie Perskie Oczko! Lecz Bankier ma pierwszeństwo.");
+                } else {
+                    // Player wins with Persian Eye (Special bonus 2:1 payout)
+                    handleEndRound('persian', "✨ PERSKIE OCZKO! (Dwa Asy) - Spektakularna wygrana!");
+                }
+                return;
+            }
+
+            if (playerScore === 21) {
+                // Natural 21
+                playerStand();
+                return;
+            }
+
+            // Normal game continuation
+            document.getElementById('gameNotice').textContent = "Twoja kolej: Dobierz lub Pasuj";
+        }
+
+        // Player clicks "Hit" (Dobierz)
+        function playerHit() {
+            if (!isRoundActive) return;
+            initAudio();
+
+            dealCardToPlayer();
+            const score = calculateScore(playerHand);
+
+            if (score > 21) {
+                // Fura (Bust)
+                revealDealerHoleCard();
+                handleEndRound('bust', `💥 FURA! Przekroczyłeś 21 punktów (${score} pkt).`);
+            } else if (score === 21) {
+                // Hit exactly 21! Automatically stand
+                showToast("Oczko! Dokładnie 21 punktów!", "🎯");
+                playerStand();
+            } else {
+                setDialogue(randomChoice(DEALER_QUOTES.hit));
+            }
+        }
+
+        // Player clicks "Stand" (Czekaj / Pas)
+        function playerStand() {
+            if (!isRoundActive) return;
+            initAudio();
+
+            document.getElementById('hitBtn').disabled = true;
+            document.getElementById('standBtn').disabled = true;
+            document.getElementById('gameNotice').textContent = "Ruch Bankiera (Pan Kasztaniak)...";
+
+            revealDealerHoleCard();
+
+            // Dealer AI routine
+            setTimeout(dealerTurnRoutine, 600);
+        }
+
+        function revealDealerHoleCard() {
+            dealerHoleCardRevealed = true;
+            dealerHand.forEach(c => c.isHidden = false);
+            renderDealerCards();
+        }
+
+        // Dealer draws cards according to Polish standard rules (stands on 16 or 17)
+        function dealerTurnRoutine() {
+            const dealerScore = calculateScore(dealerHand);
+            const playerScore = calculateScore(playerHand);
+
+            // Bankier must draw if <= 15 points
+            if (dealerScore <= 15) {
+                dealCardToDealer(false);
+                const newScore = calculateScore(dealerHand);
+
+                if (newScore > 21) {
+                    handleEndRound('dealerBust', `Bankier przekroczył 21 (${newScore} pkt) - Fura! Wygrywasz!`);
+                    return;
+                }
+                setTimeout(dealerTurnRoutine, 600);
+            } else {
+                // Dealer stands, evaluate showdown
+                evaluateShowdown(playerScore, dealerScore);
+            }
+        }
+
+        // Compare hands at showdown
+        function evaluateShowdown(pScore, dScore) {
+            if (isPersianEye(dealerHand)) {
+                handleEndRound('dealerPersian', "Pan Kasztaniak ma Perskie Oczko! Wygrywa Bankier.");
+                return;
+            }
+
+            if (dScore > 21) {
+                handleEndRound('dealerBust', "Bankier ma furę! Gracz wygrywa!");
+            } else if (pScore > dScore) {
+                handleEndRound('win', `Wygrywasz! Twoje ${pScore} pkt bije ${dScore} pkt Bankiera.`);
+            } else if (pScore < dScore) {
+                handleEndRound('dealerWin', `Przegrałeś. Bankier ma ${dScore} pkt przeciwko Twoim ${pScore} pkt.`);
+            } else {
+                // Exact Tie: Traditional Polish rule -> Dealer wins ties!
+                handleEndRound('tie', `Remis (${pScore} : ${dScore}). W polskim oczku przy remisie wygrywa Bankier!`);
+            }
+        }
+
+        // End round and disburse winnings
+        function handleEndRound(result, reasonText) {
+            isRoundActive = false;
+            document.getElementById('hitBtn').disabled = true;
+            document.getElementById('standBtn').disabled = true;
+            document.getElementById('nextRoundBtn').classList.remove('hidden');
+
+            const noticeEl = document.getElementById('gameNotice');
+            noticeEl.textContent = reasonText;
+
+            if (result === 'persian') {
+                // Payout 2:1 for Persian Eye (returns bet + 2x bet)
+                const winnings = currentBet * 3;
+                bankroll += winnings;
+                stats.wins++;
+                playSound('persian');
+                spawnConfettiLeaves();
+                setDialogue(randomChoice(DEALER_QUOTES.persianPlayer));
+                noticeEl.className = "text-center font-black text-xl sm:text-2xl drop-shadow-md playfair text-yellow-300 animate-pulse";
+                showToast(`Wypłata Perskiego Oczka: +${winnings} kasztanów!`, "👑");
+
+            } else if (result === 'win' || result === 'dealerBust') {
+                // Standard 1:1 Win (returns bet + 1x bet)
+                const winnings = currentBet * 2;
+                bankroll += winnings;
+                stats.wins++;
+                playSound('win');
+                spawnConfettiLeaves();
+                setDialogue(result === 'dealerBust' ? randomChoice(DEALER_QUOTES.dealerBust) : randomChoice(DEALER_QUOTES.playerWin));
+                noticeEl.className = "text-center font-bold text-xl sm:text-2xl drop-shadow-md playfair text-emerald-300";
+                showToast(`Wygrana! Zgarniasz +${winnings} kasztanów!`, "🌰");
+
+            } else if (result === 'bust' || result === 'dealerWin' || result === 'dealerPersian') {
+                // Loss
+                stats.losses++;
+                playSound('lose');
+                setDialogue(result === 'bust' ? randomChoice(DEALER_QUOTES.playerBust) : randomChoice(DEALER_QUOTES.dealerWin));
+                noticeEl.className = "text-center font-bold text-xl sm:text-2xl drop-shadow-md playfair text-rose-300";
+
+            } else if (result === 'tie') {
+                // Tie (Treated as dealer win in classic rules)
+                stats.ties++;
+                playSound('lose');
+                setDialogue(randomChoice(DEALER_QUOTES.tie));
+                noticeEl.className = "text-center font-bold text-xl sm:text-2xl drop-shadow-md playfair text-amber-400";
+            }
+
+            updateStatsUI();
+            updateBetUI();
+
+            // Trigger bankruptcy check if bankroll is 0
+            if (bankroll <= 0) {
+                setTimeout(showBankruptModal, 1200);
+            }
+        }
+
+        function resetToBetting() {
+            document.getElementById('nextRoundBtn').classList.add('hidden');
+            document.getElementById('dealBtn').classList.remove('hidden');
+            document.getElementById('bettingControls').classList.remove('opacity-40', 'pointer-events-none');
+            document.getElementById('potContainer').classList.add('hidden');
+            document.getElementById('potContainer').classList.remove('flex');
+
+            playerHand = [];
+            dealerHand = [];
+            dealerHoleCardRevealed = false;
+
+            renderPlayerCards();
+            renderDealerCards();
+
+            document.getElementById('gameNotice').textContent = "Wybierz stawkę i kliknij \"Rozdaj karty\"";
+            document.getElementById('gameNotice').className = "text-center font-bold text-lg sm:text-2xl drop-shadow-md transition-all duration-300 playfair text-amber-200";
+            document.getElementById('playerScoreBadge').textContent = '0';
+            document.getElementById('dealerScoreBadge').textContent = '?';
+            document.getElementById('playerHandStatus').textContent = "Czeka na rozpoczęcie gry";
+
+            setDialogue("Postaw swoje kasztany na kolejną rundę!");
+        }
+
+        /* =====================================================================
+           CARD RENDERING & UI HELPERS
+           ===================================================================== */
+        function renderPlayerCards() {
+            const container = document.getElementById('playerCardsContainer');
+            container.innerHTML = '';
+
+            playerHand.forEach((card) => {
+                container.appendChild(createCardElement(card));
+            });
+
+            const score = calculateScore(playerHand);
+            const scoreBadge = document.getElementById('playerScoreBadge');
+            const statusEl = document.getElementById('playerHandStatus');
+
+            if (isPersianEye(playerHand)) {
+                scoreBadge.textContent = '22 (Perskie)';
+                scoreBadge.className = 'bg-yellow-950 px-2.5 py-0.5 rounded-lg border border-yellow-400 text-xs sm:text-sm font-black text-yellow-300 font-mono animate-pulse';
+                statusEl.textContent = '👑 Perskie Oczko!';
+            } else if (playerHand.length === 0) {
+                scoreBadge.textContent = '0';
+                statusEl.textContent = 'Czeka na rozdanie';
+            } else {
+                scoreBadge.textContent = score;
+                if (score > 21) {
+                    scoreBadge.className = 'bg-rose-950 px-2.5 py-0.5 rounded-lg border border-rose-500 text-xs sm:text-sm font-black text-rose-300 font-mono';
+                    statusEl.textContent = '💥 Fura (Przelot)';
+                } else if (score === 21) {
+                    scoreBadge.className = 'bg-emerald-950 px-2.5 py-0.5 rounded-lg border border-emerald-400 text-xs sm:text-sm font-black text-emerald-300 font-mono';
+                    statusEl.textContent = '🎯 Oczko (21 pkt)';
+                } else {
+                    scoreBadge.className = 'bg-black/60 px-2.5 py-0.5 rounded-lg border border-amber-500/60 text-xs sm:text-sm font-black text-amber-300 font-mono';
+                    statusEl.textContent = `${score} punktów`;
+                }
+            }
+        }
+
+        function renderDealerCards() {
+            const container = document.getElementById('dealerCardsContainer');
+            container.innerHTML = '';
+
+            dealerHand.forEach((card) => {
+                container.appendChild(createCardElement(card));
+            });
+
+            const scoreBadge = document.getElementById('dealerScoreBadge');
+
+            if (!dealerHoleCardRevealed && dealerHand.length > 0) {
+                // Show only visible card's score or "?"
+                const visibleCard = dealerHand[0];
+                scoreBadge.textContent = `${visibleCard.value} + ?`;
+            } else if (dealerHand.length === 0) {
+                scoreBadge.textContent = '?';
+            } else {
+                const score = calculateScore(dealerHand);
+                if (isPersianEye(dealerHand)) {
+                    scoreBadge.textContent = '22 (Perskie)';
+                } else {
+                    scoreBadge.textContent = score;
+                }
+            }
+        }
+
+        function createCardElement(card) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card';
+
+            if (card.isHidden) {
+                // Card back (hidden)
+                cardDiv.innerHTML = `
+                    <div class="w-full h-full card-back rounded-lg sm:rounded-xl flex flex-col items-center justify-center p-2 text-amber-300/60 shadow-inner">
+                        <span class="text-2xl sm:text-3xl opacity-80">🌰</span>
+                        <span class="text-[9px] uppercase tracking-wider font-extrabold text-amber-200/50 mt-1">Oczko</span>
+                    </div>
+                `;
+                return cardDiv;
+            }
+
+            // Card front
+            const suitColor = card.suit.color;
+            cardDiv.innerHTML = `
+                <div class="w-full h-full card-front rounded-lg sm:rounded-xl p-1.5 sm:p-2.5 flex flex-col justify-between select-none">
+                    <!-- Top Corner -->
+                    <div class="flex items-center justify-between leading-none">
+                        <div class="flex flex-col items-center">
+                            <span class="font-black text-sm sm:text-base ${suitColor}">${card.rank}</span>
+                            <span class="text-xs sm:text-sm ${suitColor}">${card.suit.symbol}</span>
+                        </div>
+                        <span class="text-[9px] sm:text-[10px] font-black px-1 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                            ${card.value}p
+                        </span>
+                    </div>
+
+                    <!-- Center Art -->
+                    <div class="flex flex-col items-center justify-center my-auto">
+                        <span class="text-2xl sm:text-3xl ${suitColor} filter drop-shadow-sm">${card.suit.symbol}</span>
+                        <span class="text-[8px] sm:text-[9px] font-extrabold uppercase text-amber-900/60 mt-0.5 tracking-tighter">
+                            ${card.name}
+                        </span>
+                    </div>
+
+                    <!-- Bottom Corner (Inverted) -->
+                    <div class="flex items-center justify-between leading-none rotate-180">
+                        <div class="flex flex-col items-center">
+                            <span class="font-black text-sm sm:text-base ${suitColor}">${card.rank}</span>
+                            <span class="text-xs sm:text-sm ${suitColor}">${card.suit.symbol}</span>
+                        </div>
+                        <span class="text-[9px] sm:text-[10px] font-black px-1 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                            ${card.value}p
+                        </span>
+                    </div>
+                </div>
+            `;
+            return cardDiv;
+        }
+
+        function setDialogue(text) {
+            const dialogueEl = document.getElementById('dealerDialogue');
+            dialogueEl.style.opacity = '0';
+            setTimeout(() => {
+                dialogueEl.textContent = `"${text}"`;
+                dialogueEl.style.opacity = '1';
+            }, 150);
+        }
+
+        function updateStatsUI() {
+            document.getElementById('winsCount').textContent = stats.wins;
+            document.getElementById('lossesCount').textContent = stats.losses;
+            document.getElementById('tiesCount').textContent = stats.ties;
+        }
+
+        function showToast(message, icon = "🍁") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            document.getElementById('toastIcon').textContent = icon;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translate(-50%, -10px)';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, 0)';
+            }, 2500);
+        }
+
+        function randomChoice(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        /* =====================================================================
+           LEAF & AUTUMN CONFETTI PARTICLES
+           ===================================================================== */
+        function spawnConfettiLeaves() {
+            const leafIcons = ['🍁', '🍂', '🌰', '🍃', '✨'];
+            for (let i = 0; i < 22; i++) {
+                setTimeout(() => {
+                    const leaf = document.createElement('div');
+                    leaf.className = 'leaf-particle';
+                    leaf.textContent = randomChoice(leafIcons);
+                    leaf.style.left = `${Math.random() * 95}vw`;
+                    leaf.style.top = '-20px';
+                    leaf.style.fontSize = `${16 + Math.random() * 24}px`;
+                    leaf.style.animationDuration = `${2.5 + Math.random() * 2}s`;
+                    document.body.appendChild(leaf);
+
+                    setTimeout(() => {
+                        leaf.remove();
+                    }, 4500);
+                }, i * 70);
+            }
+        }
+
+        /* =====================================================================
+           MODAL CONTROLS
+           ===================================================================== */
+        function openRulesModal() {
+            document.getElementById('rulesModal').classList.remove('hidden');
+        }
+
+        function closeRulesModal() {
+            document.getElementById('rulesModal').classList.add('hidden');
+        }
+
+        function showBankruptModal() {
+            document.getElementById('bankruptModal').classList.remove('hidden');
+        }
+
+        function restartBankroll() {
+            bankroll = 50;
+            currentBet = 10;
+            document.getElementById('bankruptModal').classList.add('hidden');
+            resetToBetting();
+            showToast("Otrzymałeś 50 świeżych kasztanów!", "🌰");
+            playSound('chestnut');
+        }
+
+        // Initialize display on load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateBetUI();
+            updateStatsUI();
+        });
+    </script>
+</body>
+</html>

@@ -6,7 +6,7 @@ Zestaw samodzielnych gier przeglądarkowych: od kasztanowych automatów arcade i
 
 ### Strona główna
 
-* [index.htm](./index.htm) — portal projektu z wejściem do gier i hubów, animowanym motywem kasztanowym oraz ukrytymi odnośnikami do Chess-Nuts i Miami ’77.
+* [index.htm](./index.htm) — portal projektu z wejściem do gier i hubów, animowanym motywem kasztanowym oraz ukrytymi odnośnikami do Chess-Nuts, Miami ’77, Kasztanowego Oczka i Kasztanixowego Tetrisa.
 
 ### Huby arcade
 
@@ -20,6 +20,8 @@ Zestaw samodzielnych gier przeglądarkowych: od kasztanowych automatów arcade i
 * [smerfastyczny\_labirynt.html](./smerfastyczny_labirynt.html) — labirynt Smerfów z mapą 150 poziomów, kluczami, skrótami i ucieczką przed Gargamelem.
 * [miami\_77.html](./miami_77.html) — rozbudowana gra akcji w otwartym mieście Miami z 1977 roku. Gracz wykonuje misje dla syndykatu, bada zdradę, zdobywa dowody i unika narastającego pościgu policji.
 * [chess\_nuts.html](./chess_nuts.html) — szachy w jesiennej oprawie: gra przeciw AI lub drugiemu graczowi, z przewodnikiem po figurach oraz opcjonalnymi zegarami, w tym ukrytym zegarem ruchu.
+* [KasztanoweOczko.html](./KasztanoweOczko.html) — kasztanowa wersja gry karcianej Oczko (21).
+* [kasztanix\_kasztanowy\_tetris.html](./kasztanix_kasztanowy_tetris.html) — kasztanowy Tetris z serii Kasztanix.
 * [logopedia.html](./logopedia.html) — ćwiczenia logopedyczne w trzech trybach: rozpoznawanie miejsca głoski w słowie, budowanie słów z sylab i słuch fonemowy. Zawiera podpowiedzi dla prowadzącego i odczytywanie słów.
 * [kraina\_wyraznej\_mowy.html](./kraina_wyraznej_mowy.html) — edukacyjny LogoHub z minigrami do sortowania głosek, ćwiczeń głoski R, pamięci i oddechu; zawiera też rozgrzewkę artykulacyjną oraz poradnik dla rodzica i logopedy.
 * [ShadowsOfCrown.html](./ShadowsOfCrown.html) — turowa gra strategiczno-narracyjna o intrygach na średniowiecznym dworze, relacjach z frakcjami i dążeniu do przejęcia korony.
