@@ -7,6 +7,7 @@ Zestaw samodzielnych gier przeglądarkowych: od kasztanowych automatów arcade i
 ### Strona główna
 
 * [index.htm](./index.htm) — portal projektu z wejściem do gier i hubów, animowanym motywem kasztanowym oraz ukrytymi odnośnikami do gier: Chess-Nuts, Miami ’77, Kasztanowego Oczka, Kasztanixowego Tetrisa, Pasjansa, Chestnut Combat i Chestnut Strike.
+* [play.html](./play.html) — podstrona salonu arcade z losowaniem gry kasztanem i katalogiem gier.
 
 ### Huby arcade
 
@@ -25,6 +26,8 @@ Zestaw samodzielnych gier przeglądarkowych: od kasztanowych automatów arcade i
 * [kasztanowy\_pasjans.html](./kasztanowy_pasjans.html) — klasyczny pasjans w kasztanowej oprawie.
 * [chestnut\_combat.html](./chestnut_combat.html) — lokalna bijatyka Chestnut Combat z wyborem postaci.
 * [chestnut\_strike.html](./chestnut_strike.html) — kasztanowy trening strzelecki z różnymi rodzajami broni.
+* [kasztanowa\_obrona\_stanowiska.html](./kasztanowa_obrona_stanowiska.html) — kasztanowa gra obronna: odpieraj fale przeciwników i spróbuj przetrwać 100 dni.
+* [roadtomerge.html](./roadtomerge.html) — zręcznościowa jazda z nitro, poziomami i kasztanowym chaosem korporacyjnym.
 * [logopedia.html](./logopedia.html) — ćwiczenia logopedyczne w trzech trybach: rozpoznawanie miejsca głoski w słowie, budowanie słów z sylab i słuch fonemowy. Zawiera podpowiedzi dla prowadzącego i odczytywanie słów.
 * [kraina\_wyraznej\_mowy.html](./kraina_wyraznej_mowy.html) — edukacyjny LogoHub z minigrami do sortowania głosek, ćwiczeń głoski R, pamięci i oddechu; zawiera też rozgrzewkę artykulacyjną oraz poradnik dla rodzica i logopedy.
 * [ShadowsOfCrown.html](./ShadowsOfCrown.html) — turowa gra strategiczno-narracyjna o intrygach na średniowiecznym dworze, relacjach z frakcjami i dążeniu do przejęcia korony.

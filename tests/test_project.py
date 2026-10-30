@@ -34,7 +34,7 @@ MODULE_CONTRACTS = {
     "chestnut_arcade_game_hub_v2.html": ("id=\"mainMenuView\"", "returnToMenu"),
     "autumn_neon_chestnut_2p_arcade_hub.html": ("id=\"hub-view\"", "startGame(gameId)"),
     "grinch_chest_conquest.html": ("id=\"hub-view\"", "class GrinchConquestApp"),
-    "miami_77.html": ('id="gameCanvas"', 'id="startGameBtn"', "function gameLoop"),
+    "miami_77_v2.html": ('id="gameCanvas"', 'id="startGameBtn"', "function gameLoop"),
     "KasztanoweOczko.html": ('id="bankrollDisplay"', "function startRound"),
     "kasztanix_kasztanowy_tetris.html": ('id="tetris-canvas"', 'id="start-btn"'),
     "kasztanowy_pasjans.html": ('id="stockStack"', "class SolitaireEngine"),
@@ -217,12 +217,12 @@ class ProjectPagesTests(unittest.TestCase):
         contents = (ROOT / "index.htm").read_text(encoding="utf-8")
 
         self.assertIn(
-            '<a class="miami-egg" href="./miami_77.html" '
+            '<a class="miami-egg" href="./miami_77_v2.html" '
             'aria-label="Play hidden Miami \'77"></a>',
             contents,
         )
         self.assertEqual(
-            sum(reference == "./miami_77.html" for reference in parser.links),
+            sum(reference == "./miami_77_v2.html" for reference in parser.links),
             1,
         )
         self.assertRegex(
@@ -246,6 +246,7 @@ class ProjectPagesTests(unittest.TestCase):
             "kasztanowy_pasjans.html": "pasjans-egg",
             "chestnut_combat.html": "combat-egg",
             "chestnut_strike.html": "strike-egg",
+            "miami_77_v2.html": "miami-egg",
         }
 
         for game, egg_class in hidden_games.items():

@@ -1,0 +1,2685 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kasztanowa Obrona Stanowiska: Przetrwaj 100 Dni w Korpo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .font-cinzel { font-family: 'Cinzel', serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #140f0c; }
+    ::-webkit-scrollbar-thumb { background: #92400e; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #b45309; }
+
+    @keyframes festiveGlow {
+      0%, 100% { filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.4)); transform: scale(1); }
+      50% { filter: drop-shadow(0 0 24px rgba(239, 68, 68, 0.7)); transform: scale(1.05); }
+    }
+    .chestnut-pulse {
+      animation: festiveGlow 2.5s ease-in-out infinite;
+    }
+
+    .modal-backdrop {
+      background: rgba(12, 9, 7, 0.88);
+      backdrop-filter: blur(10px);
+    }
+  </style>
+</head>
+<body class="bg-stone-950 text-stone-100 min-h-screen flex flex-col justify-between overflow-x-hidden select-none">
+
+  <!-- Górny Pasek Statystyk i Pór Roku -->
+  <header class="bg-stone-900/95 border-b border-amber-900/50 px-4 py-2.5 backdrop-blur-md sticky top-0 z-30 shadow-lg">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <!-- Logo i Tytuł -->
+      <div class="flex items-center space-x-3">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-700 via-orange-600 to-red-600 flex items-center justify-center shadow-lg shadow-amber-950 text-2xl chestnut-pulse">
+          💼
+        </div>
+        <div>
+          <h1 class="font-cinzel font-black text-lg sm:text-xl text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-300 to-yellow-200 tracking-wider">
+            OBRONA STANOWISKA
+          </h1>
+          <p id="season-badge" class="text-xs font-mono text-amber-300/80 flex items-center gap-1.5">
+            <span id="season-name">🍂 Q3: Wnioski Urlopowe</span>
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Liczniki zasobów -->
+      <div class="flex items-center flex-wrap gap-2 sm:gap-3 text-sm font-mono">
+        <!-- Budżet Biurka (Złote Kasztany) -->
+        <div class="flex items-center gap-2 bg-stone-950/80 px-3 py-1.5 rounded-xl border border-amber-800/60 shadow-inner">
+          <span class="text-amber-500 text-lg">🌰</span>
+          <div class="flex flex-col">
+            <span class="text-[10px] text-stone-400 leading-none">BUDŻET BIURKA</span>
+            <span id="stat-gold" class="font-bold text-amber-400 text-base">400</span>
+          </div>
+        </div>
+
+        <!-- Punkty Doświadczenia Stanowiska (PDS) -->
+        <div class="flex items-center gap-2 bg-stone-950/80 px-3 py-1.5 rounded-xl border border-yellow-700/60 shadow-inner">
+          <span class="text-yellow-400 text-lg">⭐</span>
+          <div class="flex flex-col">
+            <span class="text-[10px] text-stone-400 leading-none">PUNKTY ETATU (PDS)</span>
+            <span id="stat-kp" class="font-bold text-yellow-300 text-base">0</span>
+          </div>
+        </div>
+
+        <!-- Bezpieczeństwo Etatu (Zamiast standardowych żyć) -->
+        <div class="flex items-center gap-2 bg-stone-950/80 px-3 py-1.5 rounded-xl border border-rose-900/60 shadow-inner">
+          <span class="text-rose-500 text-lg">📑</span>
+          <div class="flex flex-col">
+            <span class="text-[10px] text-stone-400 leading-none">BEZPIECZEŃSTWO ETATU</span>
+            <span id="stat-lives" class="font-bold text-rose-400 text-base">100%</span>
+          </div>
+        </div>
+
+        <!-- Fala i Poziom Dnia Korpo -->
+        <div class="flex items-center gap-2 bg-stone-950/80 px-3 py-1.5 rounded-xl border border-emerald-800/60 shadow-inner">
+          <span class="text-emerald-400 text-lg">📅</span>
+          <div class="flex flex-col">
+            <span class="text-[10px] text-stone-400 leading-none">DZIEŃ KORPO</span>
+            <span id="stat-wave" class="font-bold text-emerald-400 text-base">1 / 100</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Akcje menu -->
+      <div class="flex items-center gap-2">
+        <button id="btn-tech-tree" class="px-3.5 py-2 bg-gradient-to-r from-amber-700 via-orange-700 to-red-800 hover:from-amber-600 hover:to-red-700 text-amber-100 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition border border-amber-500/40 shadow-lg shadow-amber-950">
+          <span>📜</span> Awans & Obrona Etatu
+        </button>
+        <button id="btn-audio-mute" title="Przełącz dźwięk" class="p-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-xl text-sm border border-stone-700 transition">
+          🔊
+        </button>
+        <button id="btn-info" title="Regulamin Pracy i Grinche" class="p-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-xl text-sm border border-stone-700 transition">
+          📖
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Pasek Aktywnych Narzędzi Kryzysowych (L4, Urlop na żądanie, Owocowy czwartek) -->
+  <div class="bg-stone-900/90 border-b border-amber-950/60 px-4 py-2">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+      <div class="flex items-center gap-1 text-stone-400">
+        <span class="text-amber-500 font-bold">⚡ PAKIET KRYZYSOWY BHP:</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Lewe L4 -->
+        <button id="btn-skill-l4" class="px-3 py-1.5 bg-gradient-to-r from-sky-900 to-blue-900 hover:from-sky-800 hover:to-blue-800 text-sky-100 rounded-xl border border-sky-600/40 shadow transition active:scale-95 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
+          <span>🛌</span>
+          <span>Lewe L4 od Psychiatry (<span id="cd-l4">Gotowe</span>)</span>
+        </button>
+        <!-- Urlop na żądanie -->
+        <button id="btn-skill-vacation" class="px-3 py-1.5 bg-gradient-to-r from-emerald-900 to-teal-900 hover:from-emerald-800 hover:to-teal-800 text-emerald-100 rounded-xl border border-emerald-600/40 shadow transition active:scale-95 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
+          <span>🏖️</span>
+          <span>Urlop na Żądanie UŻ (<span id="cd-vacation">Gotowe</span>)</span>
+        </button>
+        <!-- Owocowy Czwartek -->
+        <button id="btn-skill-fruits" class="px-3 py-1.5 bg-gradient-to-r from-yellow-900 to-amber-900 hover:from-yellow-800 hover:to-amber-800 text-yellow-100 rounded-xl border border-yellow-600/40 shadow transition active:scale-95 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
+          <span>🍏</span>
+          <span>Owocowy Czwartek (Koszt: 60 🌰)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Obszar główny gry -->
+  <main class="max-w-7xl mx-auto w-full p-2 sm:p-4 flex-grow flex flex-col lg:flex-row gap-4 items-start justify-center">
+
+    <!-- Lewa strona: Plansza Canvas & Panele -->
+    <div class="w-full lg:flex-1 flex flex-col items-center">
+      <div class="relative w-full aspect-[16/9] max-h-[640px] bg-stone-900 rounded-2xl overflow-hidden border-2 border-stone-800 shadow-2xl flex items-center justify-center">
+        <!-- Canvas gry -->
+        <canvas id="gameCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+
+        <!-- Baner Rozpoczęcia Fali -->
+        <div id="wave-banner" class="pointer-events-none absolute inset-x-0 top-1/4 flex flex-col items-center justify-center text-center opacity-0 transition-opacity duration-500 z-10">
+          <div class="px-7 py-3 rounded-2xl bg-black/85 border border-amber-500/50 backdrop-blur-md shadow-2xl">
+            <h2 id="wave-banner-title" class="font-cinzel text-2xl sm:text-3xl font-black text-amber-300 drop-shadow">DZIEŃ 1: ASAP</h2>
+            <p id="wave-banner-sub" class="text-xs sm:text-sm text-stone-300 font-mono mt-0.5">Wkraczają pierwsi stażyści z pretensjami!</p>
+          </div>
+        </div>
+
+        <!-- Ostrzeżenie przed Bossem / Grinchem -->
+        <div id="boss-warning" class="pointer-events-none absolute inset-0 bg-red-950/30 border-4 border-red-600/60 rounded-2xl opacity-0 transition-opacity duration-300 flex items-center justify-center">
+          <div class="bg-stone-950/95 border-2 border-red-500 p-4 sm:p-5 rounded-2xl text-center shadow-2xl animate-pulse">
+            <p class="text-red-400 font-cinzel text-lg font-black tracking-widest uppercase">⚠️ AUDYT ZARZĄDU / NALOT GRINCHA ⚠️</p>
+        <p id="boss-warning-name" class="text-stone-100 font-mono text-sm font-bold mt-1">Dyrektor Generalny Grinch</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel Sterowania Falą i Prędkością -->
+  <div class="w-full mt-3 bg-stone-900/90 border border-stone-800 rounded-2xl p-2.5 sm:p-3 flex flex-wrap items-center justify-between gap-3 shadow-md">
+    <!-- Start / Nadgodziny ASAP / Auto fali -->
+    <div class="flex items-center flex-wrap gap-2">
+      <button id="btn-next-wave" class="px-4 py-2.5 bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-700 hover:from-emerald-600 hover:to-teal-600 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-lg shadow-emerald-950 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+        <span>▶️</span> Rozpocznij Dzień
+      </button>
+      
+      <button id="btn-asap" class="px-3.5 py-2.5 bg-gradient-to-r from-rose-800 to-amber-700 hover:from-rose-700 hover:to-amber-600 text-amber-100 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" title="Natychmiast wywołaj falę za premię w kasztanach!">
+        <span>⚡</span> Nadgodziny (+ASAP)
+      </button>
+
+      <label class="flex items-center gap-2 cursor-pointer bg-stone-950 px-3 py-2 rounded-xl border border-stone-800 text-xs text-stone-300 hover:border-stone-700 transition">
+        <input id="chk-auto-wave" type="checkbox" class="w-4 h-4 rounded text-emerald-600 bg-stone-900 border-stone-700 focus:ring-emerald-500">
+        <span>Auto-Deadliny</span>
+      </label>
+    </div>
+
+    <!-- Prędkości gry -->
+    <div class="flex items-center bg-stone-950 p-1 rounded-xl border border-stone-800 gap-1 font-mono">
+      <span class="text-[11px] text-stone-400 px-2">TEMPO:</span>
+      <button data-speed="1" class="speed-btn active px-2.5 py-1 text-xs font-bold rounded bg-amber-600 text-white transition">1x</button>
+      <button data-speed="2" class="speed-btn px-2.5 py-1 text-xs font-bold rounded hover:bg-stone-800 text-stone-300 transition">2x</button>
+      <button data-speed="4" class="speed-btn px-2.5 py-1 text-xs font-bold rounded hover:bg-stone-800 text-stone-300 transition">4x</button>
+    </div>
+
+    <!-- Pasek postępu fali -->
+    <div class="hidden sm:flex flex-col items-end min-w-[140px]">
+      <div class="flex items-center justify-between w-full text-xs font-mono text-stone-400 mb-1">
+        <span>Redukcje w toku:</span>
+        <span id="wave-enemies-left">0/0</span>
+      </div>
+      <div class="w-full bg-stone-950 h-2 rounded-full overflow-hidden border border-stone-800">
+        <div id="wave-progress-fill" class="bg-gradient-to-r from-amber-500 via-orange-500 to-emerald-400 h-full w-0 transition-all duration-200"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Prawa strona: Sklep z Wieżami i Inspektor -->
+<div class="w-full lg:w-96 flex flex-col gap-3">
+  
+  <!-- Magazyn Wież -->
+  <div class="bg-stone-900/90 border border-stone-800 rounded-2xl p-3 shadow-lg">
+    <h3 class="font-cinzel text-sm font-bold text-amber-300 uppercase tracking-wider mb-2 flex items-center justify-between">
+      <span>💼 Arsenał Obrony Stanowiska</span>
+      <span class="text-[10px] font-mono text-stone-400 lowercase">wybierz i postaw</span>
+    </h3>
+    
+    <div id="tower-store" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+      <!-- Wieże generowane dynamicznie -->
+    </div>
+  </div>
+
+  <!-- Inspektor Wybranej Wieży -->
+  <div id="inspector-panel" class="bg-stone-900/90 border border-amber-900/40 rounded-2xl p-3.5 shadow-lg relative min-h-[195px] flex flex-col justify-between">
+    <div id="inspector-empty" class="text-center py-8 text-stone-500 text-xs font-mono">
+      <p class="text-3xl mb-2 opacity-40">🖥️</p>
+      Kliknij wieżę na planszy, aby zarządzać priorytetem celowania, awansować ją na wyższy poziom korpo lub sprzedać w ramach outsourcingu.
+    </div>
+
+    <div id="inspector-content" class="hidden flex flex-col h-full justify-between gap-3">
+      <div>
+        <div class="flex items-start justify-between">
+          <div>
+            <h4 id="insp-name" class="font-bold text-amber-300 text-sm">Kasztanowa Proca Stanowiskowa</h4>
+            <p id="insp-level" class="text-[11px] font-mono text-emerald-400">Poziom 1 (Młodszy Specjalista)</p>
+          </div>
+          <span id="insp-icon" class="text-2xl p-1 bg-stone-950 rounded-xl border border-stone-800">🌰</span>
+        </div>
+
+        <!-- Statystyki -->
+        <div class="grid grid-cols-3 gap-1.5 mt-2.5 font-mono text-xs">
+          <div class="bg-stone-950 p-1.5 rounded-lg border border-stone-800">
+            <span class="text-[10px] text-stone-400 block">ATAK</span>
+            <span id="insp-dmg" class="font-bold text-amber-400">24</span>
+          </div>
+          <div class="bg-stone-950 p-1.5 rounded-lg border border-stone-800">
+            <span class="text-[10px] text-stone-400 block">ZASIĘG</span>
+            <span id="insp-range" class="font-bold text-cyan-400">140</span>
+          </div>
+          <div class="bg-stone-950 p-1.5 rounded-lg border border-stone-800">
+            <span class="text-[10px] text-stone-400 block">SZYBKOŚĆ</span>
+            <span id="insp-rate" class="font-bold text-emerald-400">1.4/s</span>
+          </div>
+        </div>
+
+        <!-- Priorytet celowania -->
+        <div class="mt-2.5 flex items-center justify-between text-xs">
+          <span class="text-stone-400 font-mono text-[11px]">Celuj w:</span>
+          <select id="insp-targeting" class="bg-stone-950 border border-stone-700 text-stone-200 text-xs rounded-lg px-2 py-1 outline-none">
+            <option value="first">Pierwszy intruz (ASAP)</option>
+            <option value="strongest">Dyrektor / Tank (Najsilniejszy)</option>
+            <option value="weakest">Mały Grinch / Stażysta (Najsłabszy)</option>
+            <option value="closest">Bezpośrednie zagrożenie (Najbliższy)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Przyciski akcji: Ulepsz / Sprzedaj -->
+      <div class="flex items-center gap-2 pt-2 border-t border-stone-800">
+        <button id="btn-upgrade-tower" class="flex-1 py-2 px-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 shadow">
+          <span>⏫</span>
+          <span>Awans: <span id="insp-upgrade-cost">90</span> 🌰</span>
+        </button>
+        <button id="btn-sell-tower" class="py-2 px-3 bg-rose-950 hover:bg-rose-900 border border-rose-800/80 text-rose-300 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-1">
+          <span>🗑️</span>
+          <span>Outsource (<span id="insp-sell-value">45</span>)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Klimatyczna wskazówka -->
+  <div class="bg-stone-900/60 border border-stone-800 rounded-2xl p-3 text-stone-400 text-[11px] leading-relaxed">
+    <strong class="text-amber-400 font-mono block mb-1">📑 Kodeks Pracy i BHP Biurowego:</strong>
+    Gdy <span class="text-yellow-400">Scrum Master</span> zaczyna Standup, rzuć <span class="text-sky-300 font-medium">Lewe L4</span> aby uciec pod kołdrę. Na <span class="text-indigo-400">Korpo-Penisa w slim-ficie</span> działa wrzący <span class="text-amber-500 font-medium">Korpo-Ekspres</span>!
+  </div>
+</div>
+</main>
+
+  <!-- Modale -->
+
+  <!-- 1. Drzewko Rozwoju (Stabilizacja, Kwartalnik, Premia Świąteczna) -->
+  <div id="modal-tech-tree" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-stone-900 border border-amber-700/60 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="p-4 sm:p-5 border-b border-amber-900/50 flex items-center justify-between bg-stone-950">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl p-2 bg-amber-950/70 rounded-2xl border border-amber-700/50">📜</span>
+          <div>
+            <h2 class="font-cinzel font-black text-lg text-amber-300">Drabinka Awansu i Obrony Etatu</h2>
+            <p class="text-xs text-stone-400 font-mono">Inwestuj Punkty Doświadczenia Stanowiska (PDS) w 3 korpo-gałęzie.</p>
+          </div>
+        </div>
+        <button class="modal-close p-2 text-stone-400 hover:text-white text-2xl">&times;</button>
+      </div>
+
+      <!-- Pula punktów i zakładki -->
+      <div class="p-4 sm:p-6 overflow-y-auto space-y-4 flex-grow">
+        <div class="flex items-center justify-between bg-stone-950 p-3.5 rounded-2xl border border-yellow-700/60 shadow-inner">
+          <div class="flex items-center gap-2">
+            <span class="text-yellow-400 text-xl">⭐</span>
+            <span class="text-xs font-mono text-yellow-200">ZDOBYTE PUNKTY ETATU:</span>
+          </div>
+          <span id="tech-points-display" class="font-mono font-extrabold text-yellow-300 text-xl">0 PDS</span>
+        </div>
+
+        <div id="tech-tree-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          <!-- Karty 3 gałęzi generowane dynamicznie -->
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-stone-800 bg-stone-950 flex justify-end">
+        <button class="modal-close px-5 py-2.5 bg-stone-800 hover:bg-stone-700 text-stone-200 font-semibold rounded-xl text-xs transition">
+          Wróć do Biurka
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Encyklopedia Korpo-Szkodników i Regulamin -->
+  <div id="modal-info" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-stone-900 border border-stone-700 rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="p-4 border-b border-stone-800 flex items-center justify-between bg-stone-950">
+        <h3 class="font-cinzel font-bold text-base text-amber-300 flex items-center gap-2">
+          <span>📖</span> Regulamin Obrony Stanowiska Pracy
+        </h3>
+        <button class="modal-close p-2 text-stone-400 hover:text-white text-2xl">&times;</button>
+      </div>
+      <div class="p-5 overflow-y-auto space-y-4 text-xs text-stone-300 font-mono leading-relaxed">
+        <h4 class="font-cinzel text-amber-400 text-sm font-bold">4 Fazy Kwartalne (100 Dni):</h4>
+        <ul class="list-disc pl-5 space-y-1 text-stone-400">
+          <li><b class="text-amber-200">Dni 1–25 (Jesienny Kwartał Q3):</b> Spadające wnioski urlopowe, zwinne wiewiórki ze stażu i podkradacze długopisów. Boss Dnia 25: <i>Kierownik ds. Restrukturyzacji Grinch</i>.</li>
+          <li><b class="text-cyan-200">Dni 26–50 (Listopadowy Deadlinogeddon):</b> Przymrozki i dziki z logistyki. Boss Dnia 50: <i>Dyrektor Generalny Grinch</i>.</li>
+          <li><b class="text-blue-200">Dni 51–75 (Zimowy Audyt Roczny):</b> Śnieżyca kontrolingu, mroźne bałwany z Excela. Boss Dnia 75: <i>Audytor z Centrali Grinch</i>.</li>
+          <li><b class="text-red-300">Dni 76–100 (Wigilijna Walka o Premię & Inwazja Grinchów):</b> Zmasowany atak małych i wielkich Grinchów. Boss Dnia 100: <i>Megagrinch - Likwidator Stanowiska</i>!</li>
+        </ul>
+
+        <h4 class="font-cinzel text-amber-400 text-sm font-bold mt-4">Katalog Zagrożeń (Grinche i Inni):</h4>
+        <ul class="list-disc pl-5 space-y-1.5 text-stone-400">
+          <li><b class="text-emerald-400">Mały Grinch (🏃):</b> Zwinny manipulator, kradnie premie świąteczne i sprintuje przez korytarz.</li>
+          <li><b class="text-red-400">Duży Grinch (🧳):</b> Opasły biurokrata z teczką pełną wypowiedzeń, gruby pancerz korporacyjny.</li>
+          <li><b class="text-purple-300">Grinch Dyrektor / Manager (👔):</b> Roztacza aurę przyspieszającą okoliczne szkodniki.</li>
+          <li><b class="text-sky-300">Grinch Audytor (📉):</b> Wymaga ciągłego ognia lub kofeiny – odporny na proste pociski.</li>
+        </ul>
+      </div>
+      <div class="p-3 border-t border-stone-800 bg-stone-950 text-right">
+        <button class="modal-close px-4 py-2 bg-stone-800 text-stone-300 rounded-xl text-xs">Przyjąłem do Wiadomości</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Ekran Porażki / Sukcesu -->
+  <div id="modal-gameover" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="bg-stone-900 border-2 border-amber-600 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl flex flex-col items-center">
+      <div id="go-icon" class="text-6xl mb-3">📑</div>
+      <h2 id="go-title" class="font-cinzel text-2xl font-black text-rose-500 mb-1">WYPOWIEDZENIE ZŁOŻONE!</h2>
+      <p id="go-desc" class="text-xs font-mono text-stone-300 mb-6">Grinche i Zarząd zlikwidowali Twoje stanowisko pracy przed Wigilią.</p>
+      <div class="w-full bg-stone-950 p-3.5 rounded-2xl border border-stone-800 mb-6 font-mono text-xs space-y-1.5">
+        <div class="flex justify-between"><span>Przetrwane Dni:</span> <span id="go-stat-waves" class="text-amber-400 font-bold">12/100</span></div>
+        <div class="flex justify-between"><span>Zneutralizowane Zagrożenia:</span> <span id="go-stat-kills" class="text-emerald-400 font-bold">142</span></div>
+        <div class="flex justify-between"><span>Rozliczone Kasztany:</span> <span id="go-stat-gold" class="text-yellow-400 font-bold">2,410</span></div>
+      </div>
+      <button id="btn-restart" class="w-full py-3 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white font-bold rounded-xl shadow-lg transition">
+        Złóż Odwołanie (Spróbuj Ponownie)
+      </button>
+    </div>
+  </div>
+
+  <!-- Kod Gry & Silnik Dźwiękowy -->
+  <script>
+    /* ==========================================================================
+       1. SILNIK DŹWIĘKOWY WEB AUDIO API (Proceduralne efekty dźwiękowe)
+       ========================================================================== */
+    class SeasonalSoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+      init() {
+      if (!this.ctx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          this.ctx = new AudioContext();
+        }
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+    }
+    playTyping() {
+      if (!this.enabled || !this.ctx) return;
+      try {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(600 + Math.random() * 300, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.04);
+      } catch (e) {}
+    }
+    playBuzzer() {
+      if (!this.enabled || !this.ctx) return;
+      try {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.3);
+      } catch (e) {}
+    }
+    playSlingshot() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(420, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(140, this.ctx.currentTime + 0.09);
+          gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.09);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.09);
+        } catch (e) {}
+      }
+      playRoastPop() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(260 + Math.random() * 100, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(750, this.ctx.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.14, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.08);
+        } catch (e) {}
+      }
+      playCoffeeHiss() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(800 + Math.random() * 200, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.12);
+        } catch (e) {}
+      }
+      playFrostShatter() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(1100, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(160, this.ctx.currentTime + 0.22);
+          gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.22);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.22);
+        } catch (e) {}
+      }
+      playHolidayBell() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          [1046, 1318, 1567].forEach((freq, i) => {
+            setTimeout(() => {
+              if (!this.ctx) return;
+              const osc = this.ctx.createOscillator();
+              const gain = this.ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+              gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.35);
+              osc.connect(gain);
+              gain.connect(this.ctx.destination);
+              osc.start();
+              osc.stop(this.ctx.currentTime + 0.35);
+            }, i * 60);
+          });
+        } catch (e) {}
+      }
+      playGrinchLaugh() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          [320, 260, 200].forEach((freq, i) => {
+            setTimeout(() => {
+              if (!this.ctx) return;
+              const osc = this.ctx.createOscillator();
+              const gain = this.ctx.createGain();
+              osc.type = 'sawtooth';
+              osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+              gain.gain.setValueAtTime(0.09, this.ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+              osc.connect(gain);
+              gain.connect(this.ctx.destination);
+              osc.start();
+              osc.stop(this.ctx.currentTime + 0.12);
+            }, i * 80);
+          });
+        } catch (e) {}
+      }
+      playHit() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(170 + Math.random() * 70, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.05);
+        } catch (e) {}
+      }
+      playCollect() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(587, this.ctx.currentTime);
+          osc.frequency.setValueAtTime(880, this.ctx.currentTime + 0.07);
+          gain.gain.setValueAtTime(0.09, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.14);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.14);
+        } catch (e) {}
+      }
+    }
+    const sound = new SeasonalSoundEngine();
+
+    /* ==========================================================================
+       2. DEFINICJE 6 WIEŻ (Obrona Stanowiska Pracy)
+       ========================================================================== */
+    const TOWER_TYPES = {
+      slingshot: {
+        id: 'slingshot',
+        name: 'Kasztanowa Proca Stanowiskowa',
+        icon: '🌰',
+        cost: 100,
+        range: 135,
+        damage: 24,
+        fireRate: 1.4,
+        color: '#b45309',
+        bulletColor: '#78350f',
+        bulletSpeed: 8.5,
+        desc: 'Miotka twarde kasztany z parku prosto w potylicę managera żądającego estymacji w story pointach.'
+      },
+      burr: {
+        id: 'burr',
+        name: 'Kolczasta Łupina BHP',
+        icon: '🦔',
+        cost: 130,
+        range: 110,
+        damage: 8,
+        slowFactor: 0.5,
+        fireRate: 2.2,
+        color: '#65a30d',
+        pulseColor: 'rgba(101, 163, 13, 0.35)',
+        desc: 'Zasieki z protokołów powypadkowych i gaśnic śniegowych. Rani stopy intruzów w drogich butach ze skóry.'
+      },
+      roaster: {
+        id: 'roaster',
+        name: 'Piec na Pieczone Kasztany',
+        icon: '🔥',
+        cost: 180,
+        range: 140,
+        damage: 22,
+        burnDmg: 7,
+        fireRate: 1.8,
+        color: '#ea580c',
+        bulletColor: '#f97316',
+        bulletSpeed: 9.5,
+        desc: 'Aromat cynamonu i prażonych łupin roztapia korpo-garnitury i paraliżuje zapał do pracy nadgodzinowej.'
+      },
+      pine: {
+        id: 'pine',
+        name: 'Szyszkowa Katapulta Targetowa',
+        icon: '🌲',
+        cost: 240,
+        range: 205,
+        damage: 90,
+        fireRate: 0.45,
+        splashRadius: 80,
+        color: '#0284c7',
+        bulletColor: '#38bdf8',
+        bulletSpeed: 5,
+        isMortar: true,
+        desc: 'Wystrzeliwuje zmarznięte szyszki o parabolicznym torze lotu. Wywołuje obszarowy paraliż korporacyjny.'
+      },
+      tree: {
+        id: 'tree',
+        name: 'Świąteczna Choinka Premia',
+        icon: '🎄',
+        cost: 220,
+        range: 150,
+        damage: 32,
+        fireRate: 1.0,
+        buffRange: 130,
+        incomePerWave: 35,
+        color: '#10b981',
+        bulletColor: '#facc15',
+        bulletSpeed: 12,
+        desc: 'Zasilana ze środków Zakładowego Funduszu Świadczeń Socjalnych. Finansuje premie i zagrzewa do obrony biurka.'
+      },
+      coffee: {
+        id: 'coffee',
+        name: 'Działo Korpo-Ekspresu',
+        icon: '☕',
+        cost: 280,
+        range: 160,
+        damage: 48,
+        fireRate: 2.8,
+        color: '#78350f',
+        isBeam: true,
+        desc: 'Leje wrzącą lurę z automatu z mlekiem sojowym pod wysokim ciśnieniem, roztapiając krawaty slim-fit.'
+      }
+    };
+
+    /* ==========================================================================
+       3. DRABINKA ROZWOJU (15 Korpo-Talentów Obrony Etatu)
+       ========================================================================== */
+    const TECH_TREE = [
+      // Gałąź 1: Stabilizacja Umowy (Quiet Quitting & Uniki)
+      {
+        id: 'alt_tab_reflex',
+        branch: 'stabilizacja',
+        name: 'Refleks Alt+Tab',
+        icon: '⌨️',
+        cost: 1,
+        bought: false,
+        effect: '+2 kasztany za każdego pokonanego intruza dzięki szybkiemu chowaniu pasjansa.',
+        apply: (game) => { game.techBonus.bonusGoldPerKill += 2; }
+      },
+      {
+        id: 'remote_contract',
+        branch: 'stabilizacja',
+        name: 'Prawomocny Home Office',
+        icon: '🏠',
+        cost: 2,
+        bought: false,
+        effect: 'Koszty budowy wszystkich wież spadają o 10% dzięki pracy w dresie.',
+        apply: (game) => { game.techBonus.buildDiscount = 0.10; }
+      },
+      {
+        id: 'quiet_quitting',
+        branch: 'stabilizacja',
+        name: 'Cicha Rezygnacja (Quiet Quitting)',
+        icon: '🛋️',
+        cost: 3,
+        bought: false,
+        effect: '+20% do Bezpieczeństwa Etatu. Nikt nie wie czym się zajmujesz, więc trudniej Cię zwolnić.',
+        apply: (game) => { game.lives += 20; game.maxLives += 20; }
+      },
+      {
+        id: 'coffee_break_40m',
+        branch: 'stabilizacja',
+        name: 'Kawa Parzona 40 Minut',
+        icon: '☕',
+        cost: 4,
+        bought: false,
+        effect: 'Zwrot z outsourcingu wież wzrasta z 65% do 85%.',
+        apply: (game) => { game.techBonus.sellRate = 0.85; }
+      },
+      {
+        id: 'indefinite_tenure',
+        branch: 'stabilizacja',
+        name: 'Umowa na Czas Nieokreślony',
+        icon: '🏛️',
+        cost: 5,
+        bought: false,
+        effect: '+60 pasywnych kasztanów na koniec każdego dnia z funduszu socjalnego.',
+        apply: (game) => { game.techBonus.passiveIncome += 60; }
+      },
+
+      // Gałąź 2: Agresywny Kwartalnik (BHP & Targety)
+      {
+        id: 'pretend_typing',
+        branch: 'kwartalnik',
+        name: 'Symulator Pisania na Klawiaturze',
+        icon: '💻',
+        cost: 1,
+        bought: false,
+        effect: '+20% do zasięgu Procy Stanowiskowej i Łupiny BHP.',
+        apply: (game) => { game.techBonus.slingshotRangeMult += 0.20; }
+      },
+      {
+        id: 'burning_deadline',
+        branch: 'kwartalnik',
+        name: 'Płonący Deadline na Asapie',
+        icon: '🔥',
+        cost: 2,
+        bought: false,
+        effect: 'Piecyk na kasztany przypala garnitury wrogów na 5 sekund, redukując ich pancerz o 50%.',
+        apply: (game) => { game.techBonus.roasterBurn = true; }
+      },
+      {
+        id: 'audit_proof_burr',
+        branch: 'kwartalnik',
+        name: 'Regulamin Pracy w Twardej Oprawie',
+        icon: '🦔',
+        cost: 3,
+        bought: false,
+        effect: 'Łupiny BHP ignorują pancerz korpo-penisów i dyrektorów, zadając +40% obrażeń.',
+        apply: (game) => { game.techBonus.burrArmorPen = true; }
+      },
+      {
+        id: 'frozen_kpi',
+        branch: 'kwartalnik',
+        name: 'Szyszka w Formacie Zamrożonego KPI',
+        icon: '🌲',
+        cost: 4,
+        bought: false,
+        effect: 'Szyszkowa Katapulta zwiększa zasięg wybuchu o 35% i zamraża wrogów.',
+        apply: (game) => { game.techBonus.pineSplashMult += 0.35; }
+      },
+      {
+        id: 'scalded_espresso',
+        branch: 'kwartalnik',
+        name: 'Wrząca Kawa z Cynamonem',
+        icon: '⚡',
+        cost: 5,
+        bought: false,
+        effect: 'Działo Korpo-Ekspresu zyskuje 30% szansy na krytyczne oparzenie strumieniem.',
+        apply: (game) => { game.techBonus.coffeeFire = true; }
+      },
+
+      // Gałąź 3: Premia Świąteczna (Grinche i Gwiazdka)
+      {
+        id: 'cinnamon_bonus',
+        branch: 'premia',
+        name: 'Ekwiwalent za Pranie i Wigilię',
+        icon: '🥧',
+        cost: 2,
+        bought: false,
+        effect: 'Świąteczna Choinka generuje o 80% więcej kasztanów co falę.',
+        apply: (game) => { game.techBonus.treeBonusIncome = true; }
+      },
+      {
+        id: 'bethlehem_radiance',
+        branch: 'premia',
+        name: 'Premia Uznaniowa Kierownictwa',
+        icon: '⭐',
+        cost: 3,
+        bought: false,
+        effect: 'Aura Świątecznej Choinki zwiększa atak pobliskich wież o dodatkowe +20%.',
+        apply: (game) => { game.techBonus.treeBuffBonus += 0.20; }
+      },
+      {
+        id: 'grinch_dissolver',
+        branch: 'premia',
+        name: 'Anty-Grinchowy Protokół HR',
+        icon: '🧪',
+        cost: 4,
+        bought: false,
+        effect: '+35% obrażeń zadawanych Grinchom, Scrum Masterom i Dyrektorom.',
+        apply: (game) => { game.techBonus.antiGrinchDmg += 0.35; }
+      },
+      {
+        id: 'christmas_miracle',
+        branch: 'premia',
+        name: 'Cud Wigilijnej Trzynastki',
+        icon: '🎁',
+        cost: 5,
+        bought: false,
+        effect: 'Wszystkie wieże zyskują 20% szansy na cios krytyczny (2.6x obrażeń).',
+        apply: (game) => { game.techBonus.critChance = 0.20; }
+      },
+      {
+        id: 'corporate_immunity',
+        branch: 'premia',
+        name: 'Nietykalność w Związkach Zawodowych',
+        icon: '👑',
+        cost: 6,
+        bought: false,
+        effect: '+30% do całkowitych obrażeń całego biurowego arsenału.',
+        apply: (game) => { game.techBonus.globalDamageMult += 0.30; }
+      }
+    ];
+
+    /* ==========================================================================
+       4. GENERATOR 100 POZIOMÓW (Z KORPO-SZKODNIKAMI I BOSSAMI)
+       ========================================================================== */
+    function getSeasonInfo(wave) {
+      if (wave <= 25) {
+        return {
+          id: 'autumn',
+          name: '🍂 Q3: Wnioski Urlopowe i Zbieranie Kasztanów',
+          bgColor: '#1c130d',
+          pathColor: '#452613',
+          ambientType: 'leaf'
+        };
+      } else if (wave <= 50) {
+        return {
+          id: 'frost',
+          name: '🌧️ Q4: Listopadowy Deadlinogeddon i Odrzucone L4',
+          bgColor: '#151a1d',
+          pathColor: '#2d373e',
+          ambientType: 'frost'
+        };
+      } else if (wave <= 75) {
+        return {
+          id: 'winter',
+          name: '❄️ Grudzień: Zimowy Audyt Roczny i Cięcia Etatów',
+          bgColor: '#0f172a',
+          pathColor: '#334155',
+          ambientType: 'snow'
+        };
+      } else {
+        return {
+          id: 'holiday',
+          name: '🎄 Wigilia: Inwazja Grinchów o Karpia i Premię',
+          bgColor: '#1a0e14',
+          pathColor: '#3e1c28',
+          ambientType: 'festive'
+        };
+      }
+    }
+
+    function generateWaveData(waveNumber) {
+      const isBossWave = (waveNumber % 10 === 0) || (waveNumber % 25 === 0) || waveNumber === 5;
+      const enemies = [];
+      const hpScale = Math.pow(1.066, waveNumber - 1);
+      const count = Math.min(10 + Math.floor(waveNumber * 1.6), 75);
+
+      // BOSSOWIE KORPO CO 10 I 25 FAL
+      if (isBossWave) {
+        let bossName = "Pradawny Kasztanobrody z HR";
+        let bossHp = Math.round(1200 * hpScale);
+        let bossColor = '#b45309';
+        let bossIcon = '👹';
+
+        if (waveNumber === 10) {
+          bossName = "Kierownik Stażystów od Odrzucania L4";
+          bossHp = Math.round(2500 * hpScale);
+          bossColor = '#d97706';
+          bossIcon = '📋';
+        } else if (waveNumber === 20) {
+          bossName = "Scrum God - Agile Coach 500zł/h";
+          bossHp = Math.round(5200 * hpScale);
+          bossColor = '#0284c7';
+          bossIcon = '🧙‍♂️';
+        } else if (waveNumber === 25) {
+          bossName = "Kierownik ds. Restrukturyzacji Grinch";
+          bossHp = Math.round(9000 * hpScale);
+          bossColor = '#15803d';
+          bossIcon = '🧳';
+        } else if (waveNumber === 30) {
+          bossName = "Główny Korpo-Penis w Garniturze Slim-Fit";
+          bossHp = Math.round(12000 * hpScale);
+          bossColor = '#3b82f6';
+          bossIcon = '👔';
+        } else if (waveNumber === 40) {
+          bossName = "Dyrektor Deadlinów 'Na Wczoraj'";
+          bossHp = Math.round(18000 * hpScale);
+          bossColor = '#e11d48';
+          bossIcon = '⏰';
+        } else if (waveNumber === 50) {
+          bossName = "Prezes Janusz Alfa w Złotym Garniturze";
+          bossHp = Math.round(31000 * hpScale);
+          bossColor = '#eab308';
+          bossIcon = '🦁';
+        } else if (waveNumber === 60) {
+          bossName = "Mroźny Bałwan z Audytu Wewnętrznego";
+          bossHp = Math.round(42000 * hpScale);
+          bossColor = '#38bdf8';
+          bossIcon = '⛄';
+        } else if (waveNumber === 70) {
+          bossName = "Dyrektor Likwidator ze Złotą Pieczątką";
+          bossHp = Math.round(58000 * hpScale);
+          bossColor = '#7c3aed';
+          bossIcon = '🗄️';
+        } else if (waveNumber === 75) {
+          bossName = "Audytor z Centrali Grinch";
+          bossHp = Math.round(82000 * hpScale);
+          bossColor = '#059669';
+          bossIcon = '📉';
+        } else if (waveNumber === 80) {
+          bossName = "Scrum Master Ostateczny - Pan Retrospektywy";
+          bossHp = Math.round(105000 * hpScale);
+          bossColor = '#06b6d4';
+          bossIcon = '🧘';
+        } else if (waveNumber === 90) {
+          bossName = "Naczelny Dyrektor Redukcji Etatów i Karpia";
+          bossHp = Math.round(145000 * hpScale);
+          bossColor = '#b91c1c';
+          bossIcon = '🎩';
+        } else if (waveNumber === 100) {
+          bossName = "Mega-Grinch Likwidator Stanowiska & Optymalizator Kosztów";
+          bossHp = Math.round(270000 * hpScale);
+          bossColor = '#dc2626';
+          bossIcon = '👑';
+        }
+
+        enemies.push({
+          type: 'boss',
+          name: bossName,
+          hp: bossHp,
+          speed: 0.52,
+          armor: Math.min(4 + Math.floor(waveNumber / 4), 45),
+          reward: 160 + waveNumber * 9,
+          size: 29,
+          color: bossColor,
+          icon: bossIcon,
+          isBoss: true
+        });
+      }
+
+      // SZEREGOWI KORPO-SZKODNICY
+      for (let i = 0; i < count; i++) {
+        const rand = Math.random();
+
+        if (waveNumber <= 25) {
+          // Faza 1: Q3 Jesień
+          if (rand < 0.25) {
+            enemies.push({
+              type: 'junior_fruit',
+              name: 'Junior z Owocowego Czwartku',
+              hp: Math.round(35 * hpScale),
+              speed: 1.85,
+              armor: 0,
+              reward: 6 + Math.floor(waveNumber * 0.2),
+              size: 11,
+              color: '#facc15',
+              icon: '🍌'
+            });
+          } else if (rand < 0.5) {
+            enemies.push({
+              type: 'scrum_master',
+              name: 'Scrum Master z Certyfikatem',
+              hp: Math.round(55 * hpScale),
+              speed: 1.25,
+              armor: 2,
+              reward: 9 + Math.floor(waveNumber * 0.25),
+              size: 13,
+              color: '#0284c7',
+              icon: '📌',
+              hasStandupAura: true
+            });
+          } else if (rand < 0.75) {
+            enemies.push({
+              type: 'korpo_penis',
+              name: 'Korpo-Penis w Slim-Ficie',
+              hp: Math.round(70 * hpScale),
+              speed: 1.1,
+              armor: 4,
+              reward: 11 + Math.floor(waveNumber * 0.3),
+              size: 14,
+              color: '#3b82f6',
+              icon: '👔'
+            });
+          } else {
+            enemies.push({
+              type: 'small_grinch',
+              name: 'Mały Grinch (Podkradacz Kawy)',
+              hp: Math.round(48 * hpScale),
+              speed: 1.8,
+              armor: 1,
+              reward: 10 + Math.floor(waveNumber * 0.3),
+              size: 12,
+              color: '#16a34a',
+              icon: '🏃',
+              isGrinch: true
+            });
+          }
+        } else if (waveNumber <= 50) {
+          // Faza 2: Q4 Listopad
+          if (rand < 0.25) {
+            enemies.push({
+              type: 'hr_l4',
+              name: 'Agresywny HR-owiec z Odrzuconym L4',
+              hp: Math.round(110 * hpScale),
+              speed: 1.35,
+              armor: 3,
+              reward: 14 + Math.floor(waveNumber * 0.35),
+              size: 13,
+              color: '#e11d48',
+              icon: '📑'
+            });
+          } else if (rand < 0.5) {
+            enemies.push({
+              type: 'korpo_penis',
+              name: 'Starszy Korpo-Penis od Synergii',
+              hp: Math.round(150 * hpScale),
+              speed: 1.15,
+              armor: 6 + Math.floor(waveNumber / 8),
+              reward: 16 + Math.floor(waveNumber * 0.4),
+              size: 15,
+              color: '#2563eb',
+              icon: '👔'
+            });
+          } else if (rand < 0.75) {
+            enemies.push({
+              type: 'scrum_master',
+              name: 'Scrum Master (Karty Post-it)',
+              hp: Math.round(130 * hpScale),
+              speed: 1.3,
+              armor: 4,
+              reward: 15 + Math.floor(waveNumber * 0.4),
+              size: 14,
+              color: '#0ea5e9',
+              icon: '📌',
+              hasStandupAura: true
+            });
+          } else {
+            enemies.push({
+              type: 'big_grinch',
+              name: 'Duży Grinch z Tabelą w Excelu',
+              hp: Math.round(270 * hpScale),
+              speed: 0.8,
+              armor: 8 + Math.floor(waveNumber / 7),
+              reward: 24 + Math.floor(waveNumber * 0.5),
+              size: 19,
+              color: '#15803d',
+              icon: '🧳',
+              isGrinch: true
+            });
+          }
+        } else if (waveNumber <= 75) {
+          // Faza 3: Grudzień Audyt
+          if (rand < 0.3) {
+            enemies.push({
+              type: 'korpo_penis',
+              name: 'Mroźny Korpo-Penis z Centrali',
+              hp: Math.round(260 * hpScale),
+              speed: 1.2,
+              armor: 10 + Math.floor(waveNumber / 6),
+              reward: 25 + Math.floor(waveNumber * 0.55),
+              size: 16,
+              color: '#1d4ed8',
+              icon: '👔'
+            });
+          } else if (rand < 0.55) {
+            enemies.push({
+              type: 'small_grinch',
+              name: 'Złodziej Premii Świątecznej',
+              hp: Math.round(150 * hpScale),
+              speed: 2.05,
+              armor: 4,
+              reward: 20 + Math.floor(waveNumber * 0.45),
+              size: 13,
+              color: '#22c55e',
+              icon: '🏃',
+              isGrinch: true
+            });
+          } else if (rand < 0.8) {
+            enemies.push({
+              type: 'grinch_auditor',
+              name: 'Grinch Audytor (Likwidator Oszczędności)',
+              hp: Math.round(260 * hpScale),
+              speed: 1.35,
+              armor: 13,
+              reward: 30 + Math.floor(waveNumber * 0.6),
+              size: 15,
+              color: '#0d9488',
+              icon: '📉',
+              isGrinch: true
+            });
+          } else {
+            enemies.push({
+              type: 'scrum_master',
+              name: 'Principal Scrum Evangelist',
+              hp: Math.round(340 * hpScale),
+              speed: 1.1,
+              armor: 9,
+              reward: 36 + Math.floor(waveNumber * 0.65),
+              size: 17,
+              color: '#0369a1',
+              icon: '📌',
+              hasStandupAura: true
+            });
+          }
+        } else {
+          // Faza 4: Dni 76-100 Wigilia & Grinche
+          if (rand < 0.25) {
+            enemies.push({
+              type: 'small_grinch',
+              name: 'Mały Grinch (Kradziej Karpia)',
+              hp: Math.round(260 * hpScale),
+              speed: 2.15,
+              armor: 6,
+              reward: 30 + Math.floor(waveNumber * 0.6),
+              size: 13,
+              color: '#22c55e',
+              icon: '🏃',
+              isGrinch: true
+            });
+          } else if (rand < 0.5) {
+            enemies.push({
+              type: 'korpo_penis',
+              name: 'Dyrektorski Korpo-Penis Slim-Fit',
+              hp: Math.round(480 * hpScale),
+              speed: 1.25,
+              armor: 15 + Math.floor(waveNumber / 6),
+              reward: 45 + Math.floor(waveNumber * 0.75),
+              size: 17,
+              color: '#1e3a8a',
+              icon: '👔'
+            });
+          } else if (rand < 0.75) {
+            enemies.push({
+              type: 'big_grinch',
+              name: 'Giga Grinch ds. Likwidacji Etatów',
+              hp: Math.round(650 * hpScale),
+              speed: 0.88,
+              armor: 18 + Math.floor(waveNumber / 6),
+              reward: 52 + Math.floor(waveNumber * 0.8),
+              size: 21,
+              color: '#14532d',
+              icon: '🧳',
+              isGrinch: true
+            });
+          } else {
+            enemies.push({
+              type: 'grinch_auditor',
+              name: 'Grinch Główny Biegły Rewident',
+              hp: Math.round(510 * hpScale),
+              speed: 1.45,
+              armor: 18,
+              reward: 50 + Math.floor(waveNumber * 0.75),
+              size: 16,
+              color: '#0f766e',
+              icon: '📉',
+              isGrinch: true
+            });
+          }
+        }
+      }
+
+      return {
+        waveNumber,
+        enemies,
+        isBossWave
+      };
+    }
+
+    /* ==========================================================================
+       5. GŁÓWNA KLASA GRY: KASZTANOWA OBRONA STANOWISKA
+       ========================================================================== */
+    class ChestnutTDGame {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        
+        this.baseWidth = 1000;
+        this.baseHeight = 562.5;
+        this.scale = 1;
+
+        // Ekonomia korporacyjna
+        this.gold = 400; // Budżet biurka
+        this.kp = 0;   // Punkty Etatu (PDS)
+        this.lives = 30; // Bezpieczeństwo Etatu
+        this.maxLives = 30;
+        this.wave = 0;
+        this.maxWaves = 100;
+        
+        this.totalKills = 0;
+        this.totalGoldEarned = 400;
+        
+        // Zarządzanie stanem
+        this.gameSpeed = 1;
+        this.autoWave = false;
+        this.waveInProgress = false;
+        this.gameOver = false;
+        this.victory = false;
+
+        // Bonusy z Drzewka
+        this.techBonus = {
+          bonusGoldPerKill: 0,
+          buildDiscount: 0,
+          slingshotRangeMult: 0,
+          burrArmorPen: false,
+          pineSplashMult: 0,
+          roasterBurn: false,
+          coffeeFire: false,
+          treeBonusIncome: false,
+          treeBuffBonus: 0,
+          antiGrinchDmg: 0,
+          critChance: 0,
+          globalDamageMult: 0,
+          sellRate: 0.65,
+          passiveIncome: 0
+        };
+
+        // Obiekty gry
+        this.towers = [];
+        this.enemies = [];
+        this.projectiles = [];
+        this.particles = [];
+        this.weatherParticles = [];
+        this.apples = []; // Jabłka z Owocowego Czwartku
+        this.currentWaveData = null;
+        this.spawnTimer = 0;
+        this.spawnIndex = 0;
+
+        // Umiejętności korporacyjne (Cooldowny)
+        this.l4Cooldown = 0;
+        this.vacationCooldown = 0;
+        this.l4Active = 0; // Czas zamrożenia korpo-szkodników
+
+        // Selekcja
+        this.selectedTowerType = null;
+        this.selectedTowerInstance = null;
+        this.mousePos = { x: -100, y: -100 };
+        this.isHoveringCanvas = false;
+
+        // Ścieżka korpo-parkowa
+        this.path = [
+          { x: -30, y: 130 },
+          { x: 190, y: 130 },
+          { x: 230, y: 280 },
+          { x: 140, y: 410 },
+          { x: 350, y: 450 },
+          { x: 430, y: 290 },
+          { x: 380, y: 140 },
+          { x: 590, y: 120 },
+          { x: 690, y: 250 },
+          { x: 630, y: 430 },
+          { x: 810, y: 450 },
+          { x: 890, y: 310 },
+          { x: 890, y: 240 } // Twoje Biurko / Stanowisko Pracy
+        ];
+
+        this.initWeather();
+        this.initEventListeners();
+        this.resize();
+        this.renderStore();
+        this.renderTechTree();
+        this.updateTopBar();
+      }
+
+      initWeather() {
+        this.weatherParticles = [];
+        for (let i = 0; i < 50; i++) {
+          this.weatherParticles.push({
+            x: Math.random() * this.baseWidth,
+            y: Math.random() * this.baseHeight,
+            speed: 0.6 + Math.random() * 1.6,
+            size: 2 + Math.random() * 3,
+            angle: Math.random() * Math.PI * 2
+          });
+        }
+      }
+
+      resize() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.width * (9 / 16);
+        this.scale = this.canvas.width / this.baseWidth;
+      }
+
+      initEventListeners() {
+        window.addEventListener('resize', () => this.resize());
+
+        this.canvas.addEventListener('mousemove', (e) => {
+          const rect = this.canvas.getBoundingClientRect();
+          this.mousePos = {
+            x: (e.clientX - rect.left) / this.scale,
+            y: (e.clientY - rect.top) / this.scale
+          };
+          this.isHoveringCanvas = true;
+        });
+
+        this.canvas.addEventListener('mouseleave', () => {
+          this.isHoveringCanvas = false;
+          this.mousePos = { x: -100, y: -100 };
+        });
+
+        this.canvas.addEventListener('click', (e) => {
+          sound.init();
+          const rect = this.canvas.getBoundingClientRect();
+          const clickX = (e.clientX - rect.left) / this.scale;
+          const clickY = (e.clientY - rect.top) / this.scale;
+
+          if (this.selectedTowerType) {
+            this.buildTower(this.selectedTowerType, clickX, clickY);
+          } else {
+            const clickedTower = this.towers.find(t => Math.hypot(t.x - clickX, t.y - clickY) <= 24);
+            this.selectTowerInstance(clickedTower || null);
+          }
+        });
+
+        // Prędkości gry
+        document.querySelectorAll('.speed-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.speed-btn').forEach(b => {
+              b.classList.remove('bg-amber-600', 'text-white', 'active');
+              b.classList.add('text-stone-300');
+            });
+            btn.classList.add('bg-amber-600', 'text-white', 'active');
+            btn.classList.remove('text-stone-300');
+            this.gameSpeed = parseFloat(btn.dataset.speed);
+          });
+        });
+
+        // Start fali
+        document.getElementById('btn-next-wave').addEventListener('click', () => {
+          sound.init();
+          this.startNextWave();
+        });
+
+        // Nadgodziny ASAP (Przywołanie wcześniejsze)
+        document.getElementById('btn-asap').addEventListener('click', () => {
+          sound.init();
+          if (this.waveInProgress) {
+            this.gold += 30;
+            this.totalGoldEarned += 30;
+            this.addFloatingText('+30 🌰 PREMIA ASAP!', 890, 210, '#f59e0b');
+            sound.playCollect();
+            // Przyspiesz pozostałych wrogów w obecnej fali
+            this.enemies.forEach(en => en.currentSpeed *= 1.15);
+            this.updateTopBar();
+          } else {
+            this.gold += 40;
+            this.totalGoldEarned += 40;
+            this.addFloatingText('+40 🌰 NADGODZINY!', 890, 210, '#f59e0b');
+            this.startNextWave();
+          }
+        });
+
+        // Auto fala
+        document.getElementById('chk-auto-wave').addEventListener('change', (e) => {
+          this.autoWave = e.target.checked;
+        });
+
+        // Wyciszenie dźwięku
+        document.getElementById('btn-audio-mute').addEventListener('click', (e) => {
+          sound.init();
+          sound.enabled = !sound.enabled;
+          e.currentTarget.textContent = sound.enabled ? '🔊' : '🔇';
+        });
+
+        // Modale
+        document.getElementById('btn-tech-tree').addEventListener('click', () => {
+          document.getElementById('modal-tech-tree').classList.remove('hidden');
+        });
+        document.getElementById('btn-info').addEventListener('click', () => {
+          document.getElementById('modal-info').classList.remove('hidden');
+        });
+
+        document.querySelectorAll('.modal-close').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.getElementById('modal-tech-tree').classList.add('hidden');
+            document.getElementById('modal-info').classList.add('hidden');
+          });
+        });
+
+        // Ulepszanie & Sprzedaż
+        document.getElementById('btn-upgrade-tower').addEventListener('click', () => {
+          if (this.selectedTowerInstance) this.upgradeTower(this.selectedTowerInstance);
+        });
+
+        document.getElementById('btn-sell-tower').addEventListener('click', () => {
+          if (this.selectedTowerInstance) this.sellTower(this.selectedTowerInstance);
+        });
+
+        document.getElementById('insp-targeting').addEventListener('change', (e) => {
+          if (this.selectedTowerInstance) {
+            this.selectedTowerInstance.targeting = e.target.value;
+          }
+        });
+
+        // Restart
+        document.getElementById('btn-restart').addEventListener('click', () => {
+          window.location.reload();
+        });
+
+        // Umiejętność: Lewe L4
+        document.getElementById('btn-skill-l4').addEventListener('click', () => {
+          if (this.l4Cooldown <= 0) {
+            this.activateL4();
+          }
+        });
+
+        // Umiejętność: Urlop na Żądanie (UŻ)
+        document.getElementById('btn-skill-vacation').addEventListener('click', () => {
+          if (this.vacationCooldown <= 0) {
+            this.activateVacation();
+          }
+        });
+
+        // Umiejętność: Owocowy Czwartek
+        document.getElementById('btn-skill-fruits').addEventListener('click', () => {
+          if (this.gold >= 60) {
+            this.activateFruitThursday();
+          } else {
+            this.triggerBanner("Brak Funduszy na Banany!", "Potrzebujesz 60 🌰 na owocowy czwartek.");
+          }
+        });
+      }
+
+      activateL4() {
+        sound.playHolidayBell();
+        this.l4Cooldown = 45; // 45 sekund cooldownu
+        this.l4Active = 6.0;   // 6 sekund zamrożenia wrogów
+        this.triggerBanner("🛌 LEWE L4 OD PSYCHIATRY!", "Wszyscy intruzi i Grinche piją melisę pod kocykiem i zamierają!");
+        this.addFloatingText("🛌 L4 AKTYWNE (HERBATKA I KOCYK)", 500, 160, '#38bdf8');
+      }
+
+      activateVacation() {
+        sound.playBuzzer();
+        this.vacationCooldown = 35; // 35 sekund
+        this.triggerBanner("🏖️ WNIOSEK URLOPOWY NA ŻĄDANIE!", "Stemple 'ZATWIERDZONO' bombardują całą ścieżkę!");
+        
+        // Bombardowanie ścieżki stemplami
+        this.path.forEach((pt, idx) => {
+          if (idx > 0 && idx < this.path.length - 1) {
+            setTimeout(() => {
+              sound.playHit();
+              this.addChestnutSparks(pt.x, pt.y, 18, '#10b981');
+              this.addFloatingText("ODRZUCONO ASAP!", pt.x, pt.y - 10, '#ef4444');
+              this.enemies.forEach(e => {
+                if (Math.hypot(e.x - pt.x, e.y - pt.y) < 70) {
+                  this.damageEnemy(e, 85, null, false, true);
+                }
+              });
+            }, idx * 120);
+          }
+        });
+      }
+
+      activateFruitThursday() {
+        this.gold -= 60;
+        sound.playCollect();
+        this.triggerBanner("🍏 OWOCOWY CZWARTEK!", "Wyrzucono świeże jabłka i banany na ścieżkę!");
+        
+        // Rozrzucenie owoców na trasie
+        for (let i = 1; i < this.path.length - 1; i += 2) {
+          this.apples.push({
+            x: this.path[i].x + (Math.random() * 20 - 10),
+            y: this.path[i].y + (Math.random() * 20 - 10),
+            hp: 6,
+            life: 14.0
+          });
+          this.addChestnutSparks(this.path[i].x, this.path[i].y, 8, '#84cc16');
+        }
+        this.updateTopBar();
+      }
+
+      selectTowerInstance(tower) {
+        this.selectedTowerInstance = tower;
+        const emptyState = document.getElementById('inspector-empty');
+        const content = document.getElementById('inspector-content');
+
+        if (!tower) {
+          emptyState.classList.remove('hidden');
+          content.classList.add('hidden');
+          return;
+        }
+
+        emptyState.classList.add('hidden');
+        content.classList.remove('hidden');
+
+        const spec = TOWER_TYPES[tower.type];
+        const rankLabels = ['Młodszy Specjalista', 'Specjalista', 'Starszy Specjalista', 'Kierownik'];
+        document.getElementById('insp-name').textContent = tower.name;
+        document.getElementById('insp-level').textContent = `Poziom ${tower.level}/4 (${rankLabels[tower.level - 1]})`;
+        document.getElementById('insp-icon').textContent = tower.icon;
+
+        let dmg = tower.damage * (1 + this.techBonus.globalDamageMult);
+        let range = tower.range;
+        if (tower.type === 'slingshot' || tower.type === 'burr') {
+          range *= (1 + this.techBonus.slingshotRangeMult);
+        }
+
+        document.getElementById('insp-dmg').textContent = Math.round(dmg);
+        document.getElementById('insp-range').textContent = Math.round(range);
+        document.getElementById('insp-rate').textContent = `${tower.fireRate.toFixed(1)}/s`;
+        document.getElementById('insp-targeting').value = tower.targeting;
+
+        const upgradeCost = Math.round(spec.cost * 0.95 * Math.pow(1.55, tower.level - 1));
+        const sellRate = this.techBonus.sellRate || 0.65;
+        const sellValue = Math.round(tower.baseCost * sellRate * tower.level);
+
+        document.getElementById('insp-upgrade-cost').textContent = upgradeCost;
+        document.getElementById('insp-sell-value').textContent = sellValue;
+        document.getElementById('btn-upgrade-tower').disabled = (tower.level >= 4);
+      }
+
+      upgradeTower(tower) {
+        if (tower.level >= 4) return;
+        const spec = TOWER_TYPES[tower.type];
+        const upgradeCost = Math.round(spec.cost * 0.95 * Math.pow(1.55, tower.level - 1));
+
+        if (this.gold < upgradeCost) {
+          this.triggerBanner("Odmowa Awansu!", "Brak środków w kasztanowym budżecie.");
+          return;
+        }
+
+        this.gold -= upgradeCost;
+        tower.level += 1;
+        tower.damage = Math.round(tower.damage * 1.42);
+        tower.range = Math.round(tower.range * 1.09);
+        tower.fireRate = parseFloat((tower.fireRate * 1.12).toFixed(2));
+
+        this.addChestnutSparks(tower.x, tower.y, 16, '#facc15');
+        sound.playHolidayBell();
+        this.selectTowerInstance(tower);
+        this.updateTopBar();
+      }
+
+      sellTower(tower) {
+        const sellRate = this.techBonus.sellRate || 0.65;
+        const sellValue = Math.round(tower.baseCost * sellRate * tower.level);
+        this.gold += sellValue;
+        this.towers = this.towers.filter(t => t !== tower);
+        this.addChestnutSparks(tower.x, tower.y, 15, '#eab308');
+        sound.playCollect();
+        this.selectTowerInstance(null);
+        this.updateTopBar();
+      }
+
+      /* ========================================================================
+       7. DRZEWKO TALENTÓW SEZONOWYCH
+         ======================================================================== */
+      renderTechTree() {
+        const container = document.getElementById('tech-tree-grid');
+        container.innerHTML = '';
+        document.getElementById('tech-points-display').textContent = `${this.kp} PDS`;
+
+        const branches = [
+          { id: 'stabilizacja', title: '📜 Stabilizacja Umowy', bg: 'border-amber-800/60' },
+          { id: 'kwartalnik', title: '💼 Agresywny Kwartalnik', bg: 'border-sky-800/60' },
+          { id: 'premia', title: '🎄 Premia Świąteczna', bg: 'border-emerald-800/60' }
+        ];
+
+        branches.forEach(br => {
+          const col = document.createElement('div');
+          col.className = `flex flex-col gap-2.5 bg-stone-950/80 p-3 rounded-2xl border ${br.bg}`;
+          col.innerHTML = `<h3 class="font-cinzel text-xs font-bold text-amber-300 pb-1 border-b border-stone-800">${br.title}</h3>`;
+
+          const branchTalents = TECH_TREE.filter(t => t.branch === br.id);
+          branchTalents.forEach(tech => {
+            const card = document.createElement('div');
+            card.className = `p-2.5 rounded-xl border text-xs flex flex-col justify-between transition ${
+              tech.bought
+                ? 'bg-emerald-950/40 border-emerald-600/60'
+                : 'bg-stone-900 border-stone-800 hover:border-amber-600/50'
+            }`;
+
+            card.innerHTML = `
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-bold text-stone-200 flex items-center gap-1.5">
+                    <span>${tech.icon}</span> ${tech.name}
+                  </span>
+                  <span class="font-mono text-[11px] font-bold ${tech.bought ? 'text-emerald-400' : 'text-yellow-400'}">
+                    ${tech.bought ? '✓' : tech.cost + ' PDS'}
+                  </span>
+                </div>
+                <p class="text-[11px] text-stone-400 font-mono leading-tight">${tech.effect}</p>
+              </div>
+              <button class="mt-2 py-1 px-2.5 rounded-lg text-[11px] font-bold font-mono transition ${
+                tech.bought
+                  ? 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50 cursor-default'
+                  : 'bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 text-stone-100 shadow'
+              }">
+                ${tech.bought ? 'Zatwierdzono' : 'Awanse'}
+              </button>
+            `;
+
+            const btn = card.querySelector('button');
+            if (!tech.bought) {
+              btn.addEventListener('click', () => {
+                sound.init();
+                if (this.kp >= tech.cost) {
+                  this.kp -= tech.cost;
+                  tech.bought = true;
+                  tech.apply(this);
+                  sound.playHolidayBell();
+                  this.renderTechTree();
+                  this.renderStore();
+                  this.updateTopBar();
+                  if (this.selectedTowerInstance) this.selectTowerInstance(this.selectedTowerInstance);
+                }
+              });
+            }
+
+            col.appendChild(card);
+          });
+
+          container.appendChild(col);
+        });
+      }
+
+      /* ========================================================================
+         8. FALE & PROGRES (100 POZIOMÓW)
+         ======================================================================== */
+      startNextWave() {
+        if (this.waveInProgress || this.gameOver || this.victory) return;
+        if (this.wave >= this.maxWaves) {
+          this.triggerVictory();
+          return;
+        }
+
+        this.wave += 1;
+        this.waveInProgress = true;
+        this.currentWaveData = generateWaveData(this.wave);
+        this.spawnIndex = 0;
+        this.spawnTimer = 0;
+
+        document.getElementById('btn-next-wave').disabled = true;
+        this.updateTopBar();
+
+        const season = getSeasonInfo(this.wave);
+        document.getElementById('season-name').textContent = season.name;
+
+        if (this.currentWaveData.isBossWave) {
+          this.showBossWarning(this.currentWaveData.enemies[0].name);
+        } else {
+          this.triggerBanner(`DZIEŃ ${this.wave} / ${this.maxWaves}`, `Naciera ${this.currentWaveData.enemies.length} intruzów z HR i audytu!`);
+        }
+      }
+
+      showBossWarning(name) {
+        const overlay = document.getElementById('boss-warning');
+        document.getElementById('boss-warning-name').textContent = name;
+        overlay.classList.remove('opacity-0');
+        sound.playGrinchLaugh();
+        setTimeout(() => overlay.classList.add('opacity-0'), 2600);
+      }
+
+      triggerBanner(title, sub) {
+        const b = document.getElementById('wave-banner');
+        document.getElementById('wave-banner-title').textContent = title;
+        document.getElementById('wave-banner-sub').textContent = sub;
+        b.classList.remove('opacity-0');
+        setTimeout(() => b.classList.add('opacity-0'), 2200);
+      }
+
+      updateTopBar() {
+        document.getElementById('stat-gold').textContent = this.gold;
+        document.getElementById('stat-kp').textContent = this.kp;
+        const securityPct = Math.round((Math.max(0, this.lives) / this.maxLives) * 100);
+        document.getElementById('stat-lives').textContent = `${securityPct}% (${this.lives})`;
+        document.getElementById('stat-wave').textContent = `${this.wave} / ${this.maxWaves}`;
+
+        const total = this.currentWaveData ? this.currentWaveData.enemies.length : 0;
+        const left = total - this.spawnIndex + this.enemies.length;
+        document.getElementById('wave-enemies-left').textContent = `${left}/${total}`;
+        
+        const pct = total > 0 ? ((total - left) / total) * 100 : 0;
+        document.getElementById('wave-progress-fill').style.width = `${pct}%`;
+
+        // Cooldowny umiejętności na pasku
+        const btnL4 = document.getElementById('btn-skill-l4');
+        const txtL4 = document.getElementById('cd-l4');
+        if (this.l4Cooldown > 0) {
+          btnL4.disabled = true;
+          txtL4.textContent = `${Math.ceil(this.l4Cooldown)}s`;
+        } else {
+          btnL4.disabled = false;
+          txtL4.textContent = 'Gotowe';
+        }
+
+        const btnVac = document.getElementById('btn-skill-vacation');
+        const txtVac = document.getElementById('cd-vacation');
+        if (this.vacationCooldown > 0) {
+          btnVac.disabled = true;
+          txtVac.textContent = `${Math.ceil(this.vacationCooldown)}s`;
+        } else {
+          btnVac.disabled = false;
+          txtVac.textContent = 'Gotowe';
+        }
+      }
+
+      /* ========================================================================
+         9. SYMULACJA WALKI & POCISKÓW
+         ======================================================================== */
+      update(deltaTime) {
+        if (this.gameOver || this.victory) return;
+        const effectiveDt = deltaTime * this.gameSpeed;
+
+        // Aktualizacja cooldownów umiejętności
+        if (this.l4Cooldown > 0) {
+          this.l4Cooldown -= effectiveDt;
+          if (this.l4Cooldown < 0) this.l4Cooldown = 0;
+        }
+        if (this.vacationCooldown > 0) {
+          this.vacationCooldown -= effectiveDt;
+          if (this.vacationCooldown < 0) this.vacationCooldown = 0;
+        }
+
+        // L4 aktywne (zamrożenie ruchu i ataków wrogów)
+        let isL4Frozen = false;
+        if (this.l4Active > 0) {
+          this.l4Active -= effectiveDt;
+          isL4Frozen = true;
+          if (Math.random() < 0.15) {
+            this.addFloatingText("💤 L4...", 200 + Math.random() * 600, 150 + Math.random() * 250, '#38bdf8');
+          }
+        }
+
+        // Aktualizacja owoców na ścieżce
+        for (let i = this.apples.length - 1; i >= 0; i--) {
+          const ap = this.apples[i];
+          ap.life -= effectiveDt;
+          if (ap.life <= 0 || ap.hp <= 0) {
+            this.apples.splice(i, 1);
+          }
+        }
+
+        // Aura choinki (buff sąsiednich wież)
+        this.towers.forEach(t => t.buffMultiplier = 1.0);
+        this.towers.filter(t => t.type === 'tree').forEach(tree => {
+          const buffRange = tree.buffRange || 130;
+          const bonus = 0.20 + (this.techBonus.treeBuffBonus || 0);
+          this.towers.forEach(other => {
+            if (other !== tree && Math.hypot(other.x - tree.x, other.y - tree.y) <= buffRange) {
+              other.buffMultiplier = (other.buffMultiplier || 1.0) * (1 + bonus);
+            }
+          });
+        });
+
+        // Aura Scrum Mastera (Daily Standup - leczy okolicznych wrogów)
+        this.enemies.filter(e => e.hasStandupAura).forEach(sm => {
+          this.enemies.forEach(other => {
+            if (other !== sm && Math.hypot(other.x - sm.x, other.y - sm.y) <= 80) {
+              other.hp = Math.min(other.maxHp, other.hp + 6 * effectiveDt);
+            }
+          });
+        });
+
+        // 1. Spawnowanie
+        if (this.waveInProgress && this.currentWaveData) {
+          this.spawnTimer += effectiveDt;
+          if (this.spawnTimer >= 0.55 && this.spawnIndex < this.currentWaveData.enemies.length) {
+            this.spawnEnemy(this.currentWaveData.enemies[this.spawnIndex]);
+            this.spawnIndex++;
+            this.spawnTimer = 0;
+            this.updateTopBar();
+          }
+
+          if (this.spawnIndex >= this.currentWaveData.enemies.length && this.enemies.length === 0) {
+            this.onWaveCompleted();
+          }
+        }
+
+        // 2. Wrogowie
+        for (let i = this.enemies.length - 1; i >= 0; i--) {
+          const e = this.enemies[i];
+
+          // Jeśli L4 jest aktywne, wróg śpi
+          if (isL4Frozen) {
+            continue;
+          }
+
+          // Sprawdzanie czy wróg zatrzymał się przy owocowym czwartku
+          let eatingFruit = false;
+          for (const ap of this.apples) {
+            if (Math.hypot(e.x - ap.x, e.y - ap.y) < 22) {
+              ap.hp -= effectiveDt * 2.5;
+              eatingFruit = true;
+              break;
+            }
+          }
+          if (eatingFruit) continue;
+
+          // Podpalenie z piecyka / kawy
+          if (e.burnTimer > 0) {
+            e.burnTimer -= effectiveDt;
+            e.hp -= 12 * effectiveDt;
+            if (Math.random() < 0.2) this.addChestnutSparks(e.x, e.y, 1, '#ea580c');
+            if (e.hp <= 0) {
+              this.killEnemy(e);
+              continue;
+            }
+          }
+
+          // Spowolnienie
+          if (e.slowTimer > 0) {
+            e.slowTimer -= effectiveDt;
+            if (e.slowTimer <= 0) e.currentSpeed = e.baseSpeed;
+          }
+
+          const moveDist = e.currentSpeed * 68 * effectiveDt;
+          e.distanceTraveled += moveDist;
+          this.updateEnemyCoordinates(e);
+
+          // Dotarcie do Biurka
+          if (e.waypointIndex >= this.path.length - 1) {
+            this.lives -= e.isBoss ? 10 : 1;
+            this.addChestnutSparks(e.x, e.y, 25, '#ef4444');
+            sound.playHit();
+            this.enemies.splice(i, 1);
+            this.updateTopBar();
+
+            if (this.lives <= 0) {
+              this.triggerGameOver();
+              return;
+            }
+          }
+        }
+
+        // 3. Wieże i ostrzał
+        const now = performance.now() / 1000;
+        this.towers.forEach(tower => {
+          let range = tower.range;
+          if (tower.type === 'slingshot' || tower.type === 'burr') {
+            range *= (1 + this.techBonus.slingshotRangeMult);
+          }
+
+          const rate = tower.fireRate;
+          const interval = 1.0 / rate;
+
+          // Kolczasta Łupina BHP (AoE Aura wokół)
+          if (tower.type === 'burr') {
+            if (now - tower.lastFired >= interval) {
+              tower.lastFired = now;
+              this.triggerBurrPulse(tower, range);
+            }
+            return;
+          }
+
+          // Świąteczna Choinka
+          if (tower.type === 'tree') {
+            if (now - tower.lastFired >= interval) {
+              const target = this.findTargetForTower(tower, range);
+              if (target) {
+                tower.lastFired = now;
+                this.fireTreeRay(tower, target);
+              }
+            }
+            return;
+          }
+
+          // Działo Korpo-Ekspresu (Wrząca kawa strumieniowa)
+          if (tower.type === 'coffee') {
+            if (now - tower.lastFired >= interval) {
+              const target = this.findTargetForTower(tower, range);
+              if (target) {
+                tower.lastFired = now;
+                this.fireCoffeeBeam(tower, target);
+              }
+            }
+            return;
+          }
+
+          // Standardowe pociski (Proca, Piec, Szyszka)
+          if (now - tower.lastFired >= interval) {
+            const target = this.findTargetForTower(tower, range);
+            if (target) {
+              tower.lastFired = now;
+              this.fireProjectile(tower, target);
+            }
+          }
+        });
+
+        // 4. Pociski
+        for (let i = this.projectiles.length - 1; i >= 0; i--) {
+          const p = this.projectiles[i];
+          p.age += effectiveDt;
+
+          if (p.isMortar) {
+            p.t += effectiveDt * 1.5;
+            if (p.t >= 1) {
+              this.detonateMortar(p);
+              this.projectiles.splice(i, 1);
+            } else {
+              p.x = p.startX + (p.targetX - p.startX) * p.t;
+              const linearY = p.startY + (p.targetY - p.startY) * p.t;
+              p.y = linearY - Math.sin(p.t * Math.PI) * 75;
+            }
+          } else {
+            const target = p.target;
+            const targetExists = target && this.enemies.includes(target);
+            const destX = targetExists ? target.x : p.targetX;
+            const destY = targetExists ? target.y : p.targetY;
+
+            const dx = destX - p.x;
+            const dy = destY - p.y;
+            const dist = Math.hypot(dx, dy);
+            const step = p.speed * 60 * effectiveDt;
+
+            if (dist <= step || p.age > 2.5) {
+              if (targetExists) {
+                this.damageEnemy(target, p.damage, p.towerRef, p.isFire);
+              }
+              this.projectiles.splice(i, 1);
+            } else {
+              p.x += (dx / dist) * step;
+              p.y += (dy / dist) * step;
+            }
+          }
+        }
+
+        // 5. Cząsteczki
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+          const pt = this.particles[i];
+          pt.x += pt.vx * effectiveDt * 60;
+          pt.y += pt.vy * effectiveDt * 60;
+          pt.life -= effectiveDt * pt.decay;
+          if (pt.life <= 0) this.particles.splice(i, 1);
+        }
+
+        // 6. Pogoda korpo-sezonowa
+        this.weatherParticles.forEach(wp => {
+          wp.y += wp.speed * effectiveDt * 60;
+          wp.x += Math.sin(wp.angle) * 0.8;
+          wp.angle += 0.02;
+          if (wp.y > this.baseHeight) {
+            wp.y = -10;
+            wp.x = Math.random() * this.baseWidth;
+          }
+        });
+
+        this.updateTopBar();
+      }
+
+      onWaveCompleted() {
+        this.waveInProgress = false;
+        document.getElementById('btn-next-wave').disabled = false;
+
+        // Dochód ze świątecznych choinek
+        let treeIncome = 0;
+        this.towers.filter(t => t.type === 'tree').forEach(tr => {
+          let income = TOWER_TYPES.tree.incomePerWave * tr.level;
+          if (this.techBonus.treeBonusIncome) income = Math.round(income * 1.75);
+          treeIncome += income;
+        });
+
+        const waveGold = 45 + Math.floor(this.wave * 4) + (this.techBonus.passiveIncome || 0) + treeIncome;
+        const waveKp = (this.wave % 5 === 0) ? 2 : 1;
+        this.gold += waveGold;
+        this.kp += waveKp;
+
+        let bonusMsg = `Dzień ${this.wave} zaliczony! Premia: +${waveGold} 🌰 oraz +${waveKp} ⭐ PDS.`;
+        if (treeIncome > 0) bonusMsg += ` (W tym +${treeIncome} 🌰 z Choinek!)`;
+
+        this.triggerBanner(`DZIEŃ ${this.wave} ZALICZONY!`, bonusMsg);
+        sound.playHolidayBell();
+        this.renderTechTree();
+        this.updateTopBar();
+
+        if (this.wave >= this.maxWaves) {
+          this.triggerVictory();
+        } else if (this.autoWave) {
+          setTimeout(() => {
+            if (!this.waveInProgress && !this.gameOver) this.startNextWave();
+          }, 1800);
+        }
+      }
+
+      triggerGameOver() {
+        this.gameOver = true;
+        document.getElementById('go-icon').textContent = '📑';
+        document.getElementById('go-title').textContent = 'WYPOWIEDZENIE ZŁOŻONE!';
+        document.getElementById('go-desc').textContent = 'Zarząd i Grinche zlikwidowali Twoje stanowisko pracy przed Wigilią. Twoje biurko zostało zlicytowane.';
+        document.getElementById('go-stat-waves').textContent = `${this.wave} / ${this.maxWaves} dni`;
+        document.getElementById('go-stat-kills').textContent = this.totalKills;
+        document.getElementById('go-stat-gold').textContent = this.totalGoldEarned;
+        document.getElementById('modal-gameover').classList.remove('hidden');
+      }
+
+      triggerVictory() {
+        this.victory = true;
+        document.getElementById('go-icon').textContent = '🏆';
+        document.getElementById('go-title').className = "font-cinzel text-2xl font-black text-amber-300 mb-1";
+        document.getElementById('go-title').textContent = 'ETAT OCALONY! AWANS NA PREZESA!';
+        document.getElementById('go-desc').textContent = 'Przetrwałeś całe 100 Dni Korpo! Grinche uciekły w popłochu, a cała wigilijna premia trafiła do Twojej kieszeni.';
+        document.getElementById('go-stat-waves').textContent = `100 / 100 (MAKSYMALNA OBRONA ETATU)`;
+        document.getElementById('go-stat-kills').textContent = this.totalKills;
+        document.getElementById('go-stat-gold').textContent = this.totalGoldEarned;
+        document.getElementById('modal-gameover').classList.remove('hidden');
+      }
+
+      /* ========================================================================
+         10. RENDEROWANIE GRAFIKI (Canvas 2D)
+         ======================================================================== */
+      render() {
+        this.ctx.save();
+        this.ctx.scale(this.scale, this.scale);
+
+        const season = getSeasonInfo(this.wave);
+
+        // Tło sezonowe
+        this.ctx.fillStyle = season.bgColor;
+        this.ctx.fillRect(0, 0, this.baseWidth, this.baseHeight);
+
+        // Ścieżka
+        this.renderPath(season.pathColor);
+
+        // Stanowisko Pracy (Biurko Ocalenia)
+        this.renderBase();
+
+        // Owoce z Owocowego Czwartku
+        this.renderApples();
+
+        // Wieże
+        this.towers.forEach(t => this.renderTower(t));
+
+        // Wrogowie
+        this.enemies.forEach(e => this.renderEnemy(e));
+
+        // Pociski
+        this.projectiles.forEach(p => this.renderProjectile(p));
+
+        // Cząsteczki
+        this.particles.forEach(pt => this.renderParticle(pt));
+
+        // Cząsteczki aury/pogody
+        this.renderWeather(season);
+
+        // Efekt zamrożenia pod kocykiem (L4)
+        if (this.l4Active > 0) {
+          this.ctx.fillStyle = 'rgba(56, 189, 248, 0.18)';
+          this.ctx.fillRect(0, 0, this.baseWidth, this.baseHeight);
+          this.ctx.font = 'bold 24px Cinzel';
+          this.ctx.fillStyle = '#bae6fd';
+          this.ctx.textAlign = 'center';
+          this.ctx.fillText(`☕ PRZEBYWASZ NA LEWYM L4 (${Math.ceil(this.l4Active)}s)`, this.baseWidth / 2, 40);
+        }
+
+        // Podgląd stawiania wieży
+        this.renderPlacementPreview();
+
+        this.ctx.restore();
+      }
+
+      renderApples() {
+        this.apples.forEach(ap => {
+          this.ctx.font = '16px sans-serif';
+          this.ctx.textAlign = 'center';
+          this.ctx.textBaseline = 'middle';
+          this.ctx.fillText('🍏', ap.x, ap.y);
+        });
+      }
+      renderEnemy(enemy) {
+        this.ctx.save();
+        this.ctx.translate(enemy.x, enemy.y);
+
+        if (enemy.isBoss) {
+          this.ctx.strokeStyle = 'rgba(239, 68, 68, 0.7)';
+          this.ctx.lineWidth = 2.5;
+          this.ctx.setLineDash([5, 5]);
+          this.ctx.beginPath();
+          this.ctx.arc(0, 0, enemy.size + 9, 0, Math.PI * 2);
+          this.ctx.stroke();
+          this.ctx.setLineDash([]);
+        }
+
+        // Aura Scrum Mastera
+        if (enemy.hasStandupAura) {
+          this.ctx.strokeStyle = 'rgba(14, 165, 233, 0.45)';
+          this.ctx.lineWidth = 1.5;
+          this.ctx.setLineDash([3, 3]);
+          this.ctx.beginPath();
+          this.ctx.arc(0, 0, 80, 0, Math.PI * 2);
+          this.ctx.stroke();
+          this.ctx.setLineDash([]);
+        }
+
+        // Ciało intruza
+        this.ctx.fillStyle = enemy.color;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, enemy.size, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeStyle = '#ffffff60';
+        this.ctx.stroke();
+
+        // Efekt spowolnienia
+        if (enemy.slowTimer > 0) {
+          this.ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+          this.ctx.beginPath();
+          this.ctx.arc(0, 0, enemy.size, 0, Math.PI * 2);
+          this.ctx.fill();
+        }
+
+        // Podpalenie
+        if (enemy.burnTimer > 0) {
+          this.ctx.fillStyle = 'rgba(249, 115, 22, 0.45)';
+          this.ctx.beginPath();
+          this.ctx.arc(0, 0, enemy.size, 0, Math.PI * 2);
+          this.ctx.fill();
+        }
+
+        // Rysowanie detali garnituru dla Korpo-Penisa
+        if (enemy.type === 'korpo_penis') {
+          this.ctx.fillStyle = '#ef4444'; // Czerwony krawat sukcesu
+          this.ctx.beginPath();
+          this.ctx.moveTo(0, -enemy.size * 0.2);
+          this.ctx.lineTo(3, enemy.size * 0.7);
+          this.ctx.lineTo(-3, enemy.size * 0.7);
+          this.ctx.closePath();
+          this.ctx.fill();
+        }
+
+        // Emotka / Ikona
+        this.ctx.font = `${Math.round(enemy.size * 1.15)}px sans-serif`;
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        let glyph = enemy.icon || '🌰';
+        this.ctx.fillText(glyph, 0, 0);
+
+        // Pasek HP
+        const barWidth = enemy.size * 2 + 8;
+        const hpPercent = Math.max(0, enemy.hp / enemy.maxHp);
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.fillRect(-barWidth / 2, -enemy.size - 9, barWidth, 4.5);
+
+        this.ctx.fillStyle = hpPercent > 0.4 ? '#22c55e' : '#ef4444';
+        this.ctx.fillRect(-barWidth / 2, -enemy.size - 9, barWidth * hpPercent, 4.5);
+
+        this.ctx.restore();
+      }
+
+      spawnEnemy(spec) {
+        const startPt = this.path[0];
+        const newEnemy = {
+          ...spec,
+          x: startPt.x,
+          y: startPt.y,
+          maxHp: spec.hp,
+          hp: spec.hp,
+          baseSpeed: spec.speed,
+          currentSpeed: spec.speed,
+          waypointIndex: 0,
+          distanceTraveled: 0,
+          slowTimer: 0,
+          burnTimer: 0
+        };
+        this.enemies.push(newEnemy);
+      }
+
+      updateEnemyCoordinates(enemy) {
+        if (enemy.waypointIndex >= this.path.length - 1) return;
+        const targetPt = this.path[enemy.waypointIndex + 1];
+        const dx = targetPt.x - enemy.x;
+        const dy = targetPt.y - enemy.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < 4) {
+          enemy.waypointIndex++;
+        } else {
+          enemy.x += (dx / dist) * Math.min(dist, enemy.currentSpeed * 2.2);
+          enemy.y += (dy / dist) * Math.min(dist, enemy.currentSpeed * 2.2);
+        }
+      }
+
+      killEnemy(enemy) {
+        this.totalKills++;
+        let reward = enemy.reward + (this.techBonus.bonusGoldPerKill || 0);
+        this.gold += reward;
+        this.totalGoldEarned += reward;
+        this.addFloatingText(`+${reward} 🌰`, enemy.x, enemy.y - 12, '#fbbf24');
+        this.addChestnutSparks(enemy.x, enemy.y, enemy.isBoss ? 28 : 10, enemy.color);
+        sound.playCollect();
+
+        const idx = this.enemies.indexOf(enemy);
+        if (idx !== -1) this.enemies.splice(idx, 1);
+        this.updateTopBar();
+      }
+
+      damageEnemy(enemy, rawDmg, towerRef = null, isFire = false, ignoreArmor = false) {
+        let dmg = rawDmg * (1 + this.techBonus.globalDamageMult);
+
+        if (towerRef && towerRef.buffMultiplier) {
+          dmg *= towerRef.buffMultiplier;
+        }
+
+        if (enemy.isGrinch && this.techBonus.antiGrinchDmg) {
+          dmg *= (1 + this.techBonus.antiGrinchDmg);
+        }
+
+        let isCrit = false;
+        if (this.techBonus.critChance && Math.random() < this.techBonus.critChance) {
+          isCrit = true;
+          dmg *= 2.6;
+        }
+
+        let effectiveArmor = enemy.armor || 0;
+        if (ignoreArmor || (towerRef && towerRef.type === 'burr' && this.techBonus.burrArmorPen)) {
+          effectiveArmor = 0;
+        }
+
+        const finalDmg = Math.max(1, Math.round(dmg - effectiveArmor));
+        enemy.hp -= finalDmg;
+
+        if (isFire || (towerRef && towerRef.type === 'roaster' && this.techBonus.roasterBurn)) {
+          enemy.burnTimer = 4.0;
+        }
+
+        if (isCrit) {
+          this.addFloatingText(`CRIT! -${finalDmg}`, enemy.x, enemy.y - 16, '#ef4444');
+          sound.playHit();
+        }
+
+        this.addChestnutSparks(enemy.x, enemy.y, 3, isFire ? '#ea580c' : '#fbbf24');
+
+        if (enemy.hp <= 0) {
+          this.killEnemy(enemy);
+        }
+      }
+
+      findTargetForTower(tower, range) {
+        const candidates = this.enemies.filter(e => Math.hypot(e.x - tower.x, e.y - tower.y) <= range);
+        if (candidates.length === 0) return null;
+
+        const mode = tower.targeting || 'first';
+        if (mode === 'strongest') {
+          return candidates.reduce((prev, curr) => (curr.hp > prev.hp ? curr : prev), candidates[0]);
+        } else if (mode === 'weakest') {
+          return candidates.reduce((prev, curr) => (curr.hp < prev.hp ? curr : prev), candidates[0]);
+        } else if (mode === 'closest') {
+          return candidates.reduce((prev, curr) => {
+            const dCurr = Math.hypot(curr.x - tower.x, curr.y - tower.y);
+            const dPrev = Math.hypot(prev.x - tower.x, prev.y - tower.y);
+            return dCurr < dPrev ? curr : prev;
+          }, candidates[0]);
+        }
+        // Domyślnie 'first': najdalsza przebyta droga
+        return candidates.reduce((prev, curr) => (curr.distanceTraveled > prev.distanceTraveled ? curr : prev), candidates[0]);
+      }
+
+      triggerBurrPulse(tower, range) {
+        sound.playFrostShatter();
+        this.addChestnutSparks(tower.x, tower.y, 8, '#65a30d');
+        this.enemies.forEach(e => {
+          if (Math.hypot(e.x - tower.x, e.y - tower.y) <= range) {
+            e.currentSpeed = e.baseSpeed * (TOWER_TYPES.burr.slowFactor || 0.5);
+            e.slowTimer = 2.2;
+            this.damageEnemy(e, tower.damage, tower, false);
+          }
+        });
+      }
+
+      fireTreeRay(tower, target) {
+        sound.playHolidayBell();
+        this.particles.push({
+          x: tower.x,
+          y: tower.y,
+          targetX: target.x,
+          targetY: target.y,
+          isBeam: true,
+          color: '#facc15',
+          life: 0.25,
+          decay: 4.0
+        });
+        this.damageEnemy(target, tower.damage, tower, false);
+      }
+
+      fireCoffeeBeam(tower, target) {
+        sound.playCoffeeHiss();
+        this.particles.push({
+          x: tower.x,
+          y: tower.y,
+          targetX: target.x,
+          targetY: target.y,
+          isBeam: true,
+          color: '#78350f',
+          life: 0.18,
+          decay: 5.0
+        });
+        const isFire = Boolean(this.techBonus.coffeeFire);
+        this.damageEnemy(target, tower.damage, tower, isFire);
+      }
+
+      fireProjectile(tower, target) {
+        const spec = TOWER_TYPES[tower.type];
+        if (tower.type === 'slingshot') sound.playSlingshot();
+        if (tower.type === 'roaster') sound.playRoastPop();
+        if (tower.type === 'pine') sound.playFrostShatter();
+
+        if (spec.isMortar) {
+          this.projectiles.push({
+            isMortar: true,
+            startX: tower.x,
+            startY: tower.y,
+            x: tower.x,
+            y: tower.y,
+            targetX: target.x,
+            targetY: target.y,
+            t: 0,
+            damage: tower.damage,
+            splashRadius: (spec.splashRadius || 80) * (1 + this.techBonus.pineSplashMult),
+            towerRef: tower,
+            color: spec.bulletColor,
+            age: 0
+          });
+        } else {
+          this.projectiles.push({
+            x: tower.x,
+            y: tower.y,
+            target,
+            targetX: target.x,
+            targetY: target.y,
+            speed: spec.bulletSpeed || 8,
+            damage: tower.damage,
+            towerRef: tower,
+            color: spec.bulletColor,
+            isFire: (tower.type === 'roaster'),
+            age: 0
+          });
+        }
+      }
+
+      detonateMortar(proj) {
+        sound.playFrostShatter();
+        this.addChestnutSparks(proj.targetX, proj.targetY, 20, '#38bdf8');
+        this.enemies.forEach(e => {
+          const d = Math.hypot(e.x - proj.targetX, e.y - proj.targetY);
+          if (d <= proj.splashRadius) {
+            e.currentSpeed = e.baseSpeed * 0.45;
+            e.slowTimer = 3.5;
+            this.damageEnemy(e, proj.damage * (1 - d / (proj.splashRadius * 1.4)), proj.towerRef, false);
+          }
+        });
+      }
+
+      buildTower(type, x, y) {
+        const spec = TOWER_TYPES[type];
+        if (!spec) return;
+
+        let cost = spec.cost;
+        if (this.techBonus.buildDiscount) {
+          cost = Math.round(cost * (1 - this.techBonus.buildDiscount));
+        }
+
+        if (this.gold < cost) {
+          this.triggerBanner("Brak Budżetu Biurka!", `Potrzebujesz ${cost} 🌰 kasztanów.`);
+          return;
+        }
+
+        if (!this.isValidBuildLocation(x, y)) {
+          this.triggerBanner("Niedozwolona Przestrzeń!", "Nie można blokować korytarza ani stawiać na innej wieży.");
+          return;
+        }
+
+        this.gold -= cost;
+        const newTower = {
+          type,
+          name: spec.name,
+          icon: spec.icon,
+          x,
+          y,
+          baseCost: cost,
+          level: 1,
+          damage: spec.damage,
+          range: spec.range,
+          fireRate: spec.fireRate,
+          lastFired: 0,
+          targeting: 'first',
+          buffMultiplier: 1.0
+        };
+
+        this.towers.push(newTower);
+        this.addChestnutSparks(x, y, 16, spec.color);
+        sound.playCollect();
+        this.selectTowerInstance(newTower);
+        this.renderStore();
+        this.updateTopBar();
+      }
+
+      isValidBuildLocation(x, y) {
+        if (x < 25 || x > this.baseWidth - 25 || y < 25 || y > this.baseHeight - 25) return false;
+
+        // Nie stawiaj na innej wieży
+        for (const t of this.towers) {
+          if (Math.hypot(t.x - x, t.y - y) < 40) return false;
+        }
+
+        // Nie stawiaj na ścieżce
+        for (let i = 0; i < this.path.length - 1; i++) {
+          const p1 = this.path[i];
+          const p2 = this.path[i + 1];
+          const distToSegment = this.distToSegment({ x, y }, p1, p2);
+          if (distToSegment < 38) return false;
+        }
+
+        return true;
+      }
+
+      distToSegment(p, v, w) {
+        const l2 = (v.x - w.x) ** 2 + (v.y - w.y) ** 2;
+        if (l2 === 0) return Math.hypot(p.x - v.x, p.y - v.y);
+        let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+        t = Math.max(0, Math.min(1, t));
+        return Math.hypot(p.x - (v.x + t * (w.x - v.x)), p.y - (v.y + t * (w.y - v.y)));
+      }
+
+      renderStore() {
+        const store = document.getElementById('tower-store');
+        store.innerHTML = '';
+
+        Object.values(TOWER_TYPES).forEach(t => {
+          let cost = t.cost;
+          if (this.techBonus.buildDiscount) {
+            cost = Math.round(cost * (1 - this.techBonus.buildDiscount));
+          }
+
+          const card = document.createElement('div');
+          const isSelected = this.selectedTowerType === t.id;
+          card.className = `p-2.5 rounded-xl border cursor-pointer transition flex items-center justify-between ${
+            isSelected
+              ? 'bg-amber-950/70 border-amber-500 shadow-md ring-2 ring-amber-500/50'
+              : 'bg-stone-950/80 border-stone-800 hover:border-amber-700/60'
+          }`;
+
+          card.innerHTML = `
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl p-1.5 bg-stone-900 rounded-xl border border-stone-800">${t.icon}</span>
+              <div>
+                <h4 class="font-bold text-xs text-amber-200">${t.name}</h4>
+                <p class="text-[10px] text-stone-400 font-mono">${t.desc.substring(0, 48)}...</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-mono font-bold text-amber-400 block">${cost} 🌰</span>
+              <span class="text-[9px] text-stone-500 font-mono">zasięg ${t.range}</span>
+            </div>
+          `;
+
+          card.addEventListener('click', () => {
+            sound.init();
+            if (this.selectedTowerType === t.id) {
+              this.selectedTowerType = null;
+            } else {
+              this.selectedTowerType = t.id;
+              this.selectTowerInstance(null);
+            }
+            this.renderStore();
+          });
+
+          store.appendChild(card);
+        });
+      }
+
+      renderPath(color) {
+        if (this.path.length < 2) return;
+        this.ctx.save();
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = 44;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.path[0].x, this.path[0].y);
+        for (let i = 1; i < this.path.length; i++) {
+          this.ctx.lineTo(this.path[i].x, this.path[i].y);
+        }
+        this.ctx.stroke();
+
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        this.ctx.lineWidth = 40;
+        this.ctx.stroke();
+
+        this.ctx.strokeStyle = 'rgba(251, 191, 36, 0.25)';
+        this.ctx.lineWidth = 2;
+        this.ctx.setLineDash([8, 8]);
+        this.ctx.stroke();
+        this.ctx.restore();
+      }
+
+      renderBase() {
+        const desk = this.path[this.path.length - 1];
+        this.ctx.save();
+        this.ctx.fillStyle = '#78350f';
+        this.ctx.beginPath();
+        this.ctx.arc(desk.x, desk.y, 28, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeStyle = '#f59e0b';
+        this.ctx.stroke();
+
+        this.ctx.font = '24px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('💻', desk.x, desk.y - 2);
+
+        this.ctx.font = 'bold 10px JetBrains Mono';
+        this.ctx.fillStyle = '#fde68a';
+        this.ctx.fillText('BIURKO', desk.x, desk.y + 19);
+        this.ctx.restore();
+      }
+
+      renderTower(tower) {
+        this.ctx.save();
+        this.ctx.translate(tower.x, tower.y);
+
+        const isSelected = this.selectedTowerInstance === tower;
+        if (isSelected) {
+          let range = tower.range;
+          if (tower.type === 'slingshot' || tower.type === 'burr') {
+            range *= (1 + this.techBonus.slingshotRangeMult);
+          }
+          this.ctx.strokeStyle = 'rgba(245, 158, 11, 0.55)';
+          this.ctx.fillStyle = 'rgba(245, 158, 11, 0.08)';
+          this.ctx.lineWidth = 1.5;
+          this.ctx.beginPath();
+          this.ctx.arc(0, 0, range, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.stroke();
+        }
+
+        const spec = TOWER_TYPES[tower.type];
+        this.ctx.fillStyle = spec.color;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, 18, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeStyle = isSelected ? '#fbbf24' : '#1c1917';
+        this.ctx.stroke();
+
+        this.ctx.font = '16px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(tower.icon, 0, 0);
+
+        // Poziom wieży (gwiazdki)
+        this.ctx.font = '9px JetBrains Mono';
+        this.ctx.fillStyle = '#fef08a';
+        this.ctx.fillText('⭐'.repeat(tower.level), 0, -22);
+
+        this.ctx.restore();
+      }
+
+      renderProjectile(p) {
+        this.ctx.save();
+        this.ctx.fillStyle = p.color || '#fbbf24';
+        this.ctx.beginPath();
+        this.ctx.arc(p.x, p.y, p.isMortar ? 7 : 4, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.restore();
+      }
+
+      renderParticle(pt) {
+        this.ctx.save();
+        if (pt.isBeam) {
+          this.ctx.strokeStyle = pt.color;
+          this.ctx.lineWidth = 3;
+          this.ctx.globalAlpha = pt.life;
+          this.ctx.beginPath();
+          this.ctx.moveTo(pt.x, pt.y);
+          this.ctx.lineTo(pt.targetX, pt.targetY);
+          this.ctx.stroke();
+        } else if (pt.text) {
+          this.ctx.font = 'bold 12px JetBrains Mono';
+          this.ctx.fillStyle = pt.color;
+          this.ctx.globalAlpha = Math.max(0, pt.life);
+          this.ctx.textAlign = 'center';
+          this.ctx.fillText(pt.text, pt.x, pt.y);
+        } else {
+          this.ctx.fillStyle = pt.color;
+          this.ctx.globalAlpha = Math.max(0, pt.life);
+          this.ctx.beginPath();
+          this.ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+          this.ctx.fill();
+        }
+        this.ctx.restore();
+      }
+
+      renderWeather(season) {
+        this.ctx.save();
+        this.weatherParticles.forEach(wp => {
+          if (season.ambientType === 'leaf') {
+            this.ctx.fillStyle = 'rgba(217, 119, 6, 0.4)';
+          } else if (season.ambientType === 'frost') {
+            this.ctx.fillStyle = 'rgba(186, 230, 253, 0.35)';
+          } else if (season.ambientType === 'snow') {
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+          } else {
+            this.ctx.fillStyle = 'rgba(251, 191, 36, 0.45)';
+          }
+          this.ctx.beginPath();
+          this.ctx.arc(wp.x, wp.y, wp.size, 0, Math.PI * 2);
+          this.ctx.fill();
+        });
+        this.ctx.restore();
+      }
+
+      renderPlacementPreview() {
+        if (!this.selectedTowerType || !this.isHoveringCanvas) return;
+        const spec = TOWER_TYPES[this.selectedTowerType];
+        const { x, y } = this.mousePos;
+        const valid = this.isValidBuildLocation(x, y);
+
+        let range = spec.range;
+        if (this.selectedTowerType === 'slingshot' || this.selectedTowerType === 'burr') {
+          range *= (1 + this.techBonus.slingshotRangeMult);
+        }
+
+        this.ctx.fillStyle = valid ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+        this.ctx.strokeStyle = valid ? 'rgba(16, 185, 129, 0.7)' : 'rgba(239, 68, 68, 0.7)';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, range, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.stroke();
+
+        this.ctx.fillStyle = valid ? 'rgba(245, 158, 11, 0.7)' : 'rgba(239, 68, 68, 0.7)';
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, 16, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        this.ctx.font = '16px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(spec.icon, x, y);
+      }
+
+      addChestnutSparks(x, y, count = 10, color = '#f59e0b') {
+        for (let i = 0; i < count; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 0.5 + Math.random() * 2.5;
+          this.particles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            size: 2 + Math.random() * 3,
+            color,
+            life: 1.0,
+            decay: 1.6 + Math.random() * 1.4
+          });
+        }
+      }
+
+      addFloatingText(text, x, y, color = '#facc15') {
+        this.particles.push({
+          x,
+          y,
+          vx: 0,
+          vy: -0.6,
+          text,
+          color,
+          life: 1.0,
+          decay: 0.9
+        });
+      }
+    }
+
+    /* ==========================================================================
+       11. INICJALIZACJA I PĘTLA GRY
+       ========================================================================== */
+    window.onload = function () {
+      const canvas = document.getElementById('gameCanvas');
+      const game = new ChestnutTDGame(canvas);
+
+      let lastTime = performance.now();
+      function gameLoop(currentTime) {
+        const deltaTime = Math.min((currentTime - lastTime) / 1000, 0.1);
+        lastTime = currentTime;
+
+        game.update(deltaTime);
+        game.render();
+
+        requestAnimationFrame(gameLoop);
+      }
+
+      requestAnimationFrame(gameLoop);
+    };
+  </script>
+</body>
+</html>

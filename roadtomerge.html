@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RoadToMerge - Kasztan na Krześle vs ART Merge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow: hidden;
+            background-color: #0f172a;
+        }
+        .comic-font {
+            font-family: 'Fredoka One', cursive;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+        .hud-shadow {
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.7);
+        }
+        .btn-game {
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 0 rgba(0,0,0,0.35);
+        }
+        .btn-game:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.35);
+        }
+    </style>
+</head>
+<body class="w-screen h-screen m-0 p-0 overflow-hidden bg-slate-900 text-white select-none">
+
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas" class="absolute inset-0 z-0"></canvas>
+
+    <!-- Top Status Overlay (HUD) -->
+    <div id="hud" class="absolute top-0 left-0 right-0 p-3 sm:p-4 flex flex-wrap justify-between items-center z-10 pointer-events-none">
+        <!-- Left: Level info & Team badge -->
+        <div class="flex items-center gap-2 sm:gap-3 bg-slate-900/80 backdrop-blur-md px-3 py-2 rounded-2xl border border-slate-700 shadow-xl pointer-events-auto">
+            <div class="w-10 h-10 rounded-xl bg-amber-700 border-2 border-amber-400 flex items-center justify-center text-2xl shadow-inner">
+                🌰
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="comic-font text-amber-400 text-base sm:text-lg">Poziom <span id="hudLevel">1</span>/100</span>
+                    <span class="text-[10px] bg-red-600 text-white font-black px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse">Merge Alert!</span>
+                </div>
+                <div class="text-xs text-slate-300 font-semibold" id="hudLevelName">Dojazd do Korpokorytarza</div>
+            </div>
+        </div>
+
+        <!-- Center: Progress Bar to ART Merge -->
+        <div class="w-full sm:w-1/3 order-3 sm:order-2 mt-2 sm:mt-0 bg-slate-900/80 backdrop-blur-md px-3 py-2 rounded-2xl border border-slate-700 shadow-xl pointer-events-auto">
+            <div class="flex justify-between text-xs font-bold mb-1 text-slate-300">
+                <span class="flex items-center gap-1">🌰 Team Kasztany</span>
+                <span id="hudDistance">0% do ART Merge</span>
+                <span class="text-red-400 flex items-center gap-1">🚂 ART Wcielenie</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-3.5 p-0.5 border border-slate-600 relative overflow-hidden">
+                <div id="progressBar" class="bg-gradient-to-r from-amber-500 via-yellow-400 to-red-500 h-full rounded-full w-0 transition-all duration-75"></div>
+            </div>
+        </div>
+
+        <!-- Right: Coffee Nitro & Status -->
+        <div class="flex items-center gap-2 sm:gap-3 bg-slate-900/80 backdrop-blur-md px-3 py-2 rounded-2xl border border-slate-700 shadow-xl pointer-events-auto">
+            <div class="text-right">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Kawa z Ekspresu (NITRO)</div>
+                <div class="w-28 sm:w-36 bg-slate-800 rounded-full h-3 border border-slate-600 overflow-hidden mt-0.5">
+                    <div id="nitroBar" class="bg-gradient-to-r from-amber-600 to-amber-300 h-full w-full"></div>
+                </div>
+            </div>
+            <button id="btnPause" class="btn-game bg-slate-700 hover:bg-slate-600 p-2 rounded-xl text-lg font-bold border border-slate-500 cursor-pointer">
+                ⏸️
+            </button>
+        </div>
+    </div>
+
+    <!-- Active Status Ticker -->
+    <div id="statusTicker" class="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 bg-amber-500/90 text-slate-950 font-black text-xs sm:text-sm px-4 py-1 rounded-full shadow-lg pointer-events-none transition-all duration-300 opacity-0 z-10 border-2 border-white">
+        Status: Eskalacja w toku!
+    </div>
+
+    <!-- On-Screen Controls for Mobile/Tablet -->
+    <div id="touchControls" class="absolute bottom-4 left-0 right-0 px-4 flex justify-between items-end z-20 pointer-events-none">
+        <!-- Left Buttons: Lean Back / Brake & Lean Forward / Gas -->
+        <div class="flex gap-3 pointer-events-auto">
+            <button id="btnLeft" class="btn-game w-16 h-16 sm:w-20 sm:h-20 bg-rose-600/90 active:bg-rose-700 text-white text-2xl font-black rounded-2xl border-2 border-rose-300 flex flex-col items-center justify-center">
+                <span>◀</span>
+                <span class="text-[10px] font-bold uppercase mt-[-4px]">W tył</span>
+            </button>
+            <button id="btnRight" class="btn-game w-16 h-16 sm:w-20 sm:h-20 bg-emerald-600/90 active:bg-emerald-700 text-white text-2xl font-black rounded-2xl border-2 border-emerald-300 flex flex-col items-center justify-center">
+                <span>▶</span>
+                <span class="text-[10px] font-bold uppercase mt-[-4px]">Gaz!</span>
+            </button>
+        </div>
+
+        <!-- Center: Jump / Podskok -->
+        <div class="pointer-events-auto">
+            <button id="btnJump" class="btn-game w-16 h-16 sm:w-20 sm:h-20 bg-amber-500/90 active:bg-amber-600 text-white text-2xl font-black rounded-2xl border-2 border-amber-200 flex flex-col items-center justify-center shadow-lg">
+                <span>🦘</span>
+                <span class="text-[10px] font-bold uppercase mt-[-4px]">Skok!</span>
+            </button>
+        </div>
+
+        <!-- Right: Nitro / Kawa -->
+        <div class="pointer-events-auto">
+            <button id="btnNitro" class="btn-game w-16 h-16 sm:w-20 sm:h-20 bg-amber-700/90 active:bg-amber-800 text-white text-2xl font-black rounded-2xl border-2 border-yellow-300 flex flex-col items-center justify-center shadow-lg">
+                <span>☕</span>
+                <span class="text-[10px] font-bold uppercase mt-[-4px]">Nitro</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal / Screen: Start & Level Selection -->
+    <div id="modalStart" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-40 transition-opacity">
+        <div class="max-w-xl w-full bg-slate-900 border-2 border-amber-500/80 rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative">
+            <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full bg-amber-600 border-4 border-yellow-400 flex items-center justify-center text-5xl shadow-xl animate-bounce">
+                🌰
+            </div>
+            <h1 class="comic-font text-3xl sm:text-5xl text-yellow-400 mt-6 tracking-wide drop-shadow-md">RoadToMerge</h1>
+            <p class="text-amber-200 font-bold text-sm sm:text-base mt-1">Epicka ucieczka Zespołu Kasztanów przed wchłonięciem w ART!</p>
+            
+            <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-4 my-4 text-xs sm:text-sm text-slate-300 text-left space-y-2">
+                <p>🚨 <b class="text-yellow-400">Fabuła:</b> Zespół Kasztanów ma zostać bezlitośnie wchłonięty w gigantyczny pociąg <i>SAFe ART</i>. Twoje jedyne narzędzie ucieczki? Rozklekotany fotel z działu księgowości!</p>
+                <p>👔 <b class="text-red-400">Wrogowie:</b> Grinch-Audytorzy z pieczęcią "ASAP" i mandatami za brak certyfikacji ISO-KASZTAN oraz Korpo-Daddysi rzucający karteczkami post-it i matchą na owsianym.</p>
+                <p>☕ <b class="text-emerald-400">Sterowanie:</b> [A]/[D] lub [Strzałki] (Balans/Gaz/Cofanie), [SPACJA] (Wyskocz ze sprężyny fotela), [SHIFT] (Kawa z ekspresu - Nitro).</p>
+            </div>
+
+            <div class="flex items-center justify-between my-3 px-2">
+                <span class="text-sm font-semibold text-slate-400">Wybierz Poziom (Odblokowano: <span id="unlockedCount" class="text-amber-400 font-bold">1</span>/100):</span>
+                <button id="btnOpenLevels" class="text-xs bg-slate-700 hover:bg-slate-600 text-amber-300 font-bold px-3 py-1.5 rounded-lg border border-slate-600">
+                    📋 Lista 100 Poziomów
+                </button>
+            </div>
+
+            <div class="flex gap-3 mt-4">
+                <button id="btnPlayGame" class="btn-game flex-1 py-4 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 comic-font text-xl rounded-2xl font-black border-2 border-yellow-200 shadow-xl cursor-pointer">
+                    🚀 STARTUJ FOTELEM!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Level Browser (1-100) -->
+    <div id="modalLevels" class="absolute inset-0 bg-slate-950/95 backdrop-blur-lg flex flex-col items-center justify-center p-4 z-50 hidden">
+        <div class="max-w-3xl w-full bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 flex flex-col h-[85vh] shadow-2xl">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-800">
+                <div>
+                    <h2 class="comic-font text-2xl text-yellow-400">Wybór Korpopoziomu (1 - 100)</h2>
+                    <p class="text-xs text-slate-400">Wybierz etap korporacyjnej drogi Zespołu Kasztanów</p>
+                </div>
+                <button id="btnCloseLevels" class="btn-game bg-rose-600 text-white font-black text-sm px-4 py-2 rounded-xl">Zamknij ✕</button>
+            </div>
+            
+            <div id="levelsGrid" class="flex-1 overflow-y-auto grid grid-cols-4 sm:grid-cols-6 md:grid-cols-10 gap-2.5 p-3 my-3 bg-slate-950/50 rounded-2xl border border-slate-800">
+                <!-- Dynamically populated 100 buttons -->
+            </div>
+
+            <div class="pt-3 border-t border-slate-800 flex justify-between text-xs text-slate-400 items-center">
+                <span>🌰 Im wyższy poziom, tym bardziej strome Długi Technologiczne i wścieklejsi Grinche!</span>
+                <button id="btnResetProgress" class="text-rose-400 hover:underline">Resetuj postęp</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Crash / Game Over -->
+    <div id="modalCrash" class="absolute inset-0 bg-red-955/85 backdrop-blur-md flex flex-col items-center justify-center p-4 z-40 hidden">
+        <div class="max-w-md w-full bg-slate-900 border-4 border-rose-500 rounded-3xl p-6 sm:p-8 text-center shadow-2xl">
+            <div class="text-6xl mb-3 animate-spin" style="animation-duration: 3s;">💥</div>
+            <h2 class="comic-font text-3xl text-rose-400">Kasztan spadł z krzesełka!</h2>
+            <div id="crashReason" class="text-sm font-semibold text-amber-200 bg-slate-800 p-3 rounded-xl border border-slate-700 my-4">
+                "Merge conflict: Nie dotrzesz na retro bo twój fotel stracił kółko!"
+            </div>
+            <p class="text-xs text-slate-400 mb-6">Wcielono Cię do ART-u jako Junior Ticket Pusher bez dostępu do ekspresu.</p>
+            <div class="flex gap-3">
+                <button id="btnRetry" class="btn-game flex-1 py-3 bg-rose-600 hover:bg-rose-500 text-white comic-font text-lg rounded-2xl border border-rose-300">
+                    🔄 Rollujmy znowu!
+                </button>
+                <button id="btnMenuFromCrash" class="btn-game px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white text-sm font-bold rounded-2xl">
+                    Menu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Level Victory -->
+    <div id="modalVictory" class="absolute inset-0 bg-emerald-955/85 backdrop-blur-md flex flex-col items-center justify-center p-4 z-40 hidden">
+        <div class="max-w-md w-full bg-slate-900 border-4 border-emerald-400 rounded-3xl p-6 sm:p-8 text-center shadow-2xl">
+            <div class="text-6xl mb-3 animate-bounce">🌰</div>
+            <h2 class="comic-font text-3xl text-emerald-400">KASZTANY 1 : 0 KORPO!</h2>
+            <p class="text-sm font-bold text-yellow-300 mt-1" id="victoryLevelName">Merge odroczony o kolejny sprint! Dobrze rollujesz - nakurwiaj dalej!</p>
+            <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 my-4 text-xs text-slate-300 text-left space-y-1">
+                <div class="flex justify-between"><span>Szacunek kasztanów ulicy:</span> <b class="text-yellow-400" id="victoryScore">+1500 KPI</b></div>
+                <div class="flex justify-between"><span>Czas omijania calli:</span> <b class="text-emerald-400" id="victoryTime">14.2s</b></div>
+                <div class="flex justify-between"><span>Odrzucone Grinche & Daddysi:</span> <b class="text-amber-300" id="victoryGrinches">3</b></div>
+            </div>
+            <div class="flex gap-3">
+                <button id="btnNextLevel" class="btn-game flex-1 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 comic-font text-lg font-black rounded-2xl border border-white">
+                    Uciekaj dalej! Następny Sprint ➔
+                </button>
+                <button id="btnMenuFromVictory" class="btn-game px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white text-sm font-bold rounded-2xl">
+                    Menu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Synthesis & Game Logic -->
+    <script>
+        /* =========================================================================
+           1. AUDIO ENGINE (Synthesized via Web Audio API - no external sound files)
+           ========================================================================= */
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            // Wheel squeak / rolling sound
+            playChairSqueak() {
+                if (!this.enabled || !this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(550 + Math.random() * 250, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(750 + Math.random() * 200, this.ctx.currentTime + 0.08);
+
+                    gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.09);
+                } catch(e) {}
+            }
+
+            // Jump / spring boing sound
+            playJump() {
+                if (!this.enabled || !this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(620, this.ctx.currentTime + 0.22);
+
+                    gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.22);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.24);
+                } catch(e) {}
+            }
+
+            // Elevator Ding / Corporate notification
+            playElevatorDing() {
+                if (!this.enabled || !this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.5);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.52);
+                } catch(e) {}
+            }
+
+            // Nitro espresso whoosh
+            playNitro() {
+                if (!this.enabled || !this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(520, this.ctx.currentTime + 0.28);
+
+                    gain.gain.setValueAtTime(0.22, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.28);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.3);
+                } catch(e) {}
+            }
+
+            // Powerup collection ding
+            playPickup() {
+                if (!this.enabled || !this.ctx) return;
+                try {
+                    const notes = [587, 740, 880, 1174];
+                    notes.forEach((freq, idx) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.05);
+                        gain.gain.setValueAtTime(0.12, this.ctx.currentTime + idx * 0.05);
+                        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.05 + 0.2);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(this.ctx.currentTime + idx * 0.05);
+                        osc.stop(this.ctx.currentTime + idx * 0.05 + 0.22);
+                    });
+                } catch(e) {}
+            }
+
+            // Crash / Merge conflict thud & buzzer
+            playCrash() {
+                if (!this.enabled || !this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(160, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(25, this.ctx.currentTime + 0.45);
+                    gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.5);
+
+                    // Sad corporate rejection buzzer
+                    setTimeout(() => {
+                        if (!this.ctx) return;
+                        const buzz = this.ctx.createOscillator();
+                        const buzzGain = this.ctx.createGain();
+                        buzz.type = 'square';
+                        buzz.frequency.setValueAtTime(105, this.ctx.currentTime);
+                        buzz.frequency.setValueAtTime(90, this.ctx.currentTime + 0.2);
+                        buzzGain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+                        buzzGain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.45);
+                        buzz.connect(buzzGain);
+                        buzzGain.connect(this.ctx.destination);
+                        buzz.start();
+                        buzz.stop(this.ctx.currentTime + 0.47);
+                    }, 120);
+                } catch(e) {}
+            }
+
+            // Fanfare on level complete
+            playWin() {
+                if (!this.enabled || !this.ctx) return;
+                try {
+                    const notes = [440, 554, 659, 880, 1108];
+                    notes.forEach((freq, i) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.value = freq;
+                        const t = this.ctx.currentTime + i * 0.09;
+                        gain.gain.setValueAtTime(0.18, t);
+                        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(t);
+                        osc.stop(t + 0.3);
+                    });
+                } catch(e) {}
+            }
+        }
+
+        const audio = new SoundFX();
+
+        /* =========================================================================
+           2. LEVEL GENERATOR & CORPORATE VOCABULARY (100 LEVELS)
+           ========================================================================= */
+        const CORP_TITLES = [
+            "Korytarz Bezsensownych Synców", "Wzgórze Długu Technicznego z 2014", "Rów Wypalenia Zawodowego",
+            "Przełęcz Refactoringu 'Na Kolanie'", "Dolina Zgłoszeń P0 od Prezesa", "Schody Awansu Bez Podwyżki",
+            "Kładka Przeskalowanych KPI", "Ścieżka Zwinnych Grinchy z RTE", "Bagno 'To Tylko Zmiana Jednej Linijki'",
+            "Most Pustych Obietnic HR-u", "Szczyt Synergii, Disruption i Buzzwordów", "Zaułek Dandysów z Cold Brew na Owsianym",
+            "Wiraż Wdrożenia na Produkcję w Piątek 16:59", "Polana Czwartkowych Zgniłych Owoców", "Przesmyk Nieudokumentowanego L4",
+            "Przełęcz Niekończącego się Daily", "Rondo 500 Ticketów w Backlogu", "Kolejka do Ekspresu po Zepsuciu Spieniacza",
+            "Autostrada do Przymusowego Wcielenia w ART", "Ostatnia Ostoja Samodzielnych Kasztanów"
+        ];
+
+        const FUNNY_DEATHS = [
+            "Grinch-Audytor przybił Ci pieczęć 'ASAP: MERGE ODRZUCONY' prosto w krawat!",
+            "Korpo-Daddy oblał Cię mrożoną matchą i zaprosił na 4-godzinny workshop z feedbacku!",
+            "Kółko fotela z Ikea utknęło w plątaninie kabli po starym serwerze!",
+            "Dostałeś zaproszenie na retro w piątek o 17:00. Śmierć na miejscu!",
+            "Wdrożono hotfixa bez testów. Twój fotel rozpadł się pod ciężarem bugów!",
+            "Scrum Master zablokował Cię pytaniem: 'A co z Twoim work-life balance?!'",
+            "Wpadłeś w stos raportów kwartalnych i zostałeś wchłonięty do ART-u jako Junior Ticket Pusher!"
+        ];
+
+        const STATUS_MESSAGES = [
+            "Status: PI Planning wisi w powietrzu!", "RTE już ostrzy pieczęć!", "Kawa z owsianym stygnie!",
+            "Kasztany trzymają brancha!", "Byle nie do pociągu ART!", "Zaraz retro!", "Kto wziął mój kubek?!"
+        ];
+
+        // Quotes yelled in speech bubbles
+        const GRINCH_QUOTES = [
+            "Dopisuję to do Twojego OKRa!",
+            "Gdzie jest Twój Definition of Done?!",
+            "Brak certyfikacji ISO-KASZTAN!",
+            "Call wyjaśniający w piątek o 16:55!",
+            "Zróbmy szybki sync na 4 godziny!",
+            "ASAP! Klient płacze, prezes pisze!"
+        ];
+
+        const DANDY_QUOTES = [
+            "As per my previous email!",
+            "Za mało tu synergii i proaktywności!",
+            "Czy czujesz ownership tego fuckupu?!",
+            "Pokaż mi business value tego kółka!",
+            "Parking lot na Twoje żale!",
+            "Zróbmy break-out room na płacz!"
+        ];
+
+        const CHESTNUT_SHOUTS = [
+            "Kasztany nigdy nie merge'ują!",
+            "Zaraz mi kółko z Ikea odpadnie!",
+            "Lepiej na bezrobocie niż do ART-u!",
+            "Mój sprint kończy się w rowie!",
+            "Kto zaakceptował ten Pull Request?!",
+            "Wcielenie odwołane, jadę po pączka!"
+        ];
+
+        function getLevelName(levelNum) {
+            const index = (levelNum - 1) % CORP_TITLES.length;
+            const cycle = Math.floor((levelNum - 1) / CORP_TITLES.length) + 1;
+            return cycle > 1 ? `${CORP_TITLES[index]} (Faza ${cycle})` : CORP_TITLES[index];
+        }
+
+        /* =========================================================================
+           3. PHYSICS, TERRAIN & RAGDOLL ENGINE
+           ========================================================================= */
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let currentLevel = 1;
+        let unlockedLevel = 1;
+        try {
+            const saved = localStorage.getItem('roadToMerge_unlocked');
+            if (saved) unlockedLevel = Math.max(1, Math.min(100, parseInt(saved, 10)));
+        } catch(e) {}
+
+        let gameState = 'START';
+        let levelTime = 0;
+        let levelScore = 0;
+        let grinchesAvoided = 0;
+
+        // Player Physical Entity: Chestnut on Swivel Office Chair
+        class PlayerVehicle {
+            constructor() {
+                this.reset(100, 300);
+            }
+
+            reset(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = 0;
+                this.vy = 0;
+                this.angle = 0;
+                this.vAngle = 0;
+
+                this.wheelRadius = 14;
+                this.wheelBase = 46;
+                this.isGrounded = false;
+                this.rearGrounded = false;
+                this.frontGrounded = false;
+
+                // Chestnut rider posture & speech bubble
+                this.chestnutMood = 'determined';
+                this.tieAngle = 0;
+                this.shoutText = "";
+                this.shoutTimer = 0;
+
+                // Resources
+                this.nitro = 100;
+                this.hasShield = false;
+                this.shieldTimer = 0;
+                this.crashed = false;
+
+                this.ragdollParts = [];
+            }
+
+            shoutRandom() {
+                this.shoutText = CHESTNUT_SHOUTS[Math.floor(Math.random() * CHESTNUT_SHOUTS.length)];
+                this.shoutTimer = 2.2;
+            }
+
+            update(keys, terrain, dt) {
+                if (this.shoutTimer > 0) {
+                    this.shoutTimer -= dt;
+                }
+
+                if (this.crashed) {
+                    for (const p of this.ragdollParts) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.42;
+                        p.angle += p.vAngle;
+                    }
+                    return;
+                }
+
+                const gravity = 0.38;
+                this.vy += gravity;
+
+                const enginePower = 0.58;
+                const tiltTorque = 0.0075;
+
+                // Forward
+                if (keys.right) {
+                    if (this.rearGrounded || this.frontGrounded) {
+                        this.vx += Math.cos(this.angle) * enginePower;
+                        this.vy += Math.sin(this.angle) * enginePower;
+                        if (Math.random() < 0.25) audio.playChairSqueak();
+                    }
+                    this.vAngle += tiltTorque * 0.75;
+                }
+
+                // Reverse / Lean Back
+                if (keys.left) {
+                    if (this.rearGrounded || this.frontGrounded) {
+                        this.vx -= Math.cos(this.angle) * (enginePower * 0.72);
+                        this.vy -= Math.sin(this.angle) * (enginePower * 0.72);
+                    }
+                    this.vAngle -= tiltTorque * 0.85;
+                }
+
+                // Nitro / Kawa
+                if (keys.nitro && this.nitro > 0) {
+                    this.nitro = Math.max(0, this.nitro - 0.75);
+                    const nitroPush = 1.25;
+                    this.vx += Math.cos(this.angle) * nitroPush;
+                    this.vy += Math.sin(this.angle) * nitroPush;
+                    this.chestnutMood = 'nitro';
+                    if (Math.random() < 0.2) audio.playNitro();
+                    if (Math.random() < 0.02 && this.shoutTimer <= 0) {
+                        this.shoutRandom();
+                    }
+                } else if (!keys.nitro && this.nitro < 100) {
+                    this.nitro = Math.min(100, this.nitro + 0.12);
+                    if (this.chestnutMood === 'nitro') this.chestnutMood = 'determined';
+                }
+
+                // Spring Jump from Chair
+                if (keys.jump && (this.rearGrounded || this.frontGrounded)) {
+                    this.vy = -8.6;
+                    this.vx += Math.cos(this.angle) * 2.2;
+                    this.vAngle += 0.06;
+                    audio.playJump();
+                    if (Math.random() < 0.4 && this.shoutTimer <= 0) {
+                        this.shoutRandom();
+                    }
+                    keys.jump = false;
+                }
+
+                // Air rotation damping
+                this.vAngle *= 0.94;
+                this.angle += this.vAngle;
+
+                if (!this.rearGrounded && !this.frontGrounded) {
+                    if (keys.left) this.vAngle -= 0.0055;
+                    if (keys.right) this.vAngle += 0.0055;
+                }
+
+                this.vx *= 0.988;
+                this.vy *= 0.992;
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Wheel collision against terrain
+                const rearOffset = -this.wheelBase * 0.5;
+                const frontOffset = this.wheelBase * 0.5;
+
+                const rearX = this.x + Math.cos(this.angle) * rearOffset;
+                const rearY = this.y + Math.sin(this.angle) * rearOffset + 12;
+
+                const frontX = this.x + Math.cos(this.angle) * frontOffset;
+                const frontY = this.y + Math.sin(this.angle) * frontOffset + 12;
+
+                const rearGroundY = terrain.getHeightAt(rearX);
+                const frontGroundY = terrain.getHeightAt(frontX);
+
+                this.rearGrounded = false;
+                this.frontGrounded = false;
+
+                if (rearY + this.wheelRadius >= rearGroundY) {
+                    const depth = (rearY + this.wheelRadius) - rearGroundY;
+                    this.y -= depth * 0.5;
+                    this.vy *= 0.2;
+                    this.rearGrounded = true;
+
+                    const slope = terrain.getSlopeAt(rearX);
+                    this.vAngle += (slope - this.angle) * 0.085;
+                }
+
+                if (frontY + this.wheelRadius >= frontGroundY) {
+                    const depth = (frontY + this.wheelRadius) - frontGroundY;
+                    this.y -= depth * 0.5;
+                    this.vy *= 0.2;
+                    this.frontGrounded = true;
+
+                    const slope = terrain.getSlopeAt(frontX);
+                    this.vAngle += (slope - this.angle) * 0.085;
+                }
+
+                this.isGrounded = this.rearGrounded || this.frontGrounded;
+
+                // Head Crash Check (upside down impact)
+                const normAngle = ((this.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+                const isUpsideDown = (normAngle > Math.PI * 0.55 && normAngle < Math.PI * 1.45);
+                const groundAtHead = terrain.getHeightAt(this.x);
+
+                if (isUpsideDown && (this.y - 42) + 15 >= groundAtHead) {
+                    this.triggerCrash("Merge Conflict: Kasztan uderzył łupiną o korytarz korporacyjny!");
+                }
+
+                if (this.hasShield) {
+                    this.shieldTimer -= dt;
+                    if (this.shieldTimer <= 0) {
+                        this.hasShield = false;
+                    }
+                }
+
+                this.tieAngle = Math.sin(Date.now() * 0.015) * 0.35 - (this.vx * 0.06);
+            }
+
+            triggerCrash(customMessage) {
+                if (this.crashed) return;
+                this.crashed = true;
+                audio.playCrash();
+
+                this.ragdollParts = [
+                    { type: 'head', x: this.x, y: this.y - 35, vx: this.vx * 0.8 + (Math.random() - 0.5) * 6, vy: this.vy - 6, angle: this.angle, vAngle: 0.18 },
+                    { type: 'helmet', x: this.x, y: this.y - 50, vx: (Math.random() - 0.5) * 8, vy: -7, angle: 0, vAngle: -0.25 },
+                    { type: 'seat', x: this.x, y: this.y, vx: this.vx * 0.5, vy: this.vy - 3, angle: this.angle, vAngle: -0.1 },
+                    { type: 'wheel', x: this.x - 20, y: this.y + 20, vx: (Math.random() - 0.5) * 8, vy: -5, angle: 0, vAngle: 0.3 },
+                    { type: 'wheel', x: this.x + 20, y: this.y + 20, vx: (Math.random() - 0.5) * 8, vy: -4, angle: 0, vAngle: -0.25 },
+                    { type: 'coffee', x: this.x + 10, y: this.y - 20, vx: 5, vy: -7, angle: 0, vAngle: 0.4 }
+                ];
+
+                onPlayerCrashed(customMessage);
+            }
+
+            draw(ctx) {
+                if (this.crashed) {
+                    for (const p of this.ragdollParts) {
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.angle);
+                        if (p.type === 'head') {
+                            drawChestnutHead(ctx, 0, 0, 'panic');
+                        } else if (p.type === 'helmet') {
+                            drawSpikyHuskHelmet(ctx, 0, 0);
+                        } else if (p.type === 'seat') {
+                            drawChairSeat(ctx, 0, 0);
+                        } else if (p.type === 'wheel') {
+                            drawWheel(ctx, 0, 0);
+                        } else if (p.type === 'coffee') {
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillRect(-6, -8, 12, 16);
+                            ctx.fillStyle = '#b45309';
+                            ctx.fillRect(-4, -6, 8, 4);
+                        }
+                        ctx.restore();
+                    }
+                    return;
+                }
+
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                // Shield Aura (Zgoda na L4)
+                if (this.hasShield) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(0, -22, 54, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(56, 189, 248, ${0.7 + Math.sin(Date.now() * 0.012) * 0.3})`;
+                    ctx.lineWidth = 4;
+                    ctx.setLineDash([8, 4]);
+                    ctx.stroke();
+                    ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                // 1. Office Chair Base & Gas Lift
+                drawChairBase(ctx, this.wheelBase);
+
+                // 2. Office Chair Seat
+                drawChairSeat(ctx, 0, 0);
+
+                // 3. Chestnut Rider with Acorn/Spiky Helmet
+                drawChestnutRider(ctx, 0, -24, this.chestnutMood, this.tieAngle);
+
+                // 4. Nitro Exhaust Flames
+                if (keys.nitro && this.nitro > 0) {
+                    drawNitroFlames(ctx, -24, 0);
+                }
+
+                // 5. Speech Bubble for Chestnut
+                if (this.shoutTimer > 0 && this.shoutText) {
+                    ctx.save();
+                    ctx.rotate(-this.angle); // keep text bubble upright
+                    drawSpeechBubble(ctx, 10, -85, this.shoutText, '#fef08a', '#1e293b');
+                    ctx.restore();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        // Helper: Draw speech bubble
+        function drawSpeechBubble(ctx, x, y, text, bgColor, textColor) {
+            ctx.save();
+            ctx.font = 'bold 11px "Inter", sans-serif';
+            const metrics = ctx.measureText(text);
+            const padX = 10;
+            const padY = 6;
+            const w = metrics.width + padX * 2;
+            const h = 22;
+
+            ctx.translate(x - w / 2, y);
+
+            // Bubble body
+            ctx.fillStyle = bgColor;
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, w, h, 6);
+            ctx.fill();
+            ctx.stroke();
+
+            // Bubble pointer tail
+            ctx.beginPath();
+            ctx.moveTo(w / 2 - 5, h);
+            ctx.lineTo(w / 2, h + 7);
+            ctx.lineTo(w / 2 + 5, h);
+            ctx.fillStyle = bgColor;
+            ctx.fill();
+            ctx.stroke();
+
+            // Text
+            ctx.fillStyle = textColor;
+            ctx.textAlign = 'center';
+            ctx.fillText(text, w / 2, 15);
+            ctx.restore();
+        }
+
+        /* Helper Drawing Functions */
+        function drawChairBase(ctx, wheelBase) {
+            ctx.save();
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(-4, 0, 8, 18);
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillRect(-2, 4, 4, 14);
+
+            // Sprężyna regulacji wysokości (boing)
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 2; i <= 16; i += 3) {
+                ctx.moveTo(-4, i);
+                ctx.lineTo(4, i + 1.5);
+            }
+            ctx.stroke();
+
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(-wheelBase * 0.5, 18);
+            ctx.lineTo(wheelBase * 0.5, 18);
+            ctx.stroke();
+
+            drawWheel(ctx, -wheelBase * 0.5, 18);
+            drawWheel(ctx, wheelBase * 0.5, 18);
+            ctx.restore();
+        }
+
+        function drawWheel(ctx, x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(0, 3, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#64748b';
+            ctx.beginPath();
+            ctx.arc(0, 3, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawChairSeat(ctx, x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.roundRect(-24, -4, 48, 10, 4);
+            ctx.fill();
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Backrest
+            ctx.beginPath();
+            ctx.moveTo(-18, -4);
+            ctx.quadraticCurveTo(-26, -30, -20, -52);
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = '#334155';
+            ctx.stroke();
+
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.roundRect(-24, -50, 10, 44, 4);
+            ctx.fill();
+
+            // Armrest
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(-10, -8);
+            ctx.lineTo(-8, -20);
+            ctx.lineTo(8, -20);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawSpikyHuskHelmet(ctx, x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            // Green spiky husk helmet (zielona łupina z kolcami jako hełm bojowy)
+            ctx.fillStyle = '#65a30d';
+            ctx.beginPath();
+            ctx.arc(0, 0, 16, Math.PI, 0); // half dome
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#365314';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Spikes (kolce kasztanowe)
+            ctx.fillStyle = '#84cc16';
+            const spikes = [-12, -7, -2, 3, 8, 13];
+            for (const sx of spikes) {
+                ctx.beginPath();
+                ctx.moveTo(sx - 2, -14);
+                ctx.lineTo(sx, -21);
+                ctx.lineTo(sx + 2, -14);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            // Strap under chin
+            ctx.strokeStyle = '#4d7c0f';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 5, 14, 0.2, Math.PI - 0.2);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawChestnutHead(ctx, x, y, mood) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            // Chestnut Organic Shell
+            const grad = ctx.createRadialGradient(-4, -6, 4, 0, 0, 24);
+            grad.addColorStop(0, '#a16207');
+            grad.addColorStop(0.5, '#78350f');
+            grad.addColorStop(1, '#451a03');
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(0, -22);
+            ctx.bezierCurveTo(24, -18, 26, 16, 8, 22);
+            ctx.bezierCurveTo(-4, 24, -16, 22, -22, 14);
+            ctx.bezierCurveTo(-26, -8, -16, -20, 0, -22);
+            ctx.fill();
+            ctx.strokeStyle = '#290e02';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Jasne kasztanowe oczko
+            ctx.fillStyle = '#fde68a';
+            ctx.beginPath();
+            ctx.ellipse(3, 11, 14, 8, 0.1, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Googly Eyes
+            drawGooglyEye(ctx, -6, -3, mood);
+            drawGooglyEye(ctx, 8, -3, mood);
+
+            // Mouth
+            ctx.strokeStyle = '#290e02';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            if (mood === 'panic') {
+                ctx.arc(2, 7, 6, 0, Math.PI * 2);
+                ctx.fillStyle = '#7f1d1d';
+                ctx.fill();
+            } else if (mood === 'nitro') {
+                ctx.arc(2, 5, 8, 0, Math.PI);
+                ctx.stroke();
+            } else {
+                ctx.arc(2, 6, 5, 0.2, Math.PI - 0.2);
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        function drawGooglyEye(ctx, x, y, mood) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(0, 0, 6.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            let px = (mood === 'nitro') ? 2 : 1;
+            let py = (mood === 'panic') ? -2 : 1;
+            ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(px - 1, py - 1, 1, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawChestnutRider(ctx, x, y, mood, tieAngle) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            drawChestnutHead(ctx, 0, 0, mood);
+            drawSpikyHuskHelmet(ctx, 0, -14); // zielony hełmik z kolcami
+
+            // Powiewający czerwony krawat
+            ctx.save();
+            ctx.translate(0, 14);
+            ctx.rotate(tieAngle);
+            ctx.fillStyle = '#dc2626';
+            ctx.beginPath();
+            ctx.moveTo(-3, 0);
+            ctx.lineTo(3, 0);
+            ctx.lineTo(6, 17);
+            ctx.lineTo(0, 24);
+            ctx.lineTo(-6, 17);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#fef08a';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(-2, 5); ctx.lineTo(2, 7);
+            ctx.moveTo(-3, 11); ctx.lineTo(3, 13);
+            ctx.stroke();
+            ctx.restore();
+
+            // Rączki
+            ctx.fillStyle = '#78350f';
+            ctx.beginPath();
+            ctx.arc(10, 12, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Kubek z kawą
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(12, 6, 8, 10);
+            ctx.fillStyle = '#16a34a';
+            ctx.beginPath();
+            ctx.arc(16, 11, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawNitroFlames(ctx, x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            const flicker = Math.random() * 8;
+            const grad = ctx.createLinearGradient(0, 0, -35 - flicker, 0);
+            grad.addColorStop(0, '#fef08a');
+            grad.addColorStop(0.3, '#f97316');
+            grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(0, -6);
+            ctx.lineTo(-30 - flicker, 0);
+            ctx.lineTo(0, 6);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        /* =========================================================================
+           4. PROCEDURAL CORPORATE TERRAIN & OBSTACLES (100 LEVELS)
+           ========================================================================= */
+        class TerrainManager {
+            constructor(level) {
+                this.level = level;
+                this.length = 3200 + level * 280;
+                this.step = 30;
+                this.points = [];
+                this.obstacles = [];
+                this.generate();
+            }
+
+            generate() {
+                this.points = [];
+                this.obstacles = [];
+                const numPoints = Math.ceil(this.length / this.step) + 5;
+                const baseHeight = 480;
+
+                const hillFrequency = 0.0035 + (this.level * 0.0001);
+                const hillAmplitude = 65 + Math.min(180, this.level * 3.8);
+                const bumpiness = Math.min(25, 4 + this.level * 0.35);
+
+                for (let i = 0; i <= numPoints; i++) {
+                    const x = i * this.step;
+                    let y = baseHeight;
+
+                    y += Math.sin(x * hillFrequency) * hillAmplitude;
+                    y += Math.cos(x * hillFrequency * 2.1) * (hillAmplitude * 0.45);
+
+                    if (x > 300) {
+                        y += (Math.sin(x * 0.03) + Math.cos(x * 0.08)) * bumpiness;
+
+                        const section = Math.floor(x / 600) % 5;
+                        if (section === 2 && this.level > 3) {
+                            y -= Math.sin((x % 600) / 600 * Math.PI) * 110;
+                        } else if (section === 4 && this.level > 6) {
+                            y += Math.sin((x % 600) / 600 * Math.PI) * 80;
+                        }
+                    }
+
+                    if (x < 350) {
+                        y = baseHeight;
+                    }
+
+                    this.points.push({ x, y });
+                }
+
+                // Generowanie przeszkód terenowych (stosy raportów, kałuże matchy, BSOD, sticky-notes)
+                const obstacleCount = 6 + Math.floor(this.level * 0.8);
+                const obstacleTypes = ['reports', 'matcha_puddle', 'bsod_screen', 'sticky_wall'];
+
+                for (let i = 0; i < obstacleCount; i++) {
+                    const ox = 450 + (i * ((this.length - 700) / obstacleCount)) + (Math.random() * 80 - 40);
+                    const type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+                    this.obstacles.push({
+                        type,
+                        x: ox,
+                        w: type === 'matcha_puddle' ? 50 : 34,
+                        h: type === 'sticky_wall' ? 44 : 28
+                    });
+                }
+            }
+
+            getHeightAt(x) {
+                if (x <= 0) return this.points[0].y;
+                const index = Math.floor(x / this.step);
+                if (index >= this.points.length - 1) {
+                    return this.points[this.points.length - 1].y;
+                }
+                const p1 = this.points[index];
+                const p2 = this.points[index + 1];
+                const t = (x - p1.x) / (p2.x - p1.x);
+                return p1.y + t * (p2.y - p1.y);
+            }
+
+            getSlopeAt(x) {
+                const delta = 6;
+                const y1 = this.getHeightAt(x - delta);
+                const y2 = this.getHeightAt(x + delta);
+                return Math.atan2(y2 - y1, delta * 2);
+            }
+
+            draw(ctx, cameraX, viewWidth, viewHeight) {
+                ctx.save();
+
+                const startIdx = Math.max(0, Math.floor((cameraX - 100) / this.step));
+                const endIdx = Math.min(this.points.length - 1, Math.ceil((cameraX + viewWidth + 100) / this.step));
+
+                if (startIdx < endIdx) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.points[startIdx].x, this.points[startIdx].y);
+                    for (let i = startIdx + 1; i <= endIdx; i++) {
+                        ctx.lineTo(this.points[i].x, this.points[i].y);
+                    }
+                    ctx.lineTo(this.points[endIdx].x, viewHeight + 1000);
+                    ctx.lineTo(this.points[startIdx].x, viewHeight + 1000);
+                    ctx.closePath();
+
+                    const floorGrad = ctx.createLinearGradient(0, 300, 0, viewHeight + 600);
+                    floorGrad.addColorStop(0, '#1e293b');
+                    floorGrad.addColorStop(0.2, '#0f172a');
+                    floorGrad.addColorStop(1, '#020617');
+                    ctx.fillStyle = floorGrad;
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+
+                    // Dywan biurowy & kable podłogowe
+                    ctx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
+                    ctx.lineWidth = 2;
+                    for (let i = startIdx; i <= endIdx; i += 3) {
+                        const pt = this.points[i];
+                        ctx.beginPath();
+                        ctx.moveTo(pt.x, pt.y + 12);
+                        ctx.lineTo(pt.x + 15, pt.y + 35);
+                        ctx.stroke();
+                    }
+                }
+
+                // Rysowanie przeszkód terenowych
+                for (const obs of this.obstacles) {
+                    if (obs.x > cameraX - 100 && obs.x < cameraX + viewWidth + 100) {
+                        const oy = this.getHeightAt(obs.x);
+                        this.drawTerrainObstacle(ctx, obs, oy);
+                    }
+                }
+
+                ctx.restore();
+            }
+
+            drawTerrainObstacle(ctx, obs, groundY) {
+                ctx.save();
+                ctx.translate(obs.x, groundY);
+
+                if (obs.type === 'reports') {
+                    // Stosy raportów kwartalnych
+                    ctx.fillStyle = '#f8fafc';
+                    for (let i = 0; i < 4; i++) {
+                        ctx.fillRect(-14 + (i % 2) * 2, -6 - (i * 7), 28, 6);
+                        ctx.strokeStyle = '#94a3b8';
+                        ctx.strokeRect(-14 + (i % 2) * 2, -6 - (i * 7), 28, 6);
+                    }
+                    ctx.fillStyle = '#dc2626';
+                    ctx.font = 'bold 8px sans-serif';
+                    ctx.fillText('Q4 KPI', -10, -18);
+
+                } else if (obs.type === 'matcha_puddle') {
+                    // Kałuża rozlanej matchy na owsianym
+                    ctx.fillStyle = 'rgba(134, 239, 172, 0.85)';
+                    ctx.beginPath();
+                    ctx.ellipse(0, 2, obs.w / 2, 7, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#15803d';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                    // Przewrócony kubeczek
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(8, -5, 12, 7);
+
+                } else if (obs.type === 'bsod_screen') {
+                    // Laptop z Blue Screen of Death
+                    ctx.fillStyle = '#1e3a8a'; // Windows BSOD blue
+                    ctx.fillRect(-14, -22, 28, 20);
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.strokeRect(-14, -22, 28, 20);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 9px monospace';
+                    ctx.fillText(':( BSOD', -11, -9);
+
+                    // Klawiatura laptopa
+                    ctx.fillStyle = '#475569';
+                    ctx.fillRect(-16, -2, 32, 4);
+
+                } else if (obs.type === 'sticky_wall') {
+                    // Pachołek / Tablica z karteczkami post-it (PI Planning)
+                    ctx.fillStyle = '#fef08a'; // yellow sticky
+                    ctx.fillRect(-14, -36, 12, 12);
+                    ctx.fillStyle = '#fbcfe8'; // pink sticky
+                    ctx.fillRect(2, -38, 12, 12);
+                    ctx.fillStyle = '#a7f3d0'; // mint sticky
+                    ctx.fillRect(-8, -20, 14, 14);
+
+                    ctx.fillStyle = '#0f172a';
+                    ctx.font = '7px sans-serif';
+                    ctx.fillText('BLOKER', -7, -11);
+                }
+
+                ctx.restore();
+            }
+        }
+
+        /* =========================================================================
+           5. CORPORATE ENEMIES, OBSTACLES & POWERUPS
+           ========================================================================= */
+        class EntityManager {
+            constructor(level, terrain) {
+                this.enemies = [];
+                this.powerups = [];
+                this.particles = [];
+                this.finishX = terrain.length - 200;
+                this.populate(level, terrain);
+            }
+
+            populate(level, terrain) {
+                const countEnemies = 5 + Math.floor(level * 0.95);
+                const countPowerups = 5 + Math.floor(level * 0.5);
+
+                for (let i = 0; i < countEnemies; i++) {
+                    const x = 500 + (i * ((this.finishX - 600) / countEnemies)) + (Math.random() * 120 - 60);
+                    const type = (i % 2 === 0) ? 'grinch' : 'dandy';
+                    this.enemies.push({
+                        type,
+                        x,
+                        y: 0,
+                        vx: type === 'dandy' ? (Math.random() * -0.6 - 0.2) : 0,
+                        w: 36,
+                        h: 56,
+                        bubbleText: type === 'grinch' 
+                            ? GRINCH_QUOTES[Math.floor(Math.random() * GRINCH_QUOTES.length)]
+                            : DANDY_QUOTES[Math.floor(Math.random() * DANDY_QUOTES.length)],
+                        bubbleTimer: Math.random() * 2,
+                        hit: false
+                    });
+                }
+
+                const types = ['coffee', 'l4', 'fruit', 'mr'];
+                for (let i = 0; i < countPowerups; i++) {
+                    const x = 400 + (i * ((this.finishX - 500) / countPowerups)) + (Math.random() * 80);
+                    const type = types[Math.floor(Math.random() * types.length)];
+                    this.powerups.push({
+                        type,
+                        x,
+                        y: 0,
+                        collected: false,
+                        bobble: Math.random() * Math.PI
+                    });
+                }
+            }
+
+            update(player, terrain, dt) {
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.alpha -= 0.025;
+                    if (p.alpha <= 0) this.particles.splice(i, 1);
+                }
+
+                // Kolizje z przeszkodami terenowymi (kałuże spowalniają, raporty wybijają)
+                for (const obs of terrain.obstacles) {
+                    const dist = Math.abs(player.x - obs.x);
+                    if (dist < obs.w / 2 + 10 && !player.crashed) {
+                        const groundY = terrain.getHeightAt(obs.x);
+                        if (Math.abs(player.y - groundY) < 30) {
+                            if (obs.type === 'matcha_puddle') {
+                                player.vx *= 0.94; // poślizg na macie
+                                if (Math.random() < 0.05) this.createPopText(obs.x, groundY - 20, "POŚLIZG NA MATCIE!", "#86efac");
+                            } else if (obs.type === 'reports' && Math.abs(player.vx) > 3) {
+                                player.vAngle += 0.02; // zachwianie
+                            }
+                        }
+                    }
+                }
+
+                // Wrogowie
+                for (const e of this.enemies) {
+                    e.y = terrain.getHeightAt(e.x) - e.h;
+                    e.x += e.vx;
+
+                    // Aktualizacja dymków z korpomową
+                    e.bubbleTimer -= dt;
+                    if (e.bubbleTimer <= 0) {
+                        e.bubbleTimer = 4.5 + Math.random() * 2;
+                        e.bubbleText = e.type === 'grinch'
+                            ? GRINCH_QUOTES[Math.floor(Math.random() * GRINCH_QUOTES.length)]
+                            : DANDY_QUOTES[Math.floor(Math.random() * DANDY_QUOTES.length)];
+                    }
+
+                    if (e.type === 'dandy') {
+                        if (Math.random() < 0.01) e.vx = -e.vx;
+                    }
+
+                    if (!e.hit && !player.crashed) {
+                        const dist = Math.hypot(player.x - (e.x + e.w * 0.5), player.y - (e.y + e.h * 0.5));
+                        if (dist < 44) {
+                            if (player.hasShield) {
+                                e.hit = true;
+                                this.createPopText(e.x, e.y, "ODRZUCONY PRZEZ L4!", "#38bdf8");
+                                grinchesAvoided++;
+                                audio.playPickup();
+                            } else {
+                                const msg = e.type === 'grinch' 
+                                    ? `Grinch-Audytor: "${e.bubbleText}" i pieczątka na czole!`
+                                    : `Korpo-Daddy: "${e.bubbleText}" i zablokował Cię story pointami!`;
+                                player.triggerCrash(msg);
+                            }
+                        }
+                    }
+                }
+
+                // Power-upy
+                for (const p of this.powerups) {
+                    p.bobble += 0.05;
+                    p.y = terrain.getHeightAt(p.x) - 40 + Math.sin(p.bobble) * 8;
+
+                    if (!p.collected && !player.crashed) {
+                        const dist = Math.hypot(player.x - p.x, player.y - p.y);
+                        if (dist < 44) {
+                            p.collected = true;
+                            audio.playPickup();
+                            this.applyPowerup(p.type, player, p.x, p.y);
+                        }
+                    }
+                }
+            }
+
+            applyPowerup(type, player, x, y) {
+                if (type === 'coffee') {
+                    player.nitro = 100;
+                    this.createPopText(x, y, "☕ NITRO ESPRESSO Z EKRANU!", "#f59e0b");
+                    showStatusTicker("Wypito potrójne Espresso! Kasztan przyspiesza!");
+                } else if (type === 'l4') {
+                    player.hasShield = true;
+                    player.shieldTimer = 7.0;
+                    this.createPopText(x, y, "🛡️ ZGODA NA L4 (NIETYKALNY)!", "#38bdf8");
+                    showStatusTicker("L4 Zaakceptowane! Żaden Grinch Cię nie tknie!");
+                } else if (type === 'fruit') {
+                    levelScore += 500;
+                    this.createPopText(x, y, "🍏 OWOC Z CZWARTKU (+500 KPI)!", "#10b981");
+                    showStatusTicker("Zjedzono darmowe jabłko z czwartku!");
+                } else if (type === 'mr') {
+                    this.createPopText(x, y, "✅ PULL REQUEST APPROVED!", "#a855f7");
+                    showStatusTicker("Merge Request Zaakceptowany! Droga wolna!");
+                    for (const e of this.enemies) {
+                        if (Math.abs(e.x - player.x) < 450) {
+                            e.hit = true;
+                        }
+                    }
+                }
+            }
+
+            createPopText(x, y, text, color) {
+                this.particles.push({
+                    x, y,
+                    text,
+                    color,
+                    vx: 0,
+                    vy: -1.8,
+                    alpha: 1.0
+                });
+            }
+
+            draw(ctx, cameraX, viewWidth) {
+                this.drawFinishLine(ctx);
+
+                for (const e of this.enemies) {
+                    if (e.x > cameraX - 100 && e.x < cameraX + viewWidth + 100) {
+                        if (e.hit) {
+                            ctx.save();
+                            ctx.translate(e.x, e.y);
+                            ctx.rotate(0.8);
+                            ctx.globalAlpha = 0.4;
+                            this.drawEnemySprite(ctx, e);
+                            ctx.restore();
+                        } else {
+                            this.drawEnemySprite(ctx, e);
+                        }
+                    }
+                }
+
+                for (const p of this.powerups) {
+                    if (!p.collected && p.x > cameraX - 100 && p.x < cameraX + viewWidth + 100) {
+                        this.drawPowerupSprite(ctx, p);
+                    }
+                }
+
+                for (const pt of this.particles) {
+                    ctx.save();
+                    ctx.globalAlpha = pt.alpha;
+                    ctx.font = 'bold 16px "Fredoka One", cursive';
+                    ctx.fillStyle = pt.color;
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 3;
+                    ctx.strokeText(pt.text, pt.x, pt.y);
+                    ctx.fillText(pt.text, pt.x, pt.y);
+                    ctx.restore();
+                }
+            }
+
+            drawEnemySprite(ctx, e) {
+                ctx.save();
+                ctx.translate(e.x, e.y);
+
+                if (e.type === 'grinch') {
+                    // GRINCH AUDYTOR / RTE
+                    ctx.fillStyle = '#22c55e';
+                    ctx.beginPath();
+                    ctx.ellipse(18, 14, 12, 14, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Wredne żółte oczy
+                    ctx.fillStyle = '#facc15';
+                    ctx.beginPath();
+                    ctx.arc(14, 12, 3.5, 0, Math.PI * 2);
+                    ctx.arc(22, 12, 3.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#dc2626';
+                    ctx.fillRect(14, 11, 2, 2);
+                    ctx.fillRect(22, 11, 2, 2);
+
+                    // Szyderczy uśmiech
+                    ctx.strokeStyle = '#14532d';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(10, 20); ctx.quadraticCurveTo(18, 25, 26, 17);
+                    ctx.stroke();
+
+                    // Za ciasny garniak
+                    ctx.fillStyle = '#0f172a';
+                    ctx.fillRect(8, 26, 20, 26);
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fillRect(16, 26, 4, 14);
+
+                    // Wielka pieczęć 'ASAP'
+                    ctx.fillStyle = '#b91c1c';
+                    ctx.fillRect(26, 30, 14, 16);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 8px sans-serif';
+                    ctx.fillText("ASAP", 27, 42);
+
+                    // Latające tickety z Jiry wokół głowy
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.fillRect(-4, 10, 8, 6);
+                    ctx.fillRect(28, 4, 8, 6);
+
+                } else {
+                    // KORPO-DADYS / AGILE COACH
+                    ctx.fillStyle = '#fed7aa';
+                    ctx.beginPath();
+                    ctx.arc(18, 14, 11, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Pompadour
+                    ctx.fillStyle = '#78350f';
+                    ctx.beginPath();
+                    ctx.ellipse(18, 6, 13, 8, -0.2, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Okularki zerówki
+                    ctx.strokeStyle = '#0284c7';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(12, 11, 6, 5);
+                    ctx.strokeRect(20, 11, 6, 5);
+
+                    // Pastelowa koszulka
+                    ctx.fillStyle = '#fbcfe8';
+                    ctx.fillRect(8, 25, 20, 25);
+
+                    // Sweterek w serek przewiązany przez ramiona
+                    ctx.fillStyle = '#a7f3d0';
+                    ctx.beginPath();
+                    ctx.moveTo(6, 25); ctx.lineTo(14, 38); ctx.lineTo(18, 30);
+                    ctx.lineTo(22, 38); ctx.lineTo(30, 25);
+                    ctx.fill();
+
+                    // Lakierki bez skarpetek
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(6, 50, 10, 6);
+                    ctx.fillRect(20, 50, 10, 6);
+
+                    // Wielki kubek Cold Brew / Matcha na owsianym
+                    ctx.fillStyle = '#86efac';
+                    ctx.fillRect(-4, 28, 11, 17);
+                    ctx.strokeStyle = '#22c55e';
+                    ctx.strokeRect(-4, 28, 11, 17);
+                    ctx.strokeStyle = '#ec4899';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(1, 28); ctx.lineTo(3, 20); ctx.stroke();
+                }
+
+                // Dymek z korpomową
+                if (e.bubbleText && !e.hit) {
+                    drawSpeechBubble(ctx, 18, -26, e.bubbleText, '#ffffff', '#0f172a');
+                }
+
+                ctx.restore();
+            }
+
+            drawPowerupSprite(ctx, p) {
+                ctx.save();
+                ctx.translate(p.x, p.y);
+
+                ctx.beginPath();
+                ctx.arc(0, 0, 20, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(254, 240, 138, 0.25)';
+                ctx.fill();
+
+                if (p.type === 'coffee') {
+                    ctx.fillStyle = '#78350f';
+                    ctx.beginPath(); ctx.roundRect(-10, -12, 20, 24, 4); ctx.fill();
+                    ctx.fillStyle = '#fef08a';
+                    ctx.font = 'bold 12px sans-serif'; ctx.fillText('☕', -6, 4);
+                } else if (p.type === 'l4') {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(-10, -14, 20, 28);
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fillRect(-7, -1, 14, 3);
+                    ctx.fillRect(-2, -6, 4, 13);
+                } else if (p.type === 'fruit') {
+                    ctx.font = '22px sans-serif';
+                    ctx.fillText('🍏', -12, 8);
+                } else if (p.type === 'mr') {
+                    ctx.font = '22px sans-serif';
+                    ctx.fillText('🔀', -12, 8);
+                }
+
+                ctx.restore();
+            }
+
+            drawFinishLine(ctx) {
+                ctx.save();
+                ctx.translate(this.finishX, 260);
+
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(-20, -160, 40, 260);
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(-20, -160, 40, 260);
+
+                // Caution Stripes
+                ctx.fillStyle = '#facc15';
+                for (let y = -150; y < 90; y += 30) {
+                    ctx.fillRect(-18, y, 36, 12);
+                }
+
+                // ART Merge Sign
+                ctx.fillStyle = '#dc2626';
+                ctx.beginPath();
+                ctx.roundRect(-75, -210, 150, 44, 8);
+                ctx.fill();
+                ctx.strokeStyle = '#fef08a';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 15px "Fredoka One", cursive';
+                ctx.textAlign = 'center';
+                ctx.fillText("🚂 ART MERGE", 0, -186);
+                ctx.font = 'bold 9px sans-serif';
+                ctx.fillText("PRZYMUSOWE WCIELENIE", 0, -172);
+
+                ctx.restore();
+            }
+        }
+
+        /* =========================================================================
+           6. PARALLAX OPEN-SPACE CORPORATE BACKGROUND
+           ========================================================================= */
+        function drawParallaxOffice(ctx, cameraX) {
+            const width = canvas.width;
+            const height = canvas.height;
+
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
+            skyGrad.addColorStop(0, '#090d16');
+            skyGrad.addColorStop(0.6, '#111827');
+            skyGrad.addColorStop(1, '#1e293b');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, width, height);
+
+            // Layer 1: Pokoje konferencyjne i sale PI Planning
+            ctx.save();
+            const p1 = cameraX * 0.12;
+            for (let i = -1; i < Math.ceil(width / 360) + 1; i++) {
+                const rx = (i * 380) - (p1 % 380);
+                ctx.fillStyle = 'rgba(30, 41, 59, 0.4)';
+                ctx.fillRect(rx, 140, 280, 160);
+                ctx.strokeStyle = 'rgba(56, 189, 248, 0.2)';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(rx, 140, 280, 160);
+
+                ctx.fillStyle = 'rgba(148, 163, 184, 0.4)';
+                ctx.font = '10px sans-serif';
+                ctx.fillText(i % 2 === 0 ? "SALA: SYNERGY & DISRUPTION" : "SALA: PI PLANNING TRAIN", rx + 12, 160);
+
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.6)';
+                ctx.beginPath();
+                ctx.arc(rx + 60, 220, 12, 0, Math.PI * 2);
+                ctx.arc(rx + 120, 220, 12, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+
+            // Layer 2: Śmieszne plakaty korporacyjne
+            ctx.save();
+            const p2 = cameraX * 0.28;
+            for (let i = -1; i < Math.ceil(width / 280) + 1; i++) {
+                const px = (i * 300) - (p2 % 300);
+
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(px, 180, 75, 95);
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(px, 180, 75, 95);
+
+                ctx.fillStyle = '#fef08a';
+                ctx.font = 'bold 9px sans-serif';
+                ctx.fillText(i % 2 === 0 ? "BE AGILE!" : "KASZTANY", px + 8, 205);
+                ctx.fillText(i % 2 === 0 ? "OR MERGE!" : "NIE ODDAJĄ SIĘ", px + 5, 225);
+
+                ctx.fillStyle = '#334155';
+                ctx.fillRect(px + 90, 260, 120, 80);
+                ctx.fillStyle = '#64748b';
+                ctx.fillRect(px + 120, 240, 30, 20);
+            }
+            ctx.restore();
+        }
+
+        /* =========================================================================
+           7. INPUT MANAGEMENT & INTERACTION HANDLERS
+           ========================================================================= */
+        const keys = {
+            left: false,
+            right: false,
+            jump: false,
+            nitro: false
+        };
+
+        window.addEventListener('keydown', (e) => {
+            audio.init();
+            if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
+            if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+                keys.jump = true;
+                e.preventDefault();
+            }
+            if (e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.code === 'KeyN') {
+                keys.nitro = true;
+            }
+            if (e.code === 'KeyP') togglePause();
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
+            if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') keys.jump = false;
+            if (e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.code === 'KeyN') keys.nitro = false;
+        });
+
+        function bindTouchBtn(elementId, keyProp) {
+            const btn = document.getElementById(elementId);
+            const startHandler = (e) => {
+                e.preventDefault();
+                audio.init();
+                keys[keyProp] = true;
+            };
+            const endHandler = (e) => {
+                e.preventDefault();
+                keys[keyProp] = false;
+            };
+            btn.addEventListener('touchstart', startHandler, { passive: false });
+            btn.addEventListener('touchend', endHandler, { passive: false });
+            btn.addEventListener('mousedown', startHandler);
+            btn.addEventListener('mouseup', endHandler);
+            btn.addEventListener('mouseleave', endHandler);
+        }
+
+        bindTouchBtn('btnLeft', 'left');
+        bindTouchBtn('btnRight', 'right');
+        bindTouchBtn('btnJump', 'jump');
+        bindTouchBtn('btnNitro', 'nitro');
+
+        /* =========================================================================
+           8. LEVEL MANAGER & UI CONTROLLER
+           ========================================================================= */
+        let player = new PlayerVehicle();
+        let terrain = new TerrainManager(currentLevel);
+        let entities = new EntityManager(currentLevel, terrain);
+
+        let cameraX = 0;
+        let cameraY = 0;
+
+        function startLevel(lvl) {
+            audio.init();
+            currentLevel = Math.max(1, Math.min(100, lvl));
+            terrain = new TerrainManager(currentLevel);
+            entities = new EntityManager(currentLevel, terrain);
+            player.reset(120, terrain.getHeightAt(120) - 30);
+
+            cameraX = 0;
+            cameraY = 0;
+            levelTime = 0;
+            levelScore = 0;
+            grinchesAvoided = 0;
+
+            document.getElementById('hudLevel').innerText = currentLevel;
+            document.getElementById('hudLevelName').innerText = getLevelName(currentLevel);
+
+            document.getElementById('modalStart').classList.add('hidden');
+            document.getElementById('modalCrash').classList.add('hidden');
+            document.getElementById('modalVictory').classList.add('hidden');
+            document.getElementById('modalLevels').classList.add('hidden');
+
+            gameState = 'PLAYING';
+            showStatusTicker(`Sprint #${currentLevel}: Kasztany ruszają do ucieczki!`);
+        }
+
+        function onPlayerCrashed(customReason) {
+            gameState = 'CRASHED';
+            const reason = customReason || FUNNY_DEATHS[Math.floor(Math.random() * FUNNY_DEATHS.length)];
+            document.getElementById('crashReason').innerText = `"${reason}"`;
+            setTimeout(() => {
+                document.getElementById('modalCrash').classList.remove('hidden');
+            }, 650);
+        }
+
+        function onLevelCompleted() {
+            if (gameState === 'VICTORY') return;
+            gameState = 'VICTORY';
+            audio.playWin();
+
+            if (currentLevel >= unlockedLevel && unlockedLevel < 100) {
+                unlockedLevel = currentLevel + 1;
+                try {
+                    localStorage.setItem('roadToMerge_unlocked', unlockedLevel.toString());
+                } catch(e) {}
+            }
+
+            document.getElementById('victoryLevelName').innerText = `Sprint #${currentLevel}: Merge odroczony o kolejny kwartał!`;
+            document.getElementById('victoryScore').innerText = `+${1000 + currentLevel * 150 + levelScore} KPI`;
+            document.getElementById('victoryTime').innerText = `${levelTime.toFixed(1)}s`;
+            document.getElementById('victoryGrinches').innerText = grinchesAvoided;
+
+            setTimeout(() => {
+                document.getElementById('modalVictory').classList.remove('hidden');
+            }, 400);
+        }
+
+        function togglePause() {
+            if (gameState === 'PLAYING') {
+                gameState = 'PAUSED';
+                showStatusTicker("Pauza: Korpokonsultacje...");
+            } else if (gameState === 'PAUSED') {
+                gameState = 'PLAYING';
+                showStatusTicker("Wznowiono jazdę!");
+            }
+        }
+
+        let tickerTimeout;
+        function showStatusTicker(text) {
+            const ticker = document.getElementById('statusTicker');
+            ticker.innerText = text;
+            ticker.style.opacity = '1';
+            clearTimeout(tickerTimeout);
+            tickerTimeout = setTimeout(() => {
+                ticker.style.opacity = '0';
+            }, 3000);
+        }
+
+        function populateLevelsGrid() {
+            const grid = document.getElementById('levelsGrid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 100; i++) {
+                const btn = document.createElement('button');
+                const isUnlocked = i <= unlockedLevel;
+                btn.className = `p-2 rounded-xl text-xs font-bold transition-all border ${
+                    isUnlocked 
+                        ? (i === currentLevel ? 'bg-amber-500 text-slate-950 border-white' : 'bg-slate-800 hover:bg-slate-700 text-amber-300 border-slate-700')
+                        : 'bg-slate-900/60 text-slate-600 border-slate-800 cursor-not-allowed'
+                }`;
+                btn.innerHTML = `${i}${!isUnlocked ? ' 🔒' : ''}`;
+                if (isUnlocked) {
+                    btn.onclick = () => {
+                        document.getElementById('modalLevels').classList.add('hidden');
+                        startLevel(i);
+                    };
+                }
+                grid.appendChild(btn);
+            }
+            document.getElementById('unlockedCount').innerText = unlockedLevel;
+        }
+
+        /* UI Event Listeners */
+        document.getElementById('btnPlayGame').onclick = () => startLevel(unlockedLevel);
+        document.getElementById('btnRetry').onclick = () => startLevel(currentLevel);
+        document.getElementById('btnNextLevel').onclick = () => startLevel(currentLevel + 1);
+        document.getElementById('btnPause').onclick = togglePause;
+
+        document.getElementById('btnOpenLevels').onclick = () => {
+            populateLevelsGrid();
+            document.getElementById('modalLevels').classList.remove('hidden');
+        };
+        document.getElementById('btnCloseLevels').onclick = () => {
+            document.getElementById('modalLevels').classList.add('hidden');
+        };
+
+        document.getElementById('btnMenuFromCrash').onclick = () => {
+            document.getElementById('modalCrash').classList.add('hidden');
+            document.getElementById('modalStart').classList.remove('hidden');
+            populateLevelsGrid();
+        };
+        document.getElementById('btnMenuFromVictory').onclick = () => {
+            document.getElementById('modalVictory').classList.add('hidden');
+            document.getElementById('modalStart').classList.remove('hidden');
+            populateLevelsGrid();
+        };
+
+        document.getElementById('btnResetProgress').onclick = () => {
+            unlockedLevel = 1;
+            try { localStorage.setItem('roadToMerge_unlocked', '1'); } catch(e) {}
+            populateLevelsGrid();
+            showStatusTicker("Zresetowano historię Sprintów!");
+        };
+
+        /* =========================================================================
+           9. MAIN GAME LOOP (Physics Step, Camera, Render)
+           ========================================================================= */
+        let lastTime = performance.now();
+
+        function gameLoop(now) {
+            const dt = Math.min(0.1, (now - lastTime) / 1000);
+            lastTime = now;
+
+            if (gameState === 'PLAYING') {
+                levelTime += dt;
+
+                player.update(keys, terrain, dt);
+                entities.update(player, terrain, dt);
+
+                if (player.x >= entities.finishX && !player.crashed) {
+                    onLevelCompleted();
+                }
+
+                const targetCamX = player.x - canvas.width * 0.32;
+                const targetCamY = player.y - canvas.height * 0.65;
+                cameraX += (targetCamX - cameraX) * 0.1;
+                cameraY += (targetCamY - cameraY) * 0.08;
+
+                const progressPct = Math.min(100, Math.max(0, (player.x / entities.finishX) * 100));
+                document.getElementById('progressBar').style.width = `${progressPct}%`;
+                document.getElementById('hudDistance').innerText = `${Math.floor(progressPct)}% do ART`;
+                document.getElementById('nitroBar').style.width = `${player.nitro}%`;
+
+                if (Math.random() < 0.0015) {
+                    showStatusTicker(STATUS_MESSAGES[Math.floor(Math.random() * STATUS_MESSAGES.length)]);
+                }
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawParallaxOffice(ctx, cameraX);
+
+            ctx.save();
+            ctx.translate(-cameraX, -cameraY);
+
+            terrain.draw(ctx, cameraX, canvas.width, canvas.height);
+            entities.draw(ctx, cameraX, canvas.width);
+            player.draw(ctx);
+
+            ctx.restore();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.onload = function () {
+            populateLevelsGrid();
+            requestAnimationFrame(gameLoop);
+        };
+    </script>
+</body>
+</html>

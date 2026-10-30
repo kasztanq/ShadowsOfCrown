@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#35190f">
+  <title>Salon Kasztanowych Gier — Play</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --shell: #30180f;
+      --shell-light: #552817;
+      --chestnut: #7d3f20;
+      --copper: #bd7136;
+      --gold: #f5c45c;
+      --cream: #ffefd0;
+      --muted: #c9a989;
+      --screen: #17180f;
+      --green: #b7d676;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--cream);
+      background:
+        radial-gradient(ellipse at 50% 5%, rgba(166, 87, 40, .3), transparent 46rem),
+        repeating-linear-gradient(135deg, rgba(255,255,255,.018) 0 2px, transparent 2px 8px),
+        #21140f;
+    }
+
+    button, a { font: inherit; }
+    a { color: inherit; text-decoration: none; }
+    button:focus-visible, a:focus-visible {
+      outline: 3px solid #fff0a5;
+      outline-offset: 4px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .9rem clamp(1rem, 4vw, 3rem);
+      border-bottom: 1px solid rgba(255, 221, 159, .2);
+      background: rgba(31, 16, 11, .86);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: .75rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .brand-nut { font-size: 2rem; filter: drop-shadow(0 3px 0 #160b07); }
+
+    .home-link, .launch-button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 44px;
+      padding: .7rem 1rem;
+      border: 2px solid var(--gold);
+      border-radius: 6px;
+      color: var(--cream);
+      background: linear-gradient(#784020, #4a2515);
+      box-shadow: 0 4px 0 #1b0e09, inset 0 1px rgba(255,255,255,.16);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .home-link:hover, .launch-button:not(:disabled):hover {
+      filter: brightness(1.2);
+      transform: translateY(-1px);
+    }
+
+    main {
+      width: min(1120px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: clamp(1.5rem, 4vw, 3rem) 0 4rem;
+    }
+
+    .intro { margin: 0 auto 1.5rem; text-align: center; }
+    .eyebrow {
+      color: var(--gold);
+      font: 700 .72rem/1.6 "Courier New", monospace;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: .6rem 0;
+      color: #ffe3a1;
+      font: 900 clamp(1.4rem, 4.8vw, 2.8rem)/1.2 "Courier New", monospace;
+      text-shadow: 3px 4px #522a15;
+      text-transform: uppercase;
+    }
+
+    .intro p { max-width: 660px; margin: .5rem auto; color: var(--muted); line-height: 1.6; }
+
+    .cabinet {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(1rem, 4vw, 2.4rem);
+      border: 8px ridge #a65c31;
+      border-radius: 28px 28px 18px 18px;
+      background:
+        radial-gradient(ellipse at 50% -20%, rgba(255, 194, 88, .22), transparent 60%),
+        linear-gradient(145deg, #6d371d, #3c1d12 55%, #28140e);
+      box-shadow:
+        0 20px 50px #100905,
+        inset 0 0 0 3px rgba(255, 214, 137, .2),
+        inset 0 -18px 35px rgba(0,0,0,.28);
+    }
+
+    .cabinet::before, .cabinet::after {
+      position: absolute;
+      top: 50%;
+      color: rgba(255, 203, 121, .18);
+      font-size: clamp(3rem, 9vw, 7rem);
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+    .cabinet::before { content: "🌰"; left: .1em; }
+    .cabinet::after { content: "🌰"; right: .1em; }
+
+    .marquee {
+      position: relative;
+      z-index: 1;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: clamp(1rem, 4vw, 2rem);
+      border: 5px ridge #d8954d;
+      border-radius: 12px;
+      background: #26150e;
+      box-shadow: inset 0 0 24px #100a07, 0 6px 0 #2a140c;
+      text-align: center;
+    }
+
+    .marquee-title {
+      margin: 0 0 .4rem;
+      color: var(--gold);
+      font: 700 clamp(.85rem, 2.5vw, 1.1rem)/1.5 "Courier New", monospace;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .screen {
+      min-height: 142px;
+      display: grid;
+      place-content: center;
+      gap: .45rem;
+      margin: 1rem 0;
+      padding: 1rem;
+      border: 4px inset #78904e;
+      border-radius: 7px;
+      color: var(--green);
+      background:
+        repeating-linear-gradient(0deg, rgba(183,214,118,.035) 0 1px, transparent 1px 4px),
+        var(--screen);
+      box-shadow: inset 0 0 25px rgba(140, 180, 90, .14);
+      font-family: "Courier New", monospace;
+      text-shadow: 0 0 10px rgba(183, 214, 118, .45);
+    }
+
+    .screen-label { color: #98ae66; font-size: .72rem; letter-spacing: .16em; }
+    #selectedTitle {
+      display: block;
+      max-width: 100%;
+      color: inherit;
+      font-size: clamp(.95rem, 3vw, 1.55rem);
+      font-weight: 900;
+      overflow-wrap: anywhere;
+      text-decoration: none;
+    }
+    #selectedTitle:not([aria-disabled="true"]):hover { color: #f5e9bd; text-decoration: underline; }
+    #selectedTitle:focus-visible { border-radius: 2px; }
+    #selectedDescription, #selectedGameHint {
+      max-width: 100%;
+      color: #d3dcb1;
+      font-size: .9rem;
+      overflow-wrap: anywhere;
+    }
+    #selectedGameHint { color: #a7bc79; font-size: .75rem; }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: clamp(.8rem, 4vw, 2rem);
+      flex-wrap: wrap;
+    }
+
+    .random-button {
+      width: clamp(146px, 32vw, 184px);
+      aspect-ratio: 1;
+      display: grid;
+      place-content: center;
+      gap: .45rem;
+      padding: 1rem;
+      border: 6px solid #f5c45c;
+      border-radius: 50%;
+      color: #fff0cb;
+      background:
+        radial-gradient(circle at 34% 24%, #bd7136 0, #914a25 38%, #642e18 72%, #49200f 100%);
+      box-shadow:
+        0 9px 0 #291309,
+        0 0 0 4px #542a17,
+        0 0 0 6px #bd7136,
+        inset 0 0 0 3px rgba(255, 224, 153, .72),
+        inset 0 5px 12px rgba(255,255,255,.2),
+        0 0 24px rgba(255,190,75,.26);
+      cursor: pointer;
+      font-weight: 900;
+      text-transform: uppercase;
+      transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+    }
+
+    .random-button:hover {
+      filter: brightness(1.14);
+      transform: translateY(-2px);
+      box-shadow:
+        0 11px 0 #291309,
+        0 0 0 4px #542a17,
+        0 0 0 6px #d38b48,
+        inset 0 0 0 3px rgba(255, 238, 191, .9),
+        inset 0 5px 12px rgba(255,255,255,.24),
+        0 0 30px rgba(255,190,75,.38);
+    }
+
+    .random-button:active {
+      transform: translateY(6px) scale(.98);
+      box-shadow:
+        0 3px 0 #291309,
+        0 0 0 4px #542a17,
+        0 0 0 6px #bd7136,
+        inset 0 0 0 3px rgba(255, 224, 153, .72),
+        inset 0 5px 12px rgba(0,0,0,.2);
+    }
+
+    .random-button .nut {
+      font-size: clamp(2.8rem, 8vw, 4.2rem);
+      line-height: 1;
+      filter: drop-shadow(0 3px 1px rgba(31, 12, 4, .55));
+    }
+
+    .random-button .button-copy {
+      display: block;
+      padding: .38rem .55rem;
+      border: 1px solid rgba(255, 229, 174, .72);
+      border-radius: 4px;
+      color: #fff4d8;
+      background: rgba(48, 21, 10, .72);
+      font: 900 clamp(.78rem, 2.7vw, .94rem)/1.2 "Courier New", monospace;
+      letter-spacing: .13em;
+      text-shadow: 0 1px 0 #3a170a, 0 0 8px rgba(255, 219, 142, .46);
+      box-shadow: inset 0 1px rgba(255,255,255,.12), 0 2px 0 rgba(32,13,6,.45);
+    }
+    .random-button.rolling .nut { animation: tumble .65s ease-in-out; }
+    @keyframes tumble { 50% { transform: rotate(360deg) scale(.8); } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; }
+    }
+
+    .launch-button { min-width: 190px; cursor: pointer; }
+    .launch-button:disabled { opacity: .48; cursor: not-allowed; filter: grayscale(.5); }
+
+    .machine-note {
+      margin: 1rem 0 0;
+      color: var(--muted);
+      font: .78rem/1.5 "Courier New", monospace;
+    }
+
+    .selection-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin: 2.6rem 0 1rem;
+      border-bottom: 2px solid rgba(245,196,92,.42);
+      padding-bottom: .8rem;
+    }
+    .selection-heading h2 {
+      margin: 0;
+      color: #ffe3a1;
+      font: 900 clamp(1rem, 3vw, 1.4rem)/1.4 "Courier New", monospace;
+      text-transform: uppercase;
+    }
+    .count { color: var(--gold); font: 700 .75rem "Courier New", monospace; white-space: nowrap; }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+      gap: .8rem;
+    }
+
+    .game-tile {
+      min-height: 128px;
+      display: flex;
+      align-items: flex-start;
+      gap: .8rem;
+      padding: 1rem;
+      border: 2px solid #8e542d;
+      border-radius: 8px;
+      color: var(--cream);
+      background: linear-gradient(145deg, rgba(104,53,28,.95), rgba(51,27,17,.98));
+      box-shadow: 0 4px 0 #170c08, inset 0 1px rgba(255,255,255,.08);
+      transition: border-color .14s, transform .14s, background .14s;
+    }
+    .game-tile:hover {
+      transform: translateY(-3px);
+      border-color: var(--gold);
+      background: linear-gradient(145deg, #814a29, #422417);
+    }
+    .tile-icon { flex: 0 0 2.2rem; font-size: 1.8rem; text-align: center; }
+    .tile-copy { display: grid; gap: .4rem; }
+    .tile-copy strong { font: 900 .85rem/1.35 "Courier New", monospace; }
+    .tile-copy small { color: #d2b495; font-size: .76rem; line-height: 1.4; }
+    .tile-badge {
+      display: inline-block;
+      width: fit-content;
+      padding: .15rem .35rem;
+      border: 1px solid rgba(245,196,92,.52);
+      border-radius: 3px;
+      color: #f3cb7c;
+      font: 700 .58rem "Courier New", monospace;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    footer { padding: 2rem 1rem; color: #aa8c70; text-align: center; font-size: .78rem; }
+
+    @media (max-width: 520px) {
+      .brand { font-size: .78rem; letter-spacing: .06em; }
+      .home-link { padding: .6rem .7rem; font-size: .74rem; }
+      .cabinet { border-width: 5px; border-radius: 18px 18px 12px 12px; }
+      .marquee { padding: .9rem; }
+      .screen { min-height: 132px; }
+      .selection-heading { align-items: start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./index.htm" aria-label="Wróć do portalu Chestnut Forest Games">
+      <span class="brand-nut" aria-hidden="true">🌰</span>
+      <span>Chestnut Arcade</span>
+    </a>
+    <a class="home-link" href="./index.htm">← Portal główny</a>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="pageTitle">
+      <div class="eyebrow">★ Wrzuć kasztana. Uruchom przygodę. ★</div>
+      <h1 id="pageTitle">Salon Kasztanowych Gier</h1>
+      <p>Wybierz automat z listy albo naciśnij wielki kasztan, by wylosować grę z całej kolekcji.</p>
+    </section>
+
+    <section class="cabinet" aria-label="Kasztanowy automat losujący">
+      <div class="marquee">
+        <p class="marquee-title">🌰 Kasztanotron 77 🌰</p>
+        <div class="screen" id="selectionScreen" aria-live="polite" aria-atomic="true">
+          <span class="screen-label">WYBRANA GRA</span>
+          <a id="selectedTitle" href="#" aria-disabled="true" tabindex="-1">WRZUĆ KASZTANA, GRACZU!</a>
+          <span id="selectedDescription">Losuj albo wybierz automat z listy poniżej.</span>
+          <span id="selectedGameHint">Wylosuj grę, aby pojawił się link do startu.</span>
+        </div>
+        <div class="controls">
+          <button class="random-button" id="pickRandomBtn" type="button" aria-label="Losuj grę kasztanem">
+            <span class="nut" aria-hidden="true">🌰</span>
+            <span class="button-copy">ROLLUJEMY!</span>
+          </button>
+        </div>
+        <p class="machine-note">KAŻDY KASZTAN MA RÓWNE SZANSE • <span id="gameCount">0</span> GIER W AUTOMACIE</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="gameListTitle">
+      <div class="selection-heading">
+        <h2 id="gameListTitle">Wybierz konkretny automat</h2>
+        <span class="count">DOTKNIJ / KLIKNIJ GRĘ, ABY JĄ URUCHOMIĆ</span>
+      </div>
+      <div class="game-grid" id="gamesGrid">
+        <a class="game-tile" href="./chestnut_arcade_game_hub.html" data-title="Chestnut Arcade Game Hub" data-description="Dziesięć klasycznych kasztanowych minigier arcade." data-icon="🕹️">
+          <span class="tile-icon" aria-hidden="true">🕹️</span><span class="tile-copy"><strong>Chestnut Arcade Game Hub</strong><small>Dziesięć klasycznych minigier i jesienna przygoda.</small><span class="tile-badge">Arcade hub</span></span>
+        </a>
+        <a class="game-tile" href="./chestnut_arcade_game_hub_v2.html" data-title="Chestnut Arcade v2" data-description="Cztery odświeżone gry w jednym automacie." data-icon="✨">
+          <span class="tile-icon" aria-hidden="true">✨</span><span class="tile-copy"><strong>Chestnut Arcade v2</strong><small>Snake, czołgi, Bomber-Nut i więcej.</small><span class="tile-badge">Arcade hub</span></span>
+        </a>
+        <a class="game-tile" href="./autumn_neon_chestnut_2p_arcade_hub.html" data-title="Autumn Neon 2P Hub" data-description="Lokalne gry arcade dla dwóch graczy." data-icon="🌿">
+          <span class="tile-icon" aria-hidden="true">🌿</span><span class="tile-copy"><strong>Autumn Neon 2P Hub</strong><small>Kooperacja i rywalizacja przy jednym ekranie.</small><span class="tile-badge">2 graczy</span></span>
+        </a>
+        <a class="game-tile" href="./grinch_chest_conquest.html" data-title="Grinch Chest Conquest" data-description="Sezonowy zestaw zręcznościowych gier z kasztanowymi bohaterami." data-icon="🍁">
+          <span class="tile-icon" aria-hidden="true">🍁</span><span class="tile-copy"><strong>Grinch Chest Conquest</strong><small>Świąteczny hub, bossowie i arcade'owa akcja.</small><span class="tile-badge">Arcade hub</span></span>
+        </a>
+        <a class="game-tile" href="./chestnut_combat.html" data-title="Chestnut Combat" data-description="Wybierz wojownika i walcz w kasztanowym pojedynku." data-icon="🥊">
+          <span class="tile-icon" aria-hidden="true">🥊</span><span class="tile-copy"><strong>Chestnut Combat</strong><small>Lokalna bijatyka z wyborem postaci.</small><span class="tile-badge">Bijatyka</span></span>
+        </a>
+        <a class="game-tile" href="./chestnut_strike.html" data-title="Chestnut Strike" data-description="Kasztanowy trening celności i refleksu." data-icon="🎯">
+          <span class="tile-icon" aria-hidden="true">🎯</span><span class="tile-copy"><strong>Chestnut Strike</strong><small>Trening strzelecki z różnymi rodzajami broni.</small><span class="tile-badge">Zręcznościowa</span></span>
+        </a>
+        <a class="game-tile" href="./kasztanowa_obrona_stanowiska.html" data-title="Kasztanowa Obrona Stanowiska" data-description="Przetrwaj sto dni korpoobrony i odpieraj kolejne fale." data-icon="🛡️">
+          <span class="tile-icon" aria-hidden="true">🛡️</span><span class="tile-copy"><strong>Kasztanowa Obrona Stanowiska</strong><small>Odpieraj fale i utrzymaj stanowisko przez 100 dni.</small><span class="tile-badge">Nowa gra</span></span>
+        </a>
+        <a class="game-tile" href="./chess_nuts.html" data-title="Chess-Nuts" data-description="Jesienne szachy przeciwko AI lub drugiemu graczowi." data-icon="♟️">
+          <span class="tile-icon" aria-hidden="true">♟️</span><span class="tile-copy"><strong>Chess-Nuts</strong><small>Szachy w jesiennej oprawie: AI albo drugi gracz.</small><span class="tile-badge">Strategia</span></span>
+        </a>
+        <a class="game-tile" href="./KasztanoweOczko.html" data-title="Kasztanowe Oczko" data-description="Dobierz karty i spróbuj uzbierać dokładnie 21." data-icon="🃏">
+          <span class="tile-icon" aria-hidden="true">🃏</span><span class="tile-copy"><strong>Kasztanowe Oczko</strong><small>Karciane 21 z kasztanową stawką.</small><span class="tile-badge">Karciana</span></span>
+        </a>
+        <a class="game-tile" href="./kasztanix_kasztanowy_tetris.html" data-title="Kasztanix Kasztanowy Tetris" data-description="Układaj spadające kształty i zbieraj kasztany." data-icon="🧱">
+          <span class="tile-icon" aria-hidden="true">🧱</span><span class="tile-copy"><strong>Kasztanix Kasztanowy Tetris</strong><small>Klasyczna układanka w kasztanowym wydaniu.</small><span class="tile-badge">Układanka</span></span>
+        </a>
+        <a class="game-tile" href="./kasztanowy_pasjans.html" data-title="Kasztanowy Pasjans" data-description="Klasyczny pasjans na jesiennym stole." data-icon="🂡">
+          <span class="tile-icon" aria-hidden="true">🂡</span><span class="tile-copy"><strong>Kasztanowy Pasjans</strong><small>Spokojna karciana rozgrywka przy kominku.</small><span class="tile-badge">Karciana</span></span>
+        </a>
+        <a class="game-tile" href="./miami_77_v2.html" data-title="Miami '77: Cienie Podziemia" data-description="Otwarty świat, mafijne misje i fabuła w Miami 1977." data-icon="🌴">
+          <span class="tile-icon" aria-hidden="true">🌴</span><span class="tile-copy"><strong>Miami '77: Cienie Podziemia</strong><small>Fabuła, syndykaty i pościgi w otwartym mieście.</small><span class="tile-badge">Akcja</span></span>
+        </a>
+        <a class="game-tile" href="./smerfastyczny_labirynt.html" data-title="Smerfastyczny Labirynt" data-description="Znajdź drogę przez labirynt, zbierz klucze i uciekaj." data-icon="🍄">
+          <span class="tile-icon" aria-hidden="true">🍄</span><span class="tile-copy"><strong>Smerfastyczny Labirynt</strong><small>Labiryntowa ucieczka z kluczami i skrótami.</small><span class="tile-badge">Labirynt</span></span>
+        </a>
+        <a class="game-tile" href="./roadtomerge.html" data-title="RoadToMerge" data-description="Kasztanowa jazda przez kolejne poziomy i przeszkody." data-icon="🚗">
+          <span class="tile-icon" aria-hidden="true">🚗</span><span class="tile-copy"><strong>RoadToMerge</strong><small>Rozpędź się, użyj nitro i przejedź korpokorytarz.</small><span class="tile-badge">Nowa gra</span></span>
+        </a>
+        <a class="game-tile" href="./ShadowsOfCrown.html" data-title="Cienie Korony" data-description="Intrygi, wpływy i walka o tron na średniowiecznym dworze." data-icon="👑">
+          <span class="tile-icon" aria-hidden="true">👑</span><span class="tile-copy"><strong>Cienie Korony</strong><small>Turowa strategia narracyjna pełna dworskich intryg.</small><span class="tile-badge">Strategia</span></span>
+        </a>
+        <a class="game-tile" href="./logopedia.html" data-title="Logopedyczna Akademia Dźwięków" data-description="Ćwiczenia słuchu, głosek i budowania słów." data-icon="🗣️">
+          <span class="tile-icon" aria-hidden="true">🗣️</span><span class="tile-copy"><strong>Logopedyczna Akademia Dźwięków</strong><small>Ćwicz rozpoznawanie dźwięków i budowanie słów.</small><span class="tile-badge">Edukacyjna</span></span>
+        </a>
+        <a class="game-tile" href="./kraina_wyraznej_mowy.html" data-title="Kraina Wyraźnej Mowy" data-description="Edukacyjny hub ćwiczeń mowy, pamięci i oddechu." data-icon="🦜">
+          <span class="tile-icon" aria-hidden="true">🦜</span><span class="tile-copy"><strong>Kraina Wyraźnej Mowy</strong><small>Minigry do ćwiczenia głosek, pamięci i oddechu.</small><span class="tile-badge">Edukacyjna</span></span>
+        </a>
+      </div>
+    </section>
+  </main>
+  <footer>CHESTNUT FOREST ARCADE • KAŻDA ROZGRYWKA ZACZYNA SIĘ OD KASZTANA 🌰</footer>
+
+  <script>
+    const gameTiles = [...document.querySelectorAll('.game-tile')];
+    const randomButton = document.getElementById('pickRandomBtn');
+    const selectedTitle = document.getElementById('selectedTitle');
+    const selectedDescription = document.getElementById('selectedDescription');
+    const selectedGameHint = document.getElementById('selectedGameHint');
+    let selectedGame = null;
+
+    document.getElementById('gameCount').textContent = gameTiles.length;
+
+    function selectGame(game) {
+      selectedGame = game;
+      selectedTitle.textContent = game.dataset.title;
+      selectedTitle.href = game.href;
+      selectedTitle.removeAttribute('aria-disabled');
+      selectedTitle.removeAttribute('tabindex');
+      selectedDescription.textContent = game.dataset.description;
+      selectedGameHint.textContent = 'Kliknij nazwę gry, aby ją uruchomić.';
+    }
+
+    randomButton.addEventListener('click', () => {
+      const game = gameTiles[Math.floor(Math.random() * gameTiles.length)];
+      randomButton.classList.remove('rolling');
+      void randomButton.offsetWidth;
+      randomButton.classList.add('rolling');
+      selectGame(game);
+    });
+
+    selectedTitle.addEventListener('click', (event) => {
+      if (!selectedGame) event.preventDefault();
+    });
+  </script>
+</body>
+</html>
