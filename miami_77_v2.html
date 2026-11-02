@@ -1294,6 +1294,7 @@ const audio = new Miami77SoundSystem();
 const WORLD_SIZE = 4500;
 const BLOCK_SIZE = 500;
 const ROAD_WIDTH = 152;
+const MISSION_MARKER_RADIUS = 105;
 
 const DISTRICTS = {
     neutral: {
@@ -1361,6 +1362,103 @@ function snapToAccessibleRoadOrPlaza(x, y) {
         ry = Math.max(BLOCK_SIZE, Math.min(WORLD_SIZE - BLOCK_SIZE, nearestRoadY));
     }
     return { x: rx, y: ry };
+}
+
+function findMissionRespawnPoint(originX, originY) {
+    let bestPoint = null;
+    let bestScore = -1;
+
+    for (let x = BLOCK_SIZE; x < WORLD_SIZE; x += BLOCK_SIZE) {
+        for (let y = BLOCK_SIZE; y < WORLD_SIZE; y += BLOCK_SIZE) {
+            if (isPointInBuilding(x, y, 40)) continue;
+
+            const distanceFromWreck = Math.hypot(x - originX, y - originY);
+            const distanceFromPlayer = Math.hypot(x - player.x, y - player.y);
+            if (distanceFromWreck < BLOCK_SIZE || distanceFromPlayer < 220) continue;
+
+            let nearestCarDistance = Infinity;
+            for (const car of gameState.cars) {
+                if (car.hp > 0) {
+                    nearestCarDistance = Math.min(nearestCarDistance, Math.hypot(x - car.x, y - car.y));
+                }
+            }
+            if (nearestCarDistance < 100) continue;
+
+            const score = Math.min(distanceFromWreck, distanceFromPlayer, nearestCarDistance);
+            if (score > bestScore) {
+                bestScore = score;
+                bestPoint = { x, y };
+            }
+        }
+    }
+
+    if (bestPoint) return bestPoint;
+    return snapToAccessibleRoadOrPlaza(WORLD_SIZE - originX, WORLD_SIZE - originY);
+}
+
+function getRecoverableMissionVehicleContext(car) {
+    const story = gameState.mainStory;
+    if (story.started && !story.completed) {
+        if (story.actIndex === 2 && story.raceCar === car) return 'story-race';
+        if (story.actIndex === 3 && story.targetCar === car) return 'story-surveillance';
+    }
+
+    const mission = gameState.activeMission;
+    if (mission?.targetCar === car &&
+        ['gold_limo', 'funk_van', 'v8_speed'].includes(mission.challengeId)) {
+        return 'faction-mission';
+    }
+    return null;
+}
+
+function respawnMissionVehicle(car, context) {
+    const point = findMissionRespawnPoint(car.x, car.y);
+    const story = gameState.mainStory;
+    const mission = gameState.activeMission;
+    const isSurveillanceCar = context === 'story-surveillance';
+    const replacement = createCar(
+        point.x,
+        point.y,
+        isSurveillanceCar ? 0 : car.angle,
+        car.model,
+        car.color,
+        isSurveillanceCar,
+        isSurveillanceCar ? 'driving' : 'parked'
+    );
+    replacement.isMissionTarget = true;
+    replacement.isStoryTarget = !!car.isStoryTarget;
+
+    if (isSurveillanceCar) {
+        replacement.roadType = 'h';
+        replacement.roadCoord = point.y;
+        replacement.laneDir = 1;
+        replacement.aiTargetSpeed = 145;
+        story.targetCar = replacement;
+        story.surveillanceProgress = 0;
+        story.targets = story.targets.map(target => target === car ? replacement : target);
+        story.targetCars = story.targetCars.map(target => target === car ? replacement : target);
+        setMainStoryObjective('Nowy trop limuzyny pojawił się w innym miejscu. Śledź ją z bezpiecznej odległości.');
+    } else if (context === 'story-race') {
+        story.raceCar = replacement;
+        story.targets = story.targets.map(target => target === car ? replacement : target);
+        story.targetCars = story.targetCars.map(target => target === car ? replacement : target);
+        setMainStoryObjective('V8 zniszczone. Wsiądź do nowego oznaczonego V8 i kontynuuj wyścig.');
+    } else if (mission) {
+        mission.targetCar = replacement;
+        mission.targetCars = mission.targetCars.map(target => target === car ? replacement : target);
+        mission.targetX = replacement.x;
+        mission.targetY = replacement.y;
+        if (mission.challengeId === 'v8_speed') mission.progress = 0;
+        else mission.lootCollected = false;
+        mission.desc = mission.challengeId === 'v8_speed'
+            ? 'Oznaczone V8 zostało zniszczone. Wsiądź do nowego pojazdu i spróbuj ponownie.'
+            : 'Pojazd misji został zniszczony. Odbierz nowy oznaczony pojazd.';
+        document.getElementById('activeObjectiveText').textContent = mission.desc;
+    }
+
+    gameState.cars.push(replacement);
+    showFloatingBanner('🚗 POJAZD MISJI ODTWORZONY', 'Nowy znacznik pojawił się w innym miejscu miasta.');
+    return replacement;
 }
 
 // ============================================================================
@@ -1906,6 +2004,28 @@ function spawnPedestrians() {
     }
 }
 
+function restoreActiveMissionTargets() {
+    const mission = gameState.activeMission;
+    if (!mission) return;
+
+    for (const ped of mission.targetPeds) {
+        if (ped.hp <= 0) continue;
+        ped.isMissionTarget = true;
+        if (!gameState.peds.includes(ped)) gameState.peds.push(ped);
+    }
+
+    for (const car of mission.targetCars) {
+        if (car.hp <= 0) continue;
+        car.isMissionTarget = true;
+        if (!gameState.cars.includes(car)) gameState.cars.push(car);
+    }
+
+    if (mission.targetCar?.hp > 0) {
+        mission.targetX = mission.targetCar.x;
+        mission.targetY = mission.targetCar.y;
+    }
+}
+
 // ============================================================================
 // STEROWANIE KLAWIATURĄ, MYSZĄ I EKRANEM DOTYKOWYM
 // ============================================================================
@@ -2247,6 +2367,7 @@ function damageCar(car, amount, byPlayer = false) {
 }
 
 function explodeCar(car, causedByPlayer = false) {
+    const recoveryContext = getRecoverableMissionVehicleContext(car);
     const wasPlayerInside = (player.inCar === car);
     const cx = car.x;
     const cy = car.y;
@@ -2261,8 +2382,18 @@ function explodeCar(car, causedByPlayer = false) {
 
     if (wasPlayerInside) {
         player.inCar = null;
-        damagePlayer(999, `Wybuch płonącego pojazdu (${car.model.name})!`);
+        if (recoveryContext) {
+            const exitPoint = snapToAccessibleRoadOrPlaza(cx + 200, cy + 180);
+            player.x = exitPoint.x;
+            player.y = exitPoint.y;
+            gameState.health = Math.max(1, gameState.health - 35);
+            updateHUD();
+        } else {
+            damagePlayer(999, `Wybuch płonącego pojazdu (${car.model.name})!`);
+        }
     }
+
+    if (recoveryContext) respawnMissionVehicle(car, recoveryContext);
 }
 
 function damagePlayer(amount, causeText = 'Ostrzał gangu') {
@@ -2306,14 +2437,8 @@ document.getElementById('restartGameBtn').addEventListener('click', () => {
     player.ammo.rpg = Math.max(player.ammo.rpg, 2);
 
     spawnTrafficAndParkedCars();
-    const activeMission = gameState.activeMission;
-    if (activeMission?.challengeId === 'armored_van' && activeMission.targetCar?.hp > 0) {
-        const van = activeMission.targetCar;
-        if (!gameState.cars.includes(van)) gameState.cars.push(van);
-        activeMission.targetX = van.x;
-        activeMission.targetY = van.y;
-    }
     spawnPedestrians();
+    restoreActiveMissionTargets();
     if (gameState.mainStory.started && !gameState.mainStory.completed) startMainStoryAct();
     updateHUD();
     canvas.focus();
@@ -2326,10 +2451,12 @@ function handleContextAction() {
     if (!gameState.started || gameState.isGameOver) return;
 
     if (!player.inCar) {
-        const booth = getNearestPhoneBooth(player.x, player.y, 75);
-        if (booth) {
-            openDialogue(booth);
-            return;
+        if (!gameState.activeMission) {
+            const booth = getNearestPhoneBooth(player.x, player.y, 75);
+            if (booth) {
+                openDialogue(booth);
+                return;
+            }
         }
 
         for (const shop of gameState.froggyShops) {
@@ -2626,7 +2753,8 @@ function startMissionFromBooth(b) {
         mission.targetCar = addMissionCar('van', '#475569', safeTarget.x, safeTarget.y, true);
         mission.desc = challenge.description;
     } else if (challenge.id === 'escort_mario') {
-        const start = snapToAccessibleRoadOrPlaza(safeTarget.x + 120, safeTarget.y);
+        const startX = player.x >= WORLD_SIZE - BLOCK_SIZE ? player.x - 180 : player.x + 180;
+        const start = snapToAccessibleRoadOrPlaza(startX, player.y);
         mission.targetPed = addMissionPed(start.x, start.y, {
             speed: 95,
             hp: 130,
@@ -2636,6 +2764,7 @@ function startMissionFromBooth(b) {
             hostile: false,
             shoutText: 'Mario: Mówiłem, że znam skrót!'
         });
+        mission.targetPed.isMissionMario = true;
         mission.targetX = home.x;
         mission.targetY = home.y;
     } else if (challenge.id === 'gold_limo' || challenge.id === 'funk_van') {
@@ -2926,7 +3055,8 @@ function updateMainStory(dt) {
 
     if (story.actIndex === 1) {
         for (const pickup of story.pickups) {
-            if (!pickup.collected && Math.hypot(player.x - pickup.x, player.y - pickup.y) < 70) {
+            if (!pickup.collected &&
+                Math.hypot(player.x - pickup.x, player.y - pickup.y) < MISSION_MARKER_RADIUS) {
                 pickup.collected = true;
                 audio.playSfx('pickup');
                 showFloatingBanner(`PRZESYŁKA ZEBRANA: ${pickup.label}`, `[FABUŁA GŁÓWNA - AKT 1]`);
@@ -2944,7 +3074,8 @@ function updateMainStory(dt) {
             return;
         }
         const checkpoint = story.checkpoints[story.checkpointIndex];
-        if (checkpoint && Math.hypot(player.x - checkpoint.x, player.y - checkpoint.y) < 90) {
+        if (checkpoint &&
+            Math.hypot(player.x - checkpoint.x, player.y - checkpoint.y) < MISSION_MARKER_RADIUS) {
             story.checkpointIndex++;
             audio.playSfx('pickup');
             if (story.checkpointIndex >= story.checkpoints.length) advanceMainStoryAct();
@@ -3064,6 +3195,7 @@ function killPedestrian(index, fromExplosion = false, causedByPlayer = false) {
     const ped = gameState.peds[index];
     if (!ped) return;
 
+    ped.hp = 0;
     for (let k = 0; k < 6; k++) {
         gameState.particles.push({
             x: ped.x,
@@ -3644,14 +3776,14 @@ function updateGame(dt) {
                 }
             }
             if (gameState.activeMission === m && !m.packageDelivered &&
-                Math.hypot(player.x - m.targetX, player.y - m.targetY) < 80) {
+                Math.hypot(player.x - m.targetX, player.y - m.targetY) < MISSION_MARKER_RADIUS) {
                 m.packageDelivered = true;
                 m.targetX = m.dropOff.x;
                 m.targetY = m.dropOff.y;
                 m.desc = `Dowieź paczkę do bazy mafii.`;
                 showFloatingBanner('PACZKA ODEBRANA', 'DOWIEŹ JĄ DO BAZY');
             } else if (gameState.activeMission === m && m.packageDelivered &&
-                Math.hypot(player.x - m.targetX, player.y - m.targetY) < 90) {
+                Math.hypot(player.x - m.targetX, player.y - m.targetY) < MISSION_MARKER_RADIUS) {
                 completed = true;
             }
             if (gameState.activeMission === m) {
@@ -3691,7 +3823,7 @@ function updateGame(dt) {
                 document.getElementById('activeObjectiveText').textContent = m.desc;
                 showFloatingBanner('🚗 POJAZD ODZYSKANY', m.desc);
             } else if (m.lootCollected && player.inCar && player.inCar === m.targetCar) {
-                if (Math.hypot(player.x - m.targetX, player.y - m.targetY) < 95) {
+                if (Math.hypot(player.x - m.targetX, player.y - m.targetY) < MISSION_MARKER_RADIUS) {
                     completed = true;
                     player.inCar.isMissionTarget = false;
                 }
@@ -3708,7 +3840,8 @@ function updateGame(dt) {
             }
         } else if (m.challengeId === 'police_surveillance') {
             const checkpoint = m.checkpoints[m.checkpointIndex];
-            if (checkpoint && Math.hypot(player.x - checkpoint.x, player.y - checkpoint.y) < 90) {
+            if (checkpoint &&
+                Math.hypot(player.x - checkpoint.x, player.y - checkpoint.y) < MISSION_MARKER_RADIUS) {
                 m.checkpointIndex++;
                 audio.playSfx('pickup');
             }
@@ -3727,21 +3860,17 @@ function updateGame(dt) {
         } else if (m.challengeId === 'debt_gang') {
             completed = m.targetPeds.every(ped => !gameState.peds.includes(ped));
         } else if (m.challengeId === 'v8_speed') {
-            if (!m.targetCar || m.targetCar.hp <= 0) {
-                if (m.targetCar) m.targetCar.isMissionTarget = !!m.targetCar.isStoryTarget;
-                gameState.activeMission = null;
-                document.getElementById('activeObjectiveText').textContent =
-                    'Oznaczone V8 zostało zniszczone. Wybierz nowe zlecenie w budce mafii.';
-                showFloatingBanner('PRÓBA V8 PRZERWANA', 'POJAZD ZOSTAŁ ZNISZCZONY');
-            }
-            const forwardSpeed = gameState.activeMission === m && player.inCar === m.targetCar
+            const targetCar = m.targetCar;
+            const forwardSpeed = targetCar && gameState.activeMission === m && player.inCar === targetCar
                 ? Math.abs(player.inCar.vx * Math.cos(player.inCar.angle) + player.inCar.vy * Math.sin(player.inCar.angle)) * 0.18
                 : 0;
             if (forwardSpeed > 45) m.progress = Math.min(10, m.progress + dt);
             else m.progress = 0;
-            m.targetX = m.targetCar.x;
-            m.targetY = m.targetCar.y;
-            m.desc = player.inCar === m.targetCar
+            if (targetCar) {
+                m.targetX = targetCar.x;
+                m.targetY = targetCar.y;
+            }
+            m.desc = targetCar && player.inCar === targetCar
                 ? `Utrzymaj ponad 45 MPH bez przerwy. Postęp: ${Math.floor(m.progress)}/10 s.`
                 : 'Wsiądź do oznaczonego V8 i utrzymaj ponad 45 MPH przez 10 sekund.';
             if (gameState.activeMission === m) {
@@ -4312,10 +4441,23 @@ function renderGame() {
         ctx.arc(m.targetX, m.targetY, pulse, 0, Math.PI * 2);
         ctx.stroke();
 
-        ctx.fillStyle = 'rgba(250, 204, 21, 0.22)';
-        ctx.beginPath();
-        ctx.arc(m.targetX, m.targetY, 44, 0, Math.PI * 2);
-        ctx.fill();
+        if (m.challengeId === 'escort_mario') {
+            ctx.font = 'bold 13px "Share Tech Mono", monospace';
+            ctx.textAlign = 'center';
+            const labelWidth = ctx.measureText('KRYJÓWKA').width + 20;
+            ctx.fillStyle = 'rgba(20, 83, 45, 0.96)';
+            ctx.fillRect(m.targetX - labelWidth / 2, m.targetY - 55, labelWidth, 20);
+            ctx.strokeStyle = '#86efac';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(m.targetX - labelWidth / 2, m.targetY - 55, labelWidth, 20);
+            ctx.fillStyle = '#f0fdf4';
+            ctx.fillText('KRYJÓWKA', m.targetX, m.targetY - 41);
+        } else if (m.challengeId !== 'v8_speed') {
+            ctx.fillStyle = 'rgba(250, 204, 21, 0.22)';
+            ctx.beginPath();
+            ctx.arc(m.targetX, m.targetY, 44, 0, Math.PI * 2);
+            ctx.fill();
+        }
     }
 
     // 8. Budki telefoniczne
@@ -4396,6 +4538,25 @@ function renderGame() {
             ctx.fillStyle = '#fef08a';
             ctx.fillText(label, ped.x, ped.y - 31);
             ctx.restore();
+        } else if (ped.isMissionMario) {
+            const pulse = 21 + Math.sin(performance.now() / 220) * 4;
+            ctx.save();
+            ctx.strokeStyle = '#22c55e';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(ped.x, ped.y, pulse, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.font = 'bold 12px "Share Tech Mono", monospace';
+            ctx.textAlign = 'center';
+            const labelWidth = ctx.measureText('MARIO').width + 18;
+            ctx.fillStyle = 'rgba(20, 83, 45, 0.96)';
+            ctx.fillRect(ped.x - labelWidth / 2, ped.y - 44, labelWidth, 18);
+            ctx.strokeStyle = '#86efac';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(ped.x - labelWidth / 2, ped.y - 44, labelWidth, 18);
+            ctx.fillStyle = '#f0fdf4';
+            ctx.fillText('MARIO', ped.x, ped.y - 31);
+            ctx.restore();
         } else if (ped.isMissionTarget) {
             ctx.fillStyle = '#ef4444';
             ctx.font = 'bold 14px sans-serif';
@@ -4410,11 +4571,12 @@ function renderGame() {
 
         if (ped.shoutTimer > 0 && ped.shoutText) {
             ctx.fillStyle = 'rgba(0,0,0,0.8)';
-            ctx.fillRect(ped.x - 65, ped.y - 32, 130, 16);
+            const shoutY = ped.isMissionMario ? ped.y - 66 : ped.y - 32;
+            ctx.fillRect(ped.x - 65, shoutY, 130, 16);
             ctx.fillStyle = '#fde047';
             ctx.font = '10px "Share Tech Mono", monospace';
             ctx.textAlign = 'center';
-            ctx.fillText(ped.shoutText, ped.x, ped.y - 21);
+            ctx.fillText(ped.shoutText, ped.x, shoutY + 11);
         }
     }
 
@@ -4740,7 +4902,11 @@ function renderGame() {
             ctx.fillStyle = '#facc15';
             ctx.font = 'bold 13px "Share Tech Mono", monospace';
             ctx.textAlign = 'center';
-            ctx.fillText('🎯 CEL MISJI', car.x, car.y - 24);
+            const label = gameState.activeMission?.challengeId === 'v8_speed' &&
+                gameState.activeMission.targetCar === car
+                ? 'V8 • CEL MISJI'
+                : '🎯 CEL MISJI';
+            ctx.fillText(label, car.x, car.y - 24);
         }
     }
 
