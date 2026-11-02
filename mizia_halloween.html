@@ -1,0 +1,2185 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mizia Halloween: Noc Duchów i Dyń</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Fredoka:wght@600;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #05020a;
+            font-family: 'Nunito', sans-serif;
+            touch-action: none;
+        }
+        .font-spooky { font-family: 'Creepster', cursive; letter-spacing: 2px; }
+        .font-display { font-family: 'Fredoka', sans-serif; }
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+        .touch-btn {
+            background: rgba(30, 15, 45, 0.55);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 3px solid rgba(249, 115, 22, 0.45);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), inset 0 2px 8px rgba(249, 115, 22, 0.3);
+            transition: transform 0.05s ease, background 0.08s ease;
+        }
+        .touch-btn.active {
+            transform: scale(0.90);
+            background: rgba(249, 115, 22, 0.55);
+            border-color: #fde047;
+        }
+        .touch-btn-jump {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.5), rgba(249, 115, 22, 0.6));
+            border: 3px solid rgba(249, 115, 22, 0.85);
+        }
+        .touch-btn-jump.active {
+            transform: scale(0.88);
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.85), rgba(249, 115, 22, 0.95));
+            border-color: #ffffff;
+        }
+        .glass-panel {
+            background: rgba(18, 9, 31, 0.94);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 2px solid rgba(249, 115, 22, 0.3);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 35px rgba(168, 85, 247, 0.2);
+        }
+        .btn-pumpkin {
+            background: linear-gradient(180deg, #f97316 0%, #c2410c 100%);
+            box-shadow: 0 6px 0 #7c2d12, 0 10px 20px rgba(249, 115, 22, 0.4);
+            transition: transform 0.08s ease, filter 0.1s ease;
+        }
+        .btn-pumpkin:hover { filter: brightness(1.1); }
+        .btn-pumpkin:active { transform: translateY(4px); box-shadow: 0 2px 0 #7c2d12; }
+        .btn-witch {
+            background: linear-gradient(180deg, #a855f7 0%, #7e22ce 100%);
+            box-shadow: 0 6px 0 #581c87, 0 10px 20px rgba(168, 85, 247, 0.4);
+            transition: transform 0.08s ease;
+        }
+        .btn-witch:active { transform: translateY(4px); box-shadow: 0 2px 0 #581c87; }
+        @keyframes floatGhost {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+        .anim-ghost { animation: floatGhost 3.2s ease-in-out infinite; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(249, 115, 22, 0.3); border-radius: 4px; }
+    </style>
+</head>
+<body class="relative w-full h-full overflow-hidden select-none bg-[#05020a]">
+
+    <!-- CANVAS GRY -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- GÓRNY HUD -->
+    <div id="hud" class="hidden fixed top-0 left-0 right-0 z-20 pointer-events-none p-2 sm:p-4 flex flex-col gap-1.5">
+        <div class="flex items-center justify-between gap-2 max-w-6xl mx-auto w-full">
+            <!-- Życia i Cukierki -->
+            <div class="flex items-center gap-2 bg-purple-950/85 backdrop-blur px-3 py-1.5 rounded-2xl border border-orange-500/30 shadow pointer-events-auto">
+                <div id="hudHearts" class="flex items-center gap-0.5 text-base sm:text-xl">❤️❤️❤️</div>
+                <div class="h-4 w-[1px] bg-white/20 mx-1"></div>
+                <div class="flex items-center gap-1">
+                    <span class="text-orange-400 text-sm sm:text-base">🍬</span>
+                    <span id="hudScore" class="font-display font-bold text-amber-300 text-sm sm:text-lg">0</span>
+                </div>
+            </div>
+
+            <!-- Pasek Postępu -->
+            <div class="flex-1 max-w-xs sm:max-w-md mx-1 bg-purple-950/85 backdrop-blur px-3 py-1.5 rounded-2xl border border-orange-500/30 shadow">
+                <div class="flex justify-between items-center text-[10px] sm:text-xs font-bold text-orange-300 mb-0.5">
+                    <span id="hudLevelTitle" class="truncate font-display">Etap 1: Mroczny Las</span>
+                    <span id="hudProgressValue" class="text-amber-300 ml-1">0%</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-purple-500/30 relative">
+                    <div id="hudProgressBar" class="h-full bg-gradient-to-r from-purple-500 via-orange-500 to-amber-300 rounded-full transition-all duration-150" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Dźwięk i Pauza -->
+            <div class="flex items-center gap-1.5 pointer-events-auto">
+                <button id="btnSound" class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-purple-950/85 border border-orange-500/30 text-white flex items-center justify-center text-base sm:text-lg shadow active:scale-90 transition">🔊</button>
+                <button id="btnPause" class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-purple-950/85 border border-orange-500/30 text-white flex items-center justify-center text-base sm:text-lg shadow active:scale-90 transition">⏸️</button>
+            </div>
+        </div>
+
+        <!-- Aktywne zaklęcia i aury -->
+        <div id="hudBuffs" class="flex justify-center gap-2 pointer-events-none"></div>
+    </div>
+
+    <!-- PRZYCISKI MULTI-TOUCH DLA TELEFONÓW -->
+    <div id="touchControls" class="hidden fixed bottom-0 left-0 right-0 z-20 pointer-events-none pb-4 pt-1 px-4 sm:px-8 flex justify-between items-end">
+        <div class="flex items-center gap-3 pointer-events-auto">
+            <button id="touchLeft" class="touch-btn w-16 h-16 sm:w-20 sm:h-20 rounded-3xl flex items-center justify-center text-amber-300 text-3xl font-bold" aria-label="W lewo">◀</button>
+            <button id="touchRight" class="touch-btn w-16 h-16 sm:w-20 sm:h-20 rounded-3xl flex items-center justify-center text-amber-300 text-3xl font-bold" aria-label="W prawo">▶</button>
+        </div>
+        <div class="pointer-events-auto">
+            <button id="touchJump" class="touch-btn touch-btn-jump w-20 h-20 sm:w-24 sm:h-24 rounded-full flex flex-col items-center justify-center text-white font-display font-bold shadow-2xl" aria-label="Skok">
+                <span class="text-2xl sm:text-3xl leading-none">🎃</span>
+                <span class="text-[11px] sm:text-xs tracking-wider mt-0.5 text-amber-200">SKOK</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- EKRAN GŁÓWNY (START MENU) -->
+    <div id="menuScreen" class="fixed inset-0 z-30 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+        <div class="glass-panel rounded-3xl max-w-xl w-full p-5 sm:p-7 text-center text-white my-auto relative">
+            <div class="relative mx-auto w-32 h-32 sm:w-36 sm:h-36 mb-1 anim-ghost">
+                <canvas id="miziaPreviewCanvas" width="180" height="180" class="w-full h-full"></canvas>
+                <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-orange-600 text-slate-950 text-[10px] font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider shadow">
+                    Neva Masquerade Witch
+                </span>
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl font-spooky text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-200 to-purple-400 mt-2 drop-shadow-[0_4px_12px_rgba(249,115,22,0.4)]">
+                Mizia: Halloweenowa Noc
+            </h1>
+            <p class="text-purple-200 text-xs sm:text-sm mt-1 max-w-md mx-auto">
+                Poprowadź małą kotkę <strong class="text-orange-400">Mizię w kapelusiku czarownicy</strong> przez cmentarzyska, uciekaj przed własnym <strong class="text-purple-300">Cieniem</strong>, latającymi duszkami, skaczącymi dyniami i panami z laskami!
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-2.5 mt-5 justify-center">
+                <button id="btnPlayCampaign" class="btn-pumpkin px-6 py-3 rounded-2xl font-display font-bold text-base sm:text-lg text-white">
+                    🎃 ROZPOCZNIJ PRZYGODĘ
+                </button>
+                <button id="btnLevelSelect" class="bg-white/10 hover:bg-white/15 border border-purple-500/30 px-5 py-3 rounded-2xl font-display font-bold text-base text-purple-200">
+                    🗺️ WYBÓR ETAPU
+                </button>
+            </div>
+
+            <a href="./index.html" aria-label="Powrót do strony głównej" class="inline-block mt-4 text-sm text-orange-300 underline underline-offset-4">← Cienie Korony</a>
+
+            <div class="mt-4 pt-3 border-t border-purple-500/20 flex flex-wrap justify-around text-[11px] text-purple-300 gap-2">
+                <span>📱 Przyciski dotykowe na telefon</span>
+                <span>💻 Strzałki / AD + Spacja</span>
+                <span>🍲 Na końcu wielka micha zupy!</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- WYBÓR POZIOMU -->
+    <div id="levelSelectScreen" class="hidden fixed inset-0 z-30 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+        <div class="glass-panel rounded-3xl max-w-2xl w-full p-4 sm:p-6 text-white my-auto flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between mb-3 border-b border-purple-500/20 pb-2">
+                <div>
+                    <h2 class="text-2xl font-spooky text-orange-400">Halloweenowe Etapy</h2>
+                    <p class="text-xs text-purple-300">Wybierz nawiedzony świat i ocal Halloween</p>
+                </div>
+                <button id="btnCloseLevelSelect" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-slate-300 hover:text-white text-lg">✕</button>
+            </div>
+
+            <div id="levelGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 overflow-y-auto custom-scrollbar p-1 flex-1">
+                <!-- Poziomy generowane w JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- EKRAN PO UKOŃCZENIU POZIOMU -->
+    <div id="winLevelScreen" class="hidden fixed inset-0 z-30 flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-sm w-full p-6 text-center text-white">
+            <div class="text-5xl mb-2 animate-bounce">🎃✨🍬</div>
+            <h2 id="winLevelTitle" class="text-2xl font-spooky text-orange-400">Etap Ukończony!</h2>
+            <p id="winLevelDesc" class="text-purple-200 text-xs sm:text-sm mt-1">Mizia przeskoczyła zmory i zebrała pyszne cukierki!</p>
+            <div class="bg-white/5 border border-purple-500/20 rounded-2xl p-3 my-4 flex justify-around">
+                <div>
+                    <div class="text-[11px] text-purple-300">Cukierki</div>
+                    <div id="winLevelScore" class="text-xl font-display font-bold text-amber-300">0</div>
+                </div>
+                <div class="h-8 w-[1px] bg-white/10"></div>
+                <div>
+                    <div class="text-[11px] text-purple-300">Bonus</div>
+                    <div id="winLevelBonus" class="text-xl font-display font-bold text-orange-400">+500</div>
+                </div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <button id="btnNextLevel" class="btn-pumpkin py-3 rounded-2xl font-display font-bold text-base text-white">DALEJ W NOC ➔</button>
+                <button id="btnWinToMenu" class="bg-white/10 py-2.5 rounded-2xl text-xs text-purple-200">MENU</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME OVER -->
+    <div id="gameOverScreen" class="hidden fixed inset-0 z-30 flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-sm w-full p-6 text-center text-white">
+            <div class="text-5xl mb-2">🙀👻</div>
+            <h2 class="text-3xl font-spooky text-rose-400">Duchy przestraszyły Mizię!</h2>
+            <p class="text-purple-200 text-xs sm:text-sm mt-1">Puszysta kotka schowała się pod stertą suchych liści!</p>
+            <div class="bg-white/5 border border-purple-500/20 rounded-2xl p-3 my-4">
+                <div class="text-[11px] text-purple-300">Zebrane cukierki</div>
+                <div id="gameOverScore" class="text-2xl font-display font-bold text-amber-300 mt-0.5">0</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <button id="btnRetryLevel" class="btn-pumpkin py-3 rounded-2xl font-display font-bold text-base text-white">🔄 SPRÓBUJ PONOWNIE</button>
+                <button id="btnGameOverMenu" class="bg-white/10 py-2.5 rounded-2xl text-xs text-purple-200">MENU GŁÓWNE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAUZA -->
+    <div id="pauseScreen" class="hidden fixed inset-0 z-30 flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-xs w-full p-5 text-center text-white">
+            <div class="text-4xl mb-1">😺🦇</div>
+            <h3 class="text-2xl font-spooky text-orange-400">Halloweenowa Przerwa</h3>
+            <p class="text-xs text-purple-300 mb-4">Mizia odpoczywa na nagrobku</p>
+            <div class="flex flex-col gap-2">
+                <button id="btnResume" class="btn-pumpkin py-2.5 rounded-xl font-display font-bold text-sm text-white">▶ WZNÓW</button>
+                <button id="btnRestartCurrent" class="bg-white/10 py-2.5 rounded-xl text-xs text-white">🔄 OD NOWA</button>
+                <button id="btnPauseToMenu" class="bg-rose-500/20 text-rose-300 py-2.5 rounded-xl text-xs">🏠 MENU</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FINAŁOWA ANIMACJA: UCZTA DYNIOWA DLA MIZI -->
+    <div id="pumpkinSoupCutsceneScreen" class="hidden fixed inset-0 z-30 flex flex-col items-center justify-center p-3 sm:p-5 bg-[#05020a]/95 overflow-hidden">
+        <div class="glass-panel rounded-3xl max-w-xl w-full p-4 sm:p-6 text-center text-white relative flex flex-col items-center shadow-2xl border-2 border-orange-500/50">
+            <div class="inline-flex items-center gap-2 bg-orange-500/20 text-orange-400 text-xs sm:text-sm font-display font-extrabold px-4 py-1 rounded-full uppercase tracking-wider mb-2 border border-orange-500/30">
+                🎃 WIELKI HALLOWEENOWY FINAŁ 🎃
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-spooky text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-200 to-yellow-400">
+                Wielka Micha Zupy Dyniowej!
+            </h2>
+            <p id="soupDialogueText" class="text-orange-200 text-xs sm:text-sm font-bold min-h-[22px] mt-1 transition-opacity duration-200">
+                „Mniam mniam! Po pokonaniu Cienia czas na dyniową ucztę!” 🍲✨
+            </p>
+
+            <!-- PŁÓTNO KROTOCHWILNEJ ANIMACJI ZUPY -->
+            <div class="w-full max-w-[440px] aspect-[4/3] my-2 relative rounded-2xl overflow-hidden border border-orange-500/30 bg-gradient-to-b from-purple-950 to-slate-950 shadow-inner">
+                <canvas id="soupCanvas" width="440" height="330" class="w-full h-full block"></canvas>
+            </div>
+
+            <div class="flex items-center justify-between w-full max-w-md bg-white/5 border border-purple-500/20 px-4 py-2.5 rounded-2xl mt-1">
+                <div class="text-left">
+                    <div class="text-[10px] sm:text-xs text-purple-300">Zgromadzone słodkości</div>
+                    <div id="finalSoupScore" class="text-lg sm:text-xl font-display font-bold text-amber-300">0 pkt</div>
+                </div>
+                <button id="btnFinishSoupCutscene" class="btn-pumpkin px-5 py-2.5 rounded-2xl font-display font-bold text-xs sm:text-sm text-white shadow-lg">
+                    🐾 PYSZNY FINAŁ ➔
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EKRAN KOŃCOWEGO ZWYCIĘSTWA -->
+    <div id="victoryScreen" class="hidden fixed inset-0 z-30 flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-md w-full p-6 text-center text-white">
+            <div class="text-5xl mb-2 animate-bounce">🍲😻🎃✨</div>
+            <h2 class="text-3xl font-spooky text-orange-400">Mizia Najedzona i Bezpieczna!</h2>
+            <p class="text-purple-200 text-xs sm:text-sm mt-1">Zupa dyniowa zjedzona do ostatniej kropelki, brzuszek jak bębenek, a wszystkie zmory Halloween uciekły w popłochu!</p>
+            <div class="bg-white/5 border border-purple-500/20 rounded-2xl p-4 my-4">
+                <div class="text-xs text-purple-300">Łączny wynik słodyczy</div>
+                <div id="victoryScore" class="text-3xl font-display font-bold text-amber-300 mt-1">0 pkt</div>
+            </div>
+            <button id="btnVictoryToMenu" class="btn-pumpkin w-full py-3 rounded-2xl font-display font-bold text-base text-white">
+                🎃 POWRÓT DO MENU GŁÓWNEGO
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================================
+        // 1. DŹWIĘKI SPOOKY SYNTEZOWANE PRZEZ WEB AUDIO API
+        // =========================================================================
+        class SpookyAudio {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AC = window.AudioContext || window.webkitAudioContext;
+                    if (AC) this.ctx = new AC();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+            }
+            toggle() {
+                this.muted = !this.muted;
+                return this.muted;
+            }
+            tone(startFreq, endFreq, dur, type = 'sine', vol = 0.15) {
+                if (this.muted) return;
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(startFreq, now);
+                if (endFreq !== startFreq) osc.frequency.exponentialRampToValueAtTime(Math.max(1, endFreq), now + dur);
+                gain.gain.setValueAtTime(vol, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + dur);
+            }
+            jump(d = false) { this.tone(d ? 460 : 320, d ? 780 : 540, 0.14, 'triangle', 0.16); }
+            bounce() { this.tone(180, 560, 0.25, 'sine', 0.22); }
+            slurp() { this.tone(250, 480, 0.12, 'sine', 0.18); }
+            candy() {
+                if (this.muted) return;
+                this.init();
+                [587, 740, 880].forEach((f, i) => setTimeout(() => this.tone(f, f, 0.1, 'triangle', 0.12), i * 45));
+            }
+            potion() {
+                if (this.muted) return;
+                this.init();
+                [440, 554, 659, 880].forEach((f, i) => setTimeout(() => this.tone(f, f * 1.2, 0.15, 'sine', 0.14), i * 60));
+            }
+            boo() { this.tone(300, 110, 0.35, 'sawtooth', 0.2); }
+            poof() { this.tone(220, 680, 0.15, 'triangle', 0.16); }
+            spookyWin() {
+                [392, 440, 493, 587, 659].forEach((f, i) => setTimeout(() => this.tone(f, f, 0.2, 'sine', 0.15), i * 110));
+            }
+        }
+        const sfx = new SpookyAudio();
+
+        // =========================================================================
+        // 2. ROZSZERZONA BAZA 10 POZIOMÓW HALLOWEEN Z 3 ŚMIESZNYMI BOSSAMI
+        // =========================================================================
+        const HALLOWEEN_LEVELS = [
+            { id: 1, name: 'Mroczny Las Dyń', sub: 'Krzywe dynie i podstępne gałęzie', len: 3200, bgTop: '#1b092b', bgBot: '#3b124a', groundTop: '#f97316', groundCol: '#270e38', theme: 'forest' },
+            { id: 2, name: 'Cmentarzysko Zjaw', sub: 'Duszki robiące „BLEEE!” i nagrobki', len: 3400, bgTop: '#09081e', bgBot: '#1e1b4b', groundTop: '#a855f7', groundCol: '#120f2e', theme: 'cemetery' },
+            { id: 3, name: 'Nawiedzona Wioska', sub: 'Zrzędliwi panowie machający laskami', len: 3600, bgTop: '#190a28', bgBot: '#451a03', groundTop: '#ea580c', groundCol: '#240c1a', theme: 'village' },
+            { id: 4, name: 'Dwór Hrabiego (BOSS 1)', sub: 'Pojedynek: Zrzędliwy Pan Hrabia z Laską!', len: 3200, bgTop: '#2b091f', bgBot: '#5b152b', groundTop: '#f43f5e', groundCol: '#240816', theme: 'mansion', boss: 'cane_count' },
+            { id: 5, name: 'Dyniowe Wzgórza', sub: 'Gigantyczne dynie-trampoliny i pęd', len: 3900, bgTop: '#1c1917', bgBot: '#431407', groundTop: '#fb923c', groundCol: '#292524', theme: 'hills' },
+            { id: 6, name: 'Nocny Zamek Nietoperzy', sub: 'Kruszące się gzymsy i fioletowe zjawy', len: 4100, bgTop: '#0d0417', bgBot: '#280c3b', groundTop: '#9333ea', groundCol: '#170524', theme: 'castle' },
+            { id: 7, name: 'Ogród Dynio-Groma (BOSS 2)', sub: 'Wielka Dynia Derp tocząca się z zezem!', len: 3300, bgTop: '#142018', bgBot: '#14532d', groundTop: '#84cc16', groundCol: '#052e16', theme: 'garden', boss: 'mega_pumpkin' },
+            { id: 8, name: 'Podziemia z Pajęczynami', sub: 'Zabawne cienie naśladujące każdy krok', len: 4300, bgTop: '#180d24', bgBot: '#311042', groundTop: '#d946ef', groundCol: '#1e0b2b', theme: 'dungeon' },
+            { id: 9, name: 'Ścieżka Latających Mioteł', sub: 'Wysokie skoki w chmurach i pęd wiatru', len: 4500, bgTop: '#030712', bgBot: '#1e1b4b', groundTop: '#38bdf8', groundCol: '#0f172a', theme: 'sky' },
+            { id: 10, name: 'Królewska Komnata Cieni (FINAŁ)', sub: 'Wielkie starcie: Szalony Cień Mizi o 3 w nocy!', len: 3600, bgTop: '#06000c', bgBot: '#1f0322', groundTop: '#f59e0b', groundCol: '#100014', theme: 'boss_lair', boss: 'shadow_prime' }
+        ];
+
+        // =========================================================================
+        // 3. GENEROWANIE POZIOMU Z NOWYMI WROGAMI I FORMAMI BOSSÓW
+        // =========================================================================
+        function generateHalloweenLevel(cfg) {
+            const platforms = [];
+            const collectibles = [];
+            const enemies = [];
+            const floorY = 520;
+            const levelLength = cfg.len;
+
+            // Startowa platforma
+            platforms.push({ x: 0, y: floorY, w: 460, h: 120, type: 'ground' });
+
+            let cursorX = 500;
+            let step = 0;
+
+            while (cursorX < levelLength - 500) {
+                step++;
+                const gap = 80 + (step % 3) * 35;
+                cursorX += gap;
+                const pW = 190 + ((step * 73) % 200);
+                const pY = floorY - ((step % 4 === 0) ? 60 : (step % 2 === 0 ? 110 : 0));
+
+                let pType = 'normal';
+                if (step % 6 === 0) pType = 'trampoline_pumpkin'; // dynia sprężynowa
+                else if (step % 5 === 0 && cfg.id >= 3) pType = 'crumble';
+                else if (step % 4 === 1 && cfg.id >= 2) pType = (step % 2 === 0) ? 'moving_v' : 'moving_h';
+
+                const plat = {
+                    x: cursorX, y: pY, w: pW, h: 26,
+                    baseX: cursorX, baseY: pY, type: pType,
+                    moveRange: 80, moveSpeed: 1.6 + (cfg.id * 0.15),
+                    phase: step * 1.3, crumbleState: 0, crumbleTimer: 0
+                };
+                platforms.push(plat);
+
+                // Górne kładki
+                if (step % 2 === 1) {
+                    const upW = 140;
+                    const upX = cursorX + 25;
+                    const upY = pY - 120;
+                    platforms.push({
+                        x: upX, y: upY, w: upW, h: 22, baseX: upX, baseY: upY,
+                        type: 'upper', crumbleState: 0, crumbleTimer: 0
+                    });
+
+                    // Miksturki
+                    if (step % 3 === 1) {
+                        collectibles.push({
+                            x: upX + upW / 2, y: upY - 45, r: 18,
+                            type: step % 2 === 0 ? 'witch_aura' : 'potion_speed',
+                            collected: false, bob: 0
+                        });
+                    }
+                }
+
+                // Cukierki i lizaki
+                for (let c = 0; c < 3; c++) {
+                    collectibles.push({
+                        x: cursorX + 35 + c * 50,
+                        y: pY - 35 - (c === 1 ? 25 : 0),
+                        r: 12,
+                        type: c === 1 ? 'lollipop' : 'candy',
+                        collected: false, bob: c * 0.7
+                    });
+                }
+
+                // Przeciwnicy
+                if (pW >= 190 && pType !== 'crumble') {
+                    const roll = (step + cfg.id) % 4;
+                    if (roll === 0) {
+                        // 1. Dynia z zezem i krzywym uśmiechem
+                        enemies.push({
+                            x: cursorX + pW / 2, y: pY - 36, w: 38, h: 36,
+                            vx: 1.7, vy: 0, type: 'pumpkin',
+                            minX: cursorX + 8, maxX: cursorX + pW - 46,
+                            jumpTimer: 60, dead: false
+                        });
+                    } else if (roll === 1) {
+                        // 2. Duszek z wywalonym ozorem krzyczący BLEEE
+                        enemies.push({
+                            x: cursorX + pW / 2, y: pY - 100, baseY: pY - 100,
+                            w: 38, h: 42, vx: 1.5, vy: 0, type: 'ghost',
+                            minX: cursorX + 10, maxX: cursorX + pW - 48, dead: false
+                        });
+                    } else if (roll === 2 && cfg.id >= 2) {
+                        // 3. Pan z laską gubiący cylinder
+                        enemies.push({
+                            x: cursorX + pW / 2, y: pY - 60, w: 36, h: 60,
+                            vx: 1.3, vy: 0, type: 'cane_man',
+                            minX: cursorX + 10, maxX: cursorX + pW - 44,
+                            swingTimer: 0, dead: false
+                        });
+                    } else if (roll === 3 && cfg.id >= 3) {
+                        // 4. Derpowaty Cień Mizi z wybałuszonymi oczami
+                        enemies.push({
+                            x: cursorX + pW / 2, y: pY - 44, w: 52, h: 44,
+                            vx: 2.2, vy: 0, type: 'shadow_mizia',
+                            minX: cursorX + 6, maxX: cursorX + pW - 58, dead: false
+                        });
+                    }
+                }
+
+                cursorX += pW;
+            }
+
+            // Kładka końcowa
+            const finishX = cursorX + 80;
+            platforms.push({ x: finishX, y: floorY, w: 520, h: 120, type: 'ground' });
+
+            const goal = {
+                x: finishX + 240, y: floorY - 150, w: 110, h: 150
+            };
+
+            // Inicjalizacja 3 Śmiesznych Bossów
+            let boss = null;
+            if (cfg.boss === 'cane_count') {
+                boss = {
+                    type: 'cane_count',
+                    name: 'Hrabia z Monoklem i Laską',
+                    x: finishX - 120, y: floorY - 140, w: 85, h: 115,
+                    vx: 2.2, vy: 0, minX: finishX - 340, maxX: finishX + 230,
+                    maxHp: 8, hp: 8, hitFlash: 0, jumpTimer: 70, defeated: false
+                };
+            } else if (cfg.boss === 'mega_pumpkin') {
+                boss = {
+                    type: 'mega_pumpkin',
+                    name: 'Mega Dynio-Grom z Zezem',
+                    x: finishX - 120, y: floorY - 140, w: 110, h: 100,
+                    vx: 2.8, vy: 0, minX: finishX - 350, maxX: finishX + 240,
+                    maxHp: 10, hp: 10, hitFlash: 0, jumpTimer: 60, defeated: false
+                };
+            } else if (cfg.boss === 'shadow_prime') {
+                boss = {
+                    type: 'shadow_prime',
+                    name: 'Arcy-Cień Mizi o 3 w Nocy (Zoomies)',
+                    x: finishX - 120, y: floorY - 140, w: 95, h: 90,
+                    vx: 3.5, vy: 0, minX: finishX - 380, maxX: finishX + 260,
+                    maxHp: 12, hp: 12, hitFlash: 0, jumpTimer: 45, defeated: false
+                };
+            }
+
+            return {
+                config: cfg,
+                platforms,
+                collectibles,
+                enemies,
+                goal,
+                boss,
+                totalLength: finishX + 440
+            };
+        }
+
+        // =========================================================================
+        // 4. RYSOWANIE KOTKI MIZI (HALLOWEEN - NEVA MASQUERADE W KAPELUSIKU CZAROWNICY)
+        // =========================================================================
+        function drawMiziaHalloween(ctx, x, y, w, h, opts = {}) {
+            const {
+                facing = 1,
+                walkCycle = 0,
+                vy = 0,
+                onGround = true,
+                doubleSpin = 0,
+                blink = false,
+                auraTimer = 0,
+                speedTimer = 0,
+                invincibleTimer = 0,
+                time = 0
+            } = opts;
+
+            ctx.save();
+            ctx.translate(x + w / 2, y + h / 2);
+
+            if (invincibleTimer > 0 && Math.floor(time * 24) % 2 === 0) {
+                ctx.globalAlpha = 0.5;
+            }
+
+            if (doubleSpin > 0) {
+                ctx.rotate(facing * (1 - doubleSpin) * Math.PI * 2);
+            } else if (!onGround) {
+                ctx.rotate(facing * Math.max(-0.25, Math.min(0.25, vy * 0.025)));
+            }
+
+            ctx.scale(facing, 1);
+
+            // Aura Czarownicy (pomarańczowy, magiczny blask)
+            if (auraTimer > 0) {
+                ctx.save();
+                const p = 1 + Math.sin(time * 8) * 0.1;
+                ctx.strokeStyle = '#f97316';
+                ctx.shadowColor = '#ea580c';
+                ctx.shadowBlur = 14;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(0, 0, w * 0.8 * p, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Pęd Zjawy (fioletowa smuga)
+            if (speedTimer > 0) {
+                ctx.save();
+                ctx.strokeStyle = '#c084fc';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.arc(-6, 0, w * 0.72, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Kolory rasy Neva Masquerade
+            const cream = '#FAF6EE';
+            const shadow = '#EADECF';
+            const pointDark = '#3B2F2F';
+            const pointMid = '#5D4A41';
+
+            // Puszysty ciemny ogonek
+            ctx.save();
+            const tailAngle = Math.sin(time * 6 + walkCycle * 0.5) * 0.28 + (onGround ? 0 : -0.35);
+            ctx.translate(-w * 0.35, h * 0.08);
+            ctx.rotate(tailAngle);
+            const tailG = ctx.createLinearGradient(0, 0, -w * 0.5, -h * 0.35);
+            tailG.addColorStop(0, pointMid);
+            tailG.addColorStop(1, pointDark);
+            ctx.fillStyle = tailG;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(-w * 0.25, 0, -w * 0.55, -h * 0.2, -w * 0.45, -h * 0.42);
+            ctx.bezierCurveTo(-w * 0.35, -h * 0.6, -w * 0.1, -h * 0.3, 0, -h * 0.1);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+
+            // Ciemne skarpetki na łapkach
+            const lA1 = onGround ? Math.sin(walkCycle) * 6 : 4;
+            const lA2 = onGround ? Math.sin(walkCycle + Math.PI) * 6 : -4;
+
+            const drawPaw = (px, py, ang) => {
+                ctx.save();
+                ctx.translate(px, py + ang * 0.3);
+                ctx.fillStyle = shadow;
+                ctx.beginPath();
+                ctx.roundRect(-4, -4, 9, 13, 4);
+                ctx.fill();
+                ctx.fillStyle = pointDark;
+                ctx.beginPath();
+                ctx.roundRect(-4, 3, 9, 7, 3);
+                ctx.fill();
+                ctx.restore();
+            };
+
+            drawPaw(-w * 0.22, h * 0.25, lA2);
+            drawPaw(w * 0.16, h * 0.25, lA1);
+
+            // Puszysty tułów Neva Masquerade
+            ctx.fillStyle = cream;
+            ctx.beginPath();
+            ctx.ellipse(-w * 0.04, h * 0.06, w * 0.36, h * 0.26, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Cień grzbietu
+            ctx.fillStyle = '#E3D6C5';
+            ctx.beginPath();
+            ctx.ellipse(-w * 0.08, -h * 0.02, w * 0.24, h * 0.11, -0.1, 0, Math.PI * 2);
+            ctx.fill();
+
+            drawPaw(-w * 0.14, h * 0.27, lA1);
+            drawPaw(w * 0.23, h * 0.27, lA2);
+
+            // Syberyjska puszysta biała kryza
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.moveTo(w * 0.05, -h * 0.06);
+            ctx.lineTo(w * 0.28, h * 0.05);
+            ctx.lineTo(w * 0.21, h * 0.16);
+            ctx.lineTo(w * 0.25, h * 0.22);
+            ctx.lineTo(w * 0.07, h * 0.23);
+            ctx.lineTo(0, h * 0.16);
+            ctx.closePath();
+            ctx.fill();
+
+            // Głowa
+            ctx.save();
+            ctx.translate(w * 0.18, -h * 0.12);
+
+            ctx.fillStyle = cream;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, w * 0.26, h * 0.23, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Ciemne uszka point
+            ctx.fillStyle = pointDark;
+            ctx.beginPath();
+            ctx.moveTo(-w * 0.16, -h * 0.14);
+            ctx.lineTo(-w * 0.22, -h * 0.36);
+            ctx.lineTo(-w * 0.04, -h * 0.20);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(w * 0.06, -h * 0.20);
+            ctx.lineTo(w * 0.22, -h * 0.36);
+            ctx.lineTo(w * 0.22, -h * 0.12);
+            ctx.closePath();
+            ctx.fill();
+
+            // Maska na pyszczku
+            const mGrad = ctx.createRadialGradient(w * 0.04, 0, 2, w * 0.04, 0, w * 0.18);
+            mGrad.addColorStop(0, pointDark);
+            mGrad.addColorStop(0.65, pointMid);
+            mGrad.addColorStop(1, 'rgba(93, 74, 65, 0)');
+            ctx.fillStyle = mGrad;
+            ctx.beginPath();
+            ctx.ellipse(w * 0.04, 0, w * 0.18, h * 0.15, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Szafirowe błękitne oczy
+            const drawEye = (ex, ey) => {
+                if (blink) {
+                    ctx.strokeStyle = pointDark;
+                    ctx.lineWidth = 2.2;
+                    ctx.beginPath();
+                    ctx.arc(ex, ey, 4, 0.15, Math.PI - 0.15);
+                    ctx.stroke();
+                    return;
+                }
+                ctx.fillStyle = '#38BDF8';
+                ctx.beginPath();
+                ctx.ellipse(ex, ey, 4.6, 5.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#0284C7';
+                ctx.beginPath();
+                ctx.arc(ex, ey - 1, 3.4, Math.PI, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#0F172A';
+                ctx.beginPath();
+                ctx.ellipse(ex + 0.4, ey, 1.8, 3.4, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath();
+                ctx.arc(ex - 1.2, ey - 1.5, 1.4, 0, Math.PI * 2);
+                ctx.fill();
+            };
+
+            drawEye(-3, -1);
+            drawEye(9, -1);
+
+            // Nosek i wąsy
+            ctx.fillStyle = '#F472B6';
+            ctx.beginPath();
+            ctx.moveTo(1.5, 3); ctx.lineTo(6.5, 3); ctx.lineTo(4, 5.5);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(-2, 5); ctx.lineTo(-13, 3);
+            ctx.moveTo(-2, 7); ctx.lineTo(-14, 7);
+            ctx.moveTo(8, 5); ctx.lineTo(19, 3);
+            ctx.moveTo(8, 7); ctx.lineTo(20, 7);
+            ctx.stroke();
+
+            // Kapelusik czarownicy na główce
+            ctx.save();
+            ctx.translate(1, -h * 0.22);
+            ctx.rotate(-0.15 + Math.sin(time * 6) * 0.05);
+
+            // Rondo kapelusza
+            ctx.fillStyle = '#1e1035';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, w * 0.28, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Stożek kapelusza
+            ctx.beginPath();
+            ctx.moveTo(-w * 0.16, 0);
+            ctx.quadraticCurveTo(-4, -h * 0.38, 8, -h * 0.46);
+            ctx.quadraticCurveTo(8, -h * 0.26, w * 0.16, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            // Pomarańczowa wstążka ze złotą sprzączką
+            ctx.fillStyle = '#f97316';
+            ctx.fillRect(-w * 0.15, -6, w * 0.3, 5);
+            ctx.fillStyle = '#fde047';
+            ctx.strokeRect(-3, -7, 6, 6);
+            ctx.restore();
+
+            ctx.restore();
+            ctx.restore();
+        }
+
+        // =========================================================================
+        // 5. RYSOWANIE ŚMIESZNYCH HALLOWEENOWYCH PRZECIWNIKÓW I BOSSÓW
+        // =========================================================================
+        function drawSpookyEnemy(ctx, e, time) {
+            const { x, y, w, h, type, vx } = e;
+            ctx.save();
+            ctx.translate(x + w / 2, y + h / 2);
+
+            if (type === 'pumpkin') {
+                // 1. ZEZOWATA SKACZĄCA DYNIA Z JĘZOREM NA WIERZCHU
+                const bounce = Math.sin(time * 9 + x * 0.1) * 4;
+                ctx.translate(0, bounce);
+
+                // Spłaszczanie przy skoku
+                const squish = 1 + Math.sin(time * 9) * 0.08;
+                ctx.scale(squish, 2 - squish);
+
+                ctx.fillStyle = '#ea580c';
+                ctx.beginPath(); ctx.ellipse(0, 0, w * 0.48, h * 0.44, 0, 0, Math.PI * 2); ctx.fill();
+
+                ctx.fillStyle = '#f97316';
+                ctx.beginPath(); ctx.ellipse(-8, 0, w * 0.28, h * 0.42, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(8, 0, w * 0.28, h * 0.42, 0, 0, Math.PI * 2); ctx.fill();
+
+                // Zielony krzywy badylek
+                ctx.fillStyle = '#15803d';
+                ctx.fillRect(-3, -h * 0.52, 6, 8);
+
+                // Śmieszny zez zbieżny
+                ctx.fillStyle = '#fef08a';
+                ctx.beginPath(); ctx.arc(-8, -6, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(8, -6, 5, 0, Math.PI * 2); ctx.fill();
+
+                // Źrenice patrzące w nos
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath(); ctx.arc(-5, -6, 2.2, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(5, -6, 2.2, 0, Math.PI * 2); ctx.fill();
+
+                // Krzywy zębaty uśmiech z jednym zębem i wywalonym ozorkiem
+                ctx.fillStyle = '#7c2d12';
+                ctx.beginPath();
+                ctx.arc(0, 4, 8, 0, Math.PI); ctx.fill();
+                // Jeden ząbek
+                ctx.fillStyle = '#fef08a';
+                ctx.fillRect(-2, 4, 3, 3);
+                // Różowy wiszący jęzorek
+                ctx.fillStyle = '#fb7185';
+                ctx.beginPath(); ctx.ellipse(2, 10, 4, 5, 0.2, 0, Math.PI * 2); ctx.fill();
+
+            } else if (type === 'ghost') {
+                // 2. DUSZEK ROBIĄCY KOMICZNE „BOOO-BLEEE!” Z WYWALONYM OZOREM
+                const hover = Math.sin(time * 6 + x * 0.1) * 7;
+                const wobble = Math.sin(time * 8) * 0.15;
+                ctx.translate(0, hover);
+                ctx.rotate(wobble);
+
+                ctx.fillStyle = 'rgba(243, 244, 246, 0.9)';
+                ctx.beginPath();
+                ctx.arc(0, -h * 0.15, w * 0.42, Math.PI, 0);
+                ctx.lineTo(w * 0.42, h * 0.35);
+                ctx.quadraticCurveTo(w * 0.2, h * 0.15, 0, h * 0.4);
+                ctx.quadraticCurveTo(-w * 0.2, h * 0.15, -w * 0.42, h * 0.35);
+                ctx.closePath(); ctx.fill();
+
+                // Rączki machające w panice
+                ctx.strokeStyle = 'rgba(243, 244, 246, 0.9)';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(-w * 0.35, -5); ctx.lineTo(-w * 0.55, -12 + Math.sin(time * 12) * 5);
+                ctx.moveTo(w * 0.35, -5); ctx.lineTo(w * 0.55, -12 - Math.sin(time * 12) * 5);
+                ctx.stroke();
+
+                // Wytrzeszczone oczka
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath(); ctx.arc(-7, -8, 4, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(7, -8, 4, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.arc(-6, -9, 1.5, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(8, -9, 1.5, 0, Math.PI * 2); ctx.fill();
+
+                // Wielka otwarta buzia i długi różowy język
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath(); ctx.ellipse(0, 3, 5, 7, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#f43f5e';
+                ctx.beginPath();
+                ctx.ellipse(0, 10 + Math.sin(time * 10) * 2, 4.5, 7, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+            } else if (type === 'cane_man') {
+                // 3. PAN Z LASKĄ - ZRZĘDLIWY STARUSZEK GUBIĄCY CYLINDER
+                const stepSwing = Math.sin(time * 8) * 0.2;
+                ctx.rotate(stepSwing);
+
+                // Fioletowy kubraczek
+                ctx.fillStyle = '#1e1b4b';
+                ctx.beginPath();
+                ctx.moveTo(-10, -h * 0.1); ctx.lineTo(-15, h * 0.42); ctx.lineTo(15, h * 0.42); ctx.lineTo(10, -h * 0.1);
+                ctx.closePath(); ctx.fill();
+
+                // Zmarszczona twarz
+                ctx.fillStyle = '#fde047';
+                ctx.beginPath(); ctx.arc(0, -h * 0.24, 11, 0, Math.PI * 2); ctx.fill();
+
+                // Wielki krzaczasty siwy wąs podskakujący
+                ctx.fillStyle = '#e2e8f0';
+                const mustacheWiggle = Math.sin(time * 12) * 1.5;
+                ctx.beginPath();
+                ctx.ellipse(0, -h * 0.18 + mustacheWiggle, 12, 4.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Okrągłe okularki
+                ctx.strokeStyle = '#0f172a';
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(-8, -h * 0.28, 6, 5);
+                ctx.strokeRect(2, -h * 0.28, 6, 5);
+
+                // Cylinder przekrzywiony komicznie na bok
+                ctx.save();
+                const hatWobble = Math.sin(time * 10) * 0.3;
+                ctx.translate(0, -h * 0.33);
+                ctx.rotate(hatWobble + 0.2);
+                ctx.fillStyle = '#09090b';
+                ctx.fillRect(-15, -2, 30, 4);
+                ctx.fillRect(-8, -20, 16, 18);
+                ctx.fillStyle = '#f97316'; ctx.fillRect(-8, -6, 16, 4);
+                ctx.restore();
+
+                // Laska machająca jak śmigło parasolki
+                ctx.save();
+                const caneAngle = Math.sin(time * 10) * 0.6 + (vx > 0 ? 0.4 : -0.4);
+                ctx.translate(11, -h * 0.05);
+                ctx.rotate(caneAngle);
+                ctx.strokeStyle = '#d97706';
+                ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 36); ctx.stroke();
+                ctx.beginPath(); ctx.arc(5, -2, 5, Math.PI, 0, false); ctx.stroke();
+                ctx.restore();
+
+            } else if (type === 'shadow_mizia') {
+                // 4. ŚMIESZNY DERPOWATY CIEŃ MIZI
+                // Wygląda jak kreskówkowy sobowtór ze świecącymi wybałuszonymi ślepiami i językiem
+                const runBob = Math.sin(time * 14) * 3;
+                ctx.translate(0, runBob);
+
+                ctx.fillStyle = '#090314';
+                ctx.strokeStyle = '#a855f7';
+                ctx.lineWidth = 2.5;
+
+                // Niezgrabne ciałko
+                ctx.beginPath(); ctx.ellipse(0, 6, w * 0.38, h * 0.3, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+                // Ogon sterczący z nietoperzem na końcu
+                ctx.save();
+                ctx.translate(-w * 0.35, 8);
+                ctx.rotate(Math.sin(time * 12) * 0.5 - 0.4);
+                ctx.fillStyle = '#090314';
+                ctx.fillRect(-16, -3, 16, 6);
+                // Nietoperz na ogonku
+                ctx.fillStyle = '#9333ea';
+                ctx.beginPath(); ctx.arc(-18, 0, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+
+                // Głowa z krzywymi uszkami
+                ctx.save();
+                ctx.translate(12, -6);
+                ctx.fillStyle = '#090314';
+                ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+                // Jedno uszko oklapnięte, drugie sterczące
+                ctx.beginPath();
+                ctx.moveTo(-10, -8); ctx.lineTo(-14, -24); ctx.lineTo(-2, -12); // proste
+                ctx.moveTo(4, -12); ctx.lineTo(16, -18); ctx.lineTo(11, -4); // oklapnięte
+                ctx.fill(); ctx.stroke();
+
+                // Wybałuszone, świecące różowo-czerwone ślepia z zezem
+                ctx.fillStyle = '#ff0055';
+                ctx.shadowColor = '#f43f5e'; ctx.shadowBlur = 10;
+                ctx.beginPath(); ctx.arc(-5, -2, 4.5, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(6, -2, 4.5, 0, Math.PI * 2); ctx.fill();
+                ctx.shadowBlur = 0;
+
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.arc(-3, -2, 1.8, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(4, -2, 1.8, 0, Math.PI * 2); ctx.fill();
+
+                // Długaśny fioletowy język dyndający w biegu
+                ctx.fillStyle = '#d946ef';
+                const tongueWave = Math.sin(time * 16) * 3;
+                ctx.beginPath();
+                ctx.ellipse(3, 8 + tongueWave, 4, 7, 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            ctx.restore();
+        }
+
+        // =========================================================================
+        // 5B. RYSOWANIE 3 ŚMIESZNYCH I GROTESKOWYCH BOSSÓW
+        // =========================================================================
+        function drawBoss(ctx, boss, time) {
+            ctx.save();
+            ctx.translate(boss.x + boss.w / 2, boss.y + boss.h / 2);
+
+            if (boss.hitFlash > 0) {
+                ctx.filter = 'brightness(2.5)';
+            }
+
+            if (boss.type === 'cane_count') {
+                // BOSS 1: PAN HRABIA Z MONOKLEM I LASKĄ (Gubi monokl i kręci piruety)
+                const spin = Math.sin(time * 6) * 0.12;
+                ctx.rotate(spin);
+
+                // Czerwono-czarna peleryna wampira z wielkim kołnierzem
+                ctx.fillStyle = '#4c0519';
+                ctx.beginPath();
+                ctx.moveTo(-boss.w * 0.45, -boss.h * 0.2);
+                ctx.lineTo(-boss.w * 0.5, boss.h * 0.45);
+                ctx.lineTo(boss.w * 0.5, boss.h * 0.45);
+                ctx.lineTo(boss.w * 0.45, -boss.h * 0.2);
+                ctx.closePath(); ctx.fill();
+
+                // Ciało i frak
+                ctx.fillStyle = '#1e1b4b';
+                ctx.beginPath(); ctx.roundRect(-boss.w * 0.35, -boss.h * 0.1, boss.w * 0.7, boss.h * 0.5, 12); ctx.fill();
+
+                // Biała koszula z żabotem
+                ctx.fillStyle = '#f8fafc';
+                ctx.beginPath();
+                ctx.moveTo(-8, -boss.h * 0.1); ctx.lineTo(8, -boss.h * 0.1); ctx.lineTo(0, 10); ctx.closePath(); ctx.fill();
+
+                // Głowa z arystokratycznym nosem
+                ctx.fillStyle = '#fef08a';
+                ctx.beginPath(); ctx.arc(0, -boss.h * 0.25, 18, 0, Math.PI * 2); ctx.fill();
+
+                // Spadający i dyndający na sznurku monokl!
+                const monocleDrop = Math.sin(time * 10) * 8;
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(7, -boss.h * 0.25 + monocleDrop, 6, 0, Math.PI * 2); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(7, -boss.h * 0.25); ctx.lineTo(7, -boss.h * 0.25 + monocleDrop); ctx.stroke();
+
+                // Kręcona laska wirująca jak śmigłowiec
+                ctx.save();
+                const laskaAngle = time * 8;
+                ctx.translate(boss.w * 0.38, 0);
+                ctx.rotate(laskaAngle);
+                ctx.strokeStyle = '#d97706';
+                ctx.lineWidth = 5;
+                ctx.beginPath(); ctx.moveTo(0, -25); ctx.lineTo(0, 25); ctx.stroke();
+                ctx.beginPath(); ctx.arc(6, -25, 6, Math.PI, 0); ctx.stroke();
+                ctx.restore();
+
+                // Komiczny wysoki cylinder ze złotą czaszką
+                ctx.fillStyle = '#09090b';
+                ctx.fillRect(-22, -boss.h * 0.42, 44, 6);
+                ctx.fillRect(-14, -boss.h * 0.72, 28, 32);
+                ctx.fillStyle = '#f43f5e'; ctx.fillRect(-14, -boss.h * 0.48, 28, 6);
+
+            } else if (boss.type === 'mega_pumpkin') {
+                // BOSS 2: MEGA DYNIO-GROM Z ZEZEM (Tocząca się olbrzymia dynia)
+                const rollAngle = (boss.vx > 0 ? 1 : -1) * (time * 5);
+                const squish = 1 + Math.sin(time * 8) * 0.08;
+                ctx.scale(squish, 2 - squish);
+
+                // Olbrzymia dynia
+                ctx.fillStyle = '#c2410c';
+                ctx.beginPath(); ctx.ellipse(0, 0, boss.w * 0.48, boss.h * 0.45, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#ea580c';
+                ctx.beginPath(); ctx.ellipse(-15, 0, boss.w * 0.3, boss.h * 0.44, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(15, 0, boss.w * 0.3, boss.h * 0.44, 0, 0, Math.PI * 2); ctx.fill();
+
+                // Gigantyczny zez rozbieżny (jedno oko w górę, drugie w dół)
+                ctx.fillStyle = '#fef08a';
+                ctx.beginPath(); ctx.arc(-18, -10, 11, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(18, -10, 11, 0, Math.PI * 2); ctx.fill();
+
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath(); ctx.arc(-22, -14, 4.5, 0, Math.PI * 2); ctx.fill(); // oko w lewo-górę
+                ctx.beginPath(); ctx.arc(22, -6, 4.5, 0, Math.PI * 2); ctx.fill();  // oko w prawo-dół
+
+                // Otwarta paszcza plująca nasionkami
+                ctx.fillStyle = '#7c2d12';
+                ctx.beginPath(); ctx.ellipse(0, 16, 18, 12, 0, 0, Math.PI * 2); ctx.fill();
+
+                // Wystające nasionka wokół paszczy
+                ctx.fillStyle = '#fef08a';
+                for (let s = 0; s < 3; s++) {
+                    const sx = -10 + s * 10;
+                    ctx.beginPath(); ctx.ellipse(sx, 16, 2.5, 4, 0.4, 0, Math.PI * 2); ctx.fill();
+                }
+
+                // Zielony krzywy ogonek z liściem
+                ctx.fillStyle = '#15803d';
+                ctx.fillRect(-6, -boss.h * 0.54, 12, 14);
+
+            } else if (boss.type === 'shadow_prime') {
+                // BOSS 3 (FINAŁ): ARCYMISTRZ CIEŃ MIZI O 3 W NOCY (KOCIE ZOOMIES)
+                // Komiczny cień w papierowej koronie biegający w amoku
+                const zoomWobble = Math.sin(time * 18) * 0.15;
+                ctx.rotate(zoomWobble);
+
+                // Ciemna sylwetka z fioletowym płomieniem
+                ctx.fillStyle = '#05010a';
+                ctx.strokeStyle = '#d946ef';
+                ctx.lineWidth = 3.5;
+
+                ctx.beginPath();
+                ctx.ellipse(0, 10, boss.w * 0.44, boss.h * 0.38, 0, 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+
+                // Czarna powiewająca pelerynka z ręcznika
+                ctx.fillStyle = '#311042';
+                ctx.beginPath();
+                ctx.moveTo(-boss.w * 0.3, -5);
+                ctx.lineTo(-boss.w * 0.55 + Math.sin(time * 14) * 8, boss.h * 0.4);
+                ctx.lineTo(-boss.w * 0.2, boss.h * 0.3);
+                ctx.closePath(); ctx.fill();
+
+                // Głowa z wywalonym językiem
+                ctx.fillStyle = '#05010a';
+                ctx.beginPath(); ctx.arc(15, -12, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+                // Uszka nietoperzowe
+                ctx.beginPath();
+                ctx.moveTo(0, -22); ctx.lineTo(-8, -42); ctx.lineTo(12, -26);
+                ctx.moveTo(18, -26); ctx.lineTo(32, -44); ctx.lineTo(30, -18);
+                ctx.fill(); ctx.stroke();
+
+                // Papierowa złota krzywa korona z napisem "3 AM"
+                ctx.fillStyle = '#facc15';
+                ctx.beginPath();
+                ctx.moveTo(2, -32); ctx.lineTo(4, -46); ctx.lineTo(12, -36);
+                ctx.lineTo(20, -48); ctx.lineTo(26, -34); ctx.closePath(); ctx.fill();
+
+                // Płonące hipnotyczne ślepia szalonego kota
+                ctx.fillStyle = '#ef4444';
+                ctx.shadowColor = '#f43f5e'; ctx.shadowBlur = 12;
+                ctx.beginPath(); ctx.arc(10, -12, 6, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(24, -12, 6, 0, Math.PI * 2); ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Szalone spirale w oczach
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.arc(10, -12, 3, 0, Math.PI * 1.5); ctx.stroke();
+                ctx.beginPath(); ctx.arc(24, -12, 3, 0, Math.PI * 1.5); ctx.stroke();
+
+                // Długi, chyboczący się ozorek
+                ctx.fillStyle = '#f43f5e';
+                const tWave = Math.sin(time * 20) * 5;
+                ctx.beginPath();
+                ctx.ellipse(20, 6 + tWave, 6, 12, 0.4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Pasek życia Bossa
+            ctx.filter = 'none';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(-45, -boss.h * 0.78, 90, 8);
+            const r = Math.max(0, boss.hp / boss.maxHp);
+            ctx.fillStyle = '#f97316';
+            ctx.fillRect(-44, -boss.h * 0.77, 88 * r, 6);
+
+            ctx.restore();
+        }
+
+        // =========================================================================
+        // 6. SILNIK GRY I FIZYKA
+        // =========================================================================
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // UI elementy
+        const hud = document.getElementById('hud');
+        const hudHearts = document.getElementById('hudHearts');
+        const hudScore = document.getElementById('hudScore');
+        const hudLevelTitle = document.getElementById('hudLevelTitle');
+        const hudProgressValue = document.getElementById('hudProgressValue');
+        const hudProgressBar = document.getElementById('hudProgressBar');
+        const hudBuffs = document.getElementById('hudBuffs');
+        const touchControls = document.getElementById('touchControls');
+
+        const menuScreen = document.getElementById('menuScreen');
+        const levelSelectScreen = document.getElementById('levelSelectScreen');
+        const levelGrid = document.getElementById('levelGrid');
+        const winLevelScreen = document.getElementById('winLevelScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const pauseScreen = document.getElementById('pauseScreen');
+        const victoryScreen = document.getElementById('victoryScreen');
+
+        const pumpkinSoupCutsceneScreen = document.getElementById('pumpkinSoupCutsceneScreen');
+        const soupCanvas = document.getElementById('soupCanvas');
+        const soupCtx = soupCanvas ? soupCanvas.getContext('2d') : null;
+        const soupDialogueText = document.getElementById('soupDialogueText');
+
+        let gameState = 'MENU';
+        let currentLevelIdx = 0;
+        let levelData = null;
+        let score = 0;
+        let globalTime = 0;
+        let soupAnimTime = 0;
+        let viewScale = 1;
+        let viewWidth = window.innerWidth || 800;
+        let viewHeight = window.innerHeight || 600;
+
+        const mizia = {
+            x: 100, y: 380, w: 54, h: 46, vx: 0, vy: 0,
+            facing: 1, onGround: false, jumpsLeft: 2,
+            jumpBuffer: 0, coyoteTimer: 0, walkCycle: 0,
+            doubleSpin: 0, lives: 3, maxLives: 4,
+            invincibleTimer: 0, auraTimer: 0, speedTimer: 0,
+            blinkTimer: 0, isBlinking: false, standingPlat: null
+        };
+
+        const camera = { x: 0, y: 0 };
+        let particles = [];
+        let floatingTexts = [];
+
+        const input = { left: false, right: false };
+
+        function resize() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+
+            const isPortrait = h > w;
+            const targetHeight = isPortrait ? 740 : 620;
+            viewScale = (h * dpr) / targetHeight;
+            viewWidth = (w * dpr) / viewScale;
+            viewHeight = targetHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function renderMenuPreview() {
+            const pCanvas = document.getElementById('miziaPreviewCanvas');
+            if (!pCanvas) return;
+            const pCtx = pCanvas.getContext('2d');
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+
+            const g = pCtx.createRadialGradient(90, 90, 15, 90, 90, 85);
+            g.addColorStop(0, '#f97316');
+            g.addColorStop(1, '#1e1035');
+            pCtx.fillStyle = g;
+            pCtx.beginPath(); pCtx.arc(90, 90, 80, 0, Math.PI * 2); pCtx.fill();
+
+            pCtx.save();
+            pCtx.translate(28, 42);
+            drawMiziaHalloween(pCtx, 0, 0, 125, 105, {
+                facing: 1, walkCycle: globalTime * 3, onGround: true,
+                blink: Math.sin(globalTime * 3) > 0.94, time: globalTime
+            });
+            pCtx.restore();
+        }
+
+        function spawnFx(x, y, col, count = 10, speed = 4) {
+            for (let i = 0; i < count; i++) {
+                const ang = Math.random() * Math.PI * 2;
+                const spd = (0.3 + Math.random() * 0.8) * speed;
+                particles.push({
+                    x, y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - 1,
+                    r: 3 + Math.random() * 3, color: col, life: 0.5 + Math.random() * 0.3
+                });
+            }
+        }
+
+        function spawnText(x, y, text, col = '#fde047') {
+            floatingTexts.push({ x, y, text, color: col, vy: -1.6, life: 0.9 });
+        }
+
+        function loadLevel(idx) {
+            currentLevelIdx = idx;
+            const cfg = HALLOWEEN_LEVELS[idx];
+            levelData = generateHalloweenLevel(cfg);
+
+            mizia.x = 100;
+            mizia.y = 380;
+            mizia.vx = 0;
+            mizia.vy = 0;
+            mizia.facing = 1;
+            mizia.onGround = false;
+            mizia.jumpsLeft = 2;
+            mizia.lives = 3;
+            mizia.auraTimer = 0;
+            mizia.speedTimer = 0;
+            mizia.invincibleTimer = 1.0;
+            mizia.standingPlat = null;
+
+            particles = [];
+            floatingTexts = [];
+            camera.x = 0;
+            updateHUD();
+        }
+
+        function updateHUD() {
+            let hStr = '';
+            for (let i = 0; i < mizia.maxLives; i++) {
+                if (i < mizia.lives) hStr += '❤️';
+                else if (i < 3) hStr += '🖤';
+            }
+            hudHearts.textContent = hStr;
+            hudScore.textContent = score;
+
+            if (levelData) {
+                if (levelData.boss && !levelData.boss.defeated) {
+                    hudLevelTitle.textContent = `⚔️ ${levelData.boss.name}`;
+                    const bHp = Math.round((levelData.boss.hp / levelData.boss.maxHp) * 100);
+                    hudProgressValue.textContent = `${bHp}% HP`;
+                    hudProgressBar.style.width = `${bHp}%`;
+                } else {
+                    hudLevelTitle.textContent = `Etap ${levelData.config.id}: ${levelData.config.name}`;
+                    const prog = Math.min(100, Math.round((mizia.x / levelData.goal.x) * 100));
+                    hudProgressValue.textContent = `${prog}%`;
+                    hudProgressBar.style.width = `${prog}%`;
+                }
+            }
+
+            let bHtml = '';
+            if (mizia.auraTimer > 0) bHtml += `<span class="bg-orange-950/80 border border-orange-500 text-orange-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🎃 Aura Czarownicy ${mizia.auraTimer.toFixed(1)}s</span>`;
+            if (mizia.speedTimer > 0) bHtml += `<span class="bg-purple-950/80 border border-purple-400 text-purple-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">⚡ Pęd Zjawy ${mizia.speedTimer.toFixed(1)}s</span>`;
+            hudBuffs.innerHTML = bHtml;
+        }
+
+        function triggerJump() {
+            mizia.jumpBuffer = 0.16;
+        }
+
+        function updateGame(dt) {
+            globalTime += dt;
+            if (gameState !== 'PLAYING' || !levelData) return;
+
+            if (mizia.invincibleTimer > 0) mizia.invincibleTimer = Math.max(0, mizia.invincibleTimer - dt);
+            if (mizia.auraTimer > 0) mizia.auraTimer = Math.max(0, mizia.auraTimer - dt);
+            if (mizia.speedTimer > 0) mizia.speedTimer = Math.max(0, mizia.speedTimer - dt);
+            if (mizia.coyoteTimer > 0) mizia.coyoteTimer = Math.max(0, mizia.coyoteTimer - dt);
+            if (mizia.jumpBuffer > 0) mizia.jumpBuffer = Math.max(0, mizia.jumpBuffer - dt);
+            if (mizia.doubleSpin > 0) mizia.doubleSpin = Math.max(0, mizia.doubleSpin - dt * 2.8);
+
+            mizia.blinkTimer -= dt;
+            if (mizia.blinkTimer <= 0) {
+                mizia.isBlinking = !mizia.isBlinking;
+                mizia.blinkTimer = mizia.isBlinking ? 0.14 : (2.2 + Math.random() * 2.5);
+            }
+
+            // Platformy
+            for (const p of levelData.platforms) {
+                p.dx = 0; p.dy = 0;
+                if (p.type === 'moving_h') {
+                    const prevX = p.x;
+                    p.x = p.baseX + Math.sin(globalTime * p.moveSpeed + p.phase) * p.moveRange;
+                    p.dx = p.x - prevX;
+                } else if (p.type === 'moving_v') {
+                    const prevY = p.y;
+                    p.y = p.baseY + Math.sin(globalTime * p.moveSpeed + p.phase) * (p.moveRange * 0.7);
+                    p.dy = p.y - prevY;
+                } else if (p.type === 'crumble') {
+                    if (p.crumbleState === 1) {
+                        p.crumbleTimer -= dt;
+                        if (p.crumbleTimer <= 0) {
+                            p.crumbleState = 2; p.crumbleTimer = 2.4;
+                            spawnFx(p.x + p.w / 2, p.y + 10, '#c084fc', 12, 3);
+                        }
+                    } else if (p.crumbleState === 2) {
+                        p.crumbleTimer -= dt;
+                        if (p.crumbleTimer <= 0) p.crumbleState = 0;
+                    }
+                }
+            }
+
+            // Ruch poziomy
+            const maxSpd = mizia.speedTimer > 0 ? 7.6 : 5.2;
+            const accel = 0.8;
+            const friction = 0.82;
+
+            if (input.left) {
+                mizia.vx = Math.max(mizia.vx - accel, -maxSpd);
+                mizia.facing = -1;
+                mizia.walkCycle += dt * 12;
+            } else if (input.right) {
+                mizia.vx = Math.min(mizia.vx + accel, maxSpd);
+                mizia.facing = 1;
+                mizia.walkCycle += dt * 12;
+            } else {
+                mizia.vx *= friction;
+                if (Math.abs(mizia.vx) < 0.08) mizia.vx = 0;
+            }
+
+            // Wpływ ruchomej platformy
+            if (mizia.onGround && mizia.standingPlat) {
+                mizia.x += mizia.standingPlat.dx || 0;
+                mizia.y += mizia.standingPlat.dy || 0;
+            }
+
+            // Skoki
+            if (mizia.jumpBuffer > 0) {
+                const jForce = mizia.speedTimer > 0 ? -13.5 : -12.0;
+                if (mizia.onGround || mizia.coyoteTimer > 0) {
+                    mizia.vy = jForce;
+                    mizia.onGround = false;
+                    mizia.coyoteTimer = 0;
+                    mizia.jumpsLeft = 1;
+                    mizia.jumpBuffer = 0;
+                    mizia.standingPlat = null;
+                    sfx.jump(false);
+                    spawnFx(mizia.x + mizia.w / 2, mizia.y + mizia.h, '#FAF6EE', 8, 2.5);
+                } else if (mizia.jumpsLeft > 0) {
+                    mizia.vy = jForce * 0.92;
+                    mizia.jumpsLeft--;
+                    mizia.jumpBuffer = 0;
+                    mizia.doubleSpin = 1.0;
+                    sfx.jump(true);
+                    spawnFx(mizia.x + mizia.w / 2, mizia.y + mizia.h, '#f97316', 14, 3.5);
+                }
+            }
+
+            // Grawitacja
+            mizia.vy = Math.min(mizia.vy + 0.56, 14);
+
+            const prevBottom = mizia.y + mizia.h;
+            mizia.x += mizia.vx;
+            mizia.y += mizia.vy;
+
+            if (mizia.x < 10) { mizia.x = 10; mizia.vx = 0; }
+
+            // Kolizja z platformami
+            let landed = false;
+            mizia.standingPlat = null;
+
+            if (mizia.vy >= 0) {
+                for (const p of levelData.platforms) {
+                    if (p.crumbleState === 2) continue;
+                    const inX = mizia.x + mizia.w * 0.78 > p.x && mizia.x + mizia.w * 0.22 < p.x + p.w;
+                    const hitTop = prevBottom <= p.y + 14 && (mizia.y + mizia.h) >= p.y;
+
+                    if (inX && hitTop) {
+                        if (p.type === 'trampoline_pumpkin') {
+                            mizia.vy = -16.5;
+                            mizia.onGround = false;
+                            mizia.jumpsLeft = 2;
+                            sfx.bounce();
+                            spawnFx(mizia.x + mizia.w / 2, p.y, '#f97316', 16, 4);
+                            spawnText(mizia.x, p.y - 10, 'DYNIA WYBIJA! 🎃', '#f97316');
+                            landed = false;
+                            break;
+                        }
+
+                        mizia.y = p.y - mizia.h;
+                        mizia.vy = 0;
+                        mizia.onGround = true;
+                        mizia.coyoteTimer = 0.12;
+                        mizia.jumpsLeft = 2;
+                        mizia.standingPlat = p;
+                        landed = true;
+
+                        if (p.type === 'crumble' && p.crumbleState === 0) {
+                            p.crumbleState = 1;
+                            p.crumbleTimer = 0.55;
+                        }
+                        break;
+                    }
+                }
+            }
+            if (!landed) mizia.onGround = false;
+
+            if (mizia.y > 720) damagePlayer(true);
+
+            // Zbieranie cukierków i eliksirów
+            const mcX = mizia.x + mizia.w / 2;
+            const mcY = mizia.y + mizia.h / 2;
+            for (const item of levelData.collectibles) {
+                if (item.collected) continue;
+                if (Math.hypot(mcX - item.x, mcY - item.y) < item.r + 26) {
+                    item.collected = true;
+                    if (item.type === 'candy') {
+                        score += 50;
+                        sfx.candy();
+                        spawnFx(item.x, item.y, '#f97316', 8, 3);
+                        spawnText(item.x, item.y, '+50 🍬', '#fde047');
+                    } else if (item.type === 'lollipop') {
+                        score += 100;
+                        sfx.candy();
+                        spawnFx(item.x, item.y, '#c084fc', 10, 3.5);
+                        spawnText(item.x, item.y, '+100 🍭', '#c084fc');
+                    } else if (item.type === 'witch_aura') {
+                        mizia.auraTimer = 8.0;
+                        score += 150;
+                        sfx.potion();
+                        spawnFx(item.x, item.y, '#f97316', 16, 4);
+                        spawnText(item.x, item.y, 'AURA CZAROWNICY! 🎃', '#f97316');
+                    } else if (item.type === 'potion_speed') {
+                        mizia.speedTimer = 7.0;
+                        score += 150;
+                        sfx.potion();
+                        spawnFx(item.x, item.y, '#a855f7', 16, 4);
+                        spawnText(item.x, item.y, 'PĘD ZJAWY! ⚡', '#a855f7');
+                    }
+                }
+            }
+
+            // Przeciwnicy Halloween
+            for (const e of levelData.enemies) {
+                if (e.dead) continue;
+
+                if (e.type === 'pumpkin') {
+                    e.x += e.vx;
+                    if (e.x <= e.minX) { e.x = e.minX; e.vx = Math.abs(e.vx); }
+                    if (e.x >= e.maxX) { e.x = e.maxX; e.vx = -Math.abs(e.vx); }
+                    e.jumpTimer--;
+                    if (e.jumpTimer <= 0) {
+                        e.vy = -8.5;
+                        e.jumpTimer = 75;
+                    }
+                    e.vy += 0.45;
+                    e.y += e.vy;
+                    const gy = 520 - e.h;
+                    if (e.y >= gy) { e.y = gy; e.vy = 0; }
+                } else if (e.type === 'ghost') {
+                    e.x += e.vx;
+                    e.y = e.baseY + Math.sin(globalTime * 4 + e.x * 0.05) * 25;
+                    if (e.x <= e.minX) { e.x = e.minX; e.vx = Math.abs(e.vx); }
+                    if (e.x >= e.maxX) { e.x = e.maxX; e.vx = -Math.abs(e.vx); }
+                } else if (e.type === 'cane_man') {
+                    e.x += e.vx;
+                    if (e.x <= e.minX) { e.x = e.minX; e.vx = Math.abs(e.vx); }
+                    if (e.x >= e.maxX) { e.x = e.maxX; e.vx = -Math.abs(e.vx); }
+                } else if (e.type === 'shadow_mizia') {
+                    // Cień ściga Mizię w swoim rewirze
+                    const dist = mizia.x - e.x;
+                    if (Math.abs(dist) < 320) e.vx = (dist > 0 ? 1 : -1) * 2.6;
+                    e.x += e.vx;
+                    if (e.x <= e.minX) { e.x = e.minX; e.vx = 2.0; }
+                    if (e.x >= e.maxX) { e.x = e.maxX; e.vx = -2.0; }
+                }
+
+                // Kolizja Mizi z potworem
+                const p = 8;
+                if (
+                    mizia.x + mizia.w - p > e.x + p &&
+                    mizia.x + p < e.x + e.w - p &&
+                    mizia.y + mizia.h - p > e.y + p &&
+                    mizia.y + p < e.y + e.h - p
+                ) {
+                    if (mizia.auraTimer > 0) {
+                        e.dead = true;
+                        score += 200;
+                        sfx.poof();
+                        spawnFx(e.x + e.w / 2, e.y + e.h / 2, '#f97316', 16, 4.5);
+                        spawnText(e.x, e.y, '+200 ROZWIANE! 💥', '#f97316');
+                    } else if (mizia.invincibleTimer <= 0) {
+                        damagePlayer(false);
+                    }
+                }
+            }
+
+            // Boss - Król Cieni
+            if (levelData.boss && !levelData.boss.defeated) {
+                const b = levelData.boss;
+                if (b.hitFlash > 0) b.hitFlash -= dt;
+
+                b.x += b.vx;
+                if (b.x <= b.minX) { b.x = b.minX; b.vx = Math.abs(b.vx); }
+                if (b.x >= b.maxX) { b.x = b.maxX; b.vx = -Math.abs(b.vx); }
+
+                b.jumpTimer--;
+                if (b.jumpTimer <= 0) {
+                    b.vy = -10.5;
+                    b.jumpTimer = 85;
+                }
+                b.vy += 0.45;
+                b.y += b.vy;
+                const bFloor = 520 - b.h;
+                if (b.y >= bFloor) { b.y = bFloor; b.vy = 0; }
+
+                // Skok na głowę Bossa
+                const hitHead = (mizia.vy > 0 && prevBottom <= b.y + 24 && mizia.y + mizia.h >= b.y &&
+                    mizia.x + mizia.w > b.x && mizia.x < b.x + b.w);
+
+                if (hitHead || (mizia.auraTimer > 0 &&
+                    mizia.x + mizia.w > b.x && mizia.x < b.x + b.w &&
+                    mizia.y + mizia.h > b.y && mizia.y < b.y + b.h)) {
+
+                    b.hp--;
+                    b.hitFlash = 0.25;
+                    mizia.vy = -12;
+                    mizia.jumpsLeft = 2;
+                    sfx.poof();
+                    spawnFx(b.x + b.w / 2, b.y + b.h / 2, '#c084fc', 20, 5);
+                    spawnText(b.x + b.w / 2, b.y, '-1 HP! 💥', '#ef4444');
+
+                    if (b.hp <= 0) {
+                        b.defeated = true;
+                        score += 2000;
+                        sfx.spookyWin();
+                        spawnFx(b.x + b.w / 2, b.y + b.h / 2, '#fde047', 40, 7);
+                        spawnText(b.x, b.y - 30, 'CIEŃ POKONANY! 🎃', '#f59e0b');
+                    }
+                } else if (mizia.invincibleTimer <= 0 &&
+                    mizia.x + mizia.w - 12 > b.x && mizia.x + 12 < b.x + b.w &&
+                    mizia.y + mizia.h - 12 > b.y && mizia.y + 12 < b.y + b.h) {
+                    damagePlayer(false);
+                }
+            }
+
+            // Meta
+            if (levelData.goal && (!levelData.boss || levelData.boss.defeated)) {
+                const g = levelData.goal;
+                if (mizia.x + mizia.w > g.x + 10 && mizia.x < g.x + g.w - 10 && mizia.y + mizia.h > g.y) {
+                    onLevelComplete();
+                    return;
+                }
+            }
+
+            // Kamera
+            const maxCam = Math.max(0, levelData.totalLength - viewWidth * 0.7);
+            const targetCam = Math.max(0, Math.min(maxCam, mizia.x - viewWidth * 0.28));
+            camera.x += (targetCam - camera.x) * 0.12;
+
+            // Cząsteczki
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const pt = particles[i];
+                pt.x += pt.vx; pt.y += pt.vy; pt.vy += 0.15; pt.life -= dt;
+                if (pt.life <= 0) particles.splice(i, 1);
+            }
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                const ft = floatingTexts[i];
+                ft.y += ft.vy; ft.life -= dt;
+                if (ft.life <= 0) floatingTexts.splice(i, 1);
+            }
+
+            updateHUD();
+        }
+
+        function damagePlayer(fell) {
+            sfx.boo();
+            mizia.lives--;
+            spawnFx(mizia.x + mizia.w / 2, mizia.y + mizia.h / 2, '#f43f5e', 18, 5);
+            spawnText(mizia.x, mizia.y - 10, 'STRASZNE! 🙀', '#f43f5e');
+
+            if (mizia.lives <= 0) {
+                gameState = 'GAME_OVER';
+                hud.classList.add('hidden');
+                touchControls.classList.add('hidden');
+                document.getElementById('gameOverScore').textContent = `${score} pkt`;
+                gameOverScreen.classList.remove('hidden');
+                return;
+            }
+
+            mizia.invincibleTimer = 2.0;
+
+            if (fell) {
+                mizia.x = 100;
+                mizia.y = 380;
+                mizia.vx = 0; mizia.vy = 0;
+            } else {
+                mizia.vy = -8.5;
+                mizia.vx = -mizia.facing * 5.5;
+            }
+            updateHUD();
+        }
+
+        // =========================================================================
+        // 7. ŚMIESZNA ANIMACJA FINAŁOWA: MIZIA I GIGANTYCZNA MISKA ZUPY DYNIOWEJ
+        // =========================================================================
+        const SOUP_DIALOGUES = [
+            "„Mniaaaam! Chłept, chłept... Zupka dyniowa ze śmietanką!” 👅🎃",
+            "„Uszka całe w zupie, ale brzuszek rośnie jak dynia!” 🍲😻",
+            "„*BEK!* Przepraszam, to z radości po wygnaniu Cienia!” 🤪💫",
+            "„Kto by pomyślał, że Neva Masquerade aż tak kocha dynię?” 🎃✨"
+        ];
+
+        function renderPumpkinSoupCutscene(dt) {
+            if (!soupCtx) return;
+            soupAnimTime += dt;
+            const w = soupCanvas.width;
+            const h = soupCanvas.height;
+
+            soupCtx.clearRect(0, 0, w, h);
+
+            // Mroczne, przytulne wnętrze nawiedzonej kuchni
+            const bg = soupCtx.createLinearGradient(0, 0, 0, h);
+            bg.addColorStop(0, '#1c072c');
+            bg.addColorStop(0.6, '#2e0f47');
+            bg.addColorStop(1, '#0c0214');
+            soupCtx.fillStyle = bg;
+            soupCtx.fillRect(0, 0, w, h);
+
+            // Drewniany stół biesiadny
+            soupCtx.fillStyle = '#451a03';
+            soupCtx.fillRect(0, h - 85, w, 85);
+            soupCtx.fillStyle = '#78350f';
+            soupCtx.fillRect(0, h - 85, w, 8);
+
+            // Parujące ciepłe kłęby aromatu dyniowego (pomarańczowo-złote serduszka pary)
+            for (let i = 0; i < 4; i++) {
+                const t = (soupAnimTime * 0.9 + i * 0.6) % 2.4;
+                const sy = (h - 130) - t * 45;
+                const sx = 160 + i * 40 + Math.sin(soupAnimTime * 2 + i) * 12;
+                soupCtx.save();
+                soupCtx.globalAlpha = Math.max(0, 1 - (t / 2.4)) * 0.55;
+                soupCtx.font = `${14 + i * 2}px sans-serif`;
+                soupCtx.fillText('💨', sx, sy);
+                if (i % 2 === 0) soupCtx.fillText('🎃', sx + 12, sy - 6);
+                soupCtx.restore();
+            }
+
+            // GIGANTYCZNA MISKA (KOCIOŁEK) Z ZUPĄ DYNIOWĄ
+            const bowlX = w / 2 - 130;
+            const bowlY = h - 170;
+            const bowlW = 260;
+            const bowlH = 100;
+
+            // Zewnętrzna krawędź miski (antyczny fioletowo-złoty kociołek)
+            soupCtx.fillStyle = '#1e1b4b';
+            soupCtx.beginPath();
+            soupCtx.moveTo(bowlX, bowlY + 20);
+            soupCtx.quadraticCurveTo(bowlX + 20, bowlY + bowlH, bowlX + 70, bowlY + bowlH);
+            soupCtx.lineTo(bowlX + bowlW - 70, bowlY + bowlH);
+            soupCtx.quadraticCurveTo(bowlX + bowlW - 20, bowlY + bowlH, bowlX + bowlW, bowlY + 20);
+            soupCtx.closePath();
+            soupCtx.fill();
+
+            // Złote uchwyty miski
+            soupCtx.strokeStyle = '#f59e0b';
+            soupCtx.lineWidth = 4;
+            soupCtx.stroke();
+
+            // Gorąca, lśniąca pomarańczowa zupa dyniowa
+            const soupGrad = soupCtx.createLinearGradient(0, bowlY, 0, bowlY + bowlH);
+            soupGrad.addColorStop(0, '#f97316');
+            soupGrad.addColorStop(0.5, '#ea580c');
+            soupGrad.addColorStop(1, '#c2410c');
+            soupCtx.fillStyle = soupGrad;
+            soupCtx.beginPath();
+            soupCtx.ellipse(w / 2, bowlY + 25, bowlW * 0.46, 22, 0, 0, Math.PI * 2);
+            soupCtx.fill();
+
+            // Śmietankowy wzorek pajęczyny na zupie dyniowej!
+            soupCtx.strokeStyle = '#fef08a';
+            soupCtx.lineWidth = 2.2;
+            soupCtx.beginPath();
+            soupCtx.arc(w / 2 - 20, bowlY + 25, 12, 0, Math.PI * 2);
+            soupCtx.arc(w / 2 - 20, bowlY + 25, 22, 0, Math.PI * 2);
+            soupCtx.stroke();
+
+            // KOTKA MIZIA OBJADAJĄCA SIĘ ZUPĄ
+            const catX = w / 2 + 15;
+            const catY = bowlY - 12 + Math.sin(soupAnimTime * 4) * 3;
+
+            soupCtx.save();
+            soupCtx.translate(catX, catY);
+
+            // Wielki, pękaty brzuszek Mizi (jak piłeczka od zupki!)
+            soupCtx.fillStyle = '#FAF6EE';
+            soupCtx.beginPath();
+            soupCtx.ellipse(-15, 24, 38, 30, 0, 0, Math.PI * 2);
+            soupCtx.fill();
+
+            // Puszysty ciemny ogon machający w zachwycie
+            soupCtx.save();
+            soupCtx.translate(-45, 25);
+            soupCtx.rotate(Math.sin(soupAnimTime * 8) * 0.4);
+            soupCtx.fillStyle = '#3B2F2F';
+            soupCtx.beginPath();
+            soupCtx.ellipse(-15, -10, 18, 9, -0.4, 0, Math.PI * 2);
+            soupCtx.fill();
+            soupCtx.restore();
+
+            // Syberyjska kryza wokół szyi
+            soupCtx.fillStyle = '#FFFFFF';
+            soupCtx.beginPath();
+            soupCtx.moveTo(-25, 0);
+            soupCtx.lineTo(-10, 15);
+            soupCtx.lineTo(10, 15);
+            soupCtx.lineTo(25, 0);
+            soupCtx.fill();
+
+            // Głowa Mizi pochylona nad miską
+            soupCtx.fillStyle = '#FAF6EE';
+            soupCtx.beginPath();
+            soupCtx.ellipse(0, -18, 32, 26, 0, 0, Math.PI * 2);
+            soupCtx.fill();
+
+            // Ciemne uszka Neva Masquerade - UBRUDZONE POMARAŃCZOWĄ ZUPKĄ!
+            soupCtx.fillStyle = '#3B2F2F';
+            soupCtx.beginPath();
+            soupCtx.moveTo(-26, -26); soupCtx.lineTo(-34, -50); soupCtx.lineTo(-10, -34);
+            soupCtx.closePath(); soupCtx.fill();
+            soupCtx.beginPath();
+            soupCtx.moveTo(10, -34); soupCtx.lineTo(34, -50); soupCtx.lineTo(26, -26);
+            soupCtx.closePath(); soupCtx.fill();
+
+            // Kleksy zupy na uszkach
+            soupCtx.fillStyle = '#ea580c';
+            soupCtx.beginPath(); soupCtx.arc(-26, -42, 5, 0, Math.PI * 2); soupCtx.fill();
+            soupCtx.beginPath(); soupCtx.arc(26, -42, 6, 0, Math.PI * 2); soupCtx.fill();
+
+            // Maska point na pyszczku
+            const mGrad = soupCtx.createRadialGradient(0, -12, 2, 0, -12, 22);
+            mGrad.addColorStop(0, '#3B2F2F');
+            mGrad.addColorStop(0.7, '#5D4A41');
+            mGrad.addColorStop(1, 'rgba(93, 74, 65, 0)');
+            soupCtx.fillStyle = mGrad;
+            soupCtx.beginPath();
+            soupCtx.ellipse(0, -12, 22, 16, 0, 0, Math.PI * 2);
+            soupCtx.fill();
+
+            // Komentujący tekst na żywo
+            const dialogueIdx = Math.floor(soupAnimTime / 2.5) % SOUP_DIALOGUES.length;
+            if (soupDialogueText) soupDialogueText.textContent = SOUP_DIALOGUES[dialogueIdx];
+
+            // Śmieszne minki Mizi
+            if (dialogueIdx === 0 || dialogueIdx === 2) {
+                // Chłeptanie zupki jęzorkiem
+                soupCtx.fillStyle = '#38BDF8';
+                soupCtx.beginPath(); soupCtx.ellipse(-10, -18, 5, 6, 0, 0, Math.PI * 2); soupCtx.fill();
+                soupCtx.beginPath(); soupCtx.ellipse(10, -18, 5, 6, 0, 0, Math.PI * 2); soupCtx.fill();
+
+                // Animowany różowy jęzorek dosięgający zupy
+                const tY = 4 + Math.sin(soupAnimTime * 14) * 8;
+                soupCtx.fillStyle = '#f43f5e';
+                soupCtx.beginPath(); soupCtx.ellipse(0, tY, 6, 8, 0, 0, Math.PI * 2); soupCtx.fill();
+
+                if (Math.sin(soupAnimTime * 14) > 0.8) sfx.slurp();
+            } else {
+                // Błogie mruczenie i rumieńce
+                soupCtx.strokeStyle = '#270e38';
+                soupCtx.lineWidth = 2.5;
+                soupCtx.beginPath();
+                soupCtx.arc(-10, -18, 6, Math.PI * 1.1, Math.PI * 1.9);
+                soupCtx.arc(10, -18, 6, Math.PI * 1.1, Math.PI * 1.9);
+                soupCtx.stroke();
+
+                soupCtx.fillStyle = 'rgba(244, 114, 182, 0.7)';
+                soupCtx.beginPath(); soupCtx.ellipse(-16, -10, 6, 4, 0, 0, Math.PI * 2); soupCtx.fill();
+                soupCtx.beginPath(); soupCtx.ellipse(16, -10, 6, 4, 0, 0, Math.PI * 2); soupCtx.fill();
+            }
+
+            // Pomarańczowe wąsy z zupy dyniowej!
+            soupCtx.strokeStyle = '#f97316';
+            soupCtx.lineWidth = 2.5;
+            soupCtx.beginPath();
+            soupCtx.moveTo(-8, -6); soupCtx.lineTo(-24, -2);
+            soupCtx.moveTo(-8, -3); soupCtx.lineTo(-26, 4);
+            soupCtx.moveTo(8, -6); soupCtx.lineTo(24, -2);
+            soupCtx.moveTo(8, -3); soupCtx.lineTo(26, 4);
+            soupCtx.stroke();
+
+            // Kapelusik przekrzywiony na bakier z sytości
+            soupCtx.save();
+            soupCtx.translate(-6, -38);
+            soupCtx.rotate(-0.25);
+            soupCtx.fillStyle = '#1e1035';
+            soupCtx.beginPath(); soupCtx.ellipse(0, 0, 16, 5, 0, 0, Math.PI * 2); soupCtx.fill();
+            soupCtx.fillStyle = '#f97316'; soupCtx.fillRect(-6, -4, 12, 3);
+            soupCtx.fillStyle = '#1e1035';
+            soupCtx.beginPath(); soupCtx.moveTo(-7, -2); soupCtx.lineTo(-4, -20); soupCtx.lineTo(7, -2); soupCtx.fill();
+            soupCtx.restore();
+
+            soupCtx.restore();
+
+            // Rozpryski zupki wokół miski
+            for (let s = 0; s < 6; s++) {
+                const sx = bowlX + 40 + (s * 35);
+                const sy = bowlY + 20 + Math.sin(soupAnimTime * 5 + s) * 3;
+                soupCtx.fillStyle = '#f97316';
+                soupCtx.beginPath(); soupCtx.arc(sx, sy, 3, 0, Math.PI * 2); soupCtx.fill();
+            }
+        }
+
+        function onLevelComplete() {
+            sfx.spookyWin();
+            const bonus = 500 + mizia.lives * 150;
+            score += bonus;
+
+            if (currentLevelIdx < HALLOWEEN_LEVELS.length - 1) {
+                gameState = 'LEVEL_WIN';
+                document.getElementById('winLevelTitle').textContent = `Etap ${levelData.config.id} Oczyszczony!`;
+                document.getElementById('winLevelScore').textContent = `${score} pkt`;
+                document.getElementById('winLevelBonus').textContent = `+${bonus} pkt`;
+                winLevelScreen.classList.remove('hidden');
+                hud.classList.add('hidden');
+                touchControls.classList.add('hidden');
+            } else {
+                // UKOŃCZENIE KAMPANII HALLOWEEN - PRZEJŚCIE DO UCZTY Z ZUPY DYNIOWEJ!
+                gameState = 'CUTSCENE';
+                hud.classList.add('hidden');
+                touchControls.classList.add('hidden');
+                document.getElementById('finalSoupScore').textContent = `${score} pkt`;
+                pumpkinSoupCutsceneScreen.classList.remove('hidden');
+            }
+        }
+
+        // =========================================================================
+        // 8. RYSOWANIE ŚWIATA HALLOWEEN (RENDER)
+        // =========================================================================
+        function render() {
+            ctx.save();
+            ctx.scale(viewScale, viewScale);
+
+            if (!levelData) levelData = generateHalloweenLevel(HALLOWEEN_LEVELS[0]);
+            const cfg = levelData.config;
+
+            // Spooky tło nieba
+            const grad = ctx.createLinearGradient(0, 0, 0, viewHeight);
+            grad.addColorStop(0, cfg.bgTop);
+            grad.addColorStop(1, cfg.bgBot);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, viewWidth, viewHeight);
+
+            // Wielki świecący księżyc Halloween w pełni
+            ctx.fillStyle = '#fef08a';
+            ctx.shadowColor = '#facc15';
+            ctx.shadowBlur = 25;
+            ctx.beginPath();
+            ctx.arc(viewWidth * 0.8, 90, 48, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Plamy na księżycu
+            ctx.fillStyle = 'rgba(234, 179, 8, 0.2)';
+            ctx.beginPath();
+            ctx.arc(viewWidth * 0.8 - 12, 85, 12, 0, Math.PI * 2);
+            ctx.arc(viewWidth * 0.8 + 14, 98, 16, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Paralaksa: mroczne sylwetki zamków i suchych drzew
+            const pX = -(camera.x * 0.2) % 360;
+            ctx.fillStyle = 'rgba(10, 3, 20, 0.6)';
+            for (let x = pX; x < viewWidth + 360; x += 110) {
+                // Sylwetki drzew
+                ctx.beginPath();
+                ctx.moveTo(x, viewHeight);
+                ctx.lineTo(x + 10, viewHeight - 140);
+                ctx.lineTo(x - 15, viewHeight - 190);
+                ctx.lineTo(x + 14, viewHeight - 150);
+                ctx.lineTo(x + 35, viewHeight - 200);
+                ctx.lineTo(x + 20, viewHeight - 130);
+                ctx.lineTo(x + 30, viewHeight);
+                ctx.closePath(); ctx.fill();
+            }
+
+            ctx.save();
+            ctx.translate(-camera.x, -camera.y);
+
+            // Platformy
+            for (const p of levelData.platforms) {
+                if (p.x + p.w < camera.x - 80 || p.x > camera.x + viewWidth + 80) continue;
+                if (p.crumbleState === 2) continue;
+
+                ctx.save();
+                let shake = (p.crumbleState === 1) ? (Math.random() - 0.5) * 6 : 0;
+                ctx.translate(p.x + shake, p.y);
+
+                if (p.type === 'trampoline_pumpkin') {
+                    // Dynia sprężynowa
+                    ctx.fillStyle = '#ea580c';
+                    ctx.beginPath(); ctx.roundRect(0, 0, p.w, p.h, 10); ctx.fill();
+                    ctx.fillStyle = '#fde047';
+                    ctx.font = '14px sans-serif';
+                    for (let px = 15; px < p.w - 15; px += 35) ctx.fillText('🎃', px, 18);
+                } else if (p.type === 'crumble') {
+                    ctx.fillStyle = '#3b0764';
+                    ctx.beginPath(); ctx.roundRect(0, 0, p.w, p.h, 6); ctx.fill();
+                    ctx.strokeStyle = '#c084fc';
+                    ctx.setLineDash([4, 4]); ctx.strokeRect(2, 2, p.w - 4, p.h - 4); ctx.setLineDash([]);
+                } else {
+                    ctx.fillStyle = cfg.groundCol;
+                    ctx.beginPath(); ctx.roundRect(0, 0, p.w, p.h, 8); ctx.fill();
+                    ctx.fillStyle = cfg.groundTop;
+                    ctx.beginPath(); ctx.roundRect(0, 0, p.w, 8, 5); ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            // Meta (Nawiedzona Brama ze Złotą Dynią)
+            if (levelData.goal && (!levelData.boss || levelData.boss.defeated)) {
+                const g = levelData.goal;
+                ctx.save();
+                ctx.translate(g.x, g.y);
+                ctx.fillStyle = '#1f1338';
+                ctx.fillRect(10, 20, 20, g.h - 20);
+                ctx.fillRect(g.w - 30, 20, 20, g.h - 20);
+                ctx.beginPath(); ctx.arc(g.w / 2, 35, 45, Math.PI, 0); ctx.fill();
+                ctx.font = '34px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('🎃', g.w / 2, 22);
+                ctx.restore();
+            }
+
+            // Znajdźki Halloween
+            for (const item of levelData.collectibles) {
+                if (item.collected) continue;
+                if (item.x < camera.x - 40 || item.x > camera.x + viewWidth + 40) continue;
+                const bob = Math.sin(globalTime * 4.5 + item.bob) * 5;
+                ctx.save();
+                ctx.translate(item.x, item.y + bob);
+                if (item.type === 'candy') {
+                    ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🍬', 0, 7);
+                } else if (item.type === 'lollipop') {
+                    ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🍭', 0, 7);
+                } else if (item.type === 'witch_aura') {
+                    ctx.font = '24px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🎃', 0, 7);
+                } else if (item.type === 'potion_speed') {
+                    ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🧪', 0, 7);
+                }
+                ctx.restore();
+            }
+
+            // Przeciwnicy Halloween
+            for (const e of levelData.enemies) {
+                if (e.dead) continue;
+                if (e.x + e.w < camera.x - 60 || e.x > camera.x + viewWidth + 60) continue;
+                drawSpookyEnemy(ctx, e, globalTime);
+            }
+
+            // Boss
+            if (levelData.boss && !levelData.boss.defeated) {
+                drawBoss(ctx, levelData.boss, globalTime);
+            }
+
+            // Kotka Mizia w kapelusiku czarownicy
+            drawMiziaHalloween(ctx, mizia.x, mizia.y, mizia.w, mizia.h, {
+                facing: mizia.facing, walkCycle: mizia.walkCycle, vy: mizia.vy,
+                onGround: mizia.onGround, doubleSpin: mizia.doubleSpin, blink: mizia.isBlinking,
+                auraTimer: mizia.auraTimer, speedTimer: mizia.speedTimer,
+                invincibleTimer: mizia.invincibleTimer, time: globalTime
+            });
+
+            // Efekty cząsteczkowe i napisy
+            for (const pt of particles) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, pt.life * 1.5);
+                ctx.fillStyle = pt.color;
+                ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            }
+            for (const ft of floatingTexts) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, ft.life);
+                ctx.font = 'bold 15px Fredoka, sans-serif';
+                ctx.fillStyle = ft.color;
+                ctx.fillText(ft.text, ft.x, ft.y);
+                ctx.restore();
+            }
+
+            ctx.restore();
+            ctx.restore();
+
+            if (gameState === 'MENU') renderMenuPreview();
+        }
+
+        // =========================================================================
+        // 9. STEROWANIE DOTYKOWE (TELEFON) I KLAWIATURA
+        // =========================================================================
+        function bindTouch(btn, onDown, onUp) {
+            if (!btn) return;
+            const press = (e) => {
+                e.preventDefault();
+                sfx.init();
+                btn.classList.add('active');
+                onDown();
+            };
+            const release = (e) => {
+                e.preventDefault();
+                btn.classList.remove('active');
+                if (onUp) onUp();
+            };
+            btn.addEventListener('touchstart', press, { passive: false });
+            btn.addEventListener('touchend', release, { passive: false });
+            btn.addEventListener('touchcancel', release, { passive: false });
+            btn.addEventListener('mousedown', press);
+            window.addEventListener('mouseup', () => {
+                if (btn.classList.contains('active')) {
+                    btn.classList.remove('active');
+                    if (onUp) onUp();
+                }
+            });
+        }
+
+        bindTouch(document.getElementById('touchLeft'), () => { input.left = true; }, () => { input.left = false; });
+        bindTouch(document.getElementById('touchRight'), () => { input.right = true; }, () => { input.right = false; });
+        bindTouch(document.getElementById('touchJump'), () => { triggerJump(); }, null);
+
+        window.addEventListener('keydown', (e) => {
+            if (['ArrowLeft', 'KeyA'].includes(e.code)) input.left = true;
+            if (['ArrowRight', 'KeyD'].includes(e.code)) input.right = true;
+            if (['ArrowUp', 'KeyW', 'Space'].includes(e.code)) {
+                if (!e.repeat && gameState === 'PLAYING') triggerJump();
+                e.preventDefault();
+            }
+            if (e.code === 'Escape') togglePause();
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (['ArrowLeft', 'KeyA'].includes(e.code)) input.left = false;
+            if (['ArrowRight', 'KeyD'].includes(e.code)) input.right = false;
+        });
+
+        // =========================================================================
+        // 10. MENU I WYBÓR ETAPÓW (10 POZIOMÓW W SIATCE)
+        // =========================================================================
+        function renderLevelSelectGrid() {
+            levelGrid.innerHTML = '';
+            HALLOWEEN_LEVELS.forEach((lvl, i) => {
+                const card = document.createElement('div');
+                card.className = 'p-3 rounded-2xl border border-purple-500/30 bg-purple-950/40 hover:bg-purple-900/40 cursor-pointer active:scale-95 transition text-left flex flex-col justify-between';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-orange-400">Etap ${lvl.id}</span>
+                        <span>${lvl.boss ? '👑 BOSS' : '🎃'}</span>
+                    </div>
+                    <div class="font-spooky text-lg text-white mt-0.5 truncate">${lvl.name}</div>
+                    <div class="text-[11px] text-purple-300 truncate">${lvl.sub}</div>
+                `;
+                card.addEventListener('click', () => {
+                    levelSelectScreen.classList.add('hidden');
+                    startPlaying(i);
+                });
+                levelGrid.appendChild(card);
+            });
+        }
+
+        function startPlaying(idx) {
+            sfx.init();
+            menuScreen.classList.add('hidden');
+            levelSelectScreen.classList.add('hidden');
+            winLevelScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            pauseScreen.classList.add('hidden');
+            victoryScreen.classList.add('hidden');
+            pumpkinSoupCutsceneScreen.classList.add('hidden');
+
+            hud.classList.remove('hidden');
+            touchControls.classList.remove('hidden');
+
+            loadLevel(idx);
+            gameState = 'PLAYING';
+        }
+
+        function togglePause() {
+            if (gameState === 'PLAYING') {
+                gameState = 'PAUSED';
+                pauseScreen.classList.remove('hidden');
+                touchControls.classList.add('hidden');
+            } else if (gameState === 'PAUSED') {
+                gameState = 'PLAYING';
+                pauseScreen.classList.add('hidden');
+                touchControls.classList.remove('hidden');
+            }
+        }
+
+        function backToMenu() {
+            gameState = 'MENU';
+            hud.classList.add('hidden');
+            touchControls.classList.add('hidden');
+            pauseScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            winLevelScreen.classList.add('hidden');
+            victoryScreen.classList.add('hidden');
+            pumpkinSoupCutsceneScreen.classList.add('hidden');
+            levelSelectScreen.classList.add('hidden');
+            menuScreen.classList.remove('hidden');
+            loadLevel(0);
+        }
+
+        document.getElementById('btnPlayCampaign').addEventListener('click', () => startPlaying(0));
+        document.getElementById('btnLevelSelect').addEventListener('click', () => {
+            renderLevelSelectGrid();
+            levelSelectScreen.classList.remove('hidden');
+        });
+        document.getElementById('btnCloseLevelSelect').addEventListener('click', () => levelSelectScreen.classList.add('hidden'));
+
+        document.getElementById('btnNextLevel').addEventListener('click', () => startPlaying(currentLevelIdx + 1));
+        document.getElementById('btnWinToMenu').addEventListener('click', backToMenu);
+        document.getElementById('btnPause').addEventListener('click', togglePause);
+        document.getElementById('btnResume').addEventListener('click', togglePause);
+        document.getElementById('btnRestartCurrent').addEventListener('click', () => startPlaying(currentLevelIdx));
+        document.getElementById('btnPauseToMenu').addEventListener('click', backToMenu);
+        document.getElementById('btnRetryLevel').addEventListener('click', () => startPlaying(currentLevelIdx));
+        document.getElementById('btnGameOverMenu').addEventListener('click', backToMenu);
+        document.getElementById('btnVictoryToMenu').addEventListener('click', backToMenu);
+
+        // Przejście z uczty dyniowej do podsumowania zwycięstwa
+        document.getElementById('btnFinishSoupCutscene').addEventListener('click', () => {
+            pumpkinSoupCutsceneScreen.classList.add('hidden');
+            gameState = 'VICTORY';
+            document.getElementById('victoryScore').textContent = `${score} pkt`;
+            victoryScreen.classList.remove('hidden');
+        });
+
+        document.getElementById('btnSound').addEventListener('click', (e) => {
+            const m = sfx.toggle();
+            e.currentTarget.textContent = m ? '🔇' : '🔊';
+        });
+
+        // =========================================================================
+        // 11. GŁÓWNA PĘTLA GRY
+        // =========================================================================
+        let lastTime = performance.now();
+        function loop(now) {
+            const dt = Math.min(0.05, (now - lastTime) / 1000);
+            lastTime = now;
+            updateGame(dt);
+            render();
+
+            if (gameState === 'CUTSCENE') {
+                renderPumpkinSoupCutscene(dt);
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = function () {
+            loadLevel(0);
+            requestAnimationFrame(loop);
+        };
+    </script>
+</body>
+</html>

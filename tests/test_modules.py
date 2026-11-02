@@ -62,7 +62,14 @@ MODULES = {
         False,
         None,
     ),
-    "ShadowsOfCrown.html": (
+    "micro_arena_pixel_brawlers.html": (
+        "#arenaCanvas",
+        "#btnStartGame",
+        "#menuOverlay",
+        False,
+        None,
+    ),
+    "index.html": (
         "#choices-box",
         ".bottom-nav button",
         "#spy-modal",
@@ -158,53 +165,58 @@ class GameModuleBrowserTests(unittest.TestCase):
                 finally:
                     page.close()
 
-    def test_homepage_hidden_miami_link_opens_the_game(self):
-        page, errors = self.open_page("index.htm")
+    def test_homepage_discreet_game_catalog_link_opens_play_page(self):
+        page, errors = self.open_page("index.html")
         try:
-            link = page.locator(".miami-egg")
-            self.assertEqual(link.get_attribute("href"), "./miami_77.html")
-            self.assertEqual(link.evaluate("(element) => getComputedStyle(element).opacity"), "0")
+            self.assertIn("Cienie Korony", page.title())
+            self.assertEqual(page.locator("#choices-box").count(), 1)
+            catalog_link = page.locator(".games-link")
+            self.assertEqual(catalog_link.get_attribute("href"), "./play.html")
+            self.assertEqual(
+                catalog_link.evaluate("(element) => getComputedStyle(element).opacity"),
+                "0.14",
+            )
 
             with page.expect_navigation(wait_until="load"):
-                link.click(force=True)
+                catalog_link.click()
 
-            self.assertIn("MIAMI '77", page.title())
+            self.assertIn("Salon Kasztanowych Gier", page.title())
             self.assertEqual(errors, [])
         finally:
             page.close()
 
-    def test_homepage_hidden_new_game_links_open_the_games(self):
-        hidden_games = (
-            (".oczko-egg", "./KasztanoweOczko.html", "Kasztanowe Oczko"),
-            (
-                ".tetris-egg",
-                "./kasztanix_kasztanowy_tetris.html",
-                "Kasztanix - Kasztanowy Tetris 3000",
-            ),
-            (".pasjans-egg", "./kasztanowy_pasjans.html", "Kasztanowy Pasjans"),
-            (".combat-egg", "./chestnut_combat.html", "CHESTNUT COMBAT"),
-            (".strike-egg", "./chestnut_strike.html", "CHESTNUT STRIKE"),
-        )
-        for selector, href, title in hidden_games:
-            with self.subTest(game=href):
-                page, errors = self.open_page("index.htm")
-                try:
-                    link = page.locator(selector)
-                    self.assertEqual(link.get_attribute("href"), href)
-                    self.assertEqual(
-                        link.evaluate(
-                            "(element) => getComputedStyle(element).opacity"
-                        ),
-                        "0",
-                    )
+    def test_play_catalog_lists_every_game_and_random_selects_each_tile(self):
+        page, errors = self.open_page("play.html")
+        try:
+            tiles = page.locator("#gamesGrid .game-tile")
+            hrefs = tiles.evaluate_all(
+                "(elements) => elements.map((element) => new URL(element.href).pathname.split('/').pop())"
+            )
+            expected_games = sorted(
+                path.name
+                for path in ROOT.glob("*.html")
+                if path.name not in {"index.html", "play.html"}
+            )
+            self.assertEqual(sorted(hrefs), expected_games)
+            self.assertEqual(int(page.locator("#gameCount").inner_text()), len(hrefs))
 
-                    with page.expect_navigation(wait_until="load"):
-                        link.click(force=True)
+            for index, href in enumerate(hrefs):
+                page.evaluate(
+                    "(value) => { Math.random = () => value; }",
+                    (index + 0.1) / len(hrefs),
+                )
+                page.locator("#pickRandomBtn").click()
+                self.assertEqual(
+                    page.locator("#selectedTitle").evaluate(
+                        "(element) => new URL(element.href).pathname.split('/').pop()"
+                    ),
+                    href,
+                    f"Random selection did not include {href}",
+                )
 
-                    self.assertIn(title, page.title())
-                    self.assertEqual(errors, [])
-                finally:
-                    page.close()
+            self.assertEqual(errors, [])
+        finally:
+            page.close()
 
 
 if __name__ == "__main__":

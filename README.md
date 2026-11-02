@@ -1,13 +1,13 @@
 # ShadowsOfCrown — gry i huby
 
-Zestaw samodzielnych gier przeglądarkowych: od kasztanowych automatów arcade i lokalnych pojedynków dla dwóch osób, przez gry edukacyjne, po fabularne przygody. Pliki HTML można otwierać bezpośrednio w nowoczesnej przeglądarce. Niektóre strony pobierają czcionki, ikony lub style z CDN, więc do pełnego wyglądu może być potrzebne połączenie z internetem.
+Zestaw samodzielnych gier przeglądarkowych: od kasztanowych automatów arcade i lokalnych pojedynków dla dwóch osób, przez gry edukacyjne, po fabularne przygody. Stroną główną jest *Cienie Korony*; dyskretny przycisk 🎮 w górnym pasku prowadzi do ukrytego katalogu gier. Pliki HTML można otwierać bezpośrednio w nowoczesnej przeglądarce.
 
 ## Katalog gier
 
 ### Strona główna
 
-* [index.htm](./index.htm) — portal projektu z wejściem do gier i hubów, animowanym motywem kasztanowym oraz ukrytymi odnośnikami do gier: Chess-Nuts, Miami ’77, Kasztanowego Oczka, Kasztanixowego Tetrisa, Pasjansa, Chestnut Combat i Chestnut Strike.
-* [play.html](./play.html) — podstrona salonu arcade z losowaniem gry kasztanem i katalogiem gier.
+* [index.html](./index.html) — *Cienie Korony*, turowa gra strategiczno-narracyjna o intrygach na średniowiecznym dworze.
+* [play.html](./play.html) — salon arcade z losowaniem gry i katalogiem wszystkich pozostałych gier; dostępny z dyskretnego przycisku na stronie głównej.
 
 ### Huby arcade
 
@@ -30,7 +30,6 @@ Zestaw samodzielnych gier przeglądarkowych: od kasztanowych automatów arcade i
 * [roadtomerge.html](./roadtomerge.html) — zręcznościowa jazda z nitro, poziomami i kasztanowym chaosem korporacyjnym.
 * [logopedia.html](./logopedia.html) — ćwiczenia logopedyczne w trzech trybach: rozpoznawanie miejsca głoski w słowie, budowanie słów z sylab i słuch fonemowy. Zawiera podpowiedzi dla prowadzącego i odczytywanie słów.
 * [kraina\_wyraznej\_mowy.html](./kraina_wyraznej_mowy.html) — edukacyjny LogoHub z minigrami do sortowania głosek, ćwiczeń głoski R, pamięci i oddechu; zawiera też rozgrzewkę artykulacyjną oraz poradnik dla rodzica i logopedy.
-* [ShadowsOfCrown.html](./ShadowsOfCrown.html) — turowa gra strategiczno-narracyjna o intrygach na średniowiecznym dworze, relacjach z frakcjami i dążeniu do przejęcia korony.
 
 ## Ostatnie aktualizacje
 
@@ -58,14 +57,14 @@ Zestaw samodzielnych gier przeglądarkowych: od kasztanowych automatów arcade i
 ## 🛠️ Uruchomienie
 
 1. Pobierz lub sklonuj repozytorium.
-2. Otwórz [index.htm](./index.htm), aby przejść do portalu, albo uruchom bezpośrednio wybraną stronę z katalogu powyżej.
+2. Otwórz [index.html](./index.html), aby rozpocząć grę *Cienie Korony*. Pozostałe gry uruchom bezpośrednio z plików HTML w katalogu powyżej.
 3. Sterowanie i zasady są dostępne w danej grze lub hubie; obsługa urządzeń dotykowych zależy od konkretnego tytułu.
 
-Gry nie wymagają instalowania silnika. Część stron korzysta z zasobów CDN, więc połączenie z internetem może być potrzebne do załadowania wszystkich czcionek, ikon i stylów.
+Gry nie wymagają instalowania silnika ani połączenia z internetem do rozgrywki: ich logika jest zawarta w plikach HTML. Bez internetu nie załadują się jednak zewnętrzne czcionki, ikony i style z CDN, więc wygląd niektórych stron może być uproszczony.
 
 ## Testy projektu
 
-Testy sprawdzają wszystkie samodzielne strony gry: poprawne domknięcie znaczników HTML, strukturę dokumentu, unikalność identyfikatorów, lokalne odnośniki i zasoby oraz kluczowe elementy portalu. Testy modułów uruchamiają reprezentatywne gry w Chromium, sprawdzają brak błędów JavaScript po starcie i wykonują reprezentatywne akcje, weryfikując zmianę stanu. Sprawdzają również, czy ukryte odnośniki w portalu prowadzą do Miami '77 oraz nowych gier: Kasztanowego Oczka, Kasztanixowego Tetrisa, Pasjansa, Chestnut Combat i Chestnut Strike. Zestaw uruchamia się automatycznie dla każdego pull requestu przez GitHub Actions.
+Testy sprawdzają wszystkie strony HTML: poprawne domknięcie znaczników, strukturę dokumentu, unikalność identyfikatorów, lokalne odnośniki i zasoby oraz oczekiwane punkty wejścia gier. Kontrolują też kompletność katalogu arcade i uwzględnienie każdej gry w losowaniu. Testy modułów uruchamiają reprezentatywne gry w Chromium bez dostępu do sieci, sprawdzają błędy JavaScript i wykonują reprezentatywne akcje, w tym przejście z dyskretnego przycisku strony głównej do katalogu. Zestaw uruchamia się automatycznie dla każdego pull requestu przez GitHub Actions.
 
 Wymagany jest Python 3.10 lub nowszy. Zainstaluj zależności testowe i przeglądarkę Playwright:
 

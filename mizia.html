@@ -1,0 +1,2234 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mizia: Ucieczka przed Kupkami</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0b0914;
+            font-family: 'Nunito', sans-serif;
+            touch-action: none;
+        }
+        .font-display { font-family: 'Fredoka', sans-serif; }
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+        .touch-btn {
+            background: rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 3px solid rgba(255, 255, 255, 0.55);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), inset 0 2px 6px rgba(255, 255, 255, 0.4);
+            transition: transform 0.05s ease, background 0.08s ease;
+        }
+        .touch-btn.active {
+            transform: scale(0.90);
+            background: rgba(56, 189, 248, 0.55);
+            border-color: #bae6fd;
+        }
+        .touch-btn-jump {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.4), rgba(37, 99, 235, 0.45));
+            border: 3px solid rgba(125, 211, 252, 0.85);
+        }
+        .touch-btn-jump.active {
+            transform: scale(0.88);
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.8), rgba(37, 99, 235, 0.85));
+            border-color: #ffffff;
+        }
+        .glass-panel {
+            background: rgba(19, 16, 33, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 2px solid rgba(255, 255, 255, 0.16);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+        }
+        .btn-action {
+            background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+            box-shadow: 0 6px 0 #0369a1, 0 10px 20px rgba(2, 132, 199, 0.4);
+            transition: transform 0.08s ease, filter 0.1s ease;
+        }
+        .btn-action:hover { filter: brightness(1.08); }
+        .btn-action:active { transform: translateY(4px); box-shadow: 0 2px 0 #0369a1; }
+        .btn-gold {
+            background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+            box-shadow: 0 6px 0 #92400e, 0 10px 20px rgba(217, 119, 6, 0.4);
+            transition: transform 0.08s ease;
+        }
+        .btn-gold:active { transform: translateY(4px); box-shadow: 0 2px 0 #92400e; }
+        @keyframes floatIdle {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-7px); }
+        }
+        .anim-float { animation: floatIdle 3s ease-in-out infinite; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+    </style>
+</head>
+<body class="relative w-full h-full overflow-hidden select-none bg-slate-950">
+
+    <!-- PŁÓTNO GRY -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- GÓRNY PASEK HUD -->
+    <div id="hud" class="hidden fixed top-0 left-0 right-0 z-20 pointer-events-none p-2 sm:p-4 flex flex-col gap-1.5">
+        <div class="flex items-center justify-between gap-2 max-w-6xl mx-auto w-full">
+            <!-- Życia i Wynik -->
+            <div class="flex items-center gap-2 bg-slate-900/85 backdrop-blur px-3 py-1.5 rounded-2xl border border-white/15 shadow pointer-events-auto">
+                <div id="hudHearts" class="flex items-center gap-0.5 text-base sm:text-xl">❤️❤️❤️</div>
+                <div class="h-4 w-[1px] bg-white/20 mx-1"></div>
+                <div class="flex items-center gap-1">
+                    <span class="text-amber-400 text-sm sm:text-base">🐟</span>
+                    <span id="hudScore" class="font-display font-bold text-white text-sm sm:text-lg">0</span>
+                </div>
+            </div>
+
+            <!-- Pasek Postępu / Życie Bossa -->
+            <div class="flex-1 max-w-xs sm:max-w-md mx-1 bg-slate-900/85 backdrop-blur px-3 py-1.5 rounded-2xl border border-white/15 shadow">
+                <div class="flex justify-between items-center text-[10px] sm:text-xs font-bold text-sky-300 mb-0.5">
+                    <span id="hudLevelTitle" class="truncate">Etap 1: Domowy Salon</span>
+                    <span id="hudProgressValue" class="text-amber-300 ml-1">0%</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-white/10 relative">
+                    <div id="hudProgressBar" class="h-full bg-gradient-to-r from-sky-400 via-cyan-300 to-amber-400 rounded-full transition-all duration-150" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Przyciski dźwięku i pauzy -->
+            <div class="flex items-center gap-1.5 pointer-events-auto">
+                <button id="btnSound" class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-slate-900/85 border border-white/15 text-white flex items-center justify-center text-base sm:text-lg shadow active:scale-90 transition">🔊</button>
+                <button id="btnPause" class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-slate-900/85 border border-white/15 text-white flex items-center justify-center text-base sm:text-lg shadow active:scale-90 transition">⏸️</button>
+            </div>
+        </div>
+
+        <!-- Pasek aktywnych wzmocnień (Power-up) -->
+        <div id="hudBuffs" class="flex justify-center gap-2 pointer-events-none"></div>
+    </div>
+
+    <!-- PRZYCISKI EKRANOWE DLA TELEFONÓW (MULTI-TOUCH) -->
+    <div id="touchControls" class="hidden fixed bottom-0 left-0 right-0 z-20 pointer-events-none pb-4 pt-1 px-4 sm:px-8 flex justify-between items-end">
+        <div class="flex items-center gap-3 pointer-events-auto">
+            <button id="touchLeft" class="touch-btn w-16 h-16 sm:w-20 sm:h-20 rounded-3xl flex items-center justify-center text-white text-3xl font-bold" aria-label="W lewo">◀</button>
+            <button id="touchRight" class="touch-btn w-16 h-16 sm:w-20 sm:h-20 rounded-3xl flex items-center justify-center text-white text-3xl font-bold" aria-label="W prawo">▶</button>
+        </div>
+        <div class="pointer-events-auto">
+            <button id="touchJump" class="touch-btn touch-btn-jump w-20 h-20 sm:w-24 sm:h-24 rounded-full flex flex-col items-center justify-center text-white font-display font-bold shadow-xl" aria-label="Skok">
+                <span class="text-2xl sm:text-3xl leading-none">🐾</span>
+                <span class="text-[11px] sm:text-xs tracking-wider mt-0.5">SKOK</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- EKRAN STARTOWY (MENU GŁÓWNE) -->
+    <div id="menuScreen" class="fixed inset-0 z-30 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+        <div class="glass-panel rounded-3xl max-w-xl w-full p-5 sm:p-7 text-center text-white my-auto relative">
+            <div class="relative mx-auto w-32 h-32 sm:w-36 sm:h-36 mb-1 anim-float">
+                <canvas id="miziaPreviewCanvas" width="180" height="180" class="w-full h-full"></canvas>
+                <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-sky-500 text-slate-950 text-[10px] font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider shadow">
+                    Neva Masquerade
+                </span>
+            </div>
+
+            <h1 class="text-3xl sm:text-4xl font-display font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-white to-amber-300 mt-2">
+                Mizia: Ucieczka przed Kupkami!
+            </h1>
+            <p class="text-slate-300 text-xs sm:text-sm mt-1 max-w-md mx-auto">
+                Poprowadź puszystą kotkę <strong class="text-sky-300">Mizię</strong> z błękitnymi oczami przez 15 zróżnicowanych światów, trampoliny, taśmociągi i 3 walki z bossami!
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-2.5 mt-5 justify-center">
+                <button id="btnPlayCampaign" class="btn-action px-6 py-3 rounded-2xl font-display font-bold text-base sm:text-lg text-white">
+                    🐾 KAMPANIA (15 POZIOMÓW)
+                </button>
+                <button id="btnLevelSelect" class="bg-white/10 hover:bg-white/15 border border-white/20 px-5 py-3 rounded-2xl font-display font-bold text-base text-slate-200">
+                    🗺️ WYBÓR POZIOMU
+                </button>
+                <button id="btnPlayEndless" class="btn-gold px-5 py-3 rounded-2xl font-display font-bold text-base text-slate-950">
+                    ♾️ TRYB ENDLESS
+                </button>
+            </div>
+
+            <a href="./index.html" aria-label="Powrót do strony głównej" class="inline-block mt-4 text-sm text-sky-300 underline underline-offset-4">← Cienie Korony</a>
+
+            <div class="mt-4 pt-3 border-t border-white/10 flex flex-wrap justify-around text-[11px] text-slate-300 gap-2">
+                <span>📱 Przyciski dotykowe na telefonie</span>
+                <span>💻 Strzałki / AD + Spacja / W</span>
+                <span>💾 Auto-zapis postępów</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- EKRAN WYBORU POZIOMU (LEVEL SELECT) -->
+    <div id="levelSelectScreen" class="hidden fixed inset-0 z-30 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+        <div class="glass-panel rounded-3xl max-w-2xl w-full p-4 sm:p-6 text-white my-auto flex flex-col max-h-[92vh]">
+            <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-display font-bold text-amber-300">Wybór Poziomu Kampanii</h2>
+                    <p class="text-xs text-slate-400">15 etapów, trampoliny, portale i 3 bossów</p>
+                </div>
+                <button id="btnCloseLevelSelect" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-slate-300 hover:text-white text-lg">✕</button>
+            </div>
+
+            <div id="levelGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 overflow-y-auto custom-scrollbar p-1 flex-1">
+                <!-- Poziomy generowane dynamicznie w JS -->
+            </div>
+
+            <div class="mt-3 pt-2 border-t border-white/10 flex justify-between items-center text-xs text-slate-400">
+                <span id="unlockedCountText">Odblokowano: 1/15</span>
+                <button id="btnResetSave" class="text-rose-400 hover:underline">Zresetuj postępy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EKRAN UKOŃCZENIA POZIOMU -->
+    <div id="winLevelScreen" class="hidden fixed inset-0 z-30 flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-sm w-full p-6 text-center text-white">
+            <div class="text-5xl mb-2 animate-bounce">🏆✨</div>
+            <h2 id="winLevelTitle" class="text-2xl font-display font-bold text-amber-300">Etap Ukończony!</h2>
+            <p id="winLevelDesc" class="text-slate-300 text-xs sm:text-sm mt-1">Mizia bez szwanku dotarła do Złotego Drapaka!</p>
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-3 my-4 flex justify-around">
+                <div>
+                    <div class="text-[11px] text-slate-400">Wynik etapu</div>
+                    <div id="winLevelScore" class="text-xl font-display font-bold text-sky-300">0</div>
+                </div>
+                <div class="h-8 w-[1px] bg-white/10"></div>
+                <div>
+                    <div class="text-[11px] text-slate-400">Bonus</div>
+                    <div id="winLevelBonus" class="text-xl font-display font-bold text-amber-400">+500</div>
+                </div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <button id="btnNextLevel" class="btn-gold py-3 rounded-2xl font-display font-bold text-base text-slate-950">NASTĘPNY POZIOM ➔</button>
+                <button id="btnWinToMenu" class="bg-white/10 py-2.5 rounded-2xl text-xs text-slate-300">MENU GŁÓWNE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EKRAN PRZEGRANEJ -->
+    <div id="gameOverScreen" class="hidden fixed inset-0 z-30 flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-sm w-full p-6 text-center text-white">
+            <div class="text-5xl mb-2">😿💩</div>
+            <h2 class="text-2xl font-display font-bold text-rose-400">Kupki dopadły Mizię!</h2>
+            <p class="text-slate-300 text-xs sm:text-sm mt-1">Puszyste futerko Neva Masquerade potrzebuje pilnego czyszczenia!</p>
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-3 my-4">
+                <div class="text-[11px] text-slate-400">Końcowy wynik</div>
+                <div id="gameOverScore" class="text-2xl font-display font-bold text-amber-400 mt-0.5">0</div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <button id="btnRetryLevel" class="btn-action py-3 rounded-2xl font-display font-bold text-base text-white">🔄 SPRÓBUJ PONOWNIE</button>
+                <button id="btnGameOverMenu" class="bg-white/10 py-2.5 rounded-2xl text-xs text-slate-300">MENU GŁÓWNE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EKRAN PAUZY -->
+    <div id="pauseScreen" class="hidden fixed inset-0 z-30 flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-xs w-full p-5 text-center text-white">
+            <div class="text-4xl mb-1">😺💤</div>
+            <h3 class="text-xl font-display font-bold text-sky-300">Kocia Drzemka</h3>
+            <p class="text-xs text-slate-300 mb-4">Gra wstrzymana</p>
+            <div class="flex flex-col gap-2">
+                <button id="btnResume" class="btn-action py-2.5 rounded-xl font-display font-bold text-sm text-white">▶ WZNÓW</button>
+                <button id="btnRestartCurrent" class="bg-white/10 py-2.5 rounded-xl text-xs text-white">🔄 POWTÓRZ ETAP</button>
+                <button id="btnPauseToMenu" class="bg-rose-500/20 text-rose-300 py-2.5 rounded-xl text-xs">🏠 MENU GŁÓWNE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOWY EKRAN: ZABAWNE ZAKOŃCZENIE - KĄPIEL W WANNIE PEŁNEJ MLEKA -->
+    <div id="milkBathEndingScreen" class="hidden fixed inset-0 z-30 flex flex-col items-center justify-center p-3 sm:p-5 bg-slate-950/95 overflow-hidden">
+        <div class="glass-panel rounded-3xl max-w-xl w-full p-4 sm:p-6 text-center text-white relative flex flex-col items-center shadow-2xl border-2 border-amber-300/40">
+            <div class="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 text-xs sm:text-sm font-display font-extrabold px-4 py-1 rounded-full uppercase tracking-wider mb-2 border border-amber-400/30">
+                👑 WIELKI FINAŁ KAMPANII 👑
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-sky-200 to-amber-300">
+                Królewska Kąpiel Mizi w Mleku!
+            </h2>
+            <p id="bathDialogueText" class="text-sky-200 text-xs sm:text-sm font-bold min-h-[22px] mt-1 transition-opacity duration-200">
+                „Aaaaach! Po pokonaniu Króla Kupek czas na zasłużone spa!” 🥛✨
+            </p>
+
+            <!-- PŁÓTNO ANIMACJI WANNY Z MLEKIEM -->
+            <div class="w-full max-w-[420px] aspect-[4/3] my-2 relative rounded-2xl overflow-hidden border border-white/15 bg-gradient-to-b from-indigo-950 to-slate-900 shadow-inner">
+                <canvas id="bathCanvas" width="420" height="315" class="w-full h-full block"></canvas>
+            </div>
+
+            <!-- Panel punktacji i przycisk dalej -->
+            <div class="flex items-center justify-between w-full max-w-md bg-white/5 border border-white/10 px-4 py-2.5 rounded-2xl mt-1">
+                <div class="text-left">
+                    <div class="text-[10px] sm:text-xs text-slate-400">Końcowy wynik kampanii</div>
+                    <div id="milkEndingScore" class="text-lg sm:text-xl font-display font-bold text-amber-300">0 pkt</div>
+                </div>
+                <button id="btnFinishCutscene" class="btn-gold px-5 py-2.5 rounded-2xl font-display font-bold text-xs sm:text-sm text-slate-950 shadow-lg">
+                    🐾 DALEJ DO STATYSTYK ➔
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EKRAN WIELKIEGO ZWYCIĘSTWA -->
+    <div id="victoryScreen" class="hidden fixed inset-0 z-30 flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-md w-full p-6 text-center text-white">
+            <div class="text-5xl mb-2 animate-bounce">👑😻✨</div>
+            <h2 class="text-3xl font-display font-extrabold text-amber-300">Królowa Mizia Zwycięża!</h2>
+            <p class="text-slate-300 text-xs sm:text-sm mt-1">Wszystkie 15 światów ocalone, Król Kupek pokonany, a futerko Neva Masquerade lśni jak nigdy dotąd!</p>
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-4 my-4">
+                <div class="text-xs text-slate-400">Łączny wynik kampanii</div>
+                <div id="victoryScore" class="text-3xl font-display font-bold text-amber-400 mt-1">0 pkt</div>
+            </div>
+            <button id="btnVictoryToMenu" class="btn-gold w-full py-3 rounded-2xl font-display font-bold text-base text-slate-950">
+                🐾 POWRÓT DO MENU GŁÓWNEGO
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================================
+        // 1. DŹWIĘK I SYNTEZA AUDIO (Web Audio API)
+        // =========================================================================
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AC = window.AudioContext || window.webkitAudioContext;
+                    if (AC) this.ctx = new AC();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+            }
+            toggle() {
+                this.muted = !this.muted;
+                return this.muted;
+            }
+            playTone(freqStart, freqEnd, duration, type = 'sine', vol = 0.15) {
+                if (this.muted) return;
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freqStart, now);
+                if (freqEnd !== freqStart) osc.frequency.exponentialRampToValueAtTime(freqEnd, now + duration);
+                gain.gain.setValueAtTime(vol, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + duration);
+            }
+            jump(d = false) { this.playTone(d ? 450 : 300, d ? 800 : 580, 0.12, 'sine', 0.16); }
+            bounce() { this.playTone(200, 650, 0.22, 'triangle', 0.2); }
+            teleport() { this.playTone(700, 200, 0.25, 'sine', 0.18); }
+            collect(p = false) {
+                if (this.muted) return;
+                this.init();
+                const notes = p ? [523, 659, 784, 1046] : [659, 880];
+                notes.forEach((f, i) => setTimeout(() => this.playTone(f, f, 0.12, 'sine', 0.14), i * 50));
+            }
+            hit() { this.playTone(220, 90, 0.25, 'sawtooth', 0.2); }
+            pop() { this.playTone(280, 750, 0.14, 'triangle', 0.18); }
+            win() {
+                [523, 659, 784, 1046, 1318].forEach((f, i) => setTimeout(() => this.playTone(f, f, 0.16, 'triangle', 0.16), i * 90));
+            }
+        }
+        const sfx = new SoundFX();
+
+        // =========================================================================
+        // 2. BAZA 15 POZIOMÓW KAMPANII
+        // =========================================================================
+        const CAMPAIGN_LEVELS = [
+            { id: 1, name: 'Domowy Salon', sub: 'Dywany, miękkie kanapy i półki', theme: 'living', len: 3200, bgTop: '#291838', bgBot: '#432654', gCol: '#5C3A21', gTop: '#C87D55' },
+            { id: 2, name: 'Kuchenne Blaty', sub: 'Śliskie kafelki i wysokie skoki', theme: 'kitchen', len: 3400, bgTop: '#1E293B', bgBot: '#334155', gCol: '#475569', gTop: '#94A3B8' },
+            { id: 3, name: 'Zielony Ogród', sub: 'Płotki i ruchome gałązki', theme: 'garden', len: 3700, bgTop: '#0284C7', bgBot: '#BAE6FD', gCol: '#3F2E1E', gTop: '#22C55E' },
+            { id: 4, name: 'Ciemna Piwnica', sub: 'Rury i spadające z góry kupki', theme: 'basement', len: 3800, bgTop: '#0F172A', bgBot: '#1E1B4B', gCol: '#1E293B', gTop: '#475569' },
+            { id: 5, name: 'Wielka Łazienka (BOSS)', sub: 'Gąbki-trampoliny i Wielka Kupka!', theme: 'bathroom', len: 3200, bgTop: '#0C4A6E', bgBot: '#0284C7', gCol: '#0369A1', gTop: '#38BDF8', boss: 'mega_poop' },
+            { id: 6, name: 'Nocne Dachy', sub: 'Kruszące się dachówki i anteny', theme: 'rooftops', len: 4100, bgTop: '#0B0F19', bgBot: '#1E293B', gCol: '#1E293B', gTop: '#64748B' },
+            { id: 7, name: 'Korony Drzew', sub: 'Wysokie skoki i szybkie pościgi', theme: 'treetops', len: 4200, bgTop: '#064E3B', bgBot: '#047857', gCol: '#27272A', gTop: '#10B981' },
+            { id: 8, name: 'Fabryka Kartonów', sub: 'Taśmociągi i latające paczki', theme: 'factory', len: 4300, bgTop: '#451A03', bgBot: '#78350F', gCol: '#543016', gTop: '#D97706' },
+            { id: 9, name: 'Lodowy Balkon', sub: 'Oblodzone barierki o małym tarciu', theme: 'ice_balcony', len: 4400, bgTop: '#082F49', bgBot: '#0EA5E9', gCol: '#0284C7', gTop: '#E0F2FE' },
+            { id: 10, name: 'Królestwo Drapaków (BOSS)', sub: 'Pojedynek z Bossem Drapaków!', theme: 'kingdom', len: 3500, bgTop: '#3B0764', bgBot: '#6B21A8', gCol: '#4C1D95', gTop: '#F59E0B', boss: 'tower_boss' },
+            { id: 11, name: 'Kocia Biblioteka', sub: 'Magiczne portale teleportacyjne', theme: 'library', len: 4500, bgTop: '#2E1065', bgBot: '#4C1D95', gCol: '#3B0764', gTop: '#A855F7' },
+            { id: 12, name: 'Podziemne Kanały', sub: 'Wąskie kładki i goniące oddziały', theme: 'sewers', len: 4600, bgTop: '#142018', bgBot: '#1F3425', gCol: '#16281B', gTop: '#84CC16' },
+            { id: 13, name: 'Chmurne Niebo', sub: 'Podskoki na chmurkach i trampolinach', theme: 'clouds', len: 4700, bgTop: '#1E3A8A', bgBot: '#60A5FA', gCol: '#1D4ED8', gTop: '#FFFFFF' },
+            { id: 14, name: 'Kosmiczna Kuweta', sub: 'Obniżona grawitacja i portale kosmiczne', theme: 'space', len: 4800, bgTop: '#030712', bgBot: '#111827', gCol: '#1F2937', gTop: '#EC4899' },
+            { id: 15, name: 'Złoty Pałac Mizi (FINAŁ)', sub: 'Wielkie starcie z Królem Kupek!', theme: 'palace', len: 4000, bgTop: '#3D0C1E', bgBot: '#831843', gCol: '#701A75', gTop: '#FBBF24', boss: 'king_poop' }
+        ];
+
+        // =========================================================================
+        // 3. SYSTEM ZAPISU (localStorage)
+        // =========================================================================
+        const STORAGE_KEY = 'mizia_adventure_save_v2';
+        let saveState = {
+            unlockedLevel: 1,
+            bestScores: {},
+            totalScore: 0
+        };
+
+        function loadSavedProgress() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    saveState = { ...saveState, ...parsed };
+                }
+            } catch (e) {
+                console.warn('Błąd wczytywania zapisu', e);
+            }
+        }
+
+        function persistProgress() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(saveState));
+            } catch (e) {
+                console.warn('Błąd zapisu', e);
+            }
+        }
+
+        // =========================================================================
+        // 4. GENERATOR POZIOMÓW (Z nowymi platformami, portalami i bossami)
+        // =========================================================================
+        function generateLevelData(levelCfg, isEndless = false) {
+            const platforms = [];
+            const collectibles = [];
+            const enemies = [];
+            const portals = [];
+            let boss = null;
+
+            const floorY = 520;
+            const levelLength = isEndless ? 12000 : levelCfg.len;
+
+            // Startowa kładka
+            platforms.push({ x: 0, y: floorY, w: 460, h: 120, type: 'ground', theme: levelCfg.theme });
+
+            let cursorX = 500;
+            let step = 0;
+
+            while (cursorX < levelLength - 600) {
+                step++;
+                const gap = 70 + (step % 3) * 32;
+                cursorX += gap;
+                const pW = 200 + ((step * 67) % 220);
+                const pY = floorY - ((step % 4 === 0) ? 55 : (step % 2 === 0 ? 100 : 0));
+
+                // Dobór typu platformy zależnie od poziomu
+                let pType = 'normal';
+                if (levelCfg.id === 5 || levelCfg.id === 13 || step % 7 === 0) pType = 'trampoline';
+                else if (levelCfg.id === 8 || step % 9 === 0) pType = 'conveyor';
+                else if (levelCfg.id === 9 || levelCfg.id === 2 || (step % 4 === 0 && levelCfg.id >= 6)) pType = 'ice';
+                else if (levelCfg.id === 6 || (step % 5 === 0 && levelCfg.id >= 4)) pType = 'crumble';
+                else if (step % 4 === 1 && levelCfg.id >= 3) pType = (step % 2 === 0) ? 'moving_v' : 'moving_h';
+
+                const mainP = {
+                    x: cursorX,
+                    y: pY,
+                    w: pW,
+                    h: pType === 'ground' ? 120 : 26,
+                    baseX: cursorX,
+                    baseY: pY,
+                    type: pType,
+                    theme: levelCfg.theme,
+                    moveRange: 85,
+                    moveSpeed: 1.6 + (levelCfg.id * 0.1),
+                    phase: step * 1.2,
+                    crumbleState: 0,
+                    crumbleTimer: 0,
+                    conveyorSpeed: (step % 2 === 0 ? 1 : -1) * 2.8
+                };
+                platforms.push(mainP);
+
+                // Portale teleportujące (głównie biblioteka i kosmos)
+                if ((levelCfg.id === 11 || levelCfg.id === 14 || step % 11 === 0) && step > 2 && cursorX < levelLength - 1000) {
+                    if (step % 6 === 2) {
+                        const targetX = cursorX + pW + 420;
+                        portals.push({
+                            x: cursorX + 50,
+                            y: pY - 50,
+                            targetX: targetX,
+                            targetY: pY - 80,
+                            color: '#A855F7',
+                            cooldown: 0
+                        });
+                    }
+                }
+
+                // Górna platforma
+                if (step % 2 === 1) {
+                    const upW = 140 + (step % 3) * 30;
+                    const upX = cursorX + 30;
+                    const upY = pY - 125;
+                    platforms.push({
+                        x: upX, y: upY, w: upW, h: 22, baseX: upX, baseY: upY,
+                        type: (step % 5 === 0) ? 'crumble' : 'upper',
+                        theme: levelCfg.theme,
+                        crumbleState: 0, crumbleTimer: 0
+                    });
+
+                    // Power-up
+                    if (step % 3 === 0) {
+                        const pTypes = ['catnip', 'zoomies', 'heart'];
+                        collectibles.push({
+                            x: upX + upW / 2, y: upY - 70, r: 18,
+                            type: pTypes[(step + levelCfg.id) % pTypes.length],
+                            collected: false, bob: 0
+                        });
+                    }
+                }
+
+                // Przysmaki (rybki / włóczki)
+                for (let f = 0; f < 3; f++) {
+                    collectibles.push({
+                        x: cursorX + 35 + f * 55,
+                        y: pY - 35 - (f === 1 ? 25 : 0),
+                        r: 13,
+                        type: f === 1 && step % 2 === 0 ? 'yarn' : 'fish',
+                        collected: false, bob: f * 0.7
+                    });
+                }
+
+                // Przeciwnicy (Kupki)
+                if (pType !== 'crumble' && pW >= 200) {
+                    let eType = 'patrol';
+                    const roll = (step + levelCfg.id) % 5;
+                    if (roll === 1) eType = 'jumper';
+                    else if (roll === 2 && levelCfg.id >= 3) eType = 'chaser';
+                    else if (roll === 3 && levelCfg.id >= 4) eType = 'dropper';
+                    else if (roll === 4 && levelCfg.id >= 7) eType = 'flyer';
+
+                    if (eType === 'dropper') {
+                        enemies.push({
+                            x: cursorX + pW / 2 - 20, y: pY - 260, startY: pY - 260, groundY: pY - 38,
+                            w: 38, h: 38, vx: 0, vy: 0, type: 'dropper', state: 'waiting', timer: 0,
+                            minX: cursorX, maxX: cursorX + pW, dead: false
+                        });
+                    } else if (eType === 'flyer') {
+                        enemies.push({
+                            x: cursorX + pW / 2, y: pY - 130, baseY: pY - 130,
+                            w: 38, h: 36, vx: 1.6, vy: 0, type: 'flyer',
+                            minX: cursorX, maxX: cursorX + pW - 40, dead: false
+                        });
+                    } else {
+                        const baseSpd = (eType === 'chaser' ? 2.2 : 1.35) + (levelCfg.id * 0.15);
+                        enemies.push({
+                            x: cursorX + pW / 2, y: pY - 38, w: 38, h: 38,
+                            vx: baseSpd, vy: 0, baseSpeed: baseSpd, type: eType,
+                            minX: cursorX + 8, maxX: cursorX + pW - 46, platRef: mainP,
+                            jumpTimer: (step * 25) % 80, dead: false
+                        });
+                    }
+                }
+
+                cursorX += pW;
+            }
+
+            // Platforma końcowa
+            const finishX = cursorX + 80;
+            platforms.push({ x: finishX, y: floorY, w: 560, h: 120, type: 'ground', theme: levelCfg.theme });
+
+            const goal = {
+                x: finishX + 260,
+                y: floorY - 150,
+                w: 110,
+                h: 150
+            };
+
+            // Inicjalizacja Bossa jeśli poziom go posiada
+            if (levelCfg.boss && !isEndless) {
+                const arenaX = finishX - 100;
+                boss = {
+                    type: levelCfg.boss,
+                    name: levelCfg.boss === 'mega_poop' ? 'Wielka Kupka' : (levelCfg.boss === 'tower_boss' ? 'Boss Drapaków' : 'Król Kupek'),
+                    x: arenaX + 160,
+                    y: floorY - 120,
+                    w: 100,
+                    h: 96,
+                    vx: 2.2,
+                    vy: 0,
+                    minX: arenaX - 250,
+                    maxX: arenaX + 350,
+                    maxHp: levelCfg.boss === 'king_poop' ? 12 : (levelCfg.boss === 'tower_boss' ? 8 : 6),
+                    hp: levelCfg.boss === 'king_poop' ? 12 : (levelCfg.boss === 'tower_boss' ? 8 : 6),
+                    jumpTimer: 80,
+                    attackTimer: 0,
+                    hitFlash: 0,
+                    defeated: false
+                };
+            }
+
+            return {
+                config: levelCfg,
+                platforms,
+                collectibles,
+                enemies,
+                portals,
+                goal,
+                boss,
+                totalLength: finishX + 460
+            };
+        }
+
+        // =========================================================================
+        // 5. RYSOWANIE KOTKI MIZI (RASA NEVA MASQUERADE)
+        // =========================================================================
+        function drawNevaMasqueradeCat(ctx, x, y, w, h, opts = {}) {
+            const {
+                facing = 1,
+                walkCycle = 0,
+                vy = 0,
+                onGround = true,
+                doubleSpin = 0,
+                blink = false,
+                shieldTimer = 0,
+                zoomiesTimer = 0,
+                invincibleTimer = 0,
+                time = 0
+            } = opts;
+
+            ctx.save();
+            ctx.translate(x + w / 2, y + h / 2);
+
+            if (invincibleTimer > 0 && Math.floor(time * 24) % 2 === 0) {
+                ctx.globalAlpha = 0.5;
+            }
+
+            if (doubleSpin > 0) {
+                ctx.rotate(facing * (1 - doubleSpin) * Math.PI * 2);
+            } else if (!onGround) {
+                ctx.rotate(facing * Math.max(-0.25, Math.min(0.25, vy * 0.025)));
+            }
+
+            ctx.scale(facing, 1);
+
+            // Poświata Kocimiętki
+            if (shieldTimer > 0) {
+                ctx.save();
+                const p = 1 + Math.sin(time * 8) * 0.08;
+                ctx.strokeStyle = '#34D399';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.arc(0, 0, w * 0.8 * p, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Poświata Zoomies
+            if (zoomiesTimer > 0) {
+                ctx.save();
+                ctx.strokeStyle = '#E879F9';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.arc(-5, 0, w * 0.72, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Paleta rasy Neva Masquerade
+            const cream = '#FAF6EE';
+            const shadow = '#EADECF';
+            const pointDark = '#4A3B32';
+            const pointMid = '#6E5C50';
+
+            // Puszysty Ogon
+            ctx.save();
+            const tailAngle = Math.sin(time * 6 + walkCycle * 0.5) * 0.28 + (onGround ? 0 : -0.35);
+            ctx.translate(-w * 0.35, h * 0.08);
+            ctx.rotate(tailAngle);
+            const tailG = ctx.createLinearGradient(0, 0, -w * 0.5, -h * 0.35);
+            tailG.addColorStop(0, pointMid);
+            tailG.addColorStop(1, pointDark);
+            ctx.fillStyle = tailG;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(-w * 0.25, 0, -w * 0.55, -h * 0.2, -w * 0.45, -h * 0.42);
+            ctx.bezierCurveTo(-w * 0.35, -h * 0.6, -w * 0.1, -h * 0.3, 0, -h * 0.1);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+
+            // Łapki z ciemnymi skarpetkami
+            const lA1 = onGround ? Math.sin(walkCycle) * 6 : 4;
+            const lA2 = onGround ? Math.sin(walkCycle + Math.PI) * 6 : -4;
+
+            const drawPaw = (px, py, ang) => {
+                ctx.save();
+                ctx.translate(px, py + ang * 0.3);
+                ctx.fillStyle = shadow;
+                ctx.beginPath();
+                ctx.roundRect(-4, -4, 9, 13, 4);
+                ctx.fill();
+                ctx.fillStyle = pointDark;
+                ctx.beginPath();
+                ctx.roundRect(-4, 3, 9, 7, 3);
+                ctx.fill();
+                ctx.restore();
+            };
+
+            drawPaw(-w * 0.22, h * 0.25, lA2);
+            drawPaw(w * 0.16, h * 0.25, lA1);
+
+            // Puszysty tułów
+            ctx.fillStyle = cream;
+            ctx.beginPath();
+            ctx.ellipse(-w * 0.04, h * 0.06, w * 0.36, h * 0.26, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Cień grzbietu
+            ctx.fillStyle = '#E3D6C5';
+            ctx.beginPath();
+            ctx.ellipse(-w * 0.08, -h * 0.02, w * 0.24, h * 0.11, -0.1, 0, Math.PI * 2);
+            ctx.fill();
+
+            drawPaw(-w * 0.14, h * 0.27, lA1);
+            drawPaw(w * 0.23, h * 0.27, lA2);
+
+            // Syberyjska kryza wokół szyi
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.moveTo(w * 0.05, -h * 0.06);
+            ctx.lineTo(w * 0.28, h * 0.05);
+            ctx.lineTo(w * 0.21, h * 0.16);
+            ctx.lineTo(w * 0.25, h * 0.22);
+            ctx.lineTo(w * 0.07, h * 0.23);
+            ctx.lineTo(0, h * 0.16);
+            ctx.closePath();
+            ctx.fill();
+
+            // Głowa
+            ctx.save();
+            ctx.translate(w * 0.18, -h * 0.12);
+
+            ctx.fillStyle = cream;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, w * 0.26, h * 0.23, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Uszka (ciemne point z różowym środkiem)
+            ctx.fillStyle = pointDark;
+            ctx.beginPath();
+            ctx.moveTo(-w * 0.16, -h * 0.14);
+            ctx.lineTo(-w * 0.22, -h * 0.36);
+            ctx.lineTo(-w * 0.04, -h * 0.20);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = pointDark;
+            ctx.beginPath();
+            ctx.moveTo(w * 0.06, -h * 0.20);
+            ctx.lineTo(w * 0.22, -h * 0.36);
+            ctx.lineTo(w * 0.22, -h * 0.12);
+            ctx.closePath();
+            ctx.fill();
+
+            // Maska Neva Masquerade na pyszczku
+            const mGrad = ctx.createRadialGradient(w * 0.04, 0, 2, w * 0.04, 0, w * 0.18);
+            mGrad.addColorStop(0, pointDark);
+            mGrad.addColorStop(0.65, pointMid);
+            mGrad.addColorStop(1, 'rgba(110, 92, 80, 0)');
+            ctx.fillStyle = mGrad;
+            ctx.beginPath();
+            ctx.ellipse(w * 0.04, 0, w * 0.18, h * 0.15, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Szafirowo-błękitne oczy
+            const drawEye = (ex, ey) => {
+                if (blink) {
+                    ctx.strokeStyle = pointDark;
+                    ctx.lineWidth = 2.2;
+                    ctx.beginPath();
+                    ctx.arc(ex, ey, 4, 0.15, Math.PI - 0.15);
+                    ctx.stroke();
+                    return;
+                }
+                ctx.fillStyle = '#38BDF8';
+                ctx.beginPath();
+                ctx.ellipse(ex, ey, 4.6, 5.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#0284C7';
+                ctx.beginPath();
+                ctx.arc(ex, ey - 1, 3.4, Math.PI, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#0F172A';
+                ctx.beginPath();
+                ctx.ellipse(ex + 0.4, ey, 1.8, 3.4, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath();
+                ctx.arc(ex - 1.2, ey - 1.5, 1.4, 0, Math.PI * 2);
+                ctx.fill();
+            };
+
+            drawEye(-3, -1);
+            drawEye(9, -1);
+
+            // Nosek i wąsy
+            ctx.fillStyle = '#F472B6';
+            ctx.beginPath();
+            ctx.moveTo(1.5, 3); ctx.lineTo(6.5, 3); ctx.lineTo(4, 5.5);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(-2, 5); ctx.lineTo(-13, 3);
+            ctx.moveTo(-2, 7); ctx.lineTo(-14, 7);
+            ctx.moveTo(8, 5); ctx.lineTo(19, 3);
+            ctx.moveTo(8, 7); ctx.lineTo(20, 7);
+            ctx.stroke();
+
+            ctx.restore();
+            ctx.restore();
+        }
+
+        // =========================================================================
+        // 6. RYSOWANIE WROGÓW I BOSSÓW
+        // =========================================================================
+        function drawPoop(ctx, enemy, time) {
+            const { x, y, w, h, type, vx } = enemy;
+            ctx.save();
+            ctx.translate(x + w / 2, y + h / 2);
+
+            const b = Math.sin(time * 9 + x * 0.05) * 0.06;
+            ctx.scale(1 + b, 1 - b);
+
+            let colBase = '#78350F';
+            let colMid = '#92400E';
+            if (type === 'jumper') { colBase = '#9A3412'; colMid = '#C2410C'; }
+            else if (type === 'dropper') { colBase = '#581C87'; colMid = '#7E22CE'; }
+            else if (type === 'chaser') { colBase = '#451A03'; colMid = '#78350F'; }
+            else if (type === 'flyer') { colBase = '#1E3A8A'; colMid = '#2563EB'; }
+
+            // Skrzydełka latającej kupki
+            if (type === 'flyer') {
+                const wingF = Math.sin(time * 20) * 12;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+                ctx.beginPath();
+                ctx.ellipse(-w * 0.45, -h * 0.15 + wingF * 0.2, 12, 6, -0.4, 0, Math.PI * 2);
+                ctx.ellipse(w * 0.45, -h * 0.15 - wingF * 0.2, 12, 6, 0.4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Kupka (poziomy)
+            ctx.fillStyle = colBase;
+            ctx.beginPath();
+            ctx.roundRect(-w * 0.48, h * 0.06, w * 0.96, h * 0.42, 12);
+            ctx.fill();
+
+            ctx.fillStyle = colMid;
+            ctx.beginPath();
+            ctx.roundRect(-w * 0.38, -h * 0.20, w * 0.76, h * 0.34, 10);
+            ctx.fill();
+
+            // Czubek
+            ctx.fillStyle = colMid;
+            ctx.beginPath();
+            ctx.moveTo(-w * 0.22, -h * 0.16);
+            ctx.quadraticCurveTo(-w * 0.08, -h * 0.54, w * 0.06, -h * 0.48);
+            ctx.quadraticCurveTo(w * 0.24, -h * 0.34, w * 0.22, -h * 0.16);
+            ctx.closePath();
+            ctx.fill();
+
+            // Oczka
+            const look = vx >= 0 ? 1.5 : -1.5;
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(-7, -2, 5.2, 0, Math.PI * 2);
+            ctx.arc(7, -2, 5.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = type === 'chaser' ? '#DC2626' : '#0F172A';
+            ctx.beginPath();
+            ctx.arc(-7 + look, -2, 2.4, 0, Math.PI * 2);
+            ctx.arc(7 + look, -2, 2.4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawBoss(ctx, boss, time) {
+            ctx.save();
+            ctx.translate(boss.x + boss.w / 2, boss.y + boss.h / 2);
+
+            if (boss.hitFlash > 0) {
+                ctx.filter = 'brightness(2.2)';
+            }
+
+            const scale = 1 + Math.sin(time * 6) * 0.04;
+            ctx.scale(scale, scale);
+
+            // Baza bossa
+            ctx.fillStyle = boss.type === 'king_poop' ? '#581C87' : '#713F12';
+            ctx.beginPath();
+            ctx.roundRect(-boss.w * 0.48, boss.h * 0.05, boss.w * 0.96, boss.h * 0.44, 20);
+            ctx.fill();
+
+            ctx.fillStyle = boss.type === 'king_poop' ? '#7E22CE' : '#854D0E';
+            ctx.beginPath();
+            ctx.roundRect(-boss.w * 0.38, -boss.h * 0.24, boss.w * 0.76, boss.h * 0.38, 18);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(-boss.w * 0.24, -boss.h * 0.22);
+            ctx.quadraticCurveTo(-boss.w * 0.08, -boss.h * 0.58, boss.w * 0.08, -boss.h * 0.52);
+            ctx.quadraticCurveTo(boss.w * 0.26, -boss.h * 0.38, boss.w * 0.24, -boss.h * 0.20);
+            ctx.closePath();
+            ctx.fill();
+
+            // Korona dla Króla Kupek
+            if (boss.type === 'king_poop') {
+                ctx.fillStyle = '#FACC15';
+                ctx.beginPath();
+                ctx.moveTo(-24, -boss.h * 0.52);
+                ctx.lineTo(-28, -boss.h * 0.74);
+                ctx.lineTo(-10, -boss.h * 0.60);
+                ctx.lineTo(0, -boss.h * 0.80);
+                ctx.lineTo(10, -boss.h * 0.60);
+                ctx.lineTo(28, -boss.h * 0.74);
+                ctx.lineTo(24, -boss.h * 0.52);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            // Groźne oczy
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(-16, -6, 11, 0, Math.PI * 2);
+            ctx.arc(16, -6, 11, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#EF4444';
+            ctx.beginPath();
+            ctx.arc(-16 + (boss.vx > 0 ? 3 : -3), -6, 5, 0, Math.PI * 2);
+            ctx.arc(16 + (boss.vx > 0 ? 3 : -3), -6, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Pasek życia Bossa nad głową
+            ctx.filter = 'none';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+            ctx.fillRect(-45, -boss.h * 0.82, 90, 8);
+            const hpRatio = Math.max(0, boss.hp / boss.maxHp);
+            ctx.fillStyle = '#EF4444';
+            ctx.fillRect(-44, -boss.h * 0.81, 88 * hpRatio, 6);
+
+            ctx.restore();
+        }
+
+        // =========================================================================
+        // 7. SILNIK GRY, FIZYKA I OBSŁUGA POZIOMU
+        // =========================================================================
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // UI Ekrany
+        const hud = document.getElementById('hud');
+        const hudHearts = document.getElementById('hudHearts');
+        const hudScore = document.getElementById('hudScore');
+        const hudLevelTitle = document.getElementById('hudLevelTitle');
+        const hudProgressValue = document.getElementById('hudProgressValue');
+        const hudProgressBar = document.getElementById('hudProgressBar');
+        const hudBuffs = document.getElementById('hudBuffs');
+        const touchControls = document.getElementById('touchControls');
+
+        const menuScreen = document.getElementById('menuScreen');
+        const levelSelectScreen = document.getElementById('levelSelectScreen');
+        const levelGrid = document.getElementById('levelGrid');
+        const unlockedCountText = document.getElementById('unlockedCountText');
+        const winLevelScreen = document.getElementById('winLevelScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const pauseScreen = document.getElementById('pauseScreen');
+        const victoryScreen = document.getElementById('victoryScreen');
+        const milkBathEndingScreen = document.getElementById('milkBathEndingScreen');
+        const bathCanvas = document.getElementById('bathCanvas');
+        const bathCtx = bathCanvas ? bathCanvas.getContext('2d') : null;
+        const bathDialogueText = document.getElementById('bathDialogueText');
+
+        let gameState = 'MENU'; // MENU, LEVEL_SELECT, PLAYING, PAUSED, LEVEL_WIN, GAME_OVER, VICTORY, CUTSCENE
+        let isEndlessMode = false;
+        let currentLevelIndex = 0;
+        let levelData = null;
+        let score = 0;
+        let globalTime = 0;
+        let bathAnimTime = 0;
+
+        const mizia = {
+            x: 100, y: 380, w: 54, h: 46, vx: 0, vy: 0,
+            facing: 1, onGround: false, jumpsLeft: 2,
+            jumpBuffer: 0, coyoteTimer: 0, walkCycle: 0,
+            doubleSpin: 0, lives: 3, maxLives: 5,
+            invincibleTimer: 0, shieldTimer: 0, zoomiesTimer: 0,
+            blinkTimer: 0, isBlinking: false, standingPlat: null
+        };
+
+        const camera = { x: 0, y: 0 };
+        let particles = [];
+        let floatingTexts = [];
+        let afterimages = [];
+
+        const input = { left: false, right: false, jump: false };
+
+        function resize() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+
+            const isPortrait = h > w;
+            const targetHeight = isPortrait ? 740 : 620;
+            viewScale = (h * dpr) / targetHeight;
+            viewWidth = (w * dpr) / viewScale;
+            viewHeight = targetHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function renderPreviewMizia() {
+            const pCanvas = document.getElementById('miziaPreviewCanvas');
+            if (!pCanvas) return;
+            const pCtx = pCanvas.getContext('2d');
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+
+            const g = pCtx.createRadialGradient(90, 90, 15, 90, 90, 85);
+            g.addColorStop(0, '#38BDF8');
+            g.addColorStop(1, '#0F172A');
+            pCtx.fillStyle = g;
+            pCtx.beginPath();
+            pCtx.arc(90, 90, 80, 0, Math.PI * 2);
+            pCtx.fill();
+
+            pCtx.save();
+            pCtx.translate(28, 38);
+            drawNevaMasqueradeCat(pCtx, 0, 0, 125, 105, {
+                facing: 1, walkCycle: globalTime * 3, onGround: true,
+                blink: Math.sin(globalTime * 2.8) > 0.94, time: globalTime
+            });
+            pCtx.restore();
+        }
+
+        function spawnFx(x, y, color, count = 12, speed = 4) {
+            for (let i = 0; i < count; i++) {
+                const ang = Math.random() * Math.PI * 2;
+                const spd = (0.3 + Math.random() * 0.8) * speed;
+                particles.push({
+                    x, y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - 1,
+                    r: 3 + Math.random() * 3.5, color, life: 0.45 + Math.random() * 0.3
+                });
+            }
+        }
+
+        function spawnText(x, y, text, color = '#FBBF24') {
+            floatingTexts.push({ x, y, text, color, vy: -1.6, life: 0.9 });
+        }
+
+        function loadLevel(idx, isEndless = false, keepScore = false) {
+            isEndlessMode = isEndless;
+            currentLevelIndex = idx;
+            const cfg = isEndless ? {
+                id: 99, name: 'Tryb Endless ♾️', sub: 'Uciekaj bez końca!',
+                theme: 'space', len: 999999, bgTop: '#090A1A', bgBot: '#1F1030', gCol: '#311042', gTop: '#E879F9'
+            } : CAMPAIGN_LEVELS[idx];
+
+            levelData = generateLevelData(cfg, isEndless);
+
+            if (!keepScore) score = 0;
+            mizia.x = 100;
+            mizia.y = 380;
+            mizia.vx = 0;
+            mizia.vy = 0;
+            mizia.facing = 1;
+            mizia.onGround = false;
+            mizia.jumpsLeft = 2;
+            mizia.lives = 3;
+            mizia.shieldTimer = 0;
+            mizia.zoomiesTimer = 0;
+            mizia.invincibleTimer = 1.0;
+            mizia.standingPlat = null;
+
+            particles = [];
+            floatingTexts = [];
+            afterimages = [];
+            camera.x = 0;
+
+            updateHUD();
+        }
+
+        function updateHUD() {
+            let hStr = '';
+            for (let i = 0; i < mizia.maxLives; i++) {
+                if (i < mizia.lives) hStr += '❤️';
+                else if (i < 3) hStr += '🖤';
+            }
+            hudHearts.textContent = hStr;
+            hudScore.textContent = score;
+
+            if (levelData) {
+                if (levelData.boss && !levelData.boss.defeated) {
+                    hudLevelTitle.textContent = `⚔️ BOSS: ${levelData.boss.name}`;
+                    const bHp = Math.round((levelData.boss.hp / levelData.boss.maxHp) * 100);
+                    hudProgressValue.textContent = `${bHp}% HP`;
+                    hudProgressBar.style.width = `${bHp}%`;
+                    hudProgressBar.className = 'h-full bg-rose-500 rounded-full transition-all duration-150';
+                } else {
+                    hudLevelTitle.textContent = isEndlessMode ? 'TRYB ENDLESS' : `Etap ${levelData.config.id}: ${levelData.config.name}`;
+                    const prog = Math.min(100, Math.round((mizia.x / (levelData.goal ? levelData.goal.x : 5000)) * 100));
+                    hudProgressValue.textContent = `${prog}%`;
+                    hudProgressBar.style.width = `${prog}%`;
+                    hudProgressBar.className = 'h-full bg-gradient-to-r from-sky-400 via-cyan-300 to-amber-400 rounded-full transition-all duration-150';
+                }
+            }
+
+            let bHtml = '';
+            if (mizia.shieldTimer > 0) bHtml += `<span class="bg-emerald-900/80 border border-emerald-400 text-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🌿 Tarcza ${mizia.shieldTimer.toFixed(1)}s</span>`;
+            if (mizia.zoomiesTimer > 0) bHtml += `<span class="bg-fuchsia-900/80 border border-fuchsia-400 text-fuchsia-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">⚡ Turbo ${mizia.zoomiesTimer.toFixed(1)}s</span>`;
+            hudBuffs.innerHTML = bHtml;
+        }
+
+        function triggerPlayerJump() {
+            mizia.jumpBuffer = 0.16;
+        }
+
+        function updateGame(dt) {
+            globalTime += dt;
+            if (gameState !== 'PLAYING' || !levelData) return;
+
+            // Timery
+            if (mizia.invincibleTimer > 0) mizia.invincibleTimer = Math.max(0, mizia.invincibleTimer - dt);
+            if (mizia.shieldTimer > 0) mizia.shieldTimer = Math.max(0, mizia.shieldTimer - dt);
+            if (mizia.zoomiesTimer > 0) mizia.zoomiesTimer = Math.max(0, mizia.zoomiesTimer - dt);
+            if (mizia.coyoteTimer > 0) mizia.coyoteTimer = Math.max(0, mizia.coyoteTimer - dt);
+            if (mizia.jumpBuffer > 0) mizia.jumpBuffer = Math.max(0, mizia.jumpBuffer - dt);
+            if (mizia.doubleSpin > 0) mizia.doubleSpin = Math.max(0, mizia.doubleSpin - dt * 2.8);
+
+            mizia.blinkTimer -= dt;
+            if (mizia.blinkTimer <= 0) {
+                mizia.isBlinking = !mizia.isBlinking;
+                mizia.blinkTimer = mizia.isBlinking ? 0.14 : (2.2 + Math.random() * 2.5);
+            }
+
+            // Aktualizacja platform
+            for (const p of levelData.platforms) {
+                p.dx = 0; p.dy = 0;
+                if (p.type === 'moving_h') {
+                    const prevX = p.x;
+                    p.x = p.baseX + Math.sin(globalTime * p.moveSpeed + p.phase) * p.moveRange;
+                    p.dx = p.x - prevX;
+                } else if (p.type === 'moving_v') {
+                    const prevY = p.y;
+                    p.y = p.baseY + Math.sin(globalTime * p.moveSpeed + p.phase) * (p.moveRange * 0.7);
+                    p.dy = p.y - prevY;
+                } else if (p.type === 'crumble') {
+                    if (p.crumbleState === 1) {
+                        p.crumbleTimer -= dt;
+                        if (p.crumbleTimer <= 0) {
+                            p.crumbleState = 2;
+                            p.crumbleTimer = 2.4;
+                            spawnFx(p.x + p.w / 2, p.y + 10, '#94A3B8', 12, 3);
+                        }
+                    } else if (p.crumbleState === 2) {
+                        p.crumbleTimer -= dt;
+                        if (p.crumbleTimer <= 0) p.crumbleState = 0;
+                    }
+                }
+            }
+
+            // Portale (teleportacja Mizi)
+            for (const pt of levelData.portals) {
+                if (pt.cooldown > 0) pt.cooldown -= dt;
+                const d = Math.hypot((mizia.x + mizia.w / 2) - pt.x, (mizia.y + mizia.h / 2) - pt.y);
+                if (d < 38 && pt.cooldown <= 0) {
+                    sfx.teleport();
+                    spawnFx(mizia.x + mizia.w / 2, mizia.y + mizia.h / 2, pt.color, 16, 4);
+                    mizia.x = pt.targetX;
+                    mizia.y = pt.targetY;
+                    mizia.vx = 2;
+                    pt.cooldown = 2.0;
+                    spawnFx(mizia.x + mizia.w / 2, mizia.y + mizia.h / 2, pt.color, 16, 4);
+                }
+            }
+
+            // Ruch poziomy
+            const isIce = mizia.standingPlat && mizia.standingPlat.type === 'ice';
+            const maxSpd = mizia.zoomiesTimer > 0 ? 7.6 : 5.2;
+            const accel = isIce ? 0.22 : 0.8;
+            const friction = isIce ? 0.97 : 0.80;
+
+            if (input.left) {
+                mizia.vx = Math.max(mizia.vx - accel, -maxSpd);
+                mizia.facing = -1;
+                mizia.walkCycle += dt * (mizia.zoomiesTimer > 0 ? 18 : 12);
+            } else if (input.right) {
+                mizia.vx = Math.min(mizia.vx + accel, maxSpd);
+                mizia.facing = 1;
+                mizia.walkCycle += dt * (mizia.zoomiesTimer > 0 ? 18 : 12);
+            } else {
+                mizia.vx *= friction;
+                if (Math.abs(mizia.vx) < 0.08) mizia.vx = 0;
+            }
+
+            // Wpływ taśmociągu
+            if (mizia.onGround && mizia.standingPlat && mizia.standingPlat.type === 'conveyor') {
+                mizia.x += mizia.standingPlat.conveyorSpeed;
+            }
+
+            // Ruch platform
+            if (mizia.onGround && mizia.standingPlat) {
+                mizia.x += mizia.standingPlat.dx || 0;
+                mizia.y += mizia.standingPlat.dy || 0;
+            }
+
+            // Skok
+            if (mizia.jumpBuffer > 0) {
+                const jForce = mizia.zoomiesTimer > 0 ? -13.5 : -11.9;
+                if (mizia.onGround || mizia.coyoteTimer > 0) {
+                    mizia.vy = jForce;
+                    mizia.onGround = false;
+                    mizia.coyoteTimer = 0;
+                    mizia.jumpsLeft = 1;
+                    mizia.jumpBuffer = 0;
+                    mizia.standingPlat = null;
+                    sfx.jump(false);
+                    spawnFx(mizia.x + mizia.w / 2, mizia.y + mizia.h, '#FAF6EE', 8, 2.5);
+                } else if (mizia.jumpsLeft > 0) {
+                    mizia.vy = jForce * 0.92;
+                    mizia.jumpsLeft--;
+                    mizia.jumpBuffer = 0;
+                    mizia.doubleSpin = 1.0;
+                    sfx.jump(true);
+                    spawnFx(mizia.x + mizia.w / 2, mizia.y + mizia.h, '#38BDF8', 14, 3.5);
+                }
+            }
+
+            // Grawitacja (niższa w kosmosie)
+            const grav = levelData.config.theme === 'space' ? 0.34 : 0.56;
+            mizia.vy = Math.min(mizia.vy + grav, 14);
+
+            const prevBottom = mizia.y + mizia.h;
+            mizia.x += mizia.vx;
+            mizia.y += mizia.vy;
+
+            if (mizia.x < 10) { mizia.x = 10; mizia.vx = 0; }
+
+            // Kolizja z platformami
+            let landed = false;
+            mizia.standingPlat = null;
+
+            if (mizia.vy >= 0) {
+                for (const p of levelData.platforms) {
+                    if (p.crumbleState === 2) continue;
+                    const inX = mizia.x + mizia.w * 0.78 > p.x && mizia.x + mizia.w * 0.22 < p.x + p.w;
+                    const hitTop = prevBottom <= p.y + 14 && (mizia.y + mizia.h) >= p.y;
+
+                    if (inX && hitTop) {
+                        // Trampolina
+                        if (p.type === 'trampoline') {
+                            mizia.vy = -16.2;
+                            mizia.onGround = false;
+                            mizia.jumpsLeft = 2;
+                            sfx.bounce();
+                            spawnFx(mizia.x + mizia.w / 2, p.y, '#38BDF8', 14, 4);
+                            spawnText(mizia.x, p.y - 10, 'SPRĘŻYNA! 🚀', '#38BDF8');
+                            landed = false;
+                            break;
+                        }
+
+                        mizia.y = p.y - mizia.h;
+                        mizia.vy = 0;
+                        mizia.onGround = true;
+                        mizia.coyoteTimer = 0.12;
+                        mizia.jumpsLeft = 2;
+                        mizia.standingPlat = p;
+                        landed = true;
+
+                        if (p.type === 'crumble' && p.crumbleState === 0) {
+                            p.crumbleState = 1;
+                            p.crumbleTimer = 0.55;
+                        }
+                        break;
+                    }
+                }
+            }
+            if (!landed) mizia.onGround = false;
+
+            // Spadek w przepaść
+            if (mizia.y > 720) {
+                damagePlayer(true);
+            }
+
+            // Przysmaki i Wzmocnienia
+            const mcX = mizia.x + mizia.w / 2;
+            const mcY = mizia.y + mizia.h / 2;
+            for (const item of levelData.collectibles) {
+                if (item.collected) continue;
+                if (Math.hypot(mcX - item.x, mcY - item.y) < item.r + 26) {
+                    item.collected = true;
+                    if (item.type === 'fish') {
+                        score += 50;
+                        sfx.collect(false);
+                        spawnFx(item.x, item.y, '#FBBF24', 8, 3);
+                        spawnText(item.x, item.y, '+50 🐟', '#FDE047');
+                    } else if (item.type === 'yarn') {
+                        score += 100;
+                        sfx.collect(false);
+                        spawnFx(item.x, item.y, '#F472B6', 10, 3.5);
+                        spawnText(item.x, item.y, '+100 🧶', '#F472B6');
+                    } else if (item.type === 'catnip') {
+                        mizia.shieldTimer = 8.0;
+                        score += 150;
+                        sfx.collect(true);
+                        spawnFx(item.x, item.y, '#34D399', 16, 4);
+                        spawnText(item.x, item.y, 'KOCIMIĘTKA! 🌿', '#34D399');
+                    } else if (item.type === 'zoomies') {
+                        mizia.zoomiesTimer = 7.0;
+                        score += 150;
+                        sfx.collect(true);
+                        spawnFx(item.x, item.y, '#E879F9', 16, 4);
+                        spawnText(item.x, item.y, 'ZOOMIES! ⚡', '#E879F9');
+                    } else if (item.type === 'heart') {
+                        if (mizia.lives < mizia.maxLives) mizia.lives++;
+                        sfx.collect(true);
+                        spawnFx(item.x, item.y, '#FB7185', 14, 4);
+                        spawnText(item.x, item.y, '+1 ŻYCIE ❤️', '#FB7185');
+                    }
+                }
+            }
+
+            // Przeciwnicy (Kupki)
+            for (const e of levelData.enemies) {
+                if (e.dead) continue;
+
+                if (e.type === 'patrol') {
+                    e.x += e.vx;
+                    if (e.x <= e.minX) { e.x = e.minX; e.vx = Math.abs(e.vx); }
+                    if (e.x >= e.maxX) { e.x = e.maxX; e.vx = -Math.abs(e.vx); }
+                } else if (e.type === 'jumper') {
+                    e.x += e.vx;
+                    if (e.x <= e.minX) { e.x = e.minX; e.vx = Math.abs(e.vx); }
+                    if (e.x >= e.maxX) { e.x = e.maxX; e.vx = -Math.abs(e.vx); }
+                    e.jumpTimer--;
+                    if (e.jumpTimer <= 0) {
+                        e.vy = -9.2;
+                        e.jumpTimer = 70 + Math.random() * 30;
+                    }
+                    e.vy += 0.45;
+                    e.y += e.vy;
+                    const gy = e.platRef ? e.platRef.y - e.h : e.y;
+                    if (e.y >= gy) { e.y = gy; e.vy = 0; }
+                } else if (e.type === 'chaser') {
+                    const dist = mizia.x - e.x;
+                    if (Math.abs(dist) < 280) e.vx = (dist > 0 ? 1 : -1) * e.baseSpeed * 1.6;
+                    e.x += e.vx;
+                    if (e.x <= e.minX) { e.x = e.minX; e.vx = Math.abs(e.baseSpeed); }
+                    if (e.x >= e.maxX) { e.x = e.maxX; e.vx = -Math.abs(e.baseSpeed); }
+                } else if (e.type === 'dropper') {
+                    const dx = Math.abs((mizia.x + mizia.w / 2) - (e.x + e.w / 2));
+                    if (e.state === 'waiting' && dx < 110) { e.state = 'falling'; e.vy = 2; }
+                    else if (e.state === 'falling') {
+                        e.vy = Math.min(e.vy + 0.65, 11);
+                        e.y += e.vy;
+                        if (e.y >= e.groundY) { e.y = e.groundY; e.state = 'landed'; e.timer = 1.0; }
+                    } else if (e.state === 'landed') {
+                        e.timer -= dt;
+                        if (e.timer <= 0) e.state = 'rising';
+                    } else if (e.state === 'rising') {
+                        e.y -= 2.6;
+                        if (e.y <= e.startY) { e.y = e.startY; e.state = 'waiting'; }
+                    }
+                } else if (e.type === 'flyer') {
+                    e.x += e.vx;
+                    e.y = e.baseY + Math.sin(globalTime * 4 + e.x * 0.05) * 22;
+                    if (e.x <= e.minX) { e.x = e.minX; e.vx = Math.abs(e.vx); }
+                    if (e.x >= e.maxX) { e.x = e.maxX; e.vx = -Math.abs(e.vx); }
+                }
+
+                // Kolizja Mizi z wrogiem
+                const p = 8;
+                if (
+                    mizia.x + mizia.w - p > e.x + p &&
+                    mizia.x + p < e.x + e.w - p &&
+                    mizia.y + mizia.h - p > e.y + p &&
+                    mizia.y + p < e.y + e.h - p
+                ) {
+                    if (mizia.shieldTimer > 0) {
+                        e.dead = true;
+                        score += 150;
+                        sfx.pop();
+                        spawnFx(e.x + e.w / 2, e.y + e.h / 2, '#92400E', 16, 4.5);
+                        spawnText(e.x, e.y, '+150 ROZBITE! 💥', '#34D399');
+                    } else if (mizia.invincibleTimer <= 0) {
+                        damagePlayer(false);
+                    }
+                }
+            }
+
+            // Logika i Kolizja z Bossem
+            if (levelData.boss && !levelData.boss.defeated) {
+                const b = levelData.boss;
+                if (b.hitFlash > 0) b.hitFlash -= dt;
+
+                b.x += b.vx;
+                if (b.x <= b.minX) { b.x = b.minX; b.vx = Math.abs(b.vx); }
+                if (b.x >= b.maxX) { b.x = b.maxX; b.vx = -Math.abs(b.vx); }
+
+                b.jumpTimer--;
+                if (b.jumpTimer <= 0) {
+                    b.vy = -10.5;
+                    b.jumpTimer = 90 + Math.random() * 40;
+                }
+                b.vy += 0.45;
+                b.y += b.vy;
+                const bFloor = 520 - b.h;
+                if (b.y >= bFloor) { b.y = bFloor; b.vy = 0; }
+
+                // Skok na głowę bossa lub trafienie tarczą
+                const bossBox = 12;
+                const hitBossHead = (mizia.vy > 0 && prevBottom <= b.y + 22 && mizia.y + mizia.h >= b.y &&
+                    mizia.x + mizia.w > b.x && mizia.x < b.x + b.w);
+
+                if (hitBossHead || (mizia.shieldTimer > 0 &&
+                    mizia.x + mizia.w - bossBox > b.x && mizia.x + bossBox < b.x + b.w &&
+                    mizia.y + mizia.h - bossBox > b.y && mizia.y + bossBox < b.y + b.h)) {
+
+                    b.hp--;
+                    b.hitFlash = 0.25;
+                    mizia.vy = -11.5;
+                    mizia.jumpsLeft = 2;
+                    sfx.pop();
+                    spawnFx(b.x + b.w / 2, b.y + b.h / 2, '#EF4444', 18, 5);
+                    spawnText(b.x + b.w / 2, b.y, '-1 HP! 💥', '#EF4444');
+
+                    if (b.hp <= 0) {
+                        b.defeated = true;
+                        score += 1500;
+                        sfx.win();
+                        spawnFx(b.x + b.w / 2, b.y + b.h / 2, '#FACC15', 35, 7);
+                        spawnText(b.x, b.y - 30, 'BOSS POKONANY! 👑', '#FACC15');
+                    }
+                } else if (mizia.invincibleTimer <= 0 &&
+                    mizia.x + mizia.w - bossBox > b.x + bossBox && mizia.x + bossBox < b.x + b.w - bossBox &&
+                    mizia.y + mizia.h - bossBox > b.y + bossBox && mizia.y + bossBox < b.y + b.h - bossBox) {
+                    damagePlayer(false);
+                }
+            }
+
+            // Meta poziomu
+            if (levelData.goal && (!levelData.boss || levelData.boss.defeated)) {
+                const g = levelData.goal;
+                if (mizia.x + mizia.w > g.x + 10 && mizia.x < g.x + g.w - 10 && mizia.y + mizia.h > g.y) {
+                    onLevelComplete();
+                    return;
+                }
+            }
+
+            // Kamera
+            const maxCam = Math.max(0, levelData.totalLength - viewWidth * 0.7);
+            const targetCam = Math.max(0, Math.min(maxCam, mizia.x - viewWidth * 0.28));
+            camera.x += (targetCam - camera.x) * 0.12;
+
+            // Cząsteczki
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const pt = particles[i];
+                pt.x += pt.vx; pt.y += pt.vy; pt.vy += 0.15; pt.life -= dt;
+                if (pt.life <= 0) particles.splice(i, 1);
+            }
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                const ft = floatingTexts[i];
+                ft.y += ft.vy; ft.life -= dt;
+                if (ft.life <= 0) floatingTexts.splice(i, 1);
+            }
+
+            updateHUD();
+        }
+
+        function damagePlayer(fell) {
+            sfx.hit();
+            mizia.lives--;
+            spawnFx(mizia.x + mizia.w / 2, mizia.y + mizia.h / 2, '#FB7185', 18, 5);
+            spawnText(mizia.x, mizia.y - 10, 'AUĆ! 😿', '#FB7185');
+
+            if (mizia.lives <= 0) {
+                gameState = 'GAME_OVER';
+                hud.classList.add('hidden');
+                touchControls.classList.add('hidden');
+                document.getElementById('gameOverScore').textContent = `${score} pkt`;
+                gameOverScreen.classList.remove('hidden');
+                return;
+            }
+
+            mizia.invincibleTimer = 2.0;
+
+            if (fell) {
+                let safe = levelData.platforms[0];
+                for (const p of levelData.platforms) {
+                    if (p.type !== 'crumble' && p.x <= mizia.x && p.x > safe.x) safe = p;
+                }
+                mizia.x = safe.x + 25;
+                mizia.y = safe.y - mizia.h - 40;
+                mizia.vx = 0; mizia.vy = 0;
+            } else {
+                mizia.vy = -8.5;
+                mizia.vx = -mizia.facing * 5.5;
+            }
+            updateHUD();
+        }
+
+        // =========================================================================
+        // 7B. ZABAWNA ANIMACJA KĄPIELI W MLEKU (PO 15 POZIOMIE)
+        // =========================================================================
+        const BATH_DIALOGUES = [
+            "„Mlem mlem mlem... Pyszne to mleko!” 👅🥛",
+            "„Pianowe wąsy dla prawdziwej damy Neva Masquerade!” 🥸✨",
+            "„Błogi relaks... Żadna kupka już tu nie dosięgnie mojego futerka!” 😴❤️",
+            "„*Derp*... Za dużo kocimiętki i ciepłego mleczka na raz!” 🤪💫",
+            "„Puszczam oczko do wszystkich wiernych fanów!” 😉💖"
+        ];
+
+        function renderMilkBathScene(dt) {
+            if (!bathCtx) return;
+            bathAnimTime += dt;
+            const w = bathCanvas.width;
+            const h = bathCanvas.height;
+
+            bathCtx.clearRect(0, 0, w, h);
+
+            // 1. Ciepłe tło łazienki SPA
+            const bgGrad = bathCtx.createLinearGradient(0, 0, 0, h);
+            bgGrad.addColorStop(0, '#311042');
+            bgGrad.addColorStop(0.6, '#4C1D95');
+            bgGrad.addColorStop(1, '#1E1B4B');
+            bathCtx.fillStyle = bgGrad;
+            bathCtx.fillRect(0, 0, w, h);
+
+            // Kafelki w tle
+            bathCtx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            bathCtx.lineWidth = 1;
+            for (let x = 0; x < w; x += 30) {
+                bathCtx.beginPath(); bathCtx.moveTo(x, 0); bathCtx.lineTo(x, h - 60); bathCtx.stroke();
+            }
+            for (let y = 0; y < h - 60; y += 30) {
+                bathCtx.beginPath(); bathCtx.moveTo(0, y); bathCtx.lineTo(w, y); bathCtx.stroke();
+            }
+
+            // Podłoga łazienki
+            bathCtx.fillStyle = '#111827';
+            bathCtx.fillRect(0, h - 60, w, 60);
+            bathCtx.fillStyle = '#0F172A';
+            for (let tx = 0; tx < w; tx += 40) {
+                bathCtx.fillRect(tx + (Math.floor(tx / 40) % 2 === 0 ? 0 : 20), h - 60, 20, 60);
+            }
+
+            // Kłęby parującego mleka (serduszka pary)
+            for (let i = 0; i < 4; i++) {
+                const t = (bathAnimTime * 0.8 + i * 0.7) % 2.5;
+                const sy = (h - 150) - t * 45;
+                const sx = 140 + i * 45 + Math.sin(bathAnimTime * 2 + i) * 15;
+                bathCtx.save();
+                bathCtx.globalAlpha = Math.max(0, 1 - (t / 2.5)) * 0.5;
+                bathCtx.font = `${14 + i * 2}px sans-serif`;
+                bathCtx.fillText('💨', sx, sy);
+                if (i % 2 === 0) bathCtx.fillText('🤍', sx + 12, sy - 8);
+                bathCtx.restore();
+            }
+
+            // Złote nóżki wanny (styl retro clawfoot)
+            bathCtx.fillStyle = '#F59E0B';
+            bathCtx.beginPath(); bathCtx.roundRect(75, h - 70, 16, 20, 6); bathCtx.fill();
+            bathCtx.beginPath(); bathCtx.roundRect(w - 91, h - 70, 16, 20, 6); bathCtx.fill();
+
+            // Wanna (zewnętrzna powłoka)
+            const tubX = 60, tubY = 140, tubW = 300, tubH = 120;
+            bathCtx.fillStyle = '#E2E8F0';
+            bathCtx.beginPath();
+            bathCtx.moveTo(tubX, tubY + 20);
+            bathCtx.quadraticCurveTo(tubX + 20, tubY + tubH, tubX + 80, tubY + tubH);
+            bathCtx.lineTo(tubX + tubW - 80, tubY + tubH);
+            bathCtx.quadraticCurveTo(tubX + tubW - 20, tubY + tubH, tubX + tubW, tubY + 20);
+            bathCtx.closePath();
+            bathCtx.fill();
+
+            // Złote wykończenie rantu
+            bathCtx.strokeStyle = '#FBBF24';
+            bathCtx.lineWidth = 5;
+            bathCtx.stroke();
+
+            // ==========================================
+            // KOTKA MIZIA W WANNIE
+            // ==========================================
+            const catX = w / 2;
+            const catY = 155 + Math.sin(bathAnimTime * 3) * 3; // delikatne unoszenie na falach mleka
+
+            bathCtx.save();
+            bathCtx.translate(catX, catY);
+
+            // Puszyste ciałko Mizi wynurzające się z mleka
+            bathCtx.fillStyle = '#FAF6EE';
+            bathCtx.beginPath();
+            bathCtx.ellipse(0, 5, 42, 28, 0, 0, Math.PI * 2);
+            bathCtx.fill();
+
+            // Syberyjska puszysta biała kryza
+            bathCtx.fillStyle = '#FFFFFF';
+            bathCtx.beginPath();
+            bathCtx.moveTo(-25, 0);
+            bathCtx.lineTo(-12, 16);
+            bathCtx.lineTo(0, 10);
+            bathCtx.lineTo(12, 16);
+            bathCtx.lineTo(25, 0);
+            bathCtx.closePath();
+            bathCtx.fill();
+
+            // Łapki oparte o krawędź wanny (z ciemnymi pointami)
+            const drawPawRelax = (px) => {
+                bathCtx.fillStyle = '#EADECF';
+                bathCtx.beginPath(); bathCtx.ellipse(px, 12, 12, 7, 0, 0, Math.PI * 2); bathCtx.fill();
+                bathCtx.fillStyle = '#4A3B32'; // ciemna skarpetka Neva Masquerade
+                bathCtx.beginPath(); bathCtx.ellipse(px, 14, 8, 4, 0, 0, Math.PI * 2); bathCtx.fill();
+            };
+            drawPawRelax(-45);
+            drawPawRelax(45);
+
+            // Głowa Mizi
+            bathCtx.fillStyle = '#FAF6EE';
+            bathCtx.beginPath();
+            bathCtx.ellipse(0, -22, 34, 28, 0, 0, Math.PI * 2);
+            bathCtx.fill();
+
+            // Ciemne uszka Neva Masquerade
+            const earWiggle = Math.sin(bathAnimTime * 5) * 0.08;
+            bathCtx.save();
+            bathCtx.rotate(earWiggle);
+            bathCtx.fillStyle = '#4A3B32';
+            bathCtx.beginPath(); bathCtx.moveTo(-28, -32); bathCtx.lineTo(-38, -60); bathCtx.lineTo(-12, -42); bathCtx.closePath(); bathCtx.fill();
+            bathCtx.fillStyle = '#F472B6';
+            bathCtx.beginPath(); bathCtx.moveTo(-25, -34); bathCtx.lineTo(-33, -54); bathCtx.lineTo(-14, -42); bathCtx.closePath(); bathCtx.fill();
+            bathCtx.restore();
+
+            bathCtx.save();
+            bathCtx.rotate(-earWiggle);
+            bathCtx.fillStyle = '#4A3B32';
+            bathCtx.beginPath(); bathCtx.moveTo(12, -42); bathCtx.lineTo(38, -60); bathCtx.lineTo(28, -32); bathCtx.closePath(); bathCtx.fill();
+            bathCtx.fillStyle = '#F472B6';
+            bathCtx.beginPath(); bathCtx.moveTo(14, -42); bathCtx.lineTo(33, -54); bathCtx.lineTo(25, -34); bathCtx.closePath(); bathCtx.fill();
+            bathCtx.restore();
+
+            // Ciemniejsza maska rasy na pyszczku
+            const maskGrad = bathCtx.createRadialGradient(0, -18, 4, 0, -18, 24);
+            maskGrad.addColorStop(0, '#4A3B32');
+            maskGrad.addColorStop(0.7, '#6E5C50');
+            maskGrad.addColorStop(1, 'rgba(110, 92, 80, 0)');
+            bathCtx.fillStyle = maskGrad;
+            bathCtx.beginPath();
+            bathCtx.ellipse(0, -18, 22, 17, 0, 0, Math.PI * 2);
+            bathCtx.fill();
+
+            // ==========================================
+            // ŚMIESZNE MINKI MIZI (CYKL CO 2.5 SEKUNDY)
+            // ==========================================
+            const facePhase = Math.floor(bathAnimTime / 2.5) % 5;
+            if (bathDialogueText) {
+                bathDialogueText.textContent = BATH_DIALOGUES[facePhase];
+            }
+
+            const drawBlueEye = (ex, ey, pupilDx = 0, pupilDy = 0) => {
+                bathCtx.fillStyle = '#38BDF8';
+                bathCtx.beginPath(); bathCtx.ellipse(ex, ey, 6, 7, 0, 0, Math.PI * 2); bathCtx.fill();
+                bathCtx.fillStyle = '#0284C7';
+                bathCtx.beginPath(); bathCtx.arc(ex, ey - 2, 4.5, Math.PI, Math.PI * 2); bathCtx.fill();
+                bathCtx.fillStyle = '#0F172A';
+                bathCtx.beginPath(); bathCtx.ellipse(ex + pupilDx, ey + pupilDy, 2.5, 4.5, 0, 0, Math.PI * 2); bathCtx.fill();
+                bathCtx.fillStyle = '#FFFFFF';
+                bathCtx.beginPath(); bathCtx.arc(ex - 1.8, ey - 2, 1.8, 0, Math.PI * 2); bathCtx.fill();
+            };
+
+            const drawHappyClosedEye = (ex, ey) => {
+                bathCtx.strokeStyle = '#291838';
+                bathCtx.lineWidth = 2.8;
+                bathCtx.beginPath();
+                bathCtx.arc(ex, ey + 1, 6, Math.PI * 1.1, Math.PI * 1.9);
+                bathCtx.stroke();
+            };
+
+            // Różowy nosek
+            bathCtx.fillStyle = '#F472B6';
+            bathCtx.beginPath();
+            bathCtx.moveTo(-3, -15); bathCtx.lineTo(3, -15); bathCtx.lineTo(0, -11);
+            bathCtx.closePath();
+            bathCtx.fill();
+
+            if (facePhase === 0) {
+                // Faza 1: Chłeptanie mleka ozorkiem
+                drawBlueEye(-11, -22, 0, 2);
+                drawBlueEye(11, -22, 0, 2);
+
+                // Wysuwany animowany różowy ozorek
+                const tongueY = -7 + Math.sin(bathAnimTime * 14) * 6;
+                bathCtx.fillStyle = '#FB7185';
+                bathCtx.beginPath();
+                bathCtx.ellipse(0, tongueY, 5.5, 7, 0, 0, Math.PI * 2);
+                bathCtx.fill();
+                bathCtx.fillStyle = '#F43F5E';
+                bathCtx.fillRect(-0.8, tongueY - 4, 1.6, 6);
+            } else if (facePhase === 1) {
+                // Faza 2: Wąsy i czapka z piany mlecznej
+                drawBlueEye(-11, -22);
+                drawBlueEye(11, -22);
+
+                // Wielkie puszyste wąsy z piany!
+                bathCtx.fillStyle = '#FFFFFF';
+                bathCtx.beginPath();
+                bathCtx.arc(-8, -10, 8, 0, Math.PI * 2);
+                bathCtx.arc(-16, -9, 6, 0, Math.PI * 2);
+                bathCtx.arc(8, -10, 8, 0, Math.PI * 2);
+                bathCtx.arc(16, -9, 6, 0, Math.PI * 2);
+                bathCtx.fill();
+
+                // Piana na głowie
+                bathCtx.beginPath();
+                bathCtx.arc(-6, -46, 9, 0, Math.PI * 2);
+                bathCtx.arc(8, -48, 11, 0, Math.PI * 2);
+                bathCtx.arc(0, -53, 8, 0, Math.PI * 2);
+                bathCtx.fill();
+            } else if (facePhase === 2) {
+                // Faza 3: Błogie mruczenie (zamknięte oczka i rumieńce)
+                drawHappyClosedEye(-11, -22);
+                drawHappyClosedEye(11, -22);
+
+                // Rumieńce
+                bathCtx.fillStyle = 'rgba(244, 114, 182, 0.55)';
+                bathCtx.beginPath(); bathCtx.ellipse(-18, -15, 6, 4, 0, 0, Math.PI * 2); bathCtx.fill();
+                bathCtx.beginPath(); bathCtx.ellipse(18, -15, 6, 4, 0, 0, Math.PI * 2); bathCtx.fill();
+
+                // Uśmiech
+                bathCtx.strokeStyle = '#4A3B32';
+                bathCtx.lineWidth = 2;
+                bathCtx.beginPath();
+                bathCtx.arc(-4, -12, 4, 0.2, Math.PI - 0.2);
+                bathCtx.arc(4, -12, 4, 0.2, Math.PI - 0.2);
+                bathCtx.stroke();
+            } else if (facePhase === 3) {
+                // Faza 4: Zabawny Derp Face (błogi zez zbieżny do środka i krzywy uśmieszek)
+                drawBlueEye(-11, -22, 2.5, 0.5); // zez do środka
+                drawBlueEye(11, -22, -2.5, 0.5);
+
+                bathCtx.strokeStyle = '#4A3B32';
+                bathCtx.lineWidth = 2.2;
+                bathCtx.beginPath();
+                bathCtx.moveTo(-6, -9);
+                bathCtx.quadraticCurveTo(0, -4, 9, -10);
+                bathCtx.stroke();
+
+                // Mały bąbelek na nosie
+                bathCtx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+                bathCtx.beginPath(); bathCtx.arc(0, -14, 4, 0, Math.PI * 2); bathCtx.fill();
+            } else {
+                // Faza 5: Puszczenie oczka
+                drawBlueEye(-11, -22);
+                drawHappyClosedEye(11, -22);
+
+                // Figlarny uśmiech z małym ząbkiem
+                bathCtx.strokeStyle = '#4A3B32';
+                bathCtx.lineWidth = 2;
+                bathCtx.beginPath();
+                bathCtx.arc(-2, -10, 5, 0.1, Math.PI - 0.2);
+                bathCtx.stroke();
+                bathCtx.fillStyle = '#FFFFFF';
+                bathCtx.beginPath(); bathCtx.moveTo(1, -9); bathCtx.lineTo(4, -9); bathCtx.lineTo(2.5, -6); bathCtx.closePath(); bathCtx.fill();
+            }
+
+            // Wibrysy (wąsy)
+            bathCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+            bathCtx.lineWidth = 1.3;
+            bathCtx.beginPath();
+            bathCtx.moveTo(-10, -12); bathCtx.lineTo(-30, -15);
+            bathCtx.moveTo(-10, -9); bathCtx.lineTo(-31, -7);
+            bathCtx.moveTo(10, -12); bathCtx.lineTo(30, -15);
+            bathCtx.moveTo(10, -9); bathCtx.lineTo(31, -7);
+            bathCtx.stroke();
+
+            bathCtx.restore();
+
+            // ==========================================
+            // MLEKO W WANNIE (KREMOWO-BIAŁE ZE WZBURZONYMI FALAMI)
+            // ==========================================
+            bathCtx.save();
+            const milkGrad = bathCtx.createLinearGradient(0, tubY + 30, 0, tubY + tubH);
+            milkGrad.addColorStop(0, '#FFFFFF');
+            milkGrad.addColorStop(0.3, '#FFFBEB');
+            milkGrad.addColorStop(1, '#FEF3C7');
+            bathCtx.fillStyle = milkGrad;
+
+            bathCtx.beginPath();
+            bathCtx.moveTo(tubX + 8, tubY + 45);
+            // Animowana tafla mleka
+            for (let x = tubX + 8; x <= tubX + tubW - 8; x += 10) {
+                const wave = Math.sin(bathAnimTime * 4 + x * 0.05) * 4;
+                bathCtx.lineTo(x, tubY + 45 + wave);
+            }
+            bathCtx.quadraticCurveTo(tubX + tubW - 10, tubY + tubH - 5, tubX + tubW - 75, tubY + tubH - 5);
+            bathCtx.lineTo(tubX + 75, tubY + tubH - 5);
+            bathCtx.quadraticCurveTo(tubX + 10, tubY + tubH - 5, tubX + 8, tubY + 45);
+            bathCtx.closePath();
+            bathCtx.fill();
+
+            // Bąbelki mleka unoszące się po tafli
+            for (let b = 0; b < 9; b++) {
+                const bx = tubX + 35 + ((b * 32 + bathAnimTime * 20) % (tubW - 70));
+                const by = tubY + 44 + Math.sin(bathAnimTime * 3 + b) * 5;
+                bathCtx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                bathCtx.beginPath(); bathCtx.arc(bx, by, 4 + (b % 3) * 2, 0, Math.PI * 2); bathCtx.fill();
+                bathCtx.strokeStyle = '#FEF08A';
+                bathCtx.lineWidth = 1;
+                bathCtx.stroke();
+            }
+
+            // Zabawkowa żółta kaczuszka pływająca w mleku
+            const duckX = tubX + 45 + Math.sin(bathAnimTime * 2) * 12;
+            const duckY = tubY + 38 + Math.cos(bathAnimTime * 3) * 3;
+            bathCtx.fillStyle = '#FACC15';
+            bathCtx.beginPath(); bathCtx.ellipse(duckX, duckY, 11, 7, 0, 0, Math.PI * 2); bathCtx.fill();
+            bathCtx.beginPath(); bathCtx.arc(duckX + 6, duckY - 6, 6, 0, Math.PI * 2); bathCtx.fill();
+            bathCtx.fillStyle = '#EA580C'; // dziobek
+            bathCtx.beginPath(); bathCtx.moveTo(duckX + 11, duckY - 6); bathCtx.lineTo(duckX + 17, duckY - 5); bathCtx.lineTo(duckX + 11, duckY - 3); bathCtx.closePath(); bathCtx.fill();
+            bathCtx.fillStyle = '#0F172A'; // oczko
+            bathCtx.beginPath(); bathCtx.arc(duckX + 8, duckY - 7, 1.2, 0, Math.PI * 2); bathCtx.fill();
+
+            // Przednia krawędź wanny
+            bathCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            bathCtx.lineWidth = 3;
+            bathCtx.beginPath();
+            bathCtx.moveTo(tubX + 10, tubY + 42);
+            bathCtx.lineTo(tubX + tubW - 10, tubY + 42);
+            bathCtx.stroke();
+
+            bathCtx.restore();
+
+            // Złote konfetti w powietrzu
+            for (let c = 0; c < 12; c++) {
+                const cx = (c * 35 + bathAnimTime * 25) % w;
+                const cy = (c * 28 + Math.sin(bathAnimTime * 3 + c) * 40) % (h - 70);
+                bathCtx.fillStyle = ['#FACC15', '#38BDF8', '#F472B6', '#34D399'][c % 4];
+                bathCtx.fillRect(cx, cy, 6, 6);
+            }
+        }
+
+        function onLevelComplete() {
+            sfx.win();
+            const bonus = 500 + mizia.lives * 100;
+            score += bonus;
+
+            // Zapis postępów
+            if (!isEndlessMode) {
+                const cur = levelData.config.id;
+                if (cur >= saveState.unlockedLevel && cur < CAMPAIGN_LEVELS.length) {
+                    saveState.unlockedLevel = cur + 1;
+                }
+                saveState.bestScores[cur] = Math.max(saveState.bestScores[cur] || 0, score);
+                persistProgress();
+
+                if (currentLevelIndex < CAMPAIGN_LEVELS.length - 1) {
+                    gameState = 'LEVEL_WIN';
+                    document.getElementById('winLevelTitle').textContent = `Etap ${cur} Ukończony!`;
+                    document.getElementById('winLevelScore').textContent = `${score} pkt`;
+                    document.getElementById('winLevelBonus').textContent = `+${bonus} pkt`;
+                    winLevelScreen.classList.remove('hidden');
+                    hud.classList.add('hidden');
+                    touchControls.classList.add('hidden');
+                } else {
+                    // OSTATNIA MISJA KAMPANII (POZIOM 15) UKOŃCZONA!
+                    // Uruchamiamy zabawną animowaną scenę z kąpielą w mleku
+                    gameState = 'CUTSCENE';
+                    hud.classList.add('hidden');
+                    touchControls.classList.add('hidden');
+                    document.getElementById('milkEndingScore').textContent = `${score} pkt`;
+                    milkBathEndingScreen.classList.remove('hidden');
+                }
+            } else {
+                // Endless restart na wyższym tempie
+                loadLevel(0, true, true);
+            }
+        }
+
+        // =========================================================================
+        // 8. RYSOWANIE KADRU GRY (RENDER)
+        // =========================================================================
+        function render() {
+            ctx.save();
+            ctx.scale(viewScale, viewScale);
+
+            if (!levelData) levelData = generateLevelData(CAMPAIGN_LEVELS[0]);
+            const cfg = levelData.config;
+
+            // Tło nieba
+            const grad = ctx.createLinearGradient(0, 0, 0, viewHeight);
+            grad.addColorStop(0, cfg.bgTop);
+            grad.addColorStop(1, cfg.bgBot);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, viewWidth, viewHeight);
+
+            // Paralaksa
+            const pX = -(camera.x * 0.25) % 400;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            for (let x = pX; x < viewWidth + 400; x += 120) {
+                ctx.fillRect(x, 100, 40, viewHeight);
+            }
+
+            // Przesunięcie kamery
+            ctx.save();
+            ctx.translate(-camera.x, -camera.y);
+
+            // Platformy
+            for (const p of levelData.platforms) {
+                if (p.x + p.w < camera.x - 80 || p.x > camera.x + viewWidth + 80) continue;
+                if (p.crumbleState === 2) continue;
+
+                ctx.save();
+                let shake = (p.crumbleState === 1) ? (Math.random() - 0.5) * 6 : 0;
+                ctx.translate(p.x + shake, p.y);
+
+                if (p.type === 'trampoline') {
+                    ctx.fillStyle = '#0284C7';
+                    ctx.beginPath();
+                    ctx.roundRect(0, 0, p.w, p.h, 6);
+                    ctx.fill();
+                    ctx.fillStyle = '#38BDF8';
+                    ctx.beginPath();
+                    ctx.roundRect(4, -4, p.w - 8, 8, 4);
+                    ctx.fill();
+                } else if (p.type === 'conveyor') {
+                    ctx.fillStyle = '#78350F';
+                    ctx.beginPath();
+                    ctx.roundRect(0, 0, p.w, p.h, 6);
+                    ctx.fill();
+                    // Strzałki kierunku
+                    ctx.fillStyle = '#FDE047';
+                    const dir = p.conveyorSpeed > 0 ? '▶' : '◀';
+                    ctx.font = '12px sans-serif';
+                    for (let cx = 15; cx < p.w - 15; cx += 35) ctx.fillText(dir, cx, 16);
+                } else if (p.type === 'ice') {
+                    ctx.fillStyle = '#38BDF8';
+                    ctx.beginPath(); ctx.roundRect(0, 0, p.w, p.h, 6); ctx.fill();
+                    ctx.fillStyle = '#E0F2FE';
+                    ctx.beginPath(); ctx.roundRect(0, 0, p.w, 8, 4); ctx.fill();
+                } else if (p.type === 'crumble') {
+                    ctx.fillStyle = '#64748B';
+                    ctx.beginPath(); ctx.roundRect(0, 0, p.w, p.h, 6); ctx.fill();
+                    ctx.strokeStyle = '#CBD5E1';
+                    ctx.setLineDash([6, 4]); ctx.strokeRect(2, 2, p.w - 4, p.h - 4); ctx.setLineDash([]);
+                } else {
+                    ctx.fillStyle = cfg.gCol;
+                    ctx.beginPath(); ctx.roundRect(0, 0, p.w, p.h, 8); ctx.fill();
+                    ctx.fillStyle = cfg.gTop;
+                    ctx.beginPath(); ctx.roundRect(0, 0, p.w, 10, 6); ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            // Portale
+            for (const pt of levelData.portals) {
+                ctx.save();
+                ctx.translate(pt.x, pt.y);
+                const rot = globalTime * 3;
+                ctx.rotate(rot);
+                ctx.strokeStyle = pt.color;
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 18, 32, 0, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Meta (Złoty Drapak)
+            if (levelData.goal && (!levelData.boss || levelData.boss.defeated)) {
+                const g = levelData.goal;
+                ctx.save();
+                ctx.translate(g.x, g.y);
+                ctx.fillStyle = '#F59E0B';
+                ctx.beginPath(); ctx.roundRect(0, g.h - 20, g.w, 20, 6); ctx.fill();
+                ctx.fillStyle = '#FEF3C7';
+                ctx.fillRect(g.w / 2 - 12, 30, 24, g.h - 50);
+                ctx.fillStyle = '#D97706';
+                ctx.beginPath(); ctx.roundRect(10, 10, g.w - 20, 22, 8); ctx.fill();
+                ctx.font = '28px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('👑', g.w / 2, 8);
+                ctx.restore();
+            }
+
+            // Przysmaki
+            for (const item of levelData.collectibles) {
+                if (item.collected) continue;
+                if (item.x < camera.x - 40 || item.x > camera.x + viewWidth + 40) continue;
+                const bob = Math.sin(globalTime * 4.5 + item.bob) * 5;
+                ctx.save();
+                ctx.translate(item.x, item.y + bob);
+                if (item.type === 'fish') {
+                    ctx.fillStyle = '#FBBF24';
+                    ctx.beginPath(); ctx.ellipse(-2, 0, 10, 6, 0, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(6, 0); ctx.lineTo(13, -6); ctx.lineTo(13, 6); ctx.closePath(); ctx.fill();
+                } else if (item.type === 'yarn') {
+                    ctx.fillStyle = '#F472B6';
+                    ctx.beginPath(); ctx.arc(0, 0, 11, 0, Math.PI * 2); ctx.fill();
+                } else if (item.type === 'catnip') {
+                    ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🌿', 0, 7);
+                } else if (item.type === 'zoomies') {
+                    ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('⚡', 0, 7);
+                } else if (item.type === 'heart') {
+                    ctx.font = '20px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('❤️', 0, 7);
+                }
+                ctx.restore();
+            }
+
+            // Wrogowie
+            for (const e of levelData.enemies) {
+                if (e.dead) continue;
+                if (e.x + e.w < camera.x - 60 || e.x > camera.x + viewWidth + 60) continue;
+                drawPoop(ctx, e, globalTime);
+            }
+
+            // Boss
+            if (levelData.boss && !levelData.boss.defeated) {
+                drawBoss(ctx, levelData.boss, globalTime);
+            }
+
+            // Kotka Mizia
+            drawNevaMasqueradeCat(ctx, mizia.x, mizia.y, mizia.w, mizia.h, {
+                facing: mizia.facing, walkCycle: mizia.walkCycle, vy: mizia.vy,
+                onGround: mizia.onGround, doubleSpin: mizia.doubleSpin, blink: mizia.isBlinking,
+                shieldTimer: mizia.shieldTimer, zoomiesTimer: mizia.zoomiesTimer,
+                invincibleTimer: mizia.invincibleTimer, time: globalTime
+            });
+
+            // Cząsteczki i napisy
+            for (const pt of particles) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, pt.life * 1.5);
+                ctx.fillStyle = pt.color;
+                ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            }
+            for (const ft of floatingTexts) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, ft.life);
+                ctx.font = 'bold 15px Fredoka, sans-serif';
+                ctx.fillStyle = ft.color;
+                ctx.fillText(ft.text, ft.x, ft.y);
+                ctx.restore();
+            }
+
+            ctx.restore();
+            ctx.restore();
+
+            if (gameState === 'MENU') renderPreviewMizia();
+        }
+
+        // =========================================================================
+        // 9. STEROWANIE DOTYKOWE (TELEFON) I KLAWIATURA
+        // =========================================================================
+        function bindTouch(btn, onDown, onUp) {
+            const press = (e) => {
+                e.preventDefault();
+                sfx.init();
+                btn.classList.add('active');
+                onDown();
+            };
+            const release = (e) => {
+                e.preventDefault();
+                btn.classList.remove('active');
+                if (onUp) onUp();
+            };
+            btn.addEventListener('touchstart', press, { passive: false });
+            btn.addEventListener('touchend', release, { passive: false });
+            btn.addEventListener('touchcancel', release, { passive: false });
+            btn.addEventListener('mousedown', press);
+            window.addEventListener('mouseup', () => {
+                if (btn.classList.contains('active')) {
+                    btn.classList.remove('active');
+                    if (onUp) onUp();
+                }
+            });
+        }
+
+        bindTouch(document.getElementById('touchLeft'), () => { input.left = true; }, () => { input.left = false; });
+        bindTouch(document.getElementById('touchRight'), () => { input.right = true; }, () => { input.right = false; });
+        bindTouch(document.getElementById('touchJump'), () => { triggerPlayerJump(); }, null);
+
+        window.addEventListener('keydown', (e) => {
+            if (['ArrowLeft', 'KeyA'].includes(e.code)) input.left = true;
+            if (['ArrowRight', 'KeyD'].includes(e.code)) input.right = true;
+            if (['ArrowUp', 'KeyW', 'Space'].includes(e.code)) {
+                if (!e.repeat && gameState === 'PLAYING') triggerPlayerJump();
+                e.preventDefault();
+            }
+            if (e.code === 'Escape') togglePause();
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (['ArrowLeft', 'KeyA'].includes(e.code)) input.left = false;
+            if (['ArrowRight', 'KeyD'].includes(e.code)) input.right = false;
+        });
+
+        // =========================================================================
+        // 10. OBSŁUGA MENU, WYBORU POZIOMU I ZDARZEŃ
+        // =========================================================================
+        function renderLevelSelectGrid() {
+            levelGrid.innerHTML = '';
+            unlockedCountText.textContent = `Odblokowano: ${saveState.unlockedLevel}/15`;
+
+            CAMPAIGN_LEVELS.forEach((lvl, i) => {
+                const unlocked = (i + 1) <= saveState.unlockedLevel;
+                const isBoss = !!lvl.boss;
+                const bScore = saveState.bestScores[lvl.id] || 0;
+
+                const card = document.createElement('div');
+                card.className = `p-2.5 rounded-2xl border text-left flex flex-col justify-between transition ${
+                    unlocked
+                        ? 'bg-white/10 hover:bg-white/20 border-white/20 cursor-pointer active:scale-95'
+                        : 'bg-black/30 border-white/5 opacity-50 cursor-not-allowed'
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-sky-300">Etap ${lvl.id}</span>
+                        <span>${isBoss ? '👑' : (unlocked ? '⭐' : '🔒')}</span>
+                    </div>
+                    <div class="font-display font-bold text-sm text-white truncate mt-0.5">${lvl.name}</div>
+                    <div class="text-[10px] text-slate-300 truncate">${lvl.sub}</div>
+                    <div class="text-[9px] text-amber-300 font-bold mt-1.5">${bScore > 0 ? `Rekord: ${bScore} pkt` : (unlocked ? 'Nowy!' : 'Zablokowany')}</div>
+                `;
+
+                if (unlocked) {
+                    card.addEventListener('click', () => {
+                        levelSelectScreen.classList.add('hidden');
+                        startPlaying(i, false);
+                    });
+                }
+                levelGrid.appendChild(card);
+            });
+        }
+
+        function startPlaying(idx, isEndless = false) {
+            sfx.init();
+            menuScreen.classList.add('hidden');
+            levelSelectScreen.classList.add('hidden');
+            winLevelScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            pauseScreen.classList.add('hidden');
+            victoryScreen.classList.add('hidden');
+            milkBathEndingScreen.classList.add('hidden');
+
+            hud.classList.remove('hidden');
+            touchControls.classList.remove('hidden');
+
+            loadLevel(idx, isEndless, false);
+            gameState = 'PLAYING';
+        }
+
+        function togglePause() {
+            if (gameState === 'PLAYING') {
+                gameState = 'PAUSED';
+                pauseScreen.classList.remove('hidden');
+                touchControls.classList.add('hidden');
+            } else if (gameState === 'PAUSED') {
+                gameState = 'PLAYING';
+                pauseScreen.classList.add('hidden');
+                touchControls.classList.remove('hidden');
+            }
+        }
+
+        function backToMenu() {
+            gameState = 'MENU';
+            hud.classList.add('hidden');
+            touchControls.classList.add('hidden');
+            pauseScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            winLevelScreen.classList.add('hidden');
+            victoryScreen.classList.add('hidden');
+            milkBathEndingScreen.classList.add('hidden');
+            levelSelectScreen.classList.add('hidden');
+            menuScreen.classList.remove('hidden');
+            loadLevel(0, false, false);
+        }
+
+        document.getElementById('btnPlayCampaign').addEventListener('click', () => startPlaying(0, false));
+        document.getElementById('btnPlayEndless').addEventListener('click', () => startPlaying(0, true));
+        document.getElementById('btnLevelSelect').addEventListener('click', () => {
+            renderLevelSelectGrid();
+            levelSelectScreen.classList.remove('hidden');
+        });
+        document.getElementById('btnCloseLevelSelect').addEventListener('click', () => levelSelectScreen.classList.add('hidden'));
+
+        document.getElementById('btnResetSave').addEventListener('click', () => {
+            saveState = { unlockedLevel: 1, bestScores: {}, totalScore: 0 };
+            persistProgress();
+            renderLevelSelectGrid();
+        });
+
+        document.getElementById('btnNextLevel').addEventListener('click', () => startPlaying(currentLevelIndex + 1, false));
+        document.getElementById('btnWinToMenu').addEventListener('click', backToMenu);
+        document.getElementById('btnPause').addEventListener('click', togglePause);
+        document.getElementById('btnResume').addEventListener('click', togglePause);
+        document.getElementById('btnRestartCurrent').addEventListener('click', () => startPlaying(currentLevelIndex, isEndlessMode));
+        document.getElementById('btnPauseToMenu').addEventListener('click', backToMenu);
+        document.getElementById('btnRetryLevel').addEventListener('click', () => startPlaying(currentLevelIndex, isEndlessMode));
+        document.getElementById('btnGameOverMenu').addEventListener('click', backToMenu);
+        document.getElementById('btnVictoryToMenu').addEventListener('click', backToMenu);
+
+        // Przejście z animacji kąpieli do pełnego podsumowania zwycięstwa
+        document.getElementById('btnFinishCutscene').addEventListener('click', () => {
+            milkBathEndingScreen.classList.add('hidden');
+            gameState = 'VICTORY';
+            document.getElementById('victoryScore').textContent = `${score} pkt`;
+            victoryScreen.classList.remove('hidden');
+        });
+
+        document.getElementById('btnSound').addEventListener('click', (e) => {
+            const m = sfx.toggle();
+            e.currentTarget.textContent = m ? '🔇' : '🔊';
+        });
+
+        // =========================================================================
+        // 11. GŁÓWNA PĘTLA GRY
+        // =========================================================================
+        let lastTime = performance.now();
+        function loop(now) {
+            const dt = Math.min(0.05, (now - lastTime) / 1000);
+            lastTime = now;
+            updateGame(dt);
+            render();
+
+            if (gameState === 'CUTSCENE') {
+                renderMilkBathScene(dt);
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = function () {
+            loadSavedProgress();
+            loadLevel(0, false, false);
+            requestAnimationFrame(loop);
+        };
+    </script>
+</body>
+</html>

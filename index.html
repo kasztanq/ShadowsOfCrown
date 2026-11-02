@@ -123,6 +123,8 @@
   }
 
   .icon-btn:hover { border-color: var(--gold); background: #332922; }
+  .games-link { opacity: 0.14; }
+  .games-link:hover, .games-link:focus-visible { opacity: 1; }
 
   /* Cztery wskaźniki stanu */
   .meters-panel {
@@ -495,9 +497,7 @@
           <div class="hud-controls">
             <button class="icon-btn" id="mute-btn" onclick="toggleMute()" title="Dźwięk">🔊</button>
             <button class="icon-btn" onclick="resetGame()" title="Nowa gra">🔄</button>
-            <a class="icon-btn" href="./index.htm" aria-label="Back to home" title="Back to home">
-              <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
-            </a>
+            <a class="icon-btn games-link" href="./play.html" aria-label="Otwórz ukryty katalog gier" title="Katalog gier">🎮</a>
           </div>
         </div>
         <div class="rank-banner">

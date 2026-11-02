@@ -8,7 +8,7 @@ from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 GAME_PAGES = sorted(ROOT.glob("*.html"))
-SITE_PAGES = [ROOT / "index.htm", *GAME_PAGES]
+SITE_PAGES = GAME_PAGES
 VOID_ELEMENTS = {
     "area",
     "base",
@@ -44,7 +44,23 @@ MODULE_CONTRACTS = {
     "chess_nuts.html": ("id=\"chessboard\"", "Chess-Nuts"),
     "logopedia.html": ("id=\"interaction-area\"", "function switchMode", "function resetTask"),
     "kraina_wyraznej_mowy.html": ("id=\"view-dashboard\"", "function navigateTo"),
-    "ShadowsOfCrown.html": ('id="game-frame"', 'id="choices-box"'),
+    "kasztanowa_obrona_stanowiska.html": (
+        'id="gameCanvas"',
+        'id="stat-lives"',
+        "function gameLoop",
+    ),
+    "miami_77.html": ('id="gameCanvas"', 'id="startGameBtn"', "function gameLoop"),
+    "mizia.html": ('id="gameCanvas"', 'id="btnPlayCampaign"'),
+    "mizia_halloween.html": ('id="gameCanvas"', 'id="btnPlayCampaign"'),
+    "play.html": ('id="gamesGrid"', "function selectGame(game)"),
+    "roadtomerge.html": ('id="gameCanvas"', 'id="btnPlayGame"', "function gameLoop"),
+    "index.html": ('id="game-frame"', 'id="choices-box"'),
+    "micro_arena_pixel_brawlers.html": (
+        'id="arenaCanvas"',
+        'id="menuOverlay"',
+        'id="btnStartGame"',
+        "class GameEngine",
+    ),
 }
 
 
@@ -71,7 +87,7 @@ class PageParser(HTMLParser):
         if "id" in attributes:
             self.ids.append(attributes["id"])
 
-        if tag == "a" and attributes.get("href") == "./index.htm":
+        if tag == "a" and attributes.get("href") == "./index.html":
             if attributes.get("aria-label", "").strip():
                 self.home_links += 1
 
@@ -191,6 +207,8 @@ class ProjectPagesTests(unittest.TestCase):
 
     def test_every_game_page_has_an_accessible_home_link(self):
         for path in GAME_PAGES:
+            if path.name == "index.html":
+                continue
             with self.subTest(page=path.name):
                 parser = parse_page(path)
                 self.assertGreater(
@@ -199,82 +217,38 @@ class ProjectPagesTests(unittest.TestCase):
                     f"{path.stem}: missing accessible home page link",
                 )
 
-    def test_homepage_has_a_discreet_chess_nuts_easter_egg(self):
-        parser = parse_page(ROOT / "index.htm")
-        contents = (ROOT / "index.htm").read_text(encoding="utf-8")
+    def test_homepage_is_cienie_korony_with_discreet_game_catalog_link(self):
+        parser = parse_page(ROOT / "index.html")
+        contents = (ROOT / "index.html").read_text(encoding="utf-8")
 
-        self.assertEqual(contents.count('class="orbit-nut"'), 7)
-        self.assertIn('class="hero-caption"', contents)
-        self.assertIn('class="chess-egg" href="./chess_nuts.html"', contents)
-        self.assertNotIn("Chess-Nuts</span>", contents)
-        self.assertEqual(
-            sum(reference == "./chess_nuts.html" for reference in parser.links),
-            1,
-        )
-
-    def test_homepage_has_a_hidden_miami_77_pixel_easter_egg(self):
-        parser = parse_page(ROOT / "index.htm")
-        contents = (ROOT / "index.htm").read_text(encoding="utf-8")
-
+        self.assertIn("<title>Cienie Korony", contents)
+        self.assertIn('id="game-frame"', contents)
+        self.assertIn('id="choices-box"', contents)
         self.assertIn(
-            '<a class="miami-egg" href="./miami_77_v2.html" '
-            'aria-label="Play hidden Miami \'77"></a>',
+            '<a class="icon-btn games-link" href="./play.html" '
+            'aria-label="Otwórz ukryty katalog gier" title="Katalog gier">🎮</a>',
             contents,
         )
+        self.assertIn(".games-link { opacity: 0.14; }", contents)
+        self.assertIn(".games-link:hover, .games-link:focus-visible { opacity: 1; }", contents)
         self.assertEqual(
-            sum(reference == "./miami_77_v2.html" for reference in parser.links),
+            sum(reference == "./play.html" for reference in parser.links),
             1,
         )
-        self.assertRegex(
-            contents,
-            r"\.miami-egg\s*\{[^}]*position:\s*absolute;[^}]*"
-            r"top:\s*18px;[^}]*right:\s*7px;[^}]*width:\s*8px;[^}]*"
-            r"height:\s*8px;[^}]*opacity:\s*0;",
-        )
-        self.assertRegex(contents, r"\.orbit-nut:nth-child\(3\)\s*\{")
-        self.assertRegex(
-            contents,
-            r"\.miami-egg:focus-visible\s*\{[^}]*opacity:\s*1;",
-        )
 
-    def test_homepage_has_hidden_links_to_the_new_games(self):
-        parser = parse_page(ROOT / "index.htm")
-        contents = (ROOT / "index.htm").read_text(encoding="utf-8")
-        hidden_games = {
-            "KasztanoweOczko.html": "oczko-egg",
-            "kasztanix_kasztanowy_tetris.html": "tetris-egg",
-            "kasztanowy_pasjans.html": "pasjans-egg",
-            "chestnut_combat.html": "combat-egg",
-            "chestnut_strike.html": "strike-egg",
-            "miami_77_v2.html": "miami-egg",
+    def test_play_catalog_lists_every_game_page(self):
+        parser = parse_page(ROOT / "play.html")
+        catalog_games = {
+            Path(urlsplit(reference).path).name
+            for reference in parser.links
+            if urlsplit(reference).path.lower().endswith(".html")
+            and Path(urlsplit(reference).path).name not in {"index.html", "play.html"}
+        }
+        expected_games = {
+            path.name for path in GAME_PAGES if path.name not in {"index.html", "play.html"}
         }
 
-        for game, egg_class in hidden_games.items():
-            with self.subTest(game=game):
-                self.assertIn(f'class="{egg_class}" href="./{game}"', contents)
-                self.assertEqual(
-                    sum(reference == f"./{game}" for reference in parser.links),
-                    1,
-                )
-                self.assertRegex(
-                    contents,
-                    rf"\.{egg_class}\s*\{{[^}}]*opacity:\s*0;",
-                )
-                self.assertIn(f".{egg_class}:focus-visible", contents)
-                self.assertRegex(
-                    contents,
-                    rf"\.{egg_class}:focus-visible[\s\S]*?opacity:\s*1;",
-                )
-
-    def test_arcade_cabinet_one_describes_the_current_hub(self):
-        contents = (ROOT / "index.htm").read_text(encoding="utf-8")
-        cabinet = contents.split('id="arcade"', maxsplit=1)[1].split(
-            "</article>", maxsplit=1
-        )[0]
-
-        self.assertIn("10 arcade games", cabinet)
-        self.assertIn("Golden chestnuts", cabinet)
-        self.assertIn("./chestnut_arcade_game_hub.html", cabinet)
+        self.assertEqual(catalog_games, expected_games)
 
 
 if __name__ == "__main__":
